@@ -56,13 +56,7 @@ public class EntityTenseiBakuSilver extends ElementsNarutomodMod.ModElement {
 		 .id(new ResourceLocation("narutomod", "tensei_baku_silver"), ENTITYID).name("tensei_baku_silver").tracker(64, 3, true).build());
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
-	}
-
-	public static class EC extends Entity {
+	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private static final DataParameter<Integer> USERID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private final AirPunch airPunch = new AirPunch();
 		private float power;
@@ -81,6 +75,11 @@ public class EntityTenseiBakuSilver extends ElementsNarutomodMod.ModElement {
 			this.power = powerIn;
 			this.duration = (int)powerIn * 4 + this.growTime;
 			this.setIdlePosition();
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.TENSEIGAN;
 		}
 
 		@Override
@@ -156,33 +155,33 @@ public class EntityTenseiBakuSilver extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
-			public void execute(EntityLivingBase player, double range, double radius) {
+			public void execute(Entity player, double range, double radius) {
 				this.griefing = world.getGameRules().getBoolean("mobGriefing");
 				super.execute(player, range, radius);
 			}
 
 			@Override
-			protected void preExecuteParticles(EntityLivingBase player) {
+			protected void preExecuteParticles(Entity player) {
 				Vec3d vec0 = player.getLookVec();
 				Vec3d vec = vec0.scale(2d).addVector(player.posX, player.posY + 1.5d, player.posZ);
 				for (int i = 1; i <= 50; i++) {
-					Vec3d vec1 = vec0.scale((player.getRNG().nextDouble()*0.8d+0.2d) * this.getRange(0) * 0.125d);
+					Vec3d vec1 = vec0.scale((EC.this.rand.nextDouble()*0.8d+0.2d) * this.getRange(0) * 0.125d);
 					Particles.spawnParticle(player.world, Particles.Types.SMOKE, vec.x, vec.y, vec.z, 1, 0d, 0d, 0d, 
-					 vec1.x + (player.getRNG().nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
-					 vec1.y + (player.getRNG().nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
-					 vec1.z + (player.getRNG().nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
-					 0x80C0C0C0, 80 + player.getRNG().nextInt(20), (int)(16.0D / (player.getRNG().nextDouble()*0.8D+0.2D)));
+					 vec1.x + (EC.this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
+					 vec1.y + (EC.this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
+					 vec1.z + (EC.this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
+					 0x80C0C0C0, 80 + EC.this.rand.nextInt(20), (int)(16.0D / (EC.this.rand.nextDouble()*0.8D+0.2D)));
 				}
 			}
 
 			@Override
-			protected void attackEntityFrom(EntityLivingBase player, Entity target) {
+			protected void attackEntityFrom(Entity player, Entity target) {
 				ProcedureUtils.pushEntity(player, target, this.getRange(0), target instanceof EntityFallingBlock ? 1.0f : 2.0f);
 			}
 
 			@Override
-			protected EntityItem processAffectedBlock(EntityLivingBase player, BlockPos pos, EnumFacing facing) {
-				if (this.griefing && player.getRNG().nextInt(10) == 0) {
+			protected EntityItem processAffectedBlock(Entity player, BlockPos pos, EnumFacing facing) {
+				if (this.griefing && EC.this.rand.nextInt(10) == 0) {
 					Entity falling = new EntityFallingBlock(player.world, 0.5d+pos.getX(), pos.getY(), 0.5d+pos.getZ(), player.world.getBlockState(pos)) {
 						{
 							this.shouldDropItem = false;
@@ -206,7 +205,7 @@ public class EntityTenseiBakuSilver extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
-			protected float getBreakChance(BlockPos pos, EntityLivingBase player, double range) {
+			protected float getBreakChance(BlockPos pos, Entity player, double range) {
 				return 0.0f;
 			}
 		}
@@ -217,74 +216,102 @@ public class EntityTenseiBakuSilver extends ElementsNarutomodMod.ModElement {
 				entity.world.spawnEntity(new EC(entity, power));
 				return true;
 			}
+
+			@Override
+			public float getBasePower() {
+				return 10.0f;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 20.0f;
+			}
+	
+			@Override
+			public float getMaxPower() {
+				return 60.0f;
+			}
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class RenderCustom extends Render<EC> {
-		private final ResourceLocation TEXTURE = new ResourceLocation("narutomod:textures/ring_green.png");
-		private final ResourceLocation TEXTURE2 = new ResourceLocation("narutomod:textures/white_orb.png");
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
 
-		public RenderCustom(RenderManager renderManager) {
-			super(renderManager);
-			shadowSize = 0.1f;
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
+		@Override
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
 		}
 
-		@Override
-		public void doRender(EC entity, double x, double y, double z, float entityYaw, float partialTicks) {
-			this.bindEntityTexture(entity);
-			float ageInTicks = (float)entity.ticksExisted + partialTicks;
-			GlStateManager.pushMatrix();
-			GlStateManager.translate(x, y + 0.5d, z);
-			GlStateManager.enableRescaleNormal();
-			float alpha = ageInTicks / (float)entity.growTime;
-			if (alpha > 1.0F) {
-				alpha = Math.max(1.0F - (alpha - 1.0F) * 0.5F, 0.0F);
+		@SideOnly(Side.CLIENT)
+		public class RenderCustom extends Render<EC> {
+			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/ring_green.png");
+			private final ResourceLocation texture2 = new ResourceLocation("narutomod:textures/white_orb.png");
+	
+			public RenderCustom(RenderManager renderManager) {
+				super(renderManager);
+				shadowSize = 0.1f;
 			}
-			GlStateManager.disableCull();
-			GlStateManager.enableAlpha();
-			GlStateManager.enableBlend();
-			GlStateManager.disableLighting();
-			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-			Tessellator tessellator = Tessellator.getInstance();
-			BufferBuilder bufferbuilder = tessellator.getBuffer();
-			
-			GlStateManager.pushMatrix();
-			GlStateManager.scale(3.0F, 3.0F, 3.0F);
-			GlStateManager.rotate(-entity.rotationYaw, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate(9f * ageInTicks, 0.0F, 0.0F, 1.0F);
-			bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
-			bufferbuilder.pos(-0.5D, -0.5D, 0.0D).tex(0.0D, 1.0D).color(1.0F, 1.0F, 1.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
-			bufferbuilder.pos(0.5D, -0.5D, 0.0D).tex(1.0D, 1.0D).color(1.0F, 1.0F, 1.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
-			bufferbuilder.pos(0.5D, 0.5D, 0.0D).tex(1.0D, 0.0D).color(1.0F, 1.0F, 1.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
-			bufferbuilder.pos(-0.5D, 0.5D, 0.0D).tex(0.0D, 0.0D).color(1.0F, 1.0F, 1.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
-			tessellator.draw();
-			GlStateManager.popMatrix();
-			
-			this.bindTexture(TEXTURE2);
-			alpha = MathHelper.sqrt(1.0F - Math.min(ageInTicks / (float)entity.growTime, 1.0F));
-			GlStateManager.scale(0.5F, 0.5F, 0.5F);
-			GlStateManager.rotate(180F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate((float)(this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-			GlStateManager.rotate(9f * ageInTicks, 0.0F, 0.0F, 1.0F);
-			bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
-			bufferbuilder.pos(-0.5D, -0.5D, 0.0D).tex(0.0D, 1.0D).color(0.0F, 0.0F, 0.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
-			bufferbuilder.pos(0.5D, -0.5D, 0.0D).tex(1.0D, 1.0D).color(0.0F, 0.0F, 0.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
-			bufferbuilder.pos(0.5D, 0.5D, 0.0D).tex(1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
-			bufferbuilder.pos(-0.5D, 0.5D, 0.0D).tex(0.0D, 0.0D).color(0.0F, 0.0F, 0.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
-			tessellator.draw();
-			
-			GlStateManager.enableLighting();
-			GlStateManager.disableBlend();
-			GlStateManager.disableAlpha();
-			GlStateManager.enableCull();
-			GlStateManager.disableRescaleNormal();
-			GlStateManager.popMatrix();
-		}
-
-		@Override
-		protected ResourceLocation getEntityTexture(EC entity) {
-			return TEXTURE;
+	
+			@Override
+			public void doRender(EC entity, double x, double y, double z, float entityYaw, float partialTicks) {
+				this.bindEntityTexture(entity);
+				float ageInTicks = (float)entity.ticksExisted + partialTicks;
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(x, y + 0.5d, z);
+				GlStateManager.enableRescaleNormal();
+				float alpha = ageInTicks / (float)entity.growTime;
+				if (alpha > 1.0F) {
+					alpha = Math.max(1.0F - (alpha - 1.0F) * 0.5F, 0.0F);
+				}
+				GlStateManager.disableCull();
+				GlStateManager.enableAlpha();
+				GlStateManager.enableBlend();
+				GlStateManager.disableLighting();
+				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
+				Tessellator tessellator = Tessellator.getInstance();
+				BufferBuilder bufferbuilder = tessellator.getBuffer();
+				
+				GlStateManager.pushMatrix();
+				GlStateManager.scale(3.0F, 3.0F, 3.0F);
+				GlStateManager.rotate(-entity.rotationYaw, 0.0F, 1.0F, 0.0F);
+				GlStateManager.rotate(9f * ageInTicks, 0.0F, 0.0F, 1.0F);
+				bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
+				bufferbuilder.pos(-0.5D, -0.5D, 0.0D).tex(0.0D, 1.0D).color(1.0F, 1.0F, 1.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
+				bufferbuilder.pos(0.5D, -0.5D, 0.0D).tex(1.0D, 1.0D).color(1.0F, 1.0F, 1.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
+				bufferbuilder.pos(0.5D, 0.5D, 0.0D).tex(1.0D, 0.0D).color(1.0F, 1.0F, 1.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
+				bufferbuilder.pos(-0.5D, 0.5D, 0.0D).tex(0.0D, 0.0D).color(1.0F, 1.0F, 1.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
+				tessellator.draw();
+				GlStateManager.popMatrix();
+				
+				this.bindTexture(this.texture2);
+				alpha = MathHelper.sqrt(1.0F - Math.min(ageInTicks / (float)entity.growTime, 1.0F));
+				GlStateManager.scale(0.5F, 0.5F, 0.5F);
+				GlStateManager.rotate(180F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+				GlStateManager.rotate((float)(this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+				GlStateManager.rotate(9f * ageInTicks, 0.0F, 0.0F, 1.0F);
+				bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
+				bufferbuilder.pos(-0.5D, -0.5D, 0.0D).tex(0.0D, 1.0D).color(0.0F, 0.0F, 0.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
+				bufferbuilder.pos(0.5D, -0.5D, 0.0D).tex(1.0D, 1.0D).color(0.0F, 0.0F, 0.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
+				bufferbuilder.pos(0.5D, 0.5D, 0.0D).tex(1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
+				bufferbuilder.pos(-0.5D, 0.5D, 0.0D).tex(0.0D, 0.0D).color(0.0F, 0.0F, 0.0F, alpha).normal(0.0F, 1.0F, 0.0F).endVertex();
+				tessellator.draw();
+				
+				GlStateManager.enableLighting();
+				GlStateManager.disableBlend();
+				//GlStateManager.disableAlpha();
+				GlStateManager.enableCull();
+				GlStateManager.disableRescaleNormal();
+				GlStateManager.popMatrix();
+			}
+	
+			@Override
+			protected ResourceLocation getEntityTexture(EC entity) {
+				return this.texture;
+			}
 		}
 	}
 }

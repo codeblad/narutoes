@@ -39,7 +39,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		 .id(new ResourceLocation("narutomod", "false_darkness"), ENTITYID).name("false_darkness").tracker(64, 3, true).build());
 	}
 
-	public static class EC extends Entity {
+	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private EntityLivingBase user;
 		private EntityLivingBase target;
 		private float power;
@@ -56,6 +56,11 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 			this.target = targetIn;
 			this.power = powerIn;
 			this.setPosition(userIn.posX, userIn.posY + userIn.getEyeHeight() - 0.2d, userIn.posZ);
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.RAITON;
 		}
 
 		@Override
@@ -112,12 +117,17 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 20d);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 20d, 3d);
 				if (res != null && res.entityHit instanceof EntityLivingBase) {
 					entity.world.spawnEntity(new EC(entity, (EntityLivingBase)res.entityHit, power));
 					return true;
 				}
 				return false;
+			}
+
+			@Override
+			public float getPowerupDelay() {
+				return 150.0f;
 			}
 		}
 	}

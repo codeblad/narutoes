@@ -10,47 +10,49 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Item;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.EntityAITarget;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityCreature;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Item;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateFlying;
 import net.minecraft.block.Block;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
 import net.minecraft.nbt.NBTTagCompound;
 
 import net.narutomod.entity.EntityC1;
 import net.narutomod.entity.EntityC2;
 import net.narutomod.entity.EntityC3;
+import net.narutomod.entity.EntityC4;
 import net.narutomod.entity.EntityClone;
 import net.narutomod.entity.EntityExplosiveClone;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureOnLeftClickEmpty;
 import net.narutomod.potion.PotionChakraEnhancedStrength;
 import net.narutomod.creativetab.TabModTab;
+import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.List;
@@ -102,28 +104,10 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			if (this.getCurrentJutsu(stack) == JIRAIKEN) {
-				return this.getPower(stack, entity, timeLeft, 0.2f, 150f);
-			} else if (this.getCurrentJutsu(stack) == CLAY) {
-				return (float)Math.floor(this.getPower(stack, entity, timeLeft, 1f, 150f));
-			}
-			return 1f;
-		}
-
-		@Override
-		protected float getMaxPower(ItemStack stack, EntityLivingBase entity) {
-			if (this.getCurrentJutsu(stack) == CLAY) {
-				return Math.min(3.1f, super.getMaxPower(stack, entity));
-			}
-			return super.getMaxPower(stack, entity);
-		}
-
-		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
 			if (player instanceof EntityPlayer && !player.world.isRemote && this.getCurrentJutsu(stack) == CLAY) {
 				((EntityPlayer)player).sendStatusMessage(
-				 new TextComponentString("C-" + (int)this.getPower(stack, player, count)), true);
+				 new TextComponentString("C-" + Math.max(1, (int)this.getPower(stack, player, count))), true);
 			} else {
 				super.onUsingTick(stack, player, count);
 			}
@@ -141,16 +125,16 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
-			if (entity instanceof EntityLivingBase && JIRAIKEN.jutsu.isActivated(itemstack)) {
+			if (entity.ticksExisted % 10 == 2 && entity instanceof EntityLivingBase && JIRAIKEN.jutsu.isActivated(itemstack)) {
 				((EntityLivingBase)entity).addPotionEffect(new PotionEffect(
-				 PotionChakraEnhancedStrength.potion, 2, (int)(((Jiraiken)JIRAIKEN.jutsu).getPower(itemstack) * 19), false, false));
+				 PotionChakraEnhancedStrength.potion, 12, (int)(((Jiraiken)JIRAIKEN.jutsu).getPower(itemstack) * 19), false, false));
 			}
 		}
 
 		@Override
 		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
 			if (attacker.equals(target)) {
-				target = ProcedureUtils.objectEntityLookingAt(attacker, 50d).entityHit;
+				target = ProcedureUtils.objectEntityLookingAt(attacker, 50d, 3d, ExplosiveClay.class).entityHit;
 			}
 			if (target instanceof EntityLivingBase) {
 				attacker.setRevengeTarget((EntityLivingBase)target);
@@ -191,22 +175,47 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 		public float getPower(ItemStack stack) {
 			return stack.hasTagCompound() ? stack.getTagCompound().getFloat("JiraikenPower") : 0f;
 		}
+
+		@Override
+		public float getBasePower() {
+			return 0.2f;
+		}
+
+		@Override
+		public float getPowerupDelay() {
+			return 200.0f;
+		}
+
+		@Override
+		public float getMaxPower() {
+			return 10.0f;
+		}
 	}
 
-	public abstract static class ExplosiveClay extends EntityCreature {
+	public abstract static class ExplosiveClay extends EntityCreature implements ItemJutsu.IJutsu {
 		private EntityLivingBase owner;
 		private int lifeSpan = 600;
+		private float explosionSize = 3.0f;
+		private final EntityAITarget aiCopyOwnerTarget = new AICopyOwnerTarget(this);
+		private final EntityAITarget aiHurtByTarget = new EntityAIHurtByTarget(this, false, new Class[0]);
+		private boolean targetTasksEnabled;
 
 		public ExplosiveClay(World world) {
 			super(world);
 			//this.setSize(0.4F, 0.8F);
 			this.isImmuneToFire = true;
 			this.moveHelper = new EntityClone.AIFlyControl(this);
+			this.setTargetTasks();
 		}
 
 		public ExplosiveClay(EntityLivingBase ownerIn) {
 			this(ownerIn.world);
 			this.owner = ownerIn;
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.BAKUTON;
 		}
 
 		@Override
@@ -224,8 +233,23 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 			this.tasks.addTask(0, new EntityAISwimming(this));
 			this.tasks.addTask(1, new AIChargeAttack());
 			this.tasks.addTask(2, new EntityAIWatchClosest(this, EntityPlayer.class, 3.0F, 1.0F));
-			this.targetTasks.addTask(1, new AICopyOwnerTarget(this));
-			this.targetTasks.addTask(2, new EntityAIHurtByTarget(this, false, new Class[0]));
+		}
+
+		protected void setTargetTasks() {
+			if (!this.targetTasksEnabled) {
+				this.targetTasks.addTask(1, this.aiCopyOwnerTarget);
+				this.targetTasks.addTask(2, this.aiHurtByTarget);
+				this.targetTasksEnabled = true;
+			}
+		}
+
+		protected void clearTargetTasks() {
+			if (this.targetTasksEnabled) {
+				this.targetTasks.removeTask(this.aiCopyOwnerTarget);
+				this.targetTasks.removeTask(this.aiHurtByTarget);
+				this.setAttackTarget(null);
+				this.targetTasksEnabled = false;
+			}
 		}
 
 		@Override
@@ -250,6 +274,10 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 			this.lifeSpan = this.ticksExisted + ticks;
 		}
 
+		protected void setExplosionSize(float size) {
+			this.explosionSize = size;
+		}
+
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
@@ -271,6 +299,23 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 	    protected void playStepSound(BlockPos pos, Block blockIn) {
 	    }
 
+	    @Override
+	    public boolean isOnSameTeam(Entity entityIn) {
+	    	return super.isOnSameTeam(entityIn) || entityIn.equals(this.owner);
+	    }
+
+	    @Override
+	    public boolean attackEntityAsMob(Entity entityIn) {
+	    	EntityLivingBase owner = this.getOwner();
+	    	if (!this.world.isRemote) {
+		    	this.world.createExplosion(owner, this.posX, this.posY, this.posZ,
+			     this.explosionSize, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
+	    		this.setDead();
+	    		return true;
+	    	}
+	    	return false;
+	    }
+
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
 			if (source.isExplosion() || source == DamageSource.FALL) {
@@ -279,12 +324,35 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 			return super.attackEntityFrom(source, amount);
 		}
 
+		@Override
+		protected void onDeathUpdate() {
+			if (!this.world.isRemote) {
+		    	this.world.createExplosion(owner, this.posX, this.posY, this.posZ,
+			     this.explosionSize, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner));
+			}
+    		this.setDead();
+		}
+
+		private void poof() {
+			this.playSound(net.minecraft.init.SoundEvents.ENTITY_SLIME_SQUISH, 0.6F, 0.7F);
+			Particles.Renderer particles = new Particles.Renderer(this.world);
+			for (int i = 0; i < 200; i++) {
+				float scale = (1.667f + this.rand.nextFloat() * 1.667f) * this.height;
+				particles.spawnParticles(Particles.Types.SMOKE, this.posX + (this.rand.nextFloat()-0.5f) * this.width,
+				 this.posY + this.rand.nextFloat() * this.height, this.posZ + (this.rand.nextFloat()-0.5f) * this.width,
+				 1, 0d, 0d, 0d, 0d, 0d, 0d, -1, (int)(scale * 10f), 0, 0, -1, -6 - this.rand.nextInt(8));
+			}
+			particles.send();
+		}
+
 	    @Override
 	    public void onUpdate() {
 	    	this.fallDistance = 0f;
+	    	this.clearActivePotions();
 	    	super.onUpdate();
 	    	this.setNoGravity(true);
 	    	if (this.ticksExisted > this.lifeSpan && !this.world.isRemote) {
+	    		this.poof();
 	    		this.setDead();
 	    	}
 	    }
@@ -295,12 +363,19 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 				Entity ec;
 				Vec3d vec = entity.getLookVec();
 				vec = entity.getPositionVector().addVector(vec.x, 1d, vec.z);
-				if (powerIn < 2f) {
+				if (powerIn < 1f) {
+					return false;
+				} else if (powerIn < 2f) {
 					ec = new EntityC1.EC(entity);
 				} else if (powerIn < 3f) {
 					ec = new EntityC2.EC(entity);
+					ProcedureUtils.poofWithSmoke(entity.world, vec.x, vec.y, vec.z, ec.width, ec.height);
 				} else if (powerIn < 4f) {
 					ec = new EntityC3.EC(entity);
+				} else if (powerIn <= this.getMaxPower()) {
+					ec = new EntityC4.EC(entity);
+					float f = ((RangedItem)stack.getItem()).getXpRatio(stack, CLAY);
+					((EntityC4.EC)ec).setExplosionDamage(100, (int)(2.0f * f));
 				} else {
 					return false;
 				}
@@ -308,6 +383,21 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 				ec.setRotationYawHead(entity.rotationYaw);
 				entity.world.spawnEntity(ec);
 				return true;
+			}
+
+			@Override
+			public float getBasePower() {
+				return 0.9f;
+			}
+
+			@Override
+			public float getPowerupDelay() {
+				return 150.0f;
+			}
+
+			@Override
+			public float getMaxPower() {
+				return 4.1f;
 			}
 	    }
 	
@@ -341,11 +431,11 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 	
 	        @Override
 	        public void updateTask() {
-	            EntityLivingBase entitylivingbase = ExplosiveClay.this.getAttackTarget();
-	            if (ExplosiveClay.this.getEntityBoundingBox().intersects(entitylivingbase.getEntityBoundingBox())) {
-	                ExplosiveClay.this.attackEntityAsMob(entitylivingbase);
+	            EntityLivingBase target = ExplosiveClay.this.getAttackTarget();
+	            if (ExplosiveClay.this.getEntityBoundingBox().intersects(target.getEntityBoundingBox().grow(target.width * 0.5f))) {
+	                ExplosiveClay.this.attackEntityAsMob(target);
 	            } else { //if (ExplosiveClay.this.getDistanceSq(entitylivingbase) < 9.0D) {
-	                Vec3d vec3d = entitylivingbase.getPositionEyes(1.0F);
+	                Vec3d vec3d = target.getPositionEyes(1.0F);
 	                ExplosiveClay.this.moveHelper.setMoveTo(vec3d.x, vec3d.y, vec3d.z, 2.0D);
 	            }
 	        }
@@ -356,14 +446,31 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 	            super(creature, false);
 	        }
 	
+	        @Override
 	        public boolean shouldExecute() {
-	        	this.target = ExplosiveClay.this.owner instanceof EntityLiving 
-	        	 ? ((EntityLiving)ExplosiveClay.this.owner).getAttackTarget() 
-	        	 : ExplosiveClay.this.owner != null ? ExplosiveClay.this.owner.getRevengeTarget() != null
-	        	 ? ExplosiveClay.this.owner.getRevengeTarget() : ExplosiveClay.this.owner.getLastAttackedEntity() : null;
+	            if (ExplosiveClay.this.owner != null && ExplosiveClay.this.owner.isEntityAlive()) {
+		            if (ExplosiveClay.this.owner instanceof EntityLiving) {
+            			this.target = ((EntityLiving)ExplosiveClay.this.owner).getAttackTarget();
+		            } else if (ExplosiveClay.this.owner.getRevengeTarget() != null) {
+		            	this.target = ExplosiveClay.this.owner.getRevengeTarget();
+		            } else {
+		            	this.target = ExplosiveClay.this.owner.getLastAttackedEntity();
+		            }
+	            }
 	            return this.target != null && this.isSuitableTarget(this.target, false);
 	        }
+
+	        @Override
+	        public boolean shouldContinueExecuting() {
+	        	if (!ExplosiveClay.this.owner.isEntityAlive()) {
+	        		return false;
+	        	} else if (ExplosiveClay.this.owner instanceof EntityLiving && ((EntityLiving)ExplosiveClay.this.owner).isAIDisabled()) {
+	        		return false;
+	        	}
+	        	return super.shouldContinueExecuting();
+	        }
 	
+	        @Override
 	        public void startExecuting() {
 	            ExplosiveClay.this.setAttackTarget(this.target);
 	            super.startExecuting();

@@ -16,6 +16,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.particle.ParticleBlockDust;
+import net.minecraft.client.particle.ParticleRain;
 import net.minecraft.client.particle.ParticleSimpleAnimated;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.IParticleFactory;
@@ -26,12 +28,15 @@ import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.Block;
 
 import net.narutomod.potion.PotionCorrosion;
 import net.narutomod.procedure.ProcedureUtils;
@@ -42,12 +47,14 @@ import java.util.List;
 import io.netty.buffer.ByteBuf;
 import com.google.common.collect.Maps;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import org.lwjgl.util.glu.Sphere;
 import org.lwjgl.util.glu.GLU;
+import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class Particles extends ElementsNarutomodMod.ModElement {
-	private static final Random rand = new Random();
+	private static final Random RAND = new Random();
 	
 	public Particles(ElementsNarutomodMod instance) {
 		super(instance, 294);
@@ -55,13 +62,13 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
-		this.elements.addNetworkMessage(Message.Handler.class, Message.class, Side.CLIENT);
+		this.elements.addNetworkMessage(ParticleRenderer.Message.Handler.class, ParticleRenderer.Message.class, Side.CLIENT);
 		this.elements.addNetworkMessage(BurningAsh.Message.Handler.class, BurningAsh.Message.class, Side.SERVER);
 		this.elements.addNetworkMessage(AcidSpit.Message.Handler.class, AcidSpit.Message.class, Side.SERVER);
 	}
 
-	@Override
 	@SideOnly(Side.CLIENT)
+	@Override
 	public void init(FMLInitializationEvent event) {
 		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.SMOKE.getID(), new Smoke.Factory());
 		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.SUSPENDED.getID(), new Suspend.Factory());
@@ -72,9 +79,16 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.HOMING_ORB.getID(), new HomingOrb.Factory());
 		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.PORTAL_SPIRAL.getID(), new SpiralPortal.Factory());
 		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.EXPANDING_SPHERE.getID(), new ExpandingSphere.Factory());
+		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.CONCENTRIC_SPHERES.getID(), new ExpandingConcentricSpheres.Factory());
 		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.SEAL_FORMULA.getID(), new SealFormula.Factory());
+		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.SPIT.getID(), new Spit.Factory());
+		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.CLAY_SPIT.getID(), new ClaySpit.Factory());
 		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.ACID_SPIT.getID(), new AcidSpit.Factory());
 		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.WHIRLPOOL.getID(), new Whirlpool.Factory());
+		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.SONIC_BOOM.getID(), new SonicBoom.Factory());
+		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.BLOCK_DUST.getID(), new BlockDust.Factory());
+		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.SAND.getID(), new Sand.Factory());
+		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.WATER_SPLASH.getID(), new WaterSplash.Factory());
 	}
 
 	public static void spawnParticle(World world, Types type, double x, double y, double z, int count, 
@@ -85,129 +99,228 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 	public static void spawnParticle(World world, Types type, double x, double y, double z, int count, 
 	 double xOff, double yOff, double zOff, double xSpeed, double ySpeed, double zSpeed, double renderDistance, int... args) {
 		if (world.isRemote) {
-			new ParticleRenderer().spawnParticles(world, type, x, y, z, count, xOff, yOff, zOff, xSpeed, ySpeed, zSpeed, args);
+			new Renderer().spawnParticles(type, x, y, z, count, xOff, yOff, zOff, xSpeed, ySpeed, zSpeed, args);
 		} else {
-			NarutomodMod.PACKET_HANDLER.sendToAllAround(new Message(type, x, y, z, count, xOff, yOff, zOff, xSpeed, ySpeed, zSpeed, args),
-			  new NetworkRegistry.TargetPoint(world.provider.getDimension(), x, y, z, renderDistance));
+			NarutomodMod.PACKET_HANDLER.sendToAllAround(new ParticleRenderer.Message(
+			 new ParticleRenderer.MessageContents(type, x, y, z, count, xOff, yOff, zOff, xSpeed, ySpeed, zSpeed, args)),
+			 new NetworkRegistry.TargetPoint(world.provider.getDimension(), x, y, z, renderDistance));
 		}
+		//Renderer pr = new Renderer(world, renderDistance);
+		//pr.spawnParticles(type, x, y, z, count, xOff, yOff, zOff, xSpeed, ySpeed, zSpeed, args);
+		//pr.send();
 	}
 
-	static class Renderer {
-		protected void spawnParticles(World world, Particles.Types type, double x, double y, double z, int count, 
+	public static abstract class ParticleRenderer {
+		private final List<MessageContents> msgQueue = Lists.newArrayList();
+		protected final World world;
+		protected final double renderDistance;
+
+		public ParticleRenderer() {
+			this(null, 64d);
+		}
+
+		public ParticleRenderer(World worldIn, double renderDistanceIn) {
+			this.world = worldIn;
+			this.renderDistance = renderDistanceIn;
+		}
+
+		public void spawnParticles(Particles.Types type, double x, double y, double z, int count, 
 		 double xOff, double yOff, double zOff, double xSpeed, double ySpeed, double zSpeed, int... args) {
+			this.msgQueue.add(new MessageContents(type, x, y, z, count, xOff, yOff, zOff, xSpeed, ySpeed, zSpeed, args));
+		}
+
+		public void send() {
+			if (this.world instanceof WorldServer && !this.msgQueue.isEmpty()) {
+				double x = 0d;
+				double y = 0d;
+				double z = 0d;
+				for (MessageContents msgc : this.msgQueue) {
+					x += msgc.x;
+					y += msgc.y;
+					z += msgc.z;
+				}
+				x /= this.msgQueue.size();
+				y /= this.msgQueue.size();
+				z /= this.msgQueue.size();
+				NarutomodMod.PACKET_HANDLER.sendToAllAround(new Message(this.msgQueue),
+				  new NetworkRegistry.TargetPoint(this.world.provider.getDimension(), x, y, z, this.renderDistance));
+			}
+		}
+
+		public static class MessageContents {
+			Types type;
+			int count;
+			double x, y, z;
+			double ox, oy, oz;
+			double speedx, speedy, speedz;
+			int args;
+			int[] parms;
+
+			public MessageContents(Types typeIn, double xIn, double yIn, double zIn, int countIn,
+			 double xOff, double yOff, double zOff, double xSpeed, double ySpeed, double zSpeed, int... argsIn) {
+				this.type = typeIn;
+				this.count = countIn;
+				this.x = xIn;
+				this.y = yIn;
+				this.z = zIn;
+				this.ox = xOff;
+				this.oy = yOff;
+				this.oz = zOff;
+				this.speedx = xSpeed;
+				this.speedy = ySpeed;
+				this.speedz = zSpeed;
+				this.args = argsIn.length;
+				this.parms = argsIn;
+			}
+
+			public MessageContents(ByteBuf buf) {
+				this.fromBytes(buf);
+			}
+
+			public void toBytes(ByteBuf buf) {
+				buf.writeInt(this.type.getID());
+				buf.writeInt(this.count);
+				buf.writeDouble(this.x);
+				buf.writeDouble(this.y);
+				buf.writeDouble(this.z);
+				buf.writeDouble(this.ox);
+				buf.writeDouble(this.oy);
+				buf.writeDouble(this.oz);
+				buf.writeDouble(this.speedx);
+				buf.writeDouble(this.speedy);
+				buf.writeDouble(this.speedz);
+				buf.writeInt(this.args);
+				for (int j = 0; j < this.type.getArgsCount() && j < this.args; j++)
+					buf.writeInt(this.parms[j]);
+			}
+	
+			public void fromBytes(ByteBuf buf) {
+				this.type = Types.getTypeFromId(buf.readInt());
+				this.count = buf.readInt();
+				this.x = buf.readDouble();
+				this.y = buf.readDouble();
+				this.z = buf.readDouble();
+				this.ox = buf.readDouble();
+				this.oy = buf.readDouble();
+				this.oz = buf.readDouble();
+				this.speedx = buf.readDouble();
+				this.speedy = buf.readDouble();
+				this.speedz = buf.readDouble();
+				this.args = buf.readInt();
+				int i = Math.min(this.type.getArgsCount(), this.args);
+				this.parms = new int[i];
+				for (int j = 0; j < i; j++)
+					this.parms[j] = buf.readInt();
+			}
+
+			@Override
+			public String toString() {
+				String s = "";
+				for (int i = 0; i < parms.length; i++) {
+					s += parms[i] + ", ";
+				}
+				return ""+this.type+", "+count+", ("+x+", "+y+", "+z+"), ("+ox+", "+oy+", "+oz+"), ("+speedx+", "+speedy+", "+speedz+"), "+s;
+			}
+		}
+		
+		public static class Message implements IMessage {
+			List<MessageContents> list;
+
+			public Message() {}
+
+			public Message(MessageContents msgcontents) {
+				this.list = Lists.newArrayList(msgcontents);
+			}
+
+			public Message(List<MessageContents> listIn) {
+				this.list = listIn;
+			}
+
+			@Override
+			public void toBytes(ByteBuf buf) {
+				buf.writeInt(this.list.size());
+				for (MessageContents msg : this.list) {
+					msg.toBytes(buf);
+				}
+			}
+
+			@Override
+			public void fromBytes(ByteBuf buf) {
+				int j = buf.readInt();
+				this.list = Lists.newArrayList();
+				for (int i = 0; i < j; i++) {
+					this.list.add(new MessageContents(buf));
+				}
+			}
+
+			public static class Handler implements IMessageHandler<Message, IMessage> {
+				@SideOnly(Side.CLIENT)
+				@Override
+				public IMessage onMessage(Message message, MessageContext context) {
+					Minecraft.getMinecraft().addScheduledTask(() -> {
+						Renderer render = new Renderer();
+						for (MessageContents msgc : message.list) {
+							render.spawnParticles(msgc.type, msgc.x, msgc.y, msgc.z,
+							 msgc.count, msgc.ox, msgc.oy, msgc.oz, msgc.speedx, msgc.speedy, msgc.speedz, msgc.parms);
+						}
+					});
+					return null;
+				}
+			}
 		}
 	}
 	
-	private static class ParticleRenderer extends Renderer {
+	public static class Renderer extends ParticleRenderer {
+		public Renderer() {
+			super();
+		}
+
+		public Renderer(World worldIn) {
+			this(worldIn, 64d);
+		}
+
+		public Renderer(World worldIn, double renderDistanceIn) {
+			super(worldIn, renderDistanceIn);
+		}
+
 		@SideOnly(Side.CLIENT)
 		@Override
-		protected void spawnParticles(World world, Particles.Types type, double x, double y, double z, int count, 
+		public void spawnParticles(Particles.Types type, double x, double y, double z, int count, 
 		 double xOff, double yOff, double zOff, double xSpeed, double ySpeed, double zSpeed, int... args) {
-			for (int i = 0; i < count; i++) {
-				double d1 = rand.nextGaussian() * xOff;
-				double d2 = rand.nextGaussian() * yOff;
-				double d3 = rand.nextGaussian() * zOff;
-				if (count > 5) {
-					xSpeed *= rand.nextDouble() * 0.3d + 0.85d;
-					ySpeed *= rand.nextDouble() * 0.3d + 0.85d;
-					zSpeed *= rand.nextDouble() * 0.3d + 0.85d;
+			if (this.world instanceof WorldServer) {
+				super.spawnParticles(type, x, y, z, count, xOff, yOff, zOff, xSpeed, ySpeed, zSpeed, args);
+			} else {
+				Minecraft mc = Minecraft.getMinecraft();
+				if (mc.getRenderViewEntity() != null && mc.effectRenderer != null) {
+					for (int i = 0; i < count; i++) {
+						double d1 = RAND.nextGaussian() * xOff;
+						double d2 = RAND.nextGaussian() * yOff;
+						double d3 = RAND.nextGaussian() * zOff;
+						if (count > 1) {
+							xSpeed *= RAND.nextDouble() * 0.3d + 0.85d;
+							ySpeed *= RAND.nextDouble() * 0.3d + 0.85d;
+							zSpeed *= RAND.nextDouble() * 0.3d + 0.85d;
+						}
+						mc.effectRenderer.spawnEffectParticle(type.getID(), x + d1, y + d2, z + d3, xSpeed, ySpeed, zSpeed, args);
+					}
 				}
-				Minecraft.getMinecraft().renderGlobal.spawnParticle(type.getID(), true, x + d1, y + d2, z + d3, xSpeed, ySpeed, zSpeed, args);
-				//world.spawnAlwaysVisibleParticle(type.getID(), x + d1, y + d2, z + d3, xSpeed, ySpeed, zSpeed, args);
 			}
-		}
-	}
-	
-	public static class Message implements IMessage {
-		Types type;
-		int count;
-		double x, y, z;
-		double ox, oy, oz;
-		double speedx, speedy, speedz;
-		int args;
-		int[] parms;
-		
-		public Message() {
-		}
-
-		public Message(Types t, double cx, double cy, double cz, int num, double offx, double offy, double offz, 
-		 double sx, double sy, double sz, int... p) {
-			this.type = t;
-			this.count = num;
-			this.x = cx;
-			this.y = cy;
-			this.z = cz;
-			this.ox = offx;
-			this.oy = offy;
-			this.oz = offz;
-			this.speedx = sx;
-			this.speedy = sy;
-			this.speedz = sz;
-			this.args = p.length;
-			this.parms = p;
-		}
-
-		public static class Handler implements IMessageHandler<Message, IMessage> {
-			@SideOnly(Side.CLIENT)
-			@Override
-			public IMessage onMessage(Message message, MessageContext context) {
-				Minecraft.getMinecraft().addScheduledTask(() -> {
-					new ParticleRenderer().spawnParticles(Minecraft.getMinecraft().world, message.type, message.x, message.y, message.z,
-					 message.count, message.ox, message.oy, message.oz, message.speedx, message.speedy, message.speedz, message.parms);
-				});
-				return null;
-			}
-		}
-
-		public void toBytes(ByteBuf buf) {
-			buf.writeInt(this.type.getID());
-			buf.writeInt(this.count);
-			buf.writeDouble(this.x);
-			buf.writeDouble(this.y);
-			buf.writeDouble(this.z);
-			buf.writeDouble(this.ox);
-			buf.writeDouble(this.oy);
-			buf.writeDouble(this.oz);
-			buf.writeDouble(this.speedx);
-			buf.writeDouble(this.speedy);
-			buf.writeDouble(this.speedz);
-			buf.writeInt(this.args);
-			for (int j = 0; j < this.type.getArgsCount() && j < this.args; j++)
-				buf.writeInt(this.parms[j]);
-		}
-
-		public void fromBytes(ByteBuf buf) {
-			this.type = Types.getTypeFromId(buf.readInt());
-			this.count = buf.readInt();
-			this.x = buf.readDouble();
-			this.y = buf.readDouble();
-			this.z = buf.readDouble();
-			this.ox = buf.readDouble();
-			this.oy = buf.readDouble();
-			this.oz = buf.readDouble();
-			this.speedx = buf.readDouble();
-			this.speedy = buf.readDouble();
-			this.speedz = buf.readDouble();
-			this.args = buf.readInt();
-			int i = Math.min(this.type.getArgsCount(), this.args);
-			this.parms = new int[i];
-			for (int j = 0; j < i; j++)
-				this.parms[j] = buf.readInt();
 		}
 	}
 
 	@SideOnly(Side.CLIENT)
 	public static class Smoke extends Particle {
 		private static final ResourceLocation TEXTURE = new ResourceLocation("narutomod:textures/particles.png");
-		private final TextureManager textureManager;
-		private float smokeParticleScale;
+		protected final TextureManager textureManager;
+		protected float smokeParticleScale;
 		private int particleBrightness;
 		protected double floatMotionY;
+		private final double bounceMotion;
 		private int viewerId;
 
 		protected Smoke(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, 
 		 double motionX, double motionY, double motionZ, int color, float scale, int maxAge, int brightness, 
-		 int playerId, double floatSpeed) {
+		 int playerId, double floatSpeed, double bounceMotionIn) {
 			super(worldIn, xCoordIn, yCoordIn, zCoordIn, 0.0D, 0.0D, 0.0D);
 			//super(worldIn, xCoordIn, yCoordIn, zCoordIn);
 			this.particleTextureIndexY = 2;
@@ -242,6 +355,7 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 				this.particleBrightness = brightness;
 			}
 			this.floatMotionY = floatSpeed;
+			this.bounceMotion = bounceMotionIn;
 			this.viewerId = playerId >= 0 ? playerId : -1;
 		}
 
@@ -250,31 +364,34 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 			  : super.getBrightnessForRender(p_189214_1_);
 		}
 
-		public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ,
-				float rotationXY, float rotationXZ) {
+		public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
 			if (entityIn.getEntityId() != this.viewerId || Minecraft.getMinecraft().gameSettings.thirdPersonView != 0) {
 				float f = ((float)this.particleAge + partialTicks) / (float)this.particleMaxAge;
 				this.particleScale = this.smokeParticleScale * MathHelper.clamp(f * 32.0F, 0.0F, 1.0F);
-				//super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
-		     	this.textureManager.bindTexture(TEXTURE);
-		        float f0 = (float)this.particleTextureIndexX / 8.0F;
-		        float f1 = f0 + 0.124875F;
-		        float f2 = (float)this.particleTextureIndexY / 8.0F;
-		        float f3 = f2 + 0.124875F;
-		        float f4 = 0.1F * this.particleScale;
-		        float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
-		        float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
-		        float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
-		        float f8 = this.particleAlpha * (1.0F - f * f * 0.5F);
-		        int i = this.getBrightnessForRender(partialTicks);
-		        int j = i >> 16 & 65535;
-		        int k = i & 65535;
-		        Vec3d[] avec3d = new Vec3d[] {new Vec3d((double)(-rotationX * f4 - rotationXY * f4), (double)(-rotationZ * f4), (double)(-rotationYZ * f4 - rotationXZ * f4)), new Vec3d((double)(-rotationX * f4 + rotationXY * f4), (double)(rotationZ * f4), (double)(-rotationYZ * f4 + rotationXZ * f4)), new Vec3d((double)(rotationX * f4 + rotationXY * f4), (double)(rotationZ * f4), (double)(rotationYZ * f4 + rotationXZ * f4)), new Vec3d((double)(rotationX * f4 - rotationXY * f4), (double)(-rotationZ * f4), (double)(rotationYZ * f4 - rotationXZ * f4))};
-		        buffer.pos((double)f5 + avec3d[0].x, (double)f6 + avec3d[0].y, (double)f7 + avec3d[0].z).tex((double)f1, (double)f3).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
-		        buffer.pos((double)f5 + avec3d[1].x, (double)f6 + avec3d[1].y, (double)f7 + avec3d[1].z).tex((double)f1, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
-		        buffer.pos((double)f5 + avec3d[2].x, (double)f6 + avec3d[2].y, (double)f7 + avec3d[2].z).tex((double)f0, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
-		        buffer.pos((double)f5 + avec3d[3].x, (double)f6 + avec3d[3].y, (double)f7 + avec3d[3].z).tex((double)f0, (double)f3).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
+				this.renderBuffer(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
 			}
+		}
+
+		protected void renderBuffer(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+	     	this.textureManager.bindTexture(TEXTURE);
+			float f = ((float)this.particleAge + partialTicks) / (float)this.particleMaxAge;
+	        float f0 = (float)this.particleTextureIndexX / 8.0F;
+	        float f1 = f0 + 0.124875F;
+	        float f2 = (float)this.particleTextureIndexY / 8.0F;
+	        float f3 = f2 + 0.124875F;
+	        float f4 = 0.1F * this.particleScale;
+	        float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
+	        float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
+	        float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
+	        float f8 = this.particleAlpha * (1.0F - f * f * 0.5F);
+	        int i = this.getBrightnessForRender(partialTicks);
+	        int j = i >> 16 & 65535;
+	        int k = i & 65535;
+	        Vec3d[] avec3d = new Vec3d[] {new Vec3d((double)(-rotationX * f4 - rotationXY * f4), (double)(-rotationZ * f4), (double)(-rotationYZ * f4 - rotationXZ * f4)), new Vec3d((double)(-rotationX * f4 + rotationXY * f4), (double)(rotationZ * f4), (double)(-rotationYZ * f4 + rotationXZ * f4)), new Vec3d((double)(rotationX * f4 + rotationXY * f4), (double)(rotationZ * f4), (double)(rotationYZ * f4 + rotationXZ * f4)), new Vec3d((double)(rotationX * f4 - rotationXY * f4), (double)(-rotationZ * f4), (double)(rotationYZ * f4 - rotationXZ * f4))};
+	        buffer.pos((double)f5 + avec3d[0].x, (double)f6 + avec3d[0].y, (double)f7 + avec3d[0].z).tex((double)f1, (double)f3).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
+	        buffer.pos((double)f5 + avec3d[1].x, (double)f6 + avec3d[1].y, (double)f7 + avec3d[1].z).tex((double)f1, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
+	        buffer.pos((double)f5 + avec3d[2].x, (double)f6 + avec3d[2].y, (double)f7 + avec3d[2].z).tex((double)f0, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
+	        buffer.pos((double)f5 + avec3d[3].x, (double)f6 + avec3d[3].y, (double)f7 + avec3d[3].z).tex((double)f0, (double)f3).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
 		}
 
 		public void onUpdate() {
@@ -293,14 +410,49 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 				this.motionX *= 1.1D;
 				this.motionZ *= 1.1D;
 			}
-			this.motionX *= 0.9599999785423279D;
-			this.motionY *= 0.9599999785423279D;
-			this.motionZ *= 0.9599999785423279D;
+			this.motionX *= 0.96D;
+			this.motionY *= 0.96D;
+			this.motionZ *= 0.96D;
 			if (this.onGround) {
-				this.motionX *= 0.699999988079071D;
-				this.motionZ *= 0.699999988079071D;
+				this.motionX *= 0.7D;
+				this.motionZ *= 0.7D;
 			}
 		}
+
+	    @Override
+	    public void move(double x, double y, double z) {
+	        double d0 = y;
+	        double origX = x;
+	        double origZ = z;
+	        if (this.canCollide) {
+	            List<AxisAlignedBB> list = this.world.getCollisionBoxes((Entity)null, this.getBoundingBox().expand(x, y, z));
+	            for (AxisAlignedBB axisalignedbb : list) {
+	                y = axisalignedbb.calculateYOffset(this.getBoundingBox(), y);
+	            }
+	            this.setBoundingBox(this.getBoundingBox().offset(0.0D, y, 0.0D));
+	            for (AxisAlignedBB axisalignedbb1 : list) {
+	                x = axisalignedbb1.calculateXOffset(this.getBoundingBox(), x);
+	            }
+	            this.setBoundingBox(this.getBoundingBox().offset(x, 0.0D, 0.0D));
+	            for (AxisAlignedBB axisalignedbb2 : list) {
+	                z = axisalignedbb2.calculateZOffset(this.getBoundingBox(), z);
+	            }
+	            this.setBoundingBox(this.getBoundingBox().offset(0.0D, 0.0D, z));
+	        } else {
+	            this.setBoundingBox(this.getBoundingBox().offset(x, y, z));
+	        }
+	        this.resetPositionToBB();
+	        if (d0 != y) {
+	        	this.motionY *= this.bounceMotion;
+	        	this.onGround = this.bounceMotion == 0.0D && d0 < 0.0D;
+	        } 
+	        if (origX != x) {
+	            this.motionX *= this.bounceMotion;
+	        }
+	        if (origZ != z) {
+	            this.motionZ *= this.bounceMotion;
+	        }
+	    }
 
 		public boolean shouldDisableDepth() {
 			return true;
@@ -310,13 +462,14 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		public static class Factory implements IParticleFactory {
 			public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
 					double ySpeedIn, double zSpeedIn, int... parameters) {
+				double arg6 = (parameters.length > 6) ? (double)parameters[6] / 100.0D : 0.0D;
 				double arg5 = (parameters.length > 5) ? (double)parameters[5] / 1000.0D : 0.004D;
 				int arg4 = (parameters.length > 4) ? parameters[4] : -1;
 				int arg3 = (parameters.length > 3) ? parameters[3] : 0;
 				int arg2 = (parameters.length > 2) ? parameters[2] : 0;
 				float arg1 = (parameters.length > 1) ? ((float)parameters[1] / 10.0F) : 1.0F;
 				int arg0 = (parameters.length > 0) ? parameters[0] : -1;
-				return new Smoke(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1, arg2, arg3, arg4, arg5);
+				return new Smoke(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
 			}
 		}
 	}
@@ -379,7 +532,10 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 
 	@SideOnly(Side.CLIENT)
 	public static class FallingDust extends ParticleSimpleAnimated {
-		public FallingDust(World world, double x, double y, double z, double xMotion, double yMotion, double zMotion, int color) {
+		final float rotSpeed;
+		int particleBrightness;
+		
+		public FallingDust(World world, double x, double y, double z, double xMotion, double yMotion, double zMotion, int color, int brightness, float scale) {
 			super(world, x, y, z, 176, 4, -0.025F);
 			this.motionX = xMotion;
 			this.motionY = yMotion;
@@ -395,17 +551,36 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 				this.particleGreen += f;
 			if (this.particleBlue + f >= 0.0F && this.particleBlue + f <= 1.0F)
 				this.particleBlue += f;
-			this.particleScale *= 0.75F;
+			this.particleScale *= 0.75F * scale;
 			this.particleMaxAge = 60 + this.rand.nextInt(12);
-			this.setBaseAirFriction(0.2F);
+			this.rotSpeed = (this.rand.nextFloat() - 0.5F) * 0.1F;
+			if (brightness != 0) {
+				this.particleBrightness = brightness;
+			}
+			this.setBaseAirFriction(0.8F);
+		}
+
+		@Override
+		public void onUpdate() {
+			super.onUpdate();
+			this.prevParticleAngle = this.particleAngle;
+			this.particleAngle += (float)Math.PI * this.rotSpeed * 2.0F;
+		}
+
+		@Override
+		public int getBrightnessForRender(float p_189214_1_) {
+			return this.particleBrightness != 0 ? ((this.particleBrightness << 16) | this.particleBrightness) 
+			  : super.getBrightnessForRender(p_189214_1_);
 		}
 
 		@SideOnly(Side.CLIENT)
 		public static class Factory implements IParticleFactory {
 			public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
 					double ySpeedIn, double zSpeedIn, int... parameters) {
+				float arg2 = (parameters.length > 2) ? (float)parameters[2] / 10.0f : 1.0f;
+				int arg1 = (parameters.length > 1) ? parameters[1] : 0;
 				int arg0 = (parameters.length > 0) ? parameters[0] : -1;
-				return new FallingDust(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0);
+				return new FallingDust(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1, arg2);
 			}
 		}
 	}
@@ -443,10 +618,10 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 			this.textureManager = Minecraft.getMinecraft().getTextureManager();
 		}
 
-		public void move(double x, double y, double z) {
-			this.setBoundingBox(this.getBoundingBox().offset(x, y, z));
-			this.resetPositionToBB();
-		}
+		//public void move(double x, double y, double z) {
+		//	this.setBoundingBox(this.getBoundingBox().offset(x, y, z));
+		//	this.resetPositionToBB();
+		//}
 
 	    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ,
 	     float rotationYZ, float rotationXY, float rotationXZ) {
@@ -458,6 +633,11 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 			this.particleScale = this.flameScale * f8;
 	        float f0 = (float)this.particleTextureIndexX / 8.0F;
 	        float f1 = f0 + 0.124875F;
+	        if (this.rand.nextBoolean()) {
+	        	float f12 = f0;
+	        	f0 = f1;
+	        	f1 = f12;
+	        }
 	        float f2 = (float)this.particleTextureIndexY / 8.0F;
 	        float f3 = f2 + 0.124875F;
 	        float f4 = 0.1F * this.particleScale;
@@ -502,7 +682,7 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		public static class Factory implements IParticleFactory {
 			public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
 					double ySpeedIn, double zSpeedIn, int... parameters) {
-				float arg1 = (parameters.length > 1) ? (parameters[1] / 10.0F) : 1.0F;
+				float arg1 = (parameters.length > 1) ? (float)parameters[1] / 10.0F : 1.0F;
 				int arg0 = (parameters.length > 0) ? parameters[0] : -1;
 				return new Flame(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1);
 			}
@@ -512,7 +692,7 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	public static class MobAppearance extends Particle {
 		private static final Map<Integer, Class <? extends Entity>> particleEntities = ImmutableMap.of(
-			net.narutomod.entity.EntityItachi.ENTITYID, net.narutomod.entity.EntityItachi.EntityCustom.class
+			net.narutomod.entity.EntityItachi.ENTITYID_RANGED, net.narutomod.entity.EntityItachi.Entity4MobAppearance.class
 		);
 	    private Entity entity;
 	    private int entityTypeId;
@@ -744,11 +924,13 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	public static class BurningAsh extends Smoke {
 		private final Entity excludeEntity;
+		private final float explodeSize;
 
 		protected BurningAsh(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn,
-		  int excludeEntityId) {
-			super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, 0xFF606060, 5f + Particles.rand.nextFloat() * 5f, 100, 0, -1, 0f);
+		  int excludeEntityId, float explodesize) {
+			super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, 0xFF606060, 8f + RAND.nextFloat() * 5f, 100, 0, -1, 0f, 0d);
 			this.excludeEntity = worldIn.getEntityByID(excludeEntityId);
+			this.explodeSize = explodesize;
 		}
 
 		@Override
@@ -759,7 +941,7 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 				if (!list.isEmpty()) {
 					for (EntityLivingBase entity : list) {
 						if (!entity.equals(this.excludeEntity)) {
-							NarutomodMod.PACKET_HANDLER.sendToServer(new Message(entity.getEntityId(), 10));
+							NarutomodMod.PACKET_HANDLER.sendToServer(new Message(entity.getEntityId(), this.explodeSize));
 						}
 					}
 				}
@@ -770,31 +952,32 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		public static class Factory implements IParticleFactory {
 			public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
 					double ySpeedIn, double zSpeedIn, int... parameters) {
+				float arg1 = parameters.length > 1 && parameters[1] > 0 ? (float)parameters[1] : 0.0f;
 				int arg0 = (parameters.length > 0) ? parameters[0] : -1;
-				return new BurningAsh(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0);
+				return new BurningAsh(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1);
 			}
 		}
 
 		public static class Message implements IMessage {
 			int id;
-			int sec;
+			float size;
 			
 			public Message() {
 			}
 	
-			public Message(int entityId, int seconds) {
+			public Message(int entityId, float f) {
 				this.id = entityId;
-				this.sec = seconds;
+				this.size = f;
 			}
 	
 			public void toBytes(ByteBuf buf) {
 				buf.writeInt(this.id);
-				buf.writeInt(this.sec);
+				buf.writeFloat(this.size);
 			}
 	
 			public void fromBytes(ByteBuf buf) {
 				this.id = buf.readInt();
-				this.sec = buf.readInt();
+				this.size = buf.readFloat();
 			}
 
 			public static class Handler implements IMessageHandler<Message, IMessage> {
@@ -804,7 +987,11 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 					world.addScheduledTask(() -> {
 						Entity entity = world.getEntityByID(message.id);
 						if (entity instanceof EntityLivingBase) {
-							entity.setFire(message.sec);
+							if (message.size > 0.0f) {
+								world.newExplosion(null, entity.posX, entity.posY, entity.posZ, message.size, true, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, entity));
+							} else {
+								entity.setFire(15);
+							}
 						}
 					});
 					return null;
@@ -814,41 +1001,42 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 	}
 
 	@SideOnly(Side.CLIENT)
-	public static class AcidSpit extends Smoke {
-		private static int PARTICLE_ID = -1;
-		private final int id = PARTICLE_ID--;
+	public static class Spit extends Smoke {
 		private final Entity excludedEntity;
-		private EntityLivingBase affectedEntity;
+		protected EntityLivingBase affectedEntity;
 		private double heightOffset;
 
-		protected AcidSpit(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, 
-		 double xSpeedIn, double ySpeedIn, double zSpeedIn, int excludeEntityId, int color) {
-			super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, color, 0.5f + Particles.rand.nextFloat() * 4.5f, 0, 0, -1, -0.005f);
-			this.excludedEntity = worldIn.getEntityByID(excludeEntityId);
-			this.setSize(this.width * this.particleScale, this.height * this.particleScale);
+		protected Spit(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, 
+		 double xSpeedIn, double ySpeedIn, double zSpeedIn, int color, float scale, int excludedEntityId, int maxAge) {
+			super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, color, scale, maxAge, 0, -1, -0.05f, 0d);
+			this.excludedEntity = worldIn.getEntityByID(excludedEntityId);
+			//this.setSize(this.width * this.particleScale, this.height * this.particleScale);
+		}
+
+		@Override
+		public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+			float f = ((float)this.particleAge + partialTicks) / (float)this.particleMaxAge;
+			this.particleScale = this.smokeParticleScale * MathHelper.clamp(f * 4.0F, 0.0F, 1.0F);
+			this.renderBuffer(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
 		}
 
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (this.isAlive()) {
-				if (this.affectedEntity == null) {
-					for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getBoundingBox())) {
-						if (!entity.equals(this.excludedEntity)) {
-							NarutomodMod.PACKET_HANDLER.sendToServer(new Message(entity.getEntityId(), this.particleMaxAge - this.particleAge));
-							this.affectedEntity = entity;
-							this.heightOffset = this.posY - entity.posY;
-						}
+			if (this.onGround) {
+				this.motionX *= 0.6D;
+				this.motionZ *= 0.6D;
+			}
+			if (this.affectedEntity == null) {
+				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getBoundingBox())) {
+					if (!entity.equals(this.excludedEntity)) {
+						this.affectedEntity = entity;
+						this.heightOffset = this.posY - entity.posY;
 					}
-				} else {
-					this.setPosition(this.affectedEntity.posX, this.affectedEntity.posY + this.heightOffset, this.affectedEntity.posZ);
-					this.heightOffset += this.floatMotionY;
 				}
-				BlockPos pos = ProcedureUtils.getNearestNonAirBlock(this.world, this.getBoundingBox().grow(0.01d),
-				 new BlockPos(this.posX, this.posY, this.posZ), 50f, true);
-				if (pos != null) {
-					Minecraft.getMinecraft().renderGlobal.sendBlockBreakProgress(this.id, pos, 5);
-				}
+			} else {
+				this.setPosition(this.affectedEntity.posX, this.affectedEntity.posY + this.heightOffset, this.affectedEntity.posZ);
+				this.heightOffset -= 0.005f;
 			}
 		}
 
@@ -856,32 +1044,133 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		public static class Factory implements IParticleFactory {
 			public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
 					double ySpeedIn, double zSpeedIn, int... parameters) {
+				int arg3 = (parameters.length > 3) ? parameters[3] : 0;
+				int arg2 = (parameters.length > 2) ? parameters[2] : -1;
+				float arg1 = (parameters.length > 1) ? (float)parameters[1] / 10.0f : 1.0f;
+				int arg0 = (parameters.length > 0) ? parameters[0] : 0x80000000;
+				return new Spit(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1, arg2, arg3);
+			}
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static class ClaySpit extends Smoke {
+		private final Entity entity;
+		private boolean hitEntity;
+		private double heightOffset;
+
+		protected ClaySpit(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, 
+		 double xSpeedIn, double ySpeedIn, double zSpeedIn, int color, float scale, int entityId) {
+			super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, color, scale, 50 + RAND.nextInt(20), 0, -1, -0.08f, 0d);
+			this.entity = worldIn.getEntityByID(entityId);
+			//this.setSize(this.width * this.particleScale, this.height * this.particleScale);
+		}
+
+		@Override
+		public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+			float f = ((float)this.particleAge + partialTicks) / (float)this.particleMaxAge;
+			this.particleScale = this.smokeParticleScale * MathHelper.clamp(f * 4.0F, 0.0F, 1.0F);
+			this.renderBuffer(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+		}
+
+		@Override
+		public void onUpdate() {
+			super.onUpdate();
+			if (this.entity == null || !this.entity.isEntityAlive()) {
+				return;
+			} else if (!this.hitEntity) {
+				if (this.onGround) {
+					Vec3d vec = this.entity.getPositionVector().subtract(this.posX, this.posY, this. posZ).normalize().scale(0.15d);
+					this.motionX += vec.x;
+					this.motionZ += vec.z;
+				} else {
+					for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getBoundingBox())) {
+						if (entity.equals(this.entity)) {
+							this.hitEntity = true;
+							this.heightOffset = this.posY - entity.posY;
+						}
+					}
+				}
+			} else {
+				this.setPosition(this.entity.posX, this.entity.posY + this.heightOffset, this.entity.posZ);
+				this.heightOffset -= 0.005f;
+			}
+		}
+
+		@SideOnly(Side.CLIENT)
+		public static class Factory implements IParticleFactory {
+			public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
+					double ySpeedIn, double zSpeedIn, int... parameters) {
+				int arg2 = (parameters.length > 2) ? parameters[2] : -1;
+				float arg1 = (parameters.length > 1) ? (float)parameters[1] / 10.0f : 1.0f;
+				int arg0 = (parameters.length > 0) ? parameters[0] : 0x80000000;
+				return new ClaySpit(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1, arg2);
+			}
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static class AcidSpit extends Spit {
+		private static int PARTICLE_ID = -1;
+		private final int id = PARTICLE_ID--;
+		private boolean affected;
+		private int effectAmplifier;
+
+		protected AcidSpit(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, 
+		 double xSpeedIn, double ySpeedIn, double zSpeedIn, int excludeEntityId, int color, int amplifier) {
+			super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, color, 0.5f + RAND.nextFloat() * 4.5f, excludeEntityId, 0);
+			this.effectAmplifier = amplifier;
+		}
+
+		@Override
+		public void onUpdate() {
+			super.onUpdate();
+			if (this.affectedEntity != null && !this.affected) {
+				NarutomodMod.PACKET_HANDLER.sendToServer(new Message(this.affectedEntity.getEntityId(), this.particleMaxAge - this.particleAge, this.effectAmplifier));
+				this.affected = true;
+			}
+			BlockPos pos = ProcedureUtils.getNearestNonAirBlock(this.world, this.getBoundingBox().grow(0.01d),
+			 new BlockPos(this.posX, this.posY, this.posZ), 50f, true);
+			if (pos != null) {
+				Minecraft.getMinecraft().renderGlobal.sendBlockBreakProgress(this.id, pos, 5);
+			}
+		}
+
+		@SideOnly(Side.CLIENT)
+		public static class Factory implements IParticleFactory {
+			public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
+					double ySpeedIn, double zSpeedIn, int... parameters) {
+				int arg2 = (parameters.length > 2) ? parameters[2] : 1;
 				int arg1 = (parameters.length > 1) ? parameters[1] : 0x80ffd6ba;
 				int arg0 = (parameters.length > 0) ? parameters[0] : -1;
-				return new AcidSpit(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1);
+				return new AcidSpit(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1, arg2);
 			}
 		}
 
 		public static class Message implements IMessage {
 			int id;
 			int ticks;
+			int amp;
 			
 			public Message() {
 			}
 	
-			public Message(int entityId, int t) {
+			public Message(int entityId, int t, int a) {
 				this.id = entityId;
 				this.ticks = t;
+				this.amp = a;
 			}
 	
 			public void toBytes(ByteBuf buf) {
 				buf.writeInt(this.id);
 				buf.writeInt(this.ticks);
+				buf.writeInt(this.amp);
 			}
 	
 			public void fromBytes(ByteBuf buf) {
 				this.id = buf.readInt();
 				this.ticks = buf.readInt();
+				this.amp = buf.readInt();
 			}
 
 			public static class Handler implements IMessageHandler<Message, IMessage> {
@@ -891,7 +1180,7 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 					world.addScheduledTask(() -> {
 						Entity entity = world.getEntityByID(message.id);
 						if (entity instanceof EntityLivingBase) {
-							((EntityLivingBase)entity).addPotionEffect(new PotionEffect(PotionCorrosion.potion, message.ticks, 1));
+							((EntityLivingBase)entity).addPotionEffect(new PotionEffect(PotionCorrosion.potion, message.ticks, message.amp));
 						}
 					});
 					return null;
@@ -903,10 +1192,10 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	public static class ExpandingSphere extends Particle {
 		private static final ResourceLocation TEXTURE = new ResourceLocation("narutomod:textures/white_square.png");
-		private int sphereIdOutside;
-		private int sphereIdInside;
-		private final Sphere sphere;
 		private final TextureManager textureManager;
+		protected int sphereIdOutside;
+		protected int sphereIdInside;
+		protected Sphere sphere;
 
 		protected ExpandingSphere(TextureManager textureManagerIn, World worldIn, double x, double y, double z,
 		 double speedX, double speedY, double speedZ, float size, int life, int color) {
@@ -914,27 +1203,13 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 			this.motionX = speedX;
 			this.motionY = speedY;
 			this.motionZ = speedZ;
+			this.particleAlpha = (color >> 24 & 0xFF) / 255.0F;
 			this.particleRed = (color >> 16 & 0xFF) / 255.0F;
 			this.particleGreen = (color >> 8 & 0xFF) / 255.0F;
 			this.particleBlue = (color & 0xFF) / 255.0F;
 			this.particleScale = size;
 			this.particleMaxAge = life;
 			this.textureManager = textureManagerIn;
-			this.sphere = new Sphere();
-			this.sphere.setDrawStyle(GLU.GLU_FILL);
-			this.sphere.setNormals(GLU.GLU_SMOOTH);
-			this.sphere.setOrientation(GLU.GLU_OUTSIDE);
-			this.sphereIdOutside = GLAllocation.generateDisplayLists(1);
-			GlStateManager.glNewList(this.sphereIdOutside, org.lwjgl.opengl.GL11.GL_COMPILE);
-			textureManagerIn.bindTexture(TEXTURE);
-			this.sphere.draw(1.0F, 32, 32);
-			GlStateManager.glEndList();	
-			this.sphere.setOrientation(GLU.GLU_INSIDE);
-			this.sphereIdInside = GLAllocation.generateDisplayLists(1);
-			GlStateManager.glNewList(this.sphereIdInside, org.lwjgl.opengl.GL11.GL_COMPILE);
-			textureManagerIn.bindTexture(TEXTURE);
-			this.sphere.draw(1.0F, 32, 32);
-			GlStateManager.glEndList();
 		}
 
 		@Override
@@ -948,6 +1223,80 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 			this.move(this.motionX, this.motionY, this.motionZ);
 		}
 
+		protected void compileDisplayList() {
+			this.sphere = new Sphere();
+			this.sphere.setDrawStyle(GLU.GLU_FILL);
+			this.sphere.setNormals(GLU.GLU_SMOOTH);
+			this.sphere.setOrientation(GLU.GLU_OUTSIDE);
+			this.sphereIdOutside = GLAllocation.generateDisplayLists(1);
+			GlStateManager.glNewList(this.sphereIdOutside, org.lwjgl.opengl.GL11.GL_COMPILE);
+			this.textureManager.bindTexture(TEXTURE);
+			this.sphere.draw(1.0F, 32, 32);
+			GlStateManager.glEndList();	
+			this.sphere.setOrientation(GLU.GLU_INSIDE);
+			this.sphereIdInside = GLAllocation.generateDisplayLists(1);
+			GlStateManager.glNewList(this.sphereIdInside, org.lwjgl.opengl.GL11.GL_COMPILE);
+			this.textureManager.bindTexture(TEXTURE);
+			this.sphere.draw(1.0F, 32, 32);
+			GlStateManager.glEndList();
+		}
+
+		@Override
+		public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, 
+		 float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+	        float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
+	        float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
+	        float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
+			if (this.sphere == null) {
+				this.compileDisplayList();
+			}
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(f5, f6, f7);
+			GlStateManager.enableAlpha();
+			GlStateManager.alphaFunc(0x204, 0.0f);
+			GlStateManager.enableBlend();
+			GlStateManager.depthMask(false);
+			GlStateManager.disableLighting();
+			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 0xF0, 0xF0);
+			float f = ((float)this.particleAge + partialTicks) / (float)this.particleMaxAge;
+			float scale = this.particleScale * f;
+			GlStateManager.color(this.particleRed, this.particleGreen, this.particleBlue, (1.0f - f) * this.particleAlpha);
+			GlStateManager.scale(scale, scale, scale);
+			GlStateManager.callList(this.sphereIdOutside);
+			GlStateManager.callList(this.sphereIdInside);
+			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+			GlStateManager.enableLighting();
+			GlStateManager.depthMask(true);
+			GlStateManager.alphaFunc(0x204, 0.1f);
+			GlStateManager.popMatrix();
+		}
+
+		@Override
+	    public int getFXLayer() {
+	        return 3;
+	    }
+
+		@SideOnly(Side.CLIENT)
+		public static class Factory implements IParticleFactory {
+			public Particle createParticle(int particleID, World worldIn, double x, double y, double z, double xSpeedIn,
+					double ySpeedIn, double zSpeedIn, int... parameters) {
+				int arg2 = (parameters.length > 2) ? parameters[2] : -1;
+				int arg1 = (parameters.length > 1) ? parameters[1] : 1;
+				float arg0 = (parameters.length > 0) ? (float)parameters[0] / 10f: 1f;
+				return new ExpandingSphere(Minecraft.getMinecraft().getTextureManager(), worldIn, x, y, z, 
+				 xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1, arg2);
+			}
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static class ExpandingConcentricSpheres extends ExpandingSphere {
+		protected ExpandingConcentricSpheres(TextureManager textureManagerIn, World worldIn, double x, double y, double z,
+		 double speedX, double speedY, double speedZ, float size, int life, int color) {
+			super(textureManagerIn, worldIn, x, y, z, speedX, speedY, speedZ, size, life, color);
+		}
+
 		@Override
 		public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, 
 		 float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
@@ -958,7 +1307,9 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 			if (this.particleAge > 0.8f * this.particleMaxAge) {
 				f1 = 1.0f - (this.particleAge - 0.8f * this.particleMaxAge) / (0.2f * this.particleMaxAge);
 			}
-			//this.textureManager.bindTexture(TEXTURE);
+			if (this.sphere == null) {
+				this.compileDisplayList();
+			}
 			GlStateManager.enableAlpha();
 			GlStateManager.alphaFunc(0x204, 0.0f);
 			GlStateManager.enableBlend();
@@ -987,11 +1338,6 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 			GlStateManager.alphaFunc(0x204, 0.1f);
 		}
 
-		@Override
-	    public int getFXLayer() {
-	        return 3;
-	    }
-
 		@SideOnly(Side.CLIENT)
 		public static class Factory implements IParticleFactory {
 			public Particle createParticle(int particleID, World worldIn, double x, double y, double z, double xSpeedIn,
@@ -999,7 +1345,7 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 				int arg2 = (parameters.length > 2) ? parameters[2] : -1;
 				int arg1 = (parameters.length > 1) ? parameters[1] : 1;
 				float arg0 = (parameters.length > 0) ? (float)parameters[0] / 10f: 1f;
-				return new ExpandingSphere(Minecraft.getMinecraft().getTextureManager(), worldIn, x, y, z, 
+				return new ExpandingConcentricSpheres(Minecraft.getMinecraft().getTextureManager(), worldIn, x, y, z, 
 				 xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1, arg2);
 			}
 		}
@@ -1050,14 +1396,18 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ,
 		 float rotationYZ, float rotationXY, float rotationXZ) {
-			this.textureManager.bindTexture(this.getTexture());
 			float f1 = (float)this.particleAge + partialTicks;
 			float f2 = f1 / (float)this.particleMaxAge;
 			float f3 = this.particleScale * (f2 * 0.6f + 0.7f);
 			float f4 = this.particleAlpha * (1.0F - (f2 - 0.1F) * (f2 - 0.1F));
 			if (f2 <= 0.1F) {
-				f4 = f2 / 0.1F;
+				f4 = f2 * 10.0F;
 			}
+			this.renderBuffer(buffer, entityIn, partialTicks, this.rotateX, this.rotateY, this.rotateZ - 30.0F * f1, f3, f4);
+		}
+
+		protected void renderBuffer(BufferBuilder buffer, Entity entityIn, float partialTicks, float rX, float rY, float rZ, float size, float alpha) {
+			this.textureManager.bindTexture(this.getTexture());
 			float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
 			float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
 			float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
@@ -1066,18 +1416,18 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 	        int k = i & 65535;
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(f5, f6, f7);
-			GlStateManager.rotate(-this.rotateY, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate(this.rotateX, 1.0F, 0.0F, 0.0F);
-			GlStateManager.rotate(this.rotateZ - 30.0F * f1, 0.0F, 0.0F, 1.0F);
+			GlStateManager.rotate(-rY, 0.0F, 1.0F, 0.0F);
+			GlStateManager.rotate(rX, 1.0F, 0.0F, 0.0F);
+			GlStateManager.rotate(rZ, 0.0F, 0.0F, 1.0F);
 	        GlStateManager.enableBlend();
-	        GlStateManager.depthMask(false);
+	        GlStateManager.depthMask(!this.shouldDisableDepth());
 			GlStateManager.alphaFunc(0x204, 0.001f);
 	        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 			buffer.begin(7, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
-			buffer.pos(-0.5D * f3, -0.5D * f3, 0.0D).tex(0.0D, 1.0D).color(this.particleRed, this.particleGreen, this.particleBlue, f4).lightmap(j, k).endVertex();
-			buffer.pos(0.5D * f3, -0.5D * f3, 0.0D).tex(1.0D, 1.0D).color(this.particleRed, this.particleGreen, this.particleBlue, f4).lightmap(j, k).endVertex();
-			buffer.pos(0.5D * f3, 0.5D * f3, 0.0D).tex(1.0D, 0.0D).color(this.particleRed, this.particleGreen, this.particleBlue, f4).lightmap(j, k).endVertex();
-			buffer.pos(-0.5D * f3, 0.5D * f3, 0.0D).tex(0.0D, 0.0D).color(this.particleRed, this.particleGreen, this.particleBlue, f4).lightmap(j, k).endVertex();
+			buffer.pos(-0.5D * size, -0.5D * size, 0.0D).tex(0.0D, 1.0D).color(this.particleRed, this.particleGreen, this.particleBlue, alpha).lightmap(j, k).endVertex();
+			buffer.pos(0.5D * size, -0.5D * size, 0.0D).tex(1.0D, 1.0D).color(this.particleRed, this.particleGreen, this.particleBlue, alpha).lightmap(j, k).endVertex();
+			buffer.pos(0.5D * size, 0.5D * size, 0.0D).tex(1.0D, 0.0D).color(this.particleRed, this.particleGreen, this.particleBlue, alpha).lightmap(j, k).endVertex();
+			buffer.pos(-0.5D * size, 0.5D * size, 0.0D).tex(0.0D, 0.0D).color(this.particleRed, this.particleGreen, this.particleBlue, alpha).lightmap(j, k).endVertex();
 			Tessellator.getInstance().draw();
 			GlStateManager.alphaFunc(0x204, 0.1f);
 			GlStateManager.depthMask(true);
@@ -1102,6 +1452,11 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 			this.motionX *= 0.98D;
 			this.motionY *= 0.98D;
 			this.motionZ *= 0.98D;
+		}
+
+		@Override
+		public boolean shouldDisableDepth() {
+			return true;
 		}
 
 		@Override
@@ -1142,8 +1497,6 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		 float rotationYZ, float rotationXY, float rotationXZ) {
 			this.textureManager.bindTexture(TEXTURE);
 			float f0 = partialTicks + this.particleAge;
-			float f1 = 0.5F;
-			float f2 = 0.0F;
 			float f4 = 1.0F;
 			if (f0 >= 0.8F * this.particleMaxAge) {
 				f4 = Math.max(1.0F - (f0 - 0.8F * this.particleMaxAge) / (0.2F * this.particleMaxAge), 0.0F);
@@ -1157,10 +1510,10 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 			GlStateManager.translate(f5, f6, f7);
 			GlStateManager.rotate(-this.rotateY, 0.0F, 1.0F, 0.0F);
 			buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR_NORMAL);
-			buffer.pos(-f1 * f3, -f2 * f3, -0.5F * f3).tex(0.5d * (1.0d - f8), 0.5d * (1.0d + f8)).color(1.0F, 1.0F, 1.0F, f4).normal(0.0F, 1.0F, 0.0F).endVertex();
-			buffer.pos(-f1 * f3, -f2 * f3, 0.5F * f3).tex(0.5d * (1.0d - f8), 0.5d * (1.0d - f8)).color(1.0F, 1.0F, 1.0F, f4).normal(0.0F, 1.0F, 0.0F).endVertex();
-			buffer.pos(f1 * f3, f2 * f3, 0.5F * f3).tex(0.5d * (1.0d + f8), 0.5d * (1.0d - f8)).color(1.0F, 1.0F, 1.0F, f4).normal(0.0F, 1.0F, 0.0F).endVertex();
-			buffer.pos(f1 * f3, f2 * f3, -0.5F * f3).tex(0.5d * (1.0d + f8), 0.5d * (1.0d + f8)).color(1.0F, 1.0F, 1.0F, f4).normal(0.0F, 1.0F, 0.0F).endVertex();
+			buffer.pos(-0.5F * f3, 0.0F, -0.5F * f3).tex(0.5d * (1.0d - f8), 0.5d * (1.0d + f8)).color(1.0F, 1.0F, 1.0F, f4).normal(0.0F, 1.0F, 0.0F).endVertex();
+			buffer.pos(-0.5F * f3, 0.0F, 0.5F * f3).tex(0.5d * (1.0d - f8), 0.5d * (1.0d - f8)).color(1.0F, 1.0F, 1.0F, f4).normal(0.0F, 1.0F, 0.0F).endVertex();
+			buffer.pos(0.5F * f3, 0.0F, 0.5F * f3).tex(0.5d * (1.0d + f8), 0.5d * (1.0d - f8)).color(1.0F, 1.0F, 1.0F, f4).normal(0.0F, 1.0F, 0.0F).endVertex();
+			buffer.pos(0.5F * f3, 0.0F, -0.5F * f3).tex(0.5d * (1.0d + f8), 0.5d * (1.0d + f8)).color(1.0F, 1.0F, 1.0F, f4).normal(0.0F, 1.0F, 0.0F).endVertex();
 			Tessellator.getInstance().draw();
 			GlStateManager.popMatrix();
 		}
@@ -1191,6 +1544,16 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ,
+		 float rotationYZ, float rotationXY, float rotationXZ) {
+			float f1 = (float)this.particleAge + partialTicks;
+			float f2 = f1 / (float)this.particleMaxAge;
+			float f3 = this.particleScale * (f2 * 0.6f + 0.7f);
+			float f4 = this.particleAlpha * (1.0F - f2);
+			this.renderBuffer(buffer, entityIn, partialTicks, this.rotateX, this.rotateY, this.rotateZ - 30.0F * f1, f3, f4);
+		}
+
+		@Override
 		protected ResourceLocation getTexture() {
 			return TEXTURE;
 		}
@@ -1209,19 +1572,226 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
+	public static class SonicBoom extends TextureAsParticle {
+		private static final ResourceLocation TEXTURE = new ResourceLocation("narutomod:textures/sonicboom.png");
+
+		protected SonicBoom(TextureManager textureManagerIn, World worldIn, double x, double y, double z, 
+		 double speedX, double speedY, double speedZ, int color, float scale, int maxAge, int brightness) {
+			super(textureManagerIn, worldIn, x, y, z, speedX, speedY, speedZ, color, scale, maxAge, brightness);
+			this.rotateX = ProcedureUtils.getPitchFromVec(this.motionX, this.motionY, this.motionZ);
+			this.rotateY = ProcedureUtils.getYawFromVec(this.motionX, this.motionZ);
+			this.rotateZ = this.rand.nextFloat() * 360.0F;
+		}
+
+		@Override
+		protected ResourceLocation getTexture() {
+			return TEXTURE;
+		}
+
+		@SideOnly(Side.CLIENT)
+		public static class Factory implements IParticleFactory {
+			public Particle createParticle(int particleID, World worldIn, double x, double y, double z, double xSpeedIn,
+					double ySpeedIn, double zSpeedIn, int... parameters) {
+				int arg3 = parameters.length > 3 ? parameters[3] : 0;
+				int arg2 = parameters.length > 2 ? parameters[2] : 0;
+				float arg1 = parameters.length > 1 ? (float)parameters[1] / 10f : 1.0f;
+				int arg0 = parameters.length > 0 ? parameters[0] : -1;
+				return new SonicBoom(Minecraft.getMinecraft().getTextureManager(), worldIn, x, y, z, 
+				 xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1, arg2, arg3);
+			}
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static class BlockDust extends ParticleBlockDust {
+		private final float rotSpeed;
+
+	    protected BlockDust(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn,
+	     double xSpeedIn, double ySpeedIn, double zSpeedIn, IBlockState state, float size, float alpha, float gravity) {
+	        super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, state);
+	        this.particleScale *= size;
+	        this.particleAlpha = alpha;
+	        if (gravity != 0.0f) {
+	        	this.particleGravity = gravity;
+	        }
+			this.rotSpeed = (this.rand.nextFloat() - 0.5F) * 0.05F;
+	    }
+	
+	    @Override
+	    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+	        float f = ((float)this.particleTextureIndexX + this.particleTextureJitterX / 4.0F) / 16.0F;
+	        float f1 = f + 0.015609375F;
+	        float f2 = ((float)this.particleTextureIndexY + this.particleTextureJitterY / 4.0F) / 16.0F;
+	        float f3 = f2 + 0.015609375F;
+	        float f4 = 0.1F * this.particleScale;	
+	        if (this.particleTexture != null) {
+	            f = this.particleTexture.getInterpolatedU((double)(this.particleTextureJitterX / 4.0F * 16.0F));
+	            f1 = this.particleTexture.getInterpolatedU((double)((this.particleTextureJitterX + 1.0F) / 4.0F * 16.0F));
+	            f2 = this.particleTexture.getInterpolatedV((double)(this.particleTextureJitterY / 4.0F * 16.0F));
+	            f3 = this.particleTexture.getInterpolatedV((double)((this.particleTextureJitterY + 1.0F) / 4.0F * 16.0F));
+	        }
+	        float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
+	        float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
+	        float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
+	        int i = this.getBrightnessForRender(partialTicks);
+	        int j = i >> 16 & 65535;
+	        int k = i & 65535;
+	        Vec3d[] avec3d = new Vec3d[] {new Vec3d((double)(-rotationX * f4 - rotationXY * f4), (double)(-rotationZ * f4), (double)(-rotationYZ * f4 - rotationXZ * f4)), new Vec3d((double)(-rotationX * f4 + rotationXY * f4), (double)(rotationZ * f4), (double)(-rotationYZ * f4 + rotationXZ * f4)), new Vec3d((double)(rotationX * f4 + rotationXY * f4), (double)(rotationZ * f4), (double)(rotationYZ * f4 + rotationXZ * f4)), new Vec3d((double)(rotationX * f4 - rotationXY * f4), (double)(-rotationZ * f4), (double)(rotationYZ * f4 - rotationXZ * f4))};
+	        if (this.particleAngle != 0.0F) {
+	            float f8 = this.particleAngle + (this.particleAngle - this.prevParticleAngle) * partialTicks;
+	            float f9 = MathHelper.cos(f8 * 0.5F);
+	            float f10 = MathHelper.sin(f8 * 0.5F) * (float)cameraViewDir.x;
+	            float f11 = MathHelper.sin(f8 * 0.5F) * (float)cameraViewDir.y;
+	            float f12 = MathHelper.sin(f8 * 0.5F) * (float)cameraViewDir.z;
+	            Vec3d vec3d = new Vec3d((double)f10, (double)f11, (double)f12);
+	            for (int l = 0; l < 4; ++l) {
+	                avec3d[l] = vec3d.scale(2.0D * avec3d[l].dotProduct(vec3d)).add(avec3d[l].scale((double)(f9 * f9) - vec3d.dotProduct(vec3d))).add(vec3d.crossProduct(avec3d[l]).scale((double)(2.0F * f9)));
+	            }
+	        }
+	        buffer.pos((double)f5 + avec3d[0].x, (double)f6 + avec3d[0].y, (double)f7 + avec3d[0].z).tex((double)f1, (double)f3).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+	        buffer.pos((double)f5 + avec3d[1].x, (double)f6 + avec3d[1].y, (double)f7 + avec3d[1].z).tex((double)f1, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+	        buffer.pos((double)f5 + avec3d[2].x, (double)f6 + avec3d[2].y, (double)f7 + avec3d[2].z).tex((double)f, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+	        buffer.pos((double)f5 + avec3d[3].x, (double)f6 + avec3d[3].y, (double)f7 + avec3d[3].z).tex((double)f, (double)f3).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+	    }
+
+	    @Override
+	    public void onUpdate() {
+	    	super.onUpdate();
+			this.prevParticleAngle = this.particleAngle;
+			this.particleAngle += (float)Math.PI * this.rotSpeed * 2.0F;
+	    }
+
+	    @SideOnly(Side.CLIENT)
+	    public static class Factory implements IParticleFactory {
+	        @Nullable
+	        public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn,
+	         double xSpeedIn, double ySpeedIn, double zSpeedIn, int... params) {
+	            IBlockState iblockstate = Block.getStateById(params[0]);
+	            float arg3 = params.length > 3 ? (float)params[3] / 100f : 0.0f;
+	            float arg2 = params.length > 2 ? (float)params[2] / 100f : 1.0f;
+	            float arg1 = params.length > 1 ? (float)params[1] / 10f : 1.0f;
+	            return iblockstate.getRenderType() == EnumBlockRenderType.INVISIBLE ? null
+	             : (new BlockDust(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, iblockstate, arg1, arg2, arg3)).init();
+	        }
+	    }
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static class Sand extends Smoke {
+		protected Sand(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, 
+		 double motionX, double motionY, double motionZ, int color, float scale, int maxAge, double floatSpeed) {
+			super(worldIn, xCoordIn, yCoordIn, zCoordIn, motionX, motionY, motionZ, color, scale, maxAge, 0, -1, floatSpeed, 0d);
+			this.particleTextureIndexY = 0;
+			this.particleScale = scale;
+			this.motionX = motionX;
+			this.motionY = motionY;
+			this.motionZ = motionZ;
+		}
+
+		@Override
+		public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ,
+				float rotationXY, float rotationXZ) {
+	     	this.textureManager.bindTexture(Smoke.TEXTURE);
+	        float f0 = (float)this.particleTextureIndexX / 8.0F;
+	        float f1 = f0 + 0.124875F;
+	        float f2 = (float)this.particleTextureIndexY / 8.0F;
+	        float f3 = f2 + 0.124875F;
+	        float f4 = 0.1F * this.particleScale;
+	        float f5 = (float)(this.prevPosX + (this.posX - this.prevPosX) * (double)partialTicks - interpPosX);
+	        float f6 = (float)(this.prevPosY + (this.posY - this.prevPosY) * (double)partialTicks - interpPosY);
+	        float f7 = (float)(this.prevPosZ + (this.posZ - this.prevPosZ) * (double)partialTicks - interpPosZ);
+	        float f8 = this.particleAlpha;
+	        int i = this.getBrightnessForRender(partialTicks);
+	        int j = i >> 16 & 65535;
+	        int k = i & 65535;
+	        Vec3d[] avec3d = new Vec3d[] {new Vec3d((double)(-rotationX * f4 - rotationXY * f4), (double)(-rotationZ * f4), (double)(-rotationYZ * f4 - rotationXZ * f4)), new Vec3d((double)(-rotationX * f4 + rotationXY * f4), (double)(rotationZ * f4), (double)(-rotationYZ * f4 + rotationXZ * f4)), new Vec3d((double)(rotationX * f4 + rotationXY * f4), (double)(rotationZ * f4), (double)(rotationYZ * f4 + rotationXZ * f4)), new Vec3d((double)(rotationX * f4 - rotationXY * f4), (double)(-rotationZ * f4), (double)(rotationYZ * f4 - rotationXZ * f4))};
+	        buffer.pos((double)f5 + avec3d[0].x, (double)f6 + avec3d[0].y, (double)f7 + avec3d[0].z).tex((double)f1, (double)f3).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
+	        buffer.pos((double)f5 + avec3d[1].x, (double)f6 + avec3d[1].y, (double)f7 + avec3d[1].z).tex((double)f1, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
+	        buffer.pos((double)f5 + avec3d[2].x, (double)f6 + avec3d[2].y, (double)f7 + avec3d[2].z).tex((double)f0, (double)f2).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
+	        buffer.pos((double)f5 + avec3d[3].x, (double)f6 + avec3d[3].y, (double)f7 + avec3d[3].z).tex((double)f0, (double)f3).color(this.particleRed, this.particleGreen, this.particleBlue, f8).lightmap(j, k).endVertex();
+		}
+
+		@Override
+		public void onUpdate() {
+			this.prevPosX = this.posX;
+			this.prevPosY = this.posY;
+			this.prevPosZ = this.posZ;
+			if (this.particleMaxAge == 0 || this.particleAge++ >= this.particleMaxAge) {
+				this.setExpired();
+				return;
+			}
+			double d = MathHelper.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+			this.particleTextureIndexX = (this.particleTextureIndexX + (d > 0.01d ? 1 : 0)) % 8;
+			this.motionY += this.floatMotionY;
+			this.move(this.motionX, this.motionY, this.motionZ);
+			this.motionX *= 0.96D;
+			this.motionY *= 0.96D;
+			this.motionZ *= 0.96D;
+			if (this.onGround) {
+				this.motionX *= 0.7D;
+				this.motionZ *= 0.7D;
+			}
+		}
+
+		@Override
+		public boolean shouldDisableDepth() {
+			return false;
+		}
+
+		@SideOnly(Side.CLIENT)
+		public static class Factory implements IParticleFactory {
+			public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
+					double ySpeedIn, double zSpeedIn, int... parameters) {
+				double arg3 = (parameters.length > 3) ? (double)parameters[3] / 1000.0D : -0.004D;
+				int arg2 = (parameters.length > 2) ? parameters[2] : 0;
+				float arg1 = (parameters.length > 1) ? ((float)parameters[1] / 10.0F) : 1.0F;
+				int arg0 = (parameters.length > 0) ? parameters[0] : -1;
+				return new Sand(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0, arg1, arg2, arg3);
+			}
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	public static class WaterSplash extends ParticleRain {
+	    protected WaterSplash(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, float scale) {
+	        super(worldIn, xCoordIn, yCoordIn, zCoordIn);
+	        this.setParticleTextureIndex(19 + this.rand.nextInt(3));
+	        this.particleScale *= scale;
+            this.motionX = xSpeedIn;
+            this.motionY = ySpeedIn;
+            this.motionZ = zSpeedIn;
+	    }
+	
+	    @SideOnly(Side.CLIENT)
+	    public static class Factory implements IParticleFactory {
+	        public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn,
+	        		double xSpeedIn, double ySpeedIn, double zSpeedIn, int... parameters) {
+	        	float arg0 = (parameters.length > 0) ? ((float)parameters[0] / 10.0F) : 1.0F;
+	            return new WaterSplash(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn, arg0);
+	        }
+	    }
+	}
+
 	public enum Types {
-		SMOKE("smoke_colored", 54678400, 6), 
+		SMOKE("smoke_colored", 54678400, 7), 
 		SUSPENDED("suspended_colored", 54678401, 3), 
-		FALLING_DUST("falling_dust", 54678402, 1), 
+		FALLING_DUST("falling_dust", 54678402, 3),
 		FLAME("flame_colored", 54678403, 2),
 		MOB_APPEARANCE("mob_appearance", 54678404, 1),
-		BURNING_ASH("burning_ash", 54678405, 1),
+		BURNING_ASH("burning_ash", 54678405, 2),
 		HOMING_ORB("homing_orb", 54678406, 2),
 		EXPANDING_SPHERE("expanding_sphere", 54678407, 3),
 		PORTAL_SPIRAL("portal_spiral", 54678408, 3),
 		SEAL_FORMULA("seal_formula", 54678409, 3),
-		ACID_SPIT("acid_spit", 54678410, 2),
-		WHIRLPOOL("whirlpool", 54678411, 4);
+		ACID_SPIT("acid_spit", 54678410, 3),
+		WHIRLPOOL("whirlpool", 54678411, 4),
+		BLOCK_DUST("block_dust", 54678412, 4),
+		SONIC_BOOM("sonic_boom", 54678413, 4),
+		SAND("sand_colored", 54678414, 4),
+		WATER_SPLASH("water_splash", 54678415, 1),
+		SPIT("spit", 54678416, 4),
+		CLAY_SPIT("clay_spit", 54678417, 3),
+		CONCENTRIC_SPHERES("concentric_spheres", 54678418, 3);
 		
 		private final String particleName;
 		private final int particleID;

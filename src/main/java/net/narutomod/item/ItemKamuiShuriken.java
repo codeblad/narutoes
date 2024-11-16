@@ -43,6 +43,7 @@ import net.minecraft.client.Minecraft;
 import net.narutomod.world.WorldKamuiDimension;
 import net.narutomod.procedure.ProcedureKamuiTeleportEntity;
 import net.narutomod.procedure.ProcedureSusanoo;
+import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntitySusanooWinged;
 import net.narutomod.PlayerTracker;
 import net.narutomod.creativetab.TabModTab;
@@ -53,7 +54,7 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:kamuishuriken")
 	public static final Item block = null;
 	public static final int ENTITYID = 114;
-	private static final double CHAKRA_USAGE = 500.0d;
+	private static final double CHAKRA_USAGE = 700.0d;
 	
 	public ItemKamuiShuriken(ElementsNarutomodMod instance) {
 		super(instance, 331);
@@ -73,14 +74,6 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:kamuishuriken", "inventory"));
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntityKamuiShuriken.class, renderManager -> {
-			return new RenderKamuiShuriken(renderManager, Minecraft.getMinecraft().getRenderItem());
-		});
-	}
-	
 	public static class RangedItem extends Item {
 		public RangedItem() {
 			super();
@@ -94,19 +87,16 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityLivingBase entityLivingBase, int timeLeft) {
-			if (!world.isRemote && entityLivingBase instanceof EntityPlayerMP) {
+			if (!world.isRemote && entityLivingBase instanceof EntityPlayerMP
+			 && net.narutomod.Chakra.pathway(entityLivingBase).consume(CHAKRA_USAGE)) {
 				EntityPlayerMP entity = (EntityPlayerMP) entityLivingBase;
 				float power = 0.5f;
 				EntityKamuiShuriken entityarrow = new EntityKamuiShuriken(world, entity);
 				if (entity.isRiding() && entity.getRidingEntity() instanceof EntitySusanooWinged.EntityCustom) {
-					entityarrow.setScale((float) entity.getRidingEntity().getEntityData().getDouble("entityModelScale"));
+					entityarrow.setScale((float)entity.getRidingEntity().getEntityData().getDouble("entityModelScale"));
 				}
 				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 2, 0);
-				//if (!entity.capabilities.isCreativeMode) {
-				//	entity.inventory.clearMatchingItems(new ItemStack(ItemKamuiShuriken.block, 1).getItem(), -1, 1, null);
-				//}
 				world.spawnEntity(entityarrow);
-				net.narutomod.Chakra.pathway(entityLivingBase).consume(CHAKRA_USAGE);
 			}
 		}
 
@@ -166,6 +156,15 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void notifyDataManagerChange(DataParameter<?> key) {
+			super.notifyDataManagerChange(key);
+			if (SCALE.equals(key) && this.world.isRemote) {
+				float f = this.getScale();
+				this.setSize(this.ogWidth * f, this.ogWidth * f);
+			}
+		}
+
+		@Override
 		protected void onImpact(RayTraceResult result) {
 			if (result.entityHit != null) {
 				for (Entity entity = this.thrower; entity != null; entity = entity.getRidingEntity())
@@ -175,21 +174,8 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				if (result.entityHit != null && this.thrower instanceof EntityPlayer) {
 					EntityPlayer thrower = (EntityPlayer) this.thrower;
-					double d = 0.0001d * PlayerTracker.getBattleXp(thrower)
+					double d = 0.00000625d * this.getScale() * PlayerTracker.getBattleXp(thrower)
 							/ result.entityHit.getEntityBoundingBox().getAverageEdgeLength();
-					/*if (f < 1.0f) {
-						result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.thrower), 0.1f);
-						if (result.entityHit instanceof EntityLivingBase) {
-							EntityLivingBase elb = (EntityLivingBase) result.entityHit;
-							elb.setHealth(elb.getHealth() - elb.getMaxHealth() * (float) f);
-						}
-					} else {
-						if (this.world instanceof WorldServer)
-							((WorldServer) this.world).spawnParticle(EnumParticleTypes.PORTAL, result.hitVec.x, result.hitVec.y, result.hitVec.z,
-									1000, 1d, 1d, 1d, 1d);
-						ProcedureKamuiTeleportEntity.eEntity(result.entityHit, (int) result.hitVec.x, (int) result.hitVec.z,
-								this.dimension != WorldKamuiDimension.DIMID ? WorldKamuiDimension.DIMID : 0);
-					}*/
 					if (result.entityHit instanceof EntityLivingBase) {
 						EntityLivingBase elb = (EntityLivingBase) result.entityHit;
 						elb.attackEntityFrom(DamageSource.OUT_OF_WORLD, elb.getMaxHealth() * (float)d);
@@ -203,13 +189,9 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate() {
-			if (this.width < this.getScale() * this.ogWidth) {
-				this.setSize(this.ogWidth * this.getScale(), this.height * this.getScale());
-			}
 			super.onUpdate();
 			if (this.ticksExisted % 40 == 2) {
-				this.playSound((net.minecraft.util.SoundEvent)net.minecraft.util.SoundEvent.REGISTRY
-				 .getObject(new ResourceLocation(("narutomod:KamuiSFX"))), 
+				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:KamuiSFX")),
 				 1, 1f / (this.rand.nextFloat() * 0.5f + 1f) + 0.25f);
 			}
 			if (this.inGround) {
@@ -218,43 +200,58 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class RenderKamuiShuriken extends Render<EntityKamuiShuriken> {
-		protected final Item item;
-		private final RenderItem itemRenderer;
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
 
-		public RenderKamuiShuriken(RenderManager renderManagerIn, RenderItem itemRendererIn) {
-			super(renderManagerIn);
-			this.item = block;
-			this.itemRenderer = itemRendererIn;
-		}
-
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
 		@Override
-		public void doRender(EntityKamuiShuriken entity, double x, double y, double z, float entityYaw, float partialTicks) {
-			GlStateManager.pushMatrix();
-			float scale = entity.getScale();
-			GlStateManager.translate((float) x, (float) y + (0.125F * scale), (float) z);
-			GlStateManager.scale(scale, scale, scale);
-			GlStateManager.enableRescaleNormal();
-			GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate((float) (this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-			GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate(5f * ((float)entity.ticksExisted + partialTicks), 0.0F, 0.0F, 1.0F);
-			GlStateManager.rotate(-60f * ((float)entity.ticksExisted + partialTicks), 1.0F, 0.0F, 0.0F);
-			this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-			this.itemRenderer.renderItem(this.getStackToRender(entity), ItemCameraTransforms.TransformType.GROUND);
-			GlStateManager.disableRescaleNormal();
-			GlStateManager.popMatrix();
-			super.doRender(entity, x, y, z, entityYaw, partialTicks);
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EntityKamuiShuriken.class, renderManager -> {
+				return new RenderKamuiShuriken(renderManager, Minecraft.getMinecraft().getRenderItem());
+			});
 		}
 
-		public ItemStack getStackToRender(EntityKamuiShuriken entityIn) {
-			return new ItemStack(this.item);
-		}
-
-		@Override
-		protected ResourceLocation getEntityTexture(EntityKamuiShuriken entity) {
-			return TextureMap.LOCATION_BLOCKS_TEXTURE;
+		@SideOnly(Side.CLIENT)
+		public class RenderKamuiShuriken extends Render<EntityKamuiShuriken> {
+			protected final Item item;
+			private final RenderItem itemRenderer;
+	
+			public RenderKamuiShuriken(RenderManager renderManagerIn, RenderItem itemRendererIn) {
+				super(renderManagerIn);
+				this.item = block;
+				this.itemRenderer = itemRendererIn;
+			}
+	
+			@Override
+			public void doRender(EntityKamuiShuriken entity, double x, double y, double z, float entityYaw, float partialTicks) {
+				GlStateManager.pushMatrix();
+				float scale = entity.getScale();
+				GlStateManager.translate((float) x, (float) y + (0.125F * scale), (float) z);
+				GlStateManager.scale(scale, scale, scale);
+				GlStateManager.enableRescaleNormal();
+				GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+				GlStateManager.rotate((float) (this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+				GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
+				GlStateManager.rotate(5f * ((float)entity.ticksExisted + partialTicks), 0.0F, 0.0F, 1.0F);
+				GlStateManager.rotate(-60f * ((float)entity.ticksExisted + partialTicks), 1.0F, 0.0F, 0.0F);
+				this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+				this.itemRenderer.renderItem(this.getStackToRender(entity), ItemCameraTransforms.TransformType.GROUND);
+				GlStateManager.disableRescaleNormal();
+				GlStateManager.popMatrix();
+				super.doRender(entity, x, y, z, entityYaw, partialTicks);
+			}
+	
+			public ItemStack getStackToRender(EntityKamuiShuriken entityIn) {
+				return new ItemStack(this.item);
+			}
+	
+			@Override
+			protected ResourceLocation getEntityTexture(EntityKamuiShuriken entity) {
+				return TextureMap.LOCATION_BLOCKS_TEXTURE;
+			}
 		}
 	}
 }

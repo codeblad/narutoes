@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
@@ -58,12 +59,6 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 		 .tracker(64, 1, true).build());
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager -> new RenderEightTrigrams(renderManager));
-	}
-
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new EntityCustom.AttackHook());
 	}
@@ -75,6 +70,10 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 		private final Map<EntityPlayer, Integer> pMap = Maps.newHashMap();
 		public final double effectRadius;
 		public final int effectDuration;
+
+		public static boolean isActivated(Entity entity) {
+			return entity.getEntityData().getBoolean(JUTSUACTIVEKEY);
+		}
 		
 		public EntityCustom(World world) {
 			super(world);
@@ -104,7 +103,8 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 
 		public void setOwnerPlayer(EntityLivingBase player) {
 			this.ownerPlayer = player;
-			player.getEntityData().setBoolean(JUTSUACTIVEKEY, true);
+			ProcedureSync.EntityNBTTag.setAndSync(player, JUTSUACTIVEKEY, true);
+			//player.getEntityData().setBoolean(JUTSUACTIVEKEY, true);
 		}
 
 		@Override
@@ -114,7 +114,13 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void setDead() {
-			this.isDead = this.canDie;
+			if (this.canDie) {
+				if (this.ownerPlayer != null) {
+					ProcedureSync.EntityNBTTag.removeAndSync(this.ownerPlayer, JUTSUACTIVEKEY);
+					//this.ownerPlayer.getEntityData().removeTag(JUTSUACTIVEKEY);
+				}
+				super.setDead();
+			}
 		}
 
 		@Override
@@ -131,14 +137,14 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				if (this.ticksExisted > 3 && this.ticksExisted < 20) {
-					ProcedureAoeCommand.set(this, 0.0D, this.effectRadius).exclude(this.ownerPlayer).effect(MobEffects.SLOWNESS, 15, 4)
-					 .effect(MobEffects.WEAKNESS, 15, 255).effect(MobEffects.MINING_FATIGUE, 15, 5);
+					ProcedureAoeCommand.set(this, 0.0D, this.effectRadius).exclude(this.ownerPlayer).effect(MobEffects.SLOWNESS, 15, 4, true)
+					 .effect(MobEffects.WEAKNESS, 15, 255, true).effect(MobEffects.MINING_FATIGUE, 15, 5, true);
 				}
 				if (this.ownerPlayer instanceof EntityPlayer) {
 					((EntityPlayer)this.ownerPlayer).sendStatusMessage(new TextComponentString(I18n.translateToLocal("tooltip.byakugan.jutsu2")), true);
-					if (this.ticksExisted % 40 == 4) {
-						this.ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 
-						 50, (int)(PlayerTracker.getNinjaLevel((EntityPlayer)this.ownerPlayer) + this.ticksExisted) / 20));
+					if (this.ticksExisted % 40 == 4) {
+						this.ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 
+						 50, (int)(PlayerTracker.getNinjaLevel((EntityPlayer)this.ownerPlayer) + this.ticksExisted) / 30));
 						this.ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.HASTE, 50, 3));
 					}
 				}
@@ -149,12 +155,17 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 		            }
 				}
 			}
-			if (this.ticksExisted > this.effectDuration) {
-				if (this.ownerPlayer != null) {
-					this.ownerPlayer.getEntityData().setBoolean(JUTSUACTIVEKEY, false);
-				}
+			if (this.ticksExisted > this.effectDuration
+			 || (!this.world.isRemote && (this.ownerPlayer == null || !this.ownerPlayer.isEntityAlive()))) {
 				this.canDie = true;
 				this.setDead();
+			}
+		}
+
+		private void resetRenderDistance(EntityPlayer player) {
+			if (!this.world.isRemote && this.pMap.containsKey(player)) {
+				ProcedureSync.RenderDistance.sendToSelf((EntityPlayerMP)player, this.pMap.get(player), null);
+				this.pMap.remove(player);
 			}
 		}
 
@@ -175,66 +186,96 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 			@SubscribeEvent
 			public void onAttacked(LivingHurtEvent event) {
 				Entity source = event.getSource().getImmediateSource();
-				if (source != null && source.getEntityData().getBoolean(JUTSUACTIVEKEY)) {
+				if (source != null && EntityCustom.isActivated(source)) {
 					Chakra.pathway(event.getEntityLiving()).consume(0.125f);
+					event.getEntityLiving().getEntityData().setBoolean("TempData_disableKnockback", true);
+				}
+			}
+
+			@SubscribeEvent
+			public void onLivingDeath(LivingDeathEvent event) {
+				Entity entity = event.getEntity();
+				if (entity instanceof EntityPlayer) {
+					EntityCustom jutsuEntity = (EntityCustom)entity.world.findNearestEntityWithinAABB(EntityCustom.class, entity.getEntityBoundingBox().grow(32d), entity);
+					if (jutsuEntity != null) {
+						jutsuEntity.resetRenderDistance((EntityPlayer)entity);
+					}
 				}
 			}
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class RenderEightTrigrams extends Render<EntityCustom> {
-		private final ResourceLocation TEXTURE = new ResourceLocation("narutomod:textures/eight_trigrams.png");
-		protected ModelBase mainModel;
-		
-		public RenderEightTrigrams(RenderManager renderManagerIn) {
-			super(renderManagerIn);
-			this.mainModel = new ModelEightTrigrams();
-		}
-
-		@Override
-		public void doRender(EntityCustom entity, double x, double y, double z, float entityYaw, float partialTicks) {
-			this.bindEntityTexture(entity);
-			GlStateManager.pushMatrix();
-			GlStateManager.disableCull();
-			GlStateManager.translate(x, y + 0.10000000149011612D, z - 0.4000000059604645D);
-			GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
-			GlStateManager.enableAlpha();
-			GlStateManager.enableBlend();
-			GlStateManager.disableLighting();
-			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-			this.mainModel.render(entity, 0.0F, 0.0F, partialTicks + entity.ticksExisted, 0.0F, 0.0F, 1.0F);
-			GlStateManager.enableLighting();
-			GlStateManager.disableBlend();
-			GlStateManager.disableAlpha();
-			GlStateManager.enableCull();
-			GlStateManager.popMatrix();
-			super.doRender(entity, x, y, z, entityYaw, partialTicks);
-		}
-
-		@Override
-		protected ResourceLocation getEntityTexture(EntityCustom entity) {
-			return TEXTURE;
-		}
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class ModelEightTrigrams extends ModelBase {
-		private final ModelRenderer bb_main;
-		
-		public ModelEightTrigrams() {
-			this.textureWidth = 64;
-			this.textureHeight = 16;
-			this.bb_main = new ModelRenderer(this);
-			this.bb_main.setRotationPoint(0.0F, 0.0F, 0.0F);
-			this.bb_main.cubeList.add(new ModelBox(this.bb_main, 0, 0, -8.0F, 0.0F, -8.0F, 16, 0, 16, 0.0F, false));
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
+		@Override
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager -> new RenderEightTrigrams(renderManager));
 		}
 
-		@Override
-		public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
-			this.bb_main.render(f5);
+		@SideOnly(Side.CLIENT)
+		public class RenderEightTrigrams extends Render<EntityCustom> {
+			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/eight_trigrams.png");
+			protected ModelBase mainModel;
+			
+			public RenderEightTrigrams(RenderManager renderManagerIn) {
+				super(renderManagerIn);
+				this.mainModel = new ModelEightTrigrams();
+			}
+
+			@Override
+			public boolean shouldRender(EntityCustom livingEntity, net.minecraft.client.renderer.culling.ICamera camera, double camX, double camY, double camZ) {
+				return true;
+			}
+	
+			@Override
+			public void doRender(EntityCustom entity, double x, double y, double z, float entityYaw, float partialTicks) {
+				this.bindEntityTexture(entity);
+				GlStateManager.pushMatrix();
+				GlStateManager.disableCull();
+				GlStateManager.translate(x, y + 0.10000000149011612D, z - 0.4000000059604645D);
+				GlStateManager.rotate(180.0F, 1.0F, 0.0F, 0.0F);
+				GlStateManager.enableAlpha();
+				GlStateManager.enableBlend();
+				GlStateManager.disableLighting();
+				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
+				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+				this.mainModel.render(entity, 0.0F, 0.0F, partialTicks + entity.ticksExisted, 0.0F, 0.0F, 1.0F);
+				GlStateManager.enableLighting();
+				GlStateManager.disableBlend();
+				//GlStateManager.disableAlpha();
+				GlStateManager.enableCull();
+				GlStateManager.popMatrix();
+				super.doRender(entity, x, y, z, entityYaw, partialTicks);
+			}
+	
+			@Override
+			protected ResourceLocation getEntityTexture(EntityCustom entity) {
+				return this.texture;
+			}
+		}
+	
+		@SideOnly(Side.CLIENT)
+		public class ModelEightTrigrams extends ModelBase {
+			private final ModelRenderer bb_main;
+			
+			public ModelEightTrigrams() {
+				this.textureWidth = 64;
+				this.textureHeight = 16;
+				this.bb_main = new ModelRenderer(this);
+				this.bb_main.setRotationPoint(0.0F, 0.0F, 0.0F);
+				this.bb_main.cubeList.add(new ModelBox(this.bb_main, 0, 0, -8.0F, 0.0F, -8.0F, 16, 0, 16, 0.0F, false));
+			}
+	
+			@Override
+			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+				this.bb_main.render(f5);
+			}
 		}
 	}
 }

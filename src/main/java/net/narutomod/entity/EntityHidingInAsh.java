@@ -37,7 +37,7 @@ public class EntityHidingInAsh extends ElementsNarutomodMod.ModElement {
 				.id(new ResourceLocation("narutomod", "hiding_in_ash"), ENTITYID).name("hiding_in_ash").tracker(64, 3, true).build());
 	}
 
-	public static class EC extends Entity {
+	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private static final DataParameter<Integer> USER_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private static final DataParameter<Float> RANGE = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final int maxLife = 110;
@@ -53,6 +53,11 @@ public class EntityHidingInAsh extends ElementsNarutomodMod.ModElement {
 			this.setRange((float)rangeIn);
 			this.setIdlePosition();
 			userIn.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, this.maxLife, 0, false, false));
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.RAITON;
 		}
 
 		@Override
@@ -93,7 +98,7 @@ public class EntityHidingInAsh extends ElementsNarutomodMod.ModElement {
 			if (this.world.isRemote) {
 				EntityLivingBase user = this.getUser();
 				float range = this.getRange();
-				for (int i = 0; i < (int)(range * 20); i++) {
+				for (int i = 0; i < (int)(range * 10); i++) {
 					Particles.spawnParticle(this.world, Particles.Types.BURNING_ASH, this.posX, this.posY, this.posZ, 
 					  1, 0, 0, 0, range * (this.rand.nextDouble()-0.5d) * 0.1d, (this.rand.nextDouble()-0.5d) * range * 0.1d,
 					  range * (this.rand.nextDouble()-0.5d) * 0.1d, user != null ? user.getEntityId() : -1);
@@ -120,6 +125,11 @@ public class EntityHidingInAsh extends ElementsNarutomodMod.ModElement {
 				  net.minecraft.util.SoundCategory.NEUTRAL, 5, 1f);
 				entity.world.spawnEntity(new EC(entity, power));
 				return true;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 15.0f;
 			}
 		}
 	}

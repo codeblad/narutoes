@@ -6,8 +6,10 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 import net.minecraft.world.World;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
@@ -23,11 +25,11 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.Vec3d;
 
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
+
+import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityBeamBase extends ElementsNarutomodMod.ModElement {
@@ -64,7 +66,7 @@ public class EntityBeamBase extends ElementsNarutomodMod.ModElement {
 		}
 
 		public Base(EntityLivingBase shooter) {
-			this(shooter.world, shooter.posX, shooter.posY + shooter.getEyeHeight() - 0.10000000149011612D, shooter.posZ);
+			this(shooter.world, shooter.posX, shooter.posY + shooter.getEyeHeight() - 0.1D, shooter.posZ);
 			this.prevRotationPitch = this.rotationPitch = shooter.rotationPitch;
 			this.prevRotationYaw = this.rotationYaw = shooter.rotationYaw;
 			this.setShooter(shooter);
@@ -73,7 +75,7 @@ public class EntityBeamBase extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void entityInit() {
 			this.getDataManager().register(SHOOTER_ID, Integer.valueOf(-1));
-			this.getDataManager().register(BEAM_LENGTH, Float.valueOf(1));
+			this.getDataManager().register(BEAM_LENGTH, Float.valueOf(0.1f));
 		}
 
 		private void setShooter(EntityLivingBase shooter) {
@@ -81,7 +83,11 @@ public class EntityBeamBase extends ElementsNarutomodMod.ModElement {
 			this.shootingEntity = shooter;
 		}
 
+		@Nullable
 		protected EntityLivingBase getShooter() {
+			if (!this.world.isRemote) {
+				return this.shootingEntity instanceof EntityLivingBase ? (EntityLivingBase)this.shootingEntity : null;
+			}
 			Entity entity = this.world.getEntityByID(((Integer)this.dataManager.get(SHOOTER_ID)).intValue());
 			return entity instanceof EntityLivingBase ? (EntityLivingBase)entity : null;
 		}
@@ -96,16 +102,20 @@ public class EntityBeamBase extends ElementsNarutomodMod.ModElement {
 
 		public void shoot(double range) {
 			if (this.shootingEntity != null) {
-				this.hitTrace = ProcedureUtils.objectEntityLookingAt(this.shootingEntity, range);
-				this.shoot(this.hitTrace.hitVec.x - this.posX, this.hitTrace.hitVec.y - this.posY, this.hitTrace.hitVec.z - this.posZ);
+				this.shoot(ProcedureUtils.objectEntityLookingAt(this.shootingEntity, range));
 			}
 		}
 
 		public void shoot(double x, double y, double z) {
-			if (this.hitTrace == null) {
-				this.hitTrace = new RayTraceResult(new Vec3d(this.posX + x, this.posY + y, this.posZ + z),
-				 EnumFacing.getFacingFromVector((float)x, (float)y, (float)z).getOpposite());
-			}
+			this.shoot(new RayTraceResult(new Vec3d(this.posX + x, this.posY + y, this.posZ + z),
+			 EnumFacing.getFacingFromVector((float)x, (float)y, (float)z).getOpposite()));
+		}
+
+		public void shoot(RayTraceResult rayTrace) {
+			this.hitTrace = rayTrace;
+			double x = rayTrace.hitVec.x - this.posX;
+			double y = rayTrace.hitVec.y - this.posY;
+			double z = rayTrace.hitVec.z - this.posZ;
 			float f = MathHelper.sqrt(x * x + y * y + z * z);
 			this.setBeamLength(f + 0.1f);
 			x /= f;
@@ -115,10 +125,10 @@ public class EntityBeamBase extends ElementsNarutomodMod.ModElement {
 			this.motionY = 0.0D;
 			this.motionZ = 0.0D;
 			float f1 = MathHelper.sqrt(x * x + z * z);
-			this.rotationYaw = (float) (MathHelper.atan2(x, z) * (180d / Math.PI));
-			this.rotationPitch = (float) (MathHelper.atan2(y, f1) * (180d / Math.PI));
 			this.prevRotationYaw = this.rotationYaw;
 			this.prevRotationPitch = this.rotationPitch;
+			this.rotationYaw = (float) (MathHelper.atan2(x, z) * (180d / Math.PI));
+			this.rotationPitch = (float) (MathHelper.atan2(y, f1) * (180d / Math.PI));
 			//this.ticksAlive = 0;
 		}
 
@@ -163,7 +173,7 @@ public class EntityBeamBase extends ElementsNarutomodMod.ModElement {
 			this.shadowSize = 0.1F;
 		}
 
-		public Model getMainModel(T entity) {
+		public Model getMainModel(T entity, float partialTicks) {
 			return new Model(entity.getBeamLength());
 		}
 
@@ -194,15 +204,15 @@ public class EntityBeamBase extends ElementsNarutomodMod.ModElement {
 			GlStateManager.disableLighting();
 			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
 			//GlStateManager.color(1.0F, 1.0F, 1.0F, 0.3F);
-			this.getMainModel(bullet).render(bullet, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+			this.getMainModel(bullet, pt).render(bullet, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
 			//GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			GlStateManager.matrixMode(5890);
 			GlStateManager.loadIdentity();
 			GlStateManager.matrixMode(5888);
 			GlStateManager.enableLighting();
-			GlStateManager.disableAlpha();
+			//GlStateManager.disableAlpha();
 			GlStateManager.disableBlend();
-			GlStateManager.depthMask(false);
+			//GlStateManager.depthMask(false);
 			GlStateManager.popMatrix();
 		}
 

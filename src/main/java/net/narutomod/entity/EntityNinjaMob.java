@@ -16,8 +16,10 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraft.world.World;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos;
@@ -40,6 +42,7 @@ import net.minecraft.entity.ai.EntityAITarget;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.init.SoundEvents;
@@ -47,63 +50,127 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderBiped;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.pathfinding.Path;
+import net.minecraft.pathfinding.PathNavigate;
+import net.minecraft.pathfinding.PathNavigateGround;
 
 import net.narutomod.item.ItemOnBody;
 import net.narutomod.potion.PotionFeatherFalling;
+import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Chakra;
+import net.narutomod.PlayerRender;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.NarutomodMod;
 
 import io.netty.buffer.ByteBuf;
-import java.util.List;
-import java.util.Arrays;
-import java.util.UUID;
-import net.minecraft.network.PacketBuffer;
-import com.google.common.collect.Lists;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
-	public static final UUID NINJA_HEALTH = UUID.fromString("84d6711b-c26d-4dfa-b0c5-1ff54395f4de");
 	public static final List<Class <? extends Base>> TeamKonoha = Arrays.asList(EntityTenten.EntityCustom.class, EntitySakuraHaruno.EntityCustom.class, EntityIrukaSensei.EntityCustom.class, EntityMightGuy.EntityCustom.class);
 	public static final List<Class <? extends Base>> TeamZabuza = Arrays.asList(EntityZabuzaMomochi.EntityCustom.class, EntityHaku.EntityCustom.class);
-	public static final List<Class <? extends Base>> TeamItachi = Arrays.asList(EntityItachi.EntityCustom.class, EntityKisameHoshigaki.EntityCustom.class);
+	public static final List<Class <? extends Base>> TeamAkatsuki = Arrays.asList(EntityItachi.EntityCustom.class, EntityKisameHoshigaki.EntityCustom.class, EntitySasori.EntityCustom.class, EntityDeidara.EntityCustom.class, EntityKakuzu.EntityCustom.class);
 
 	public EntityNinjaMob(ElementsNarutomodMod instance) {
 		super(instance, 404);
+	}
+
+	protected static class SpawnData {
+		protected static final Map<Class<? extends Base>, List<SpawnData>> map = Maps.newHashMap();
+		protected World world;
+		protected AxisAlignedBB area;
+		protected long time;
+
+		SpawnData(Base entity) {
+			this.world = entity.world;
+			this.area = entity.getEntityBoundingBox().grow(512.0d, 64.0d, 512.0d);
+			this.time = entity.world.getTotalWorldTime();
+		}
+
+		protected static void addSpawnData(Base entity) {
+			List<SpawnData> spawndatalist = map.get(entity.getClass());
+			if (spawndatalist == null) {
+				spawndatalist = Lists.newArrayList();
+			}
+			spawndatalist.add(new SpawnData(entity));
+			map.put(entity.getClass(), spawndatalist);
+		}
+
+		protected static boolean spawnedRecentlyHere(Base entity, long interval) {
+			List<SpawnData> spawndatalist = map.get(entity.getClass());
+			if (spawndatalist != null) {
+				Iterator<SpawnData> iter = spawndatalist.iterator();
+				while (iter.hasNext()) {
+					SpawnData spawndata = iter.next();
+					if (entity.world == spawndata.world && spawndata.area.contains(entity.getPositionVector())) {
+						if (spawndata.world.getTotalWorldTime() - spawndata.time <= interval) {
+							return true;
+						} else {
+							iter.remove();
+						}
+					}
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public String toString() {
+			return "{world:"+this.world.provider.getDimension()+", area:"+area+", time:"+time+"}";
+		}
 	}
 
 	public static abstract class Base extends EntityCreature {
 		private static final DataParameter<Float> CHAKRA_MAX = EntityDataManager.createKey(Base.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> CHAKRA = EntityDataManager.createKey(Base.class, DataSerializers.FLOAT);
 		private final PathwayNinjaMob chakraPathway;
-		private final NonNullList<ItemStack> inventory = NonNullList.<ItemStack>withSize(2, ItemStack.EMPTY);
+		private final int inventorySize = 2;
+		private final NonNullList<ItemStack> inventory = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
 		public int peacefulTicks;
+		//private int haltAITicks;
 		private int standStillTicks;
+		private float haltedYaw;
+		private float haltedYawHead;
+		private float haltedRenderYawOffset;
+		private float haltedPitch;
 
 		public Base(World worldIn, int level, double chakraAmountIn) {
 			super(worldIn);
 			this.setSize(0.6f, 1.8f);
 			this.experienceValue = level;
 			this.isImmuneToFire = false;
-			this.stepHeight = 8f;
+			this.stepHeight = 16f;
+			this.moveHelper = new MoveHelper(this);
 			this.setNoAI(false);
 			this.setCanPickUpLoot(false);
 			this.setCustomNameTag(this.getName());
 			this.setAlwaysRenderNameTag(true);
 			this.chakraPathway = new PathwayNinjaMob(this, chakraAmountIn);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-			 .applyModifier(new AttributeModifier(NINJA_HEALTH, "ninja.maxhealth", 0.005d * level * level, 0));
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50d + 0.005d * level * level);
 			this.setHealth(this.getMaxHealth());
+		}
+
+		@Override
+		protected PathNavigate createNavigator(World worldIn) {
+			PathNavigateGround navi = new NavigateGround(this, worldIn);
+			navi.setCanSwim(true);
+			return navi;
 		}
 
 		@Override
@@ -118,8 +185,8 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			super.applyEntityAttributes();
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50D);
-			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(48D);
+			//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50D);
+			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
 		}
 
 		@Override
@@ -144,6 +211,10 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			return this.chakraPathway.getAmount();
 		}
 
+		public float remainingChakra() {
+			return (float)(this.getChakra() / this.chakraPathway.getMax());
+		}
+
 		public boolean consumeChakra(double amount) {
 			return this.chakraPathway.consume(amount);
 		}
@@ -157,13 +228,8 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void updateAITasks() {
 			super.updateAITasks();
-			EntityLivingBase target = this.getAttackTarget();
-			//if (target != null && (!target.isEntityAlive()
-			// || (target.isInvisible() && !ItemSharingan.wearingAny(this) && !ItemByakugan.wearingAny(this)))) {
-			//	this.setAttackTarget(null);
-			//}
 			if (ProcedureUtils.isWeapon(this.getItemFromInventory(0)) || ProcedureUtils.isWeapon(this.getHeldItemMainhand())) {
-				boolean flag = this.getRevengeTarget() != null || target != null
+				boolean flag = this.getRevengeTarget() != null || this.getAttackTarget() != null
 				 || (this.getLastAttackedEntity() != null && this.ticksExisted <= this.getLastAttackedEntityTime() + 100);
 				if (this.getHeldItemMainhand().isEmpty() == flag) {
 					this.swapWithInventory(EntityEquipmentSlot.MAINHAND, 0);
@@ -175,7 +241,22 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			this.fixOnClientSpawn();
 			super.onUpdate();
+			BlockPos pos = new BlockPos(this);
+			if (this.navigator instanceof PathNavigateGround
+			 && this.world.getBlockState(pos).getMaterial() == Material.WATER
+			 && this.world.getBlockState(pos.up()).getMaterial() != Material.WATER) {
+				this.motionY = 0.01d;
+				this.onGround = true;
+			}
 			if (!this.world.isRemote && this.isEntityAlive()) {
+		    	//if (this.haltAITicks > 0) {
+		    	//	--this.haltAITicks;
+		    	//	if (!this.isAIDisabled()) {
+		    	//		this.setNoAI(true);
+		    	//	}
+		    	//} else if (this.isAIDisabled() && !this.getEntityData().getBoolean(NarutomodModVariables.tempDisableAI)) {
+		    	//	this.setNoAI(false);
+		    	//}
 				if (this.ticksExisted % 200 == 1) {
 					this.addPotionEffect(new PotionEffect(PotionFeatherFalling.potion, 201, 1, false, false));
 				}
@@ -186,19 +267,38 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
+		protected void haltAIfor(int ticks) {
+			ProcedureOnLivingUpdate.disableAIfor(this, ticks);
+		}
+
 		@Override
 		public void travel(float strafe, float vertical, float forward) {
 			if (this.standStillTicks > 0) {
 				vertical = forward = strafe = 0.0f;
-				//this.motionX = this.motionZ = 0.0f;
+				this.rotationYaw = this.haltedYaw;
+				this.rotationYawHead = this.haltedYawHead;
+				this.renderYawOffset = this.haltedRenderYawOffset;
+				this.rotationPitch = this.haltedPitch;
 				--this.standStillTicks;
 			}
 			super.travel(strafe, vertical, forward);
 		}
 
-		public void standStillFor(int ticks) {
+		protected void standStillFor(int ticks) {
 			this.standStillTicks = ticks;
-			StandStillMessage.sendToTracking(this);
+			if (ticks > 0) {
+				this.haltedYaw = this.rotationYaw;
+				this.haltedYawHead = this.rotationYawHead;
+				this.haltedRenderYawOffset = this.renderYawOffset;
+				this.haltedPitch = this.rotationPitch;
+			}
+			if (!this.world.isRemote) {
+				StandStillMessage.sendToTracking(this);
+			}
+		}
+
+		protected boolean isStandingStill() {
+			return this.standStillTicks > 0;
 		}
 
 		@Override
@@ -219,13 +319,16 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 
 		protected void decrementAnimations() {
 			this.updateArmSwingProgress();
-			for (ItemStack stack : this.getHeldEquipment()) {
-				if (!stack.isEmpty())
-					stack.updateAnimation(this.world, this, 0, false);
+			for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
+				ItemStack stack = this.getItemStackFromSlot(slot);
+				if (!stack.isEmpty()) {
+					stack.updateAnimation(this.world, this, -slot.getSlotIndex(), slot == EntityEquipmentSlot.MAINHAND);
+				}
 			}
-			for (ItemStack stack : this.inventory) {
+			for (int i = 0; i < this.inventory.size(); i++) {
+				ItemStack stack = this.inventory.get(i);
 				if (!stack.isEmpty())
-					stack.updateAnimation(this.world, this, 0, false);
+					stack.updateAnimation(this.world, this, i, false);
 			}
 		}
 
@@ -246,6 +349,10 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			InventoryMessage.sendToTracking(this);
 		}
 
+		public int getInventorySize() {
+			return this.inventorySize;
+		}
+
 	    protected boolean isValidLightLevel() {
 	        BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
 	        if (this.world.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
@@ -264,7 +371,15 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean getCanSpawnHere() {
-			return super.getCanSpawnHere() && (this instanceof IMob ? this.world.getDifficulty() != EnumDifficulty.PEACEFUL && this.isValidLightLevel() : true);
+			return super.getCanSpawnHere() && (this instanceof IMob ? this.world.getDifficulty() != EnumDifficulty.PEACEFUL : true);
+		}
+
+		@Override
+		public void onRemovedFromWorld() {
+			super.onRemovedFromWorld();
+			if (!this.world.isRemote) {
+				SpawnData.addSpawnData(this);
+			}
 		}
 
 		@Override
@@ -318,9 +433,11 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			compound.setDouble("maxChakra", this.chakraPathway.getMax());
 			compound.setDouble("chakra", this.getChakra());
 			NBTTagList nbttaglist = new NBTTagList();
-			for (ItemStack stack : this.inventory) {
+			for (int i = 0; i < this.inventory.size(); i++) {
+				ItemStack stack = this.inventory.get(i);
 				if (!stack.isEmpty()) {
 					NBTTagCompound nbttagcompound = new NBTTagCompound();
+					nbttagcompound.setInteger("slotNo", i);
 					stack.writeToNBT(nbttagcompound);
 					nbttaglist.appendTag(nbttagcompound);
 				}
@@ -335,10 +452,14 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			this.chakraPathway.set(compound.getDouble("chakra"));
 			if (compound.hasKey("sideInventory", 9)) {
 				NBTTagList nbttaglist = compound.getTagList("sideInventory", 10);
-				for (int i = 0; i < this.inventory.size() && i < nbttaglist.tagCount(); ++i) {
-					this.inventory.set(i, new ItemStack(nbttaglist.getCompoundTagAt(i)));
+				for (int i = 0; i < nbttaglist.tagCount(); ++i) {
+					NBTTagCompound cmp = nbttaglist.getCompoundTagAt(i);
+					int j = cmp.getInteger("slotNo");
+					if (j >= 0 && j < this.inventory.size()) {
+						this.inventory.set(j, new ItemStack(cmp));
+					}
 				}
-				InventoryMessage.sendToTracking(this);
+				//InventoryMessage.sendToTracking(this);
 			}
 		}
 
@@ -360,9 +481,9 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
-			public void setMax(double d) {
+			public Chakra.Pathway<Base> setMax(double d) {
 				Base.this.getDataManager().set(Base.CHAKRA_MAX, Float.valueOf((float)d));
-				super.setMax(d);
+				return super.setMax(d);
 			}
 
 			private void fixOnClientSpawn() {
@@ -390,7 +511,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 				 && (this.user.getAttackingEntity() == null || !this.user.getAttackingEntity().isEntityAlive())) {
 					++this.user.peacefulTicks;
 					if (this.user.peacefulTicks % 20 == 19) {
-						this.consume(-this.getMax() * 0.04d);
+						this.consume(-0.04f);
 						if (this.user.getHealth() < this.user.getMaxHealth()) {
 							this.user.setHealth(this.user.getHealth() + 1.0f);
 						}
@@ -419,7 +540,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	            return false;
 	        } else {
 	            double d0 = this.leaper.getDistance(this.target);
-	            if (d0 >= 3.0D && d0 <= this.leapStrength * 12.0d && this.leaper.onGround) {
+	            if (d0 >= 3.0D && d0 <= this.leapStrength * 20.0d && this.leaper.onGround) {
                     return this.leaper.getRNG().nextInt(5) == 0;
 	            } else {
 	                return false;
@@ -435,7 +556,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	        double d0 = this.target.posX - this.leaper.posX;
 	        double d1 = this.target.posZ - this.leaper.posZ;
 	        double d4 = MathHelper.sqrt(d0 * d0 + d1 * d1);
-	        double d2 = this.target.posY - this.leaper.posY + d4 * 0.2d;
+	        double d2 = this.target.posY + (double)this.target.height * 0.4d - this.leaper.posY + d4 * 0.2d;
 	        double d3 = MathHelper.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
 	        if (d3 >= 1.0E-4D) {
 	            this.leaper.motionX = d0 / d3 * (double)this.leapStrength;
@@ -446,9 +567,10 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	}	
 
 	public static class AIAttackRangedTactical<T extends EntityCreature & IRangedAttackMob> extends EntityAIBase {
-	    private final T entity;
+	    protected final T entity;
 	    private final double moveSpeedAmp;
-	    private int attackCooldown;
+	    private int attackCooldownMin;
+	    private int attackCooldownMax;
 	    private final float attackRadius;
 	    private final float maxAttackDistance;
 	    private int attackTime = -1;
@@ -458,9 +580,14 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	    private int strafingTime = -1;
 	
 	    public AIAttackRangedTactical(T entityIn, double moveSpeed, int cooldown, float maxDistance) {
+	    	this(entityIn, moveSpeed, 0, cooldown, maxDistance);
+	    }
+
+	    public AIAttackRangedTactical(T entityIn, double moveSpeed, int cooldownMin, int cooldownMax, float maxDistance) {
 	        this.entity = entityIn;
 	        this.moveSpeedAmp = moveSpeed;
-	        this.attackCooldown = cooldown;
+	        this.attackCooldownMin = cooldownMin;
+	        this.attackCooldownMax = cooldownMax;
 	        this.attackRadius = maxDistance;
 	        this.maxAttackDistance = maxDistance * maxDistance;
 	        this.setMutexBits(3);
@@ -509,10 +636,10 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	                this.strafingTime = -1;
 	            }
 	            if (this.strafingTime >= 20) {
-	                if ((double)this.entity.getRNG().nextFloat() < 0.3D) {
+	                if (this.entity.getRNG().nextFloat() < 0.3F) {
 	                    this.strafingClockwise = !this.strafingClockwise;
 	                }
-	                if ((double)this.entity.getRNG().nextFloat() < 0.3D) {
+	                if (this.entity.getRNG().nextFloat() < 0.3F) {
 	                    this.strafingBackwards = !this.strafingBackwards;
 	                }
 	                this.strafingTime = 0;
@@ -523,7 +650,8 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	                } else if (d0 < (double)(this.maxAttackDistance * 0.25F)) {
 	                    this.strafingBackwards = true;
 	                }
-	                this.entity.getMoveHelper().strafe(this.strafingBackwards ? -0.5F : 0.5F, this.strafingClockwise ? 0.5F : -0.5F);
+	                float f = (float)this.moveSpeedAmp;
+	                this.entity.getMoveHelper().strafe(this.strafingBackwards ? -f : f, this.strafingClockwise ? 0.5F : -0.5F);
 	                this.entity.faceEntity(entitylivingbase, 30.0F, 30.0F);
 	            } else {
 	                this.entity.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
@@ -535,17 +663,19 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		            float f = MathHelper.sqrt(d0) / this.attackRadius;
 		            float lvt_5_1_ = MathHelper.clamp(f, 0.1F, 1.0F);
 		            this.entity.attackEntityWithRangedAttack(entitylivingbase, lvt_5_1_);
-		            this.attackTime = MathHelper.floor(f * (float)(this.attackCooldown));
+		            this.attackTime = MathHelper.floor(f * (float)(this.attackCooldownMax - this.attackCooldownMin) + this.attackCooldownMin);
 		        } else if (this.attackTime < 0) {
 		            float f = MathHelper.sqrt(d0) / this.attackRadius;
-		            this.attackTime = MathHelper.floor(f * (float)(this.attackCooldown));
+		            this.attackTime = MathHelper.floor(f * (float)(this.attackCooldownMax - this.attackCooldownMin) + this.attackCooldownMin);
 		        }
+	        } else {
+	        	this.entity.getNavigator().clearPath();
 	        }
 	    }
 	}
 
-	public static class AIAttackRangedJutsu<T extends Base & IRangedAttackMob> extends EntityAIBase {
-	    private final T entity;
+	public static class AIAttackRangedJutsu<T extends EntityLiving & IRangedAttackMob> extends EntityAIBase {
+	    protected final T entity;
 	    private int attackCooldown;
 	    private final float attackRadius;
 	    private int attackTime;
@@ -653,7 +783,8 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			this.target = this.defendedEntity.getRevengeTarget();
 			if (this.target == null) {
 				EntityLivingBase living = this.defendedEntity.getLastAttackedEntity();
-				if (living != null && this.defendedEntity.ticksExisted - this.defendedEntity.getLastAttackedEntityTime() < 200) {
+				//if (living != null && this.defendedEntity.ticksExisted - this.defendedEntity.getLastAttackedEntityTime() < 200) {
+				if (living != null) {
 					this.target = living;
 				}
 			}
@@ -667,6 +798,96 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		public void startExecuting() {
 			this.taskOwner.setAttackTarget(this.target);
 			super.startExecuting();
+		}
+	}
+
+	public static class NavigateGround extends PathNavigateGround {
+		private BlockPos targetPosition;
+	
+		public NavigateGround(EntityLiving entityLivingIn, World worldIn) {
+			super(entityLivingIn, worldIn);
+		}
+	
+		@Override
+	    public Path getPathToPos(BlockPos pos) {
+	        this.targetPosition = pos;
+	        return super.getPathToPos(pos);
+	    }
+		
+		@Override
+	    public Path getPathToEntityLiving(Entity entityIn) {
+	        this.targetPosition = new BlockPos(entityIn);
+	        return super.getPathToEntityLiving(entityIn);
+	    }
+		
+		@Override
+	    public boolean tryMoveToEntityLiving(Entity entityIn, double speedIn) {
+		   	Path path = this.getPathToEntityLiving(entityIn);
+		    if (path != null) {
+		        return this.setPath(path, speedIn);
+		    } else {
+		        this.targetPosition = new BlockPos(entityIn);
+		        this.speed = speedIn;
+		        return true;
+		    }
+		}
+
+		@Override
+		public void clearPath() {
+		   	super.clearPath();
+		   	this.targetPosition = null;
+		}
+		
+		@Override
+		public void onUpdateNavigation() {
+		    if (!this.noPath()) {
+		        super.onUpdateNavigation();
+		    } else {
+		        if (this.targetPosition != null) {
+		            double d0 = (double)(this.entity.width * this.entity.width);
+		            double d1 = (double)this.targetPosition.getY() - this.entity.posY;
+		            double d2 = this.entity.getDistanceSqToCenter(new BlockPos(this.targetPosition.getX(),
+		             MathHelper.floor(this.entity.posY), this.targetPosition.getZ()));
+		            if (d2 >= d0 && d1 <= this.entity.stepHeight && d1 >= -12d * this.entity.height) {
+		              	this.entity.getMoveHelper().setMoveTo((double)this.targetPosition.getX() + 0.5d,
+		               	 (double)this.targetPosition.getY(), (double)this.targetPosition.getZ() + 0.5d, this.speed);
+		            } else {
+		                this.targetPosition = null;
+		            }
+		        }
+		    }
+		}
+	}
+
+	public static class MoveHelper extends EntityMoveHelper {
+		public MoveHelper(EntityLiving entityIn) {
+			super(entityIn);
+		}
+
+		@Override
+		public void onUpdateMoveHelper() {
+			if (this.isUpdating()) {
+	            this.action = EntityMoveHelper.Action.WAIT;
+	            double d0 = this.posX - this.entity.posX;
+	            double d1 = this.posZ - this.entity.posZ;
+	            double d2 = this.posY - this.entity.posY;
+	            double d3 = d0 * d0 + d2 * d2 + d1 * d1;
+	            if (d3 < 2.5E-7D) {
+	                this.entity.setMoveForward(0.0F);
+	                return;
+	            }
+	            float f9 = (float)(MathHelper.atan2(d1, d0) * (180D / Math.PI)) - 90.0F;
+	            this.entity.rotationYaw = this.limitAngle(this.entity.rotationYaw, f9, 90.0F);
+	            this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue()));
+	            if (d2 > 0.01d && this.entity.collidedHorizontally) {
+	            	this.entity.motionY = 0.42d;
+	            } else if (d2 > (double)this.entity.stepHeight && d0 * d0 + d1 * d1 < (double)Math.max(1.0F, this.entity.width)) {
+	                this.entity.getJumpHelper().setJumping();
+	                this.action = EntityMoveHelper.Action.JUMPING;
+	            }
+			} else {
+				super.onUpdateMoveHelper();
+			}
 		}
 	}
 
@@ -702,7 +923,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	public static abstract class RenderBase<T extends Base> extends RenderBiped<T> {
 		public RenderBase(RenderManager renderManager, ModelBiped model) {
 			super(renderManager, model, 0.5f);
-			this.addLayer(new EntityClone.ClientRLM().new BipedArmorLayer(this));
+			this.addLayer(EntityClone.ClientRLM.getInstance().new BipedArmorLayer(this));
 			this.addLayer(new LayerInventoryItem(this));
 		}
 
@@ -714,6 +935,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 
 	    private void setPose(T entity) {
 	    	ModelBiped model = (ModelBiped)this.getMainModel();
+	    	model.isSneak = entity.isSneaking();
             ItemStack itemstack = entity.getHeldItemMainhand();
             ItemStack itemstack1 = entity.getHeldItemOffhand();
             ModelBiped.ArmPose mainhandpose = ModelBiped.ArmPose.EMPTY;
@@ -748,6 +970,13 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
                 model.leftArmPose = mainhandpose;
             }
 	    }
+
+		@Override
+		protected void renderLayers(T entity, float f0, float f1, float f2, float f3, float f4, float f5, float f6) {
+			if (!entity.isInvisible()) {
+				super.renderLayers(entity, f0, f1, f2, f3, f4, f5, f6);
+			}
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -764,11 +993,12 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 				ItemStack stack = entityIn.inventory.get(i);
 				if (stack.getItem() instanceof ItemOnBody.Interface) {
 					ItemOnBody.Interface item = (ItemOnBody.Interface)stack.getItem();
-					if (item.showOnBody() != ItemOnBody.BodyPart.NONE) {
+					ItemOnBody.BodyPart bodypart = item.showOnBody(stack);
+					if (bodypart != ItemOnBody.BodyPart.NONE) {
 						Vec3d offset = item.getOffset();
 						GlStateManager.pushMatrix();
 						ModelBiped model = (ModelBiped)this.renderer.getMainModel();
-						switch (item.showOnBody()) {
+						switch (bodypart) {
 							case HEAD:
 								model.bipedHead.postRender(0.0625F);
 								break;
@@ -802,6 +1032,45 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean shouldCombineTextures() {
 			return false;
+		}
+	}
+
+	@SideOnly(Side.CLIENT)
+	public abstract static class ModelNinja extends ModelBiped {
+		public ModelNinja() {
+			this.textureWidth = 64;
+			this.textureHeight = 64;
+			this.leftArmPose = ModelBiped.ArmPose.EMPTY;
+			this.rightArmPose = ModelBiped.ArmPose.EMPTY;
+		}
+
+		public ModelNinja(float modelSize) {
+			super(modelSize);
+		}
+
+		public ModelNinja(float modelSize, float p_i1149_2_, int textureWidthIn, int textureHeightIn) {
+			super(modelSize, p_i1149_2_, textureWidthIn, textureHeightIn);
+		}
+
+		@Override
+		public void setRotationAngles(float f0, float f1, float f2, float f3, float f4, float f5, Entity entityIn) {
+			boolean flag2 = PlayerRender.shouldNarutoRun(entityIn) && this.swingProgress == 0.0f;
+			if (flag2) {
+				this.isSneak = true;
+			}
+			super.setRotationAngles(f0, f1, f2, f3, f4, f5, entityIn);
+			if (flag2) {
+				this.bipedRightArm.rotateAngleX = 1.4835F;
+				this.bipedRightArm.rotateAngleY = -0.3927F;
+				this.bipedLeftArm.rotateAngleX = 1.4835F;
+				this.bipedLeftArm.rotateAngleY = 0.3927F;
+			}
+		}
+		
+		public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+			modelRenderer.rotateAngleX = x;
+			modelRenderer.rotateAngleY = y;
+			modelRenderer.rotateAngleZ = z;
 		}
 	}
 
@@ -852,7 +1121,6 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 
 	public static class InventoryMessage implements IMessage {
 		int id;
-		int listSize;
 		List<ItemStack> list;
 
 		public InventoryMessage() {
@@ -860,7 +1128,6 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 
 		public InventoryMessage(Base entity) {
 			this.id = entity.getEntityId();
-			this.listSize = entity.inventory.size();
 			this.list = entity.inventory;
 		}
 
@@ -880,7 +1147,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 				mc.addScheduledTask(() -> {
 					Entity entity = mc.world.getEntityByID(message.id);
 					if (entity instanceof Base) {
-						for (int i = 0; i < message.listSize; i++) {
+						for (int i = 0; i < message.list.size() && i < ((Base)entity).getInventorySize(); i++) {
 							((Base)entity).inventory.set(i, message.list.get(i));
 						}
 					}
@@ -892,8 +1159,9 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		public void toBytes(ByteBuf buf) {
 			PacketBuffer pbuf = new PacketBuffer(buf);
 			pbuf.writeInt(this.id);
-			pbuf.writeInt(this.listSize);
-			for (int i = 0; i < this.listSize; i++) {
+			int j = this.list.size();
+			pbuf.writeInt(j);
+			for (int i = 0; i < j; i++) {
 				pbuf.writeItemStack(this.list.get(i));
 			}
 		}
@@ -901,11 +1169,11 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		public void fromBytes(ByteBuf buf) {
 			PacketBuffer pbuf = new PacketBuffer(buf);
 			this.id = pbuf.readInt();
-			this.listSize = pbuf.readInt();
+			int j = pbuf.readInt();
 			this.list = Lists.newArrayList();
 			try {
-				for (int i = 0; i < this.listSize; i++) {
-					list.add(pbuf.readItemStack());
+				for (int i = 0; i < j; i++) {
+					this.list.add(pbuf.readItemStack());
 				}
 			} catch (Exception e) {
 				new IOException("NinjaMob@inventory packet: ", e);
@@ -936,7 +1204,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 				mc.addScheduledTask(() -> {
 					Entity entity = mc.world.getEntityByID(message.id);
 					if (entity instanceof Base) {
-						((Base)entity).standStillTicks = message.ticks;
+						((Base)entity).standStillFor(message.ticks);
 					}
 				});
 				return null;

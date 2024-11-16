@@ -14,10 +14,11 @@ import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayerMP;
 
 import net.narutomod.NarutomodMod;
 import net.narutomod.ElementsNarutomodMod;
@@ -65,11 +66,16 @@ public class ProcedureRenderView extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onChangeDensity(EntityViewRenderEvent.FogDensity event) {
-		if (this.shouldChangeDensity > Minecraft.getMinecraft().world.getTotalWorldTime()) {
+		long l = Minecraft.getMinecraft().world.getTotalWorldTime();
+		if (this.shouldChangeDensity > l) {
 			GlStateManager.setFog(GlStateManager.FogMode.EXP);
 			event.setDensity(this.newDensity);
 			event.setCanceled(true);
 			//--this.shouldChangeDensity;
+		} else if (l < this.shouldChangeDensity + 40) {
+			GlStateManager.setFog(GlStateManager.FogMode.EXP);
+			event.setDensity(this.newDensity * (this.shouldChangeDensity + 40 - l) / 40f);
+			event.setCanceled(true);
 		}
 	}
 
@@ -114,7 +120,11 @@ public class ProcedureRenderView extends ElementsNarutomodMod.ModElement {
 	}
 	
 	public static void setFogDensity(Entity entity, float den) {
-		sendToPlayer(entity, 0x7FFFFFFF, -1, den, 0);
+		setFogDensity(entity, den, 0x7FFFFFFF);
+	}
+
+	public static void setFogDensity(Entity entity, float den, int ticks) {
+		sendToPlayer(entity, ticks, -1, den, 0);
 	}
 
 	public static void setFOV(int dimid, double x, double y, double z, double range, int ticks, float fov) {
@@ -136,6 +146,23 @@ public class ProcedureRenderView extends ElementsNarutomodMod.ModElement {
 	public static void sendToPlayer(Entity entity, int densityticks, int fovticks, float den, float fov) {
 		if (entity instanceof EntityPlayerMP) {
 			NarutomodMod.PACKET_HANDLER.sendTo(new Message(-1, densityticks, fovticks, 0, 0, 0, den, fov), (EntityPlayerMP)entity);
+		}
+	}
+
+	public static void sendToPlayer(Entity entity, int cticks, int dticks, float r, float g, float b, float den) {
+		if (entity instanceof EntityPlayerMP) {
+			NarutomodMod.PACKET_HANDLER.sendTo(new Message(cticks, dticks, -1, r, g, b, den, 0f), (EntityPlayerMP)entity);
+		} else if (entity instanceof EntityPlayer && entity.world.isRemote) {
+			if (cticks >= 0) {
+				instance.shouldChangeColor = entity.world.getTotalWorldTime() + cticks;
+				instance.newRed = r;
+				instance.newGreen = g;
+				instance.newBlue = b;
+			}
+			if (dticks >= 0) {
+				instance.shouldChangeDensity = entity.world.getTotalWorldTime() + dticks;
+				instance.newDensity = den;
+			}
 		}
 	}
 
@@ -177,16 +204,7 @@ public class ProcedureRenderView extends ElementsNarutomodMod.ModElement {
 			public IMessage onMessage(Message message, MessageContext context) {
 				Minecraft mc = Minecraft.getMinecraft();
 				mc.addScheduledTask(() -> {
-					if (message.fogColor >= 0) {
-						instance.shouldChangeColor = mc.world.getTotalWorldTime() + message.fogColor;
-						instance.newRed = message.red;
-						instance.newGreen = message.green;
-						instance.newBlue = message.blue;
-					}
-					if (message.fogDensity >= 0) {
-						instance.shouldChangeDensity = mc.world.getTotalWorldTime() + message.fogDensity;
-						instance.newDensity = message.density;
-					}
+					sendToPlayer(mc.player, message.fogColor, message.fogDensity, message.red, message.green, message.blue, message.density);
 					if (message.fovTicks >= 0) {
 						instance.changeFOV = mc.world.getTotalWorldTime() + message.fovTicks;
 						instance.newFOV = message.fov;

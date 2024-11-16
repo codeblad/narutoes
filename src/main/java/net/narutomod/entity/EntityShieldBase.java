@@ -2,6 +2,7 @@ package net.narutomod.entity;
 
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.CombatRules;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHandSide;
@@ -17,22 +18,31 @@ import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.Entity;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
+import java.util.UUID;
+import java.util.Iterator;
+import java.util.List;
 import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public abstract class EntityShieldBase extends EntityLivingBase {
-	private static final DataParameter<Integer> SUMMONERID = EntityDataManager.<Integer>createKey(EntityShieldBase.class, DataSerializers.VARINT);
+	private static final DataParameter<Optional<UUID>> SUMMONER_UUID = EntityDataManager.<Optional<UUID>>createKey(EntityShieldBase.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 	private EntityLivingBase summoner;
 	private boolean ownerCanSteer = false;
 	private float steerSpeed;
 	protected boolean dieOnNoPassengers = true;
+	protected final List<Potion> effectivePotions = Lists.newArrayList();
 	
 	public EntityShieldBase(World world) {
 		super(world);
@@ -58,33 +68,34 @@ public abstract class EntityShieldBase extends EntityLivingBase {
 	@Override
 	protected void entityInit() {
 		super.entityInit();
-		this.dataManager.register(SUMMONERID, Integer.valueOf(-1));
+		this.dataManager.register(SUMMONER_UUID, Optional.absent());
 	}
 
-	protected void setSummoner(EntityLivingBase entity) {
-		this.dataManager.set(SUMMONERID, Integer.valueOf(entity.getEntityId()));
+	private void setSummonerUuid(UUID uuid) {
+		this.dataManager.set(SUMMONER_UUID, Optional.fromNullable(uuid));
 	}
 
+	private UUID getSummonerUuid() {
+		return (UUID)((Optional)this.dataManager.get(SUMMONER_UUID)).orNull();
+	}
+	
+	public void setSummoner(EntityLivingBase player) {
+	    this.setSummonerUuid(player.getUniqueID());
+	}
+	
 	@Nullable
 	public EntityLivingBase getSummoner() {
-		Entity entity = this.world.getEntityByID(((Integer)this.getDataManager().get(SUMMONERID)).intValue());
-		return entity instanceof EntityLivingBase ? (EntityLivingBase)entity : null;
+	    UUID uuid = this.getSummonerUuid();
+	    if (uuid == null) {
+	   		return null;
+	    } else {
+	    	Entity entity = ProcedureUtils.getEntityFromUUID(this.world, uuid);
+	        if (entity instanceof EntityLivingBase) {
+	        	return (EntityLivingBase)entity;
+	        }
+		    return null;
+	    }
 	}
-
-	//@Override
-	//protected boolean canDespawn() {
-	//	return false;
-	//}
-
-	//@Override
-	//protected Item getDropItem() {
-	//	return null;
-	//}
-
-	//@Override
-	//public net.minecraft.util.SoundEvent getAmbientSound() {
-	//	return null;
-	//}
 
 	@Override
 	public net.minecraft.util.SoundEvent getHurtSound(DamageSource ds) {
@@ -107,7 +118,19 @@ public abstract class EntityShieldBase extends EntityLivingBase {
 			return false;
 		if (source == DamageSource.FALL || source == DamageSource.CACTUS || source == DamageSource.IN_WALL)
 			return false;
-		return super.attackEntityFrom(source, amount);
+		float f = this.getHealth();
+		boolean flag = super.attackEntityFrom(source, amount);
+		EntityLivingBase summoner = this.getSummoner();
+		if (flag && summoner != null && !this.isEntityAlive()) {
+			summoner.attackEntityFrom(source, CombatRules.getDamageAfterAbsorb(amount, (float)this.getTotalArmorValue(), 0f) - f);
+		}
+		return flag;
+	}
+
+	@Override
+	public boolean attackEntityAsMob(Entity entityIn) {
+		EntityLivingBase owner = this.getSummoner();
+		return owner != null ? ProcedureUtils.attackEntityAsMob(this, entityIn, DamageSource.causeIndirectDamage(this, owner)) : false;
 	}
 
 	@Override
@@ -140,8 +163,8 @@ public abstract class EntityShieldBase extends EntityLivingBase {
 		this.prevRotationYaw = this.rotationYaw;
 		this.rotationPitch = passenger.rotationPitch;
 		this.setRotation(this.rotationYaw, this.rotationPitch);
-		this.renderYawOffset = passenger.rotationYaw;
-		this.rotationYawHead = passenger.rotationYaw;
+		this.renderYawOffset = passenger instanceof EntityLivingBase ? ((EntityLivingBase)passenger).renderYawOffset : passenger.rotationYaw;
+		this.rotationYawHead = passenger.getRotationYawHead();
 	}
 
 	@Override
@@ -174,6 +197,10 @@ public abstract class EntityShieldBase extends EntityLivingBase {
 		this.steerSpeed = speed;
 	}
 
+	public boolean canBeSteered() {
+		return this.ownerCanSteer;
+	}
+
 	@Override
 	public Entity getControllingPassenger() {
 		return this.getPassengers().isEmpty() ? null : this.getPassengers().get(0);
@@ -196,7 +223,28 @@ public abstract class EntityShieldBase extends EntityLivingBase {
 	}
 
 	@Override
+	public void clearActivePotions() {
+		if (!this.world.isRemote) {
+			Iterator<PotionEffect> iterator = this.getActivePotionEffects().iterator();
+			while (iterator.hasNext()) {
+				PotionEffect effect = iterator.next();
+				boolean skip = false;
+				for (Potion potion : this.effectivePotions) {
+					if (effect.getPotion() == potion) {
+						skip = true;
+					}
+				}
+				if (!skip) {
+					this.onFinishedPotionEffect(effect);
+					iterator.remove();
+				}
+			}
+		}
+	}
+
+	@Override
 	public void onLivingUpdate() {
+		this.clearActivePotions();
 		super.onLivingUpdate();
 		clampMotion(0.1D);
 		EntityLivingBase summoner = this.getSummoner();
@@ -214,10 +262,32 @@ public abstract class EntityShieldBase extends EntityLivingBase {
 		}
 	}
 
+	@Override
+	protected void onDeathUpdate() {
+		this.setDead();
+	}
+
 	//@Override
 	//public Vec3d getLookVec() {
 	//	return this.getVectorForRotation(this.rotationPitch, this.rotationYawHead);
 	//}
+
+	@Override
+	public void readEntityFromNBT(NBTTagCompound compound) {
+		super.readEntityFromNBT(compound);
+		if (compound.hasUniqueId("summonerUUID")) {
+			this.setSummonerUuid(compound.getUniqueId("summonerUUID"));
+		}
+	}
+
+	@Override
+	public void writeEntityToNBT(NBTTagCompound compound) {
+		super.writeEntityToNBT(compound);
+		UUID suuid = this.getSummonerUuid();
+		if (suuid != null) {
+			compound.setUniqueId("summonerUUID", suuid);
+		}
+	}
 
 	@Override
 	public EnumHandSide getPrimaryHand() {

@@ -14,6 +14,9 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,12 +25,11 @@ import net.minecraft.entity.Entity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
 
 import net.narutomod.entity.EntityToad;
 import net.narutomod.entity.EntitySnake;
 import net.narutomod.entity.EntitySlug;
+import net.narutomod.entity.EntityEnma;
 import net.narutomod.entity.EntityGamabunta;
 import net.narutomod.entity.EntityManda;
 import net.narutomod.procedure.ProcedureOnLeftClickEmpty;
@@ -48,9 +50,11 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITY2ID = 354;
 	public static final int ENTITY3ID = 333;
 	public static final int ENTITY4ID = 334;
+	public static final String SUMMON_RALLY = "SummonRallyPoint";
 	public static final ItemJutsu.JutsuEnum SUMMONTOAD = new ItemJutsu.JutsuEnum(0, "toad_summon", 'C', 100d, new EntityGenericToad.Jutsu());
 	public static final ItemJutsu.JutsuEnum SUMMONSNAKE = new ItemJutsu.JutsuEnum(1, "snake_summon", 'C', 100d, new EntityGenericSnake.Jutsu());
 	public static final ItemJutsu.JutsuEnum SUMMONSLUG = new ItemJutsu.JutsuEnum(2, "slug", 'C', 100d, new EntitySlug.Jutsu());
+	public static final ItemJutsu.JutsuEnum SUMMONENMA = new ItemJutsu.JutsuEnum(3, "enma", 'C', 100d, new EntityEnma.EC.Jutsu());
 
 	public ItemSummoningContract(ElementsNarutomodMod instance) {
 		super(instance, 718);
@@ -58,7 +62,7 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.items.add(() -> new ItemCustom(SUMMONTOAD, SUMMONSNAKE, SUMMONSLUG));
+		elements.items.add(() -> new ItemCustom(SUMMONTOAD, SUMMONSNAKE, SUMMONSLUG, SUMMONENMA));
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityGenericToad.class)
 		 .id(new ResourceLocation("narutomod", "toad_summon"), ENTITYID).name("toad_summon").tracker(96, 3, true).egg(-1, -1).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityGenericSnake.class)
@@ -75,16 +79,11 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		RenderingRegistry.registerEntityRenderingHandler(EntityGenericToad.class, renderManager -> {
-			return new EntityToad.RenderCustom<EntityGenericToad>(renderManager) {
+			return new EntityToad.RenderCustom<EntityGenericToad>(renderManager, new EntityToad.ModelToad()) {
 				private final ResourceLocation texture = new ResourceLocation("narutomod:textures/toad1.png");
 				@Override
-				protected void renderModel(EntityGenericToad entity, float f1, float f2, float f3, float f4, float f5, float f6) {
-					((EntityToad.ModelToad)this.mainModel).showPipe(false);
-					super.renderModel(entity, f1, f2, f3, f4, f5, f6);
-				}
-				@Override
 				protected ResourceLocation getEntityTexture(EntityGenericToad entity) {
-					return texture;
+					return this.texture;
 				}
 			};
 		});
@@ -94,7 +93,7 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 				private final ResourceLocation texture2 = new ResourceLocation("narutomod:textures/snake_blue.png");
 				@Override
 				protected ResourceLocation getEntityTexture(EntityGenericSnake entity) {
-					return entity.getScale() > 4.0f ? texture2 : texture1;
+					return entity.getScale() > 4.0f ? this.texture2 : this.texture1;
 				}
 			};
 		});
@@ -115,11 +114,6 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			return this.getPower(stack, entity, timeLeft, 0.0f, 80);
-		}
-
-		@Override
 		protected boolean executeJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 			return power >= 0.1f ? super.executeJutsu(stack, entity, power) : false;
 		}
@@ -127,12 +121,29 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
 			if (attacker.equals(target)) {
-				target = ProcedureUtils.objectEntityLookingAt(attacker, 50d).entityHit;
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(attacker, 50d, 3d);
+				target = res.entityHit;
+				/*if (res.typeOfHit == RayTraceResult.Type.BLOCK) {
+					int[] ia = {res.getBlockPos().getX(), res.getBlockPos().getY(), res.getBlockPos().getZ()};
+					attacker.getEntityData().setIntArray(SUMMON_RALLY, ia);
+				}*/
 			}
 			if (target instanceof EntityLivingBase) {
 				attacker.setRevengeTarget((EntityLivingBase)target);
 			}
 			return super.onLeftClickEntity(itemstack, attacker, target);
+		}
+
+		@Override
+		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
+			super.onUpdate(itemstack, world, entity, par4, par5);
+			if (!this.isAnyJutsuEnabled(itemstack) && itemstack.hasTagCompound() && itemstack.getTagCompound().hasKey("Type", 8)) {
+				String type = itemstack.getTagCompound().getString("Type");
+				this.enableJutsu(itemstack, SUMMONTOAD, type.equalsIgnoreCase("toad"));
+				this.enableJutsu(itemstack, SUMMONSNAKE, type.equalsIgnoreCase("snake"));
+				this.enableJutsu(itemstack, SUMMONSLUG, type.equalsIgnoreCase("slug"));
+				this.enableJutsu(itemstack, SUMMONENMA, type.equalsIgnoreCase("enma"));
+			}
 		}
 
 		@SideOnly(Side.CLIENT)
@@ -146,6 +157,9 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 				 + new TextComponentTranslation("item.summoning_contract.name").getUnformattedComponentText() + TextFormatting.RESET);
 			} else if (this.isJutsuEnabled(itemstack, SUMMONSLUG)) {
 				list.add(TextFormatting.BLUE + new TextComponentTranslation("entity.slug.name").getUnformattedComponentText() + " "
+				 + new TextComponentTranslation("item.summoning_contract.name").getUnformattedComponentText() + TextFormatting.RESET);
+			} else if (this.isJutsuEnabled(itemstack, SUMMONENMA)) {
+				list.add(TextFormatting.BLUE + new TextComponentTranslation("entity.enma.name").getUnformattedComponentText() + " "
 				 + new TextComponentTranslation("item.summoning_contract.name").getUnformattedComponentText() + TextFormatting.RESET);
 			}
 			super.addInformation(itemstack, world, list, flag);
@@ -167,7 +181,7 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			EntityLivingBase owner = this.getSummoner();
-			if (owner != null && !owner.isRiding() && this.ageTicks == 1 && this.getScale() >= 4.0f) {
+			if (owner != null && !owner.isRiding() && this.getAge() == 1 && this.getScale() >= 4.0f) {
 				owner.startRiding(this);
 			}
 		}
@@ -181,16 +195,31 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 					Particles.spawnParticle(entity.world, Particles.Types.SMOKE,
 					 entity.posX, entity.posY + 0.015d, entity.posZ, 1, 0d, 0d, 0d,
 					 (entity.getRNG().nextDouble()-0.5d) * 0.8d, entity.getRNG().nextDouble() * 0.6d + 0.2d, (entity.getRNG().nextDouble()-0.5d) * 0.8d,
-					 0xD0FFFFFF, (int)(power * 30));
+					 0xD0FFFFFF, (int)(power * 30), (int)(16.0d / (entity.getRNG().nextDouble() * 0.8d + 0.2d)));
 				}
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
-				  net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:kuchiyosenojutsu"))),
+				  net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kuchiyosenojutsu")),
 				  net.minecraft.util.SoundCategory.PLAYERS, 1f, 0.8f);
 				EntityToad.EntityCustom entity1 = power >= 16.0f ? new EntityGamabunta.EntityCustom(entity)
 				 : new EntityGenericToad(entity, power);
 				entity1.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, 0.0f);
 				net.narutomod.event.SpecialEvent.setDelayedSpawnEvent(entity.world, entity1, 0, 0, 0, entity.world.getTotalWorldTime() + 20);
 				return true;
+			}
+
+			@Override
+			public float getBasePower() {
+				return 0.0f;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 80.0f;
+			}
+
+			@Override
+			public float getMaxPower() {
+				return 16.1f;
 			}
 		}
 	}
@@ -210,7 +239,7 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			EntityLivingBase owner = this.getSummoner();
-			if (owner != null && !owner.isRiding() && this.ageTicks == 1 && this.getScale() >= 4.0f) {
+			if (owner != null && !owner.isRiding() && this.getAge() == 1 && this.getScale() >= 4.0f) {
 				owner.startRiding(this);
 			}
 		}
@@ -224,7 +253,7 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 					Particles.spawnParticle(entity.world, Particles.Types.SMOKE,
 					 entity.posX, entity.posY + 0.015d, entity.posZ, 1, 0d, 0d, 0d,
 					 (entity.getRNG().nextDouble()-0.5d) * 0.8d, entity.getRNG().nextDouble() * 0.6d + 0.2d, (entity.getRNG().nextDouble()-0.5d) * 0.8d,
-					 0xD0FFFFFF, (int)(power * 30));
+					 0xD0FFFFFF, (int)(power * 30), (int)(16.0d / (entity.getRNG().nextDouble() * 0.8d + 0.2d)));
 				}
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 				  net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:kuchiyosenojutsu"))),
@@ -234,6 +263,21 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 				entity1.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, 0.0f);
 				net.narutomod.event.SpecialEvent.setDelayedSpawnEvent(entity.world, entity1, 0, 0, 0, entity.world.getTotalWorldTime() + 20);
 				return true;
+			}
+
+			@Override
+			public float getBasePower() {
+				return 0.0f;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 75.0f;
+			}
+
+			@Override
+			public float getMaxPower() {
+				return 18.1f;
 			}
 		}
 	}

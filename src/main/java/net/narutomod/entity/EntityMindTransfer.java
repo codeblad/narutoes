@@ -10,20 +10,19 @@ import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
+import net.minecraft.world.GameType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-//import net.minecraft.entity.player.InventoryPlayer;
-//import net.minecraft.inventory.ContainerPlayer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.world.GameType;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.init.MobEffects;
 
@@ -33,12 +32,12 @@ import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemInton;
 import net.narutomod.PlayerInput;
 import net.narutomod.PlayerRender;
+import net.narutomod.PlayerTracker;
 import net.narutomod.Chakra;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
 
 import javax.annotation.Nullable;
-import javax.management.remote.TargetedNotification;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
@@ -59,7 +58,7 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 		 .tracker(64, 3, true).build());
 	}
 
-	public static class EC extends Entity implements PlayerInput.Hook.IHandler {
+	public static class EC extends Entity implements PlayerInput.Hook.IHandler, ItemJutsu.IJutsu {
 		private EntityLivingBase user;
 		private EntityLivingBase target;
 		private EntityDuplicate clone;
@@ -90,6 +89,11 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.INTON;
+		}
+
+		@Override
 		protected void entityInit() {
 		}
 
@@ -99,10 +103,6 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				if (this.user != null) {
 					this.user.getEntityData().removeTag(Jutsu.ECENTITYID);
-					if (this.clone != null) {
-						this.user.rotationYaw = this.clone.rotationYaw;
-						this.user.setPositionAndUpdate(this.clone.posX, this.clone.posY, this.clone.posZ);
-					}
 					if (this.user instanceof EntityPlayer) {
 						PlayerRender.setSkinCloneTarget((EntityPlayer)this.user, null);
 						PlayerInput.Hook.copyInputFrom((EntityPlayerMP)this.user, this, false);
@@ -124,9 +124,6 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 					PlayerInput.Hook.haltTargetInput(this.target, false);
 				}
 				if (this.clone != null) {
-					if (this.user != null) {
-						this.user.setHealth(this.clone.getHealth());
-					}
 					this.clone.setDead();
 				}
 			}
@@ -136,14 +133,15 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user instanceof EntityPlayer && this.user.isEntityAlive() 
 			 && this.target != null && this.target.isEntityAlive()
+			 && !this.user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed)
 			 && Chakra.pathway(this.user).consume(this.chakraBurn)) {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				if (this.ticksExisted == 1) {
 					this.clone = new EntityDuplicate(this.user);
 					this.world.spawnEntity(this.clone);
-					this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:mindtransfer")), 1f, 1f);
+					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:mindtransfer")), 1f, 1f);
 				}
-				if (this.clone != null && this.clone.getHealth() < this.clone.getMaxHealth() * 0.2F) {
+				if (this.clone != null && this.clone.getHealth() < Math.max(this.clone.getMaxHealth() * 0.1F, 5f)) {
 					this.setDead();
 				}
 				if (this.ticksExisted <= this.move2TargetTime) {
@@ -230,9 +228,21 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 				if (entity1 instanceof EC) {
 					entity1.setDead();
 				} else {
+					entity.getEntityData().removeTag(ECENTITYID);
 					RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 30d);
-					if (res != null && res.entityHit instanceof EntityLivingBase) {
-						entity1 = new EC(entity, (EntityLivingBase)res.entityHit, ItemInton.MBTRANSFER.chakraUsage * 0.005d);
+					if (res != null && (res.entityHit instanceof EntityLiving || res.entityHit instanceof EntityPlayer)) {
+						double d = 1.0d;
+						if (entity instanceof EntityPlayer) {
+							double d1 = PlayerTracker.getNinjaLevel((EntityPlayer)entity);
+							if (res.entityHit instanceof EntityPlayer) {
+								d = Math.max(PlayerTracker.getNinjaLevel((EntityPlayer)res.entityHit) / d1, 1.0d);
+							} else if (res.entityHit instanceof EntityNinjaMob.Base) {
+								d = Math.max(((EntityNinjaMob.Base)res.entityHit).getNinjaLevel() / d1, 1.0d);
+							} else {
+								d = Math.max(((EntityLivingBase)res.entityHit).getHealth() / entity.getHealth(), 1.0d);
+							}
+						}
+						entity1 = new EC(entity, (EntityLivingBase)res.entityHit, ItemInton.MBTRANSFER.chakraUsage * d * 0.005d);
 						entity.world.spawnEntity(entity1);
 						entity.getEntityData().setInteger(ECENTITYID, entity1.getEntityId());
 						return true;
@@ -276,8 +286,16 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void onUpdate() {
-			super.onUpdate();
+		public void setDead() {
+			super.setDead();
+			if (!this.world.isRemote && this.getSummoner() != null) {
+				EntityLivingBase summoner = this.getSummoner();
+				summoner.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, 1, 0, false, false));
+				summoner.setInvisible(true);
+				summoner.rotationYaw = this.rotationYaw;
+				summoner.setPositionAndUpdate(this.posX, this.posY, this.posZ);
+				summoner.setHealth(this.getHealth());
+			}
 		}
 	}
 

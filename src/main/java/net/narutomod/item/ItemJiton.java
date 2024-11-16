@@ -39,22 +39,18 @@ import net.minecraft.nbt.NBTTagCompound;
 
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureOnLeftClickEmpty;
-import net.narutomod.entity.EntityEarthBlocks;
-import net.narutomod.entity.EntityParticle;
-import net.narutomod.entity.EntityShieldBase;
-import net.narutomod.entity.EntitySandBullet;
-import net.narutomod.entity.EntitySandBind;
-import net.narutomod.entity.EntitySandLevitation;
+import net.narutomod.entity.*;
 import net.narutomod.PlayerTracker;
 import net.narutomod.Chakra;
+import net.narutomod.Particles;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 
-import java.util.List;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import java.util.List;
 import java.util.Iterator;
 import java.util.Random;
-import com.google.common.collect.Maps;
 import java.util.Map;
 
 @ElementsNarutomodMod.ModElement.Tag
@@ -62,10 +58,12 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:jiton")
 	public static final Item block = null;
 	public static final int ENTITYID = 201;
+	public static final int ENTITYID_RANGED = 200;
 	public static final ItemJutsu.JutsuEnum SANDSHIELD = new ItemJutsu.JutsuEnum(0, "entityjitonshield", 'S', 150, 20d, new EntitySandShield.Jutsu());
 	public static final ItemJutsu.JutsuEnum SANDBULLET = new ItemJutsu.JutsuEnum(1, "sand_bullet", 'S', 100, 20d, new EntitySandBullet.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SANDBIND = new ItemJutsu.JutsuEnum(2, "sand_bind", 'S', 200, 100d, new EntitySandBind.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SANDFLY = new ItemJutsu.JutsuEnum(3, "sand_levitation", 'S', 200, 0.25d, new EntitySandLevitation.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum GATHERING = new ItemJutsu.JutsuEnum(4, "sand_gathering", 'S', 200, 100d, new EntitySandGathering.EC.Jutsu());
 
 	public ItemJiton(ElementsNarutomodMod instance) {
 		super(instance, 518);
@@ -73,9 +71,11 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.items.add(() -> new RangedItem(SANDSHIELD, SANDBULLET, SANDBIND, SANDFLY));
+		elements.items.add(() -> new RangedItem(SANDSHIELD, SANDBULLET, SANDBIND, SANDFLY, GATHERING));
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntitySandShield.class)
-				.id(new ResourceLocation("narutomod", "entityjitonshield"), ENTITYID).name("entityjitonshield").tracker(64, 1, true).build());
+		 .id(new ResourceLocation("narutomod", "entityjitonshield"), ENTITYID).name("entityjitonshield").tracker(64, 1, true).build());
+		elements.entities.add(() -> EntityEntryBuilder.create().entity(SandParticle.class)
+		 .id(new ResourceLocation("narutomod", "jitonparticle"), ENTITYID_RANGED).name("jitonparticle").tracker(64, 1, true).build());
 	}
 
 	@Override
@@ -84,28 +84,35 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:jiton", "inventory"));
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntitySandShield.class, renderManager -> new RenderCustom(renderManager));
-	}
-
 	@Override
 	public void init(FMLInitializationEvent event) {
 		ProcedureOnLeftClickEmpty.addQualifiedItem(block, EnumHand.MAIN_HAND);
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class RenderCustom extends Render<EntitySandShield> {
-		public RenderCustom(RenderManager renderManagerIn) {
-			super(renderManagerIn);
-		}
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
+
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
 		@Override
-		public void doRender(EntitySandShield bullet, double d, double d1, double d2, float f, float f1) {
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EntitySandShield.class, renderManager -> new RenderCustom(renderManager));
 		}
-		@Override
-		protected ResourceLocation getEntityTexture(EntitySandShield entity) {
-			return null;
+
+		@SideOnly(Side.CLIENT)
+		public class RenderCustom extends Render<EntitySandShield> {
+			public RenderCustom(RenderManager renderManagerIn) {
+				super(renderManagerIn);
+			}
+			@Override
+			public void doRender(EntitySandShield bullet, double d, double d1, double d2, float f, float f1) {
+			}
+			@Override
+			protected ResourceLocation getEntityTexture(EntitySandShield entity) {
+				return null;
+			}
 		}
 	}
 
@@ -122,18 +129,23 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			return 1f;
-		}
-
-		@Override
 		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {
 			if ((entity.isCreative() || (ProcedureUtils.hasItemInInventory(entity, ItemFuton.block) 
 			 && ProcedureUtils.hasItemInInventory(entity, ItemDoton.block))) 
-			 && entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST).getItem() == ItemGourd.body) {
+			 && (entity.getItemStackFromSlot(EntityEquipmentSlot.CHEST).getItem() == ItemGourd.body
+			  || (EntityBijuManager.getTails(entity) == 1 && EntityBijuManager.cloakLevel(entity) > 0))) {
 				return super.onItemRightClick(world, entity, hand);
 			}
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, entity.getHeldItem(hand));
+		}
+
+		@Override
+		public void onUsingTick(ItemStack stack, EntityLivingBase player, int timeLeft) {
+			super.onUsingTick(stack, player, timeLeft);
+			if (!player.world.isRemote && this.getCurrentJutsu(stack) == SANDBULLET
+			 && this.getPower(stack, player, timeLeft) < this.getMaxPower(stack, player)) {
+				EntitySandBullet.addPos(getSandType(stack), player, this.getPower(stack, player, timeLeft), ItemGourd.getMouthPos(player));
+			}
 		}
 
 		@Override
@@ -150,6 +162,12 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 						ItemHandlerHelper.giveItemToPlayer(player, stack);
 					}
 				}
+				if ((player.getItemStackFromSlot(EntityEquipmentSlot.CHEST).getItem() == ItemGourd.body
+				  || (EntityBijuManager.getTails(player) == 1 && EntityBijuManager.cloakLevel(player) > 0))
+				 && this.getCurrentJutsu(itemstack) == SANDBULLET) {
+					EntitySandBullet.updateSwarms(player);
+				}
+				this.enableJutsu(itemstack, GATHERING, getSandType(itemstack) == Type.IRON);
 			}
 		}
 
@@ -200,7 +218,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 		}
 
 		public static Type getTypeFromId(int i) {
-			return TYPES.get(Integer.valueOf(i));
+			return i >= 0 && i <= 2 ? TYPES.get(Integer.valueOf(i)) : IRON;
 		}
 	}
 
@@ -228,7 +246,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 		public EntitySandShield(EntityLivingBase user, Type sandType) {
 			super(user);
 			this.setSize(3.0F, 3.0F);
-			double d = user instanceof EntityPlayer ? (5d * PlayerTracker.getNinjaLevel((EntityPlayer)user)) : 100d;
+			double d = user instanceof EntityPlayer ? (2.5d * PlayerTracker.getNinjaLevel((EntityPlayer)user)) : 100d;
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(d);
 			this.setHealth(this.getMaxHealth());
 			this.color = sandType.getColor();
@@ -283,7 +301,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && this.getHealth() > 0.0f && source.getImmediateSource() != null) {
 				Entity entity = source.getImmediateSource();
 				//this.moveSand(this.getGourdMouthPos(), entity.getPositionVector().addVector(0, entity.height/2, 0), 100);
-				this.moveSand(this.getTargetPosition(entity), this.getTargetPosition(entity), 20);
+				this.moveSand(this.getTargetPosition(entity), this.getTargetPosition(entity), 2);
 				if (entity instanceof EntityLivingBase) {
 					ProcedureUtils.pushEntity(this.getSummoner(), entity, 5d, 1.5f);
 				}
@@ -342,7 +360,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && !this.isRidingSameEntity(entity) && ProcedureUtils.getVelocity(entity) > 0.22d) {
 				EntityEarthBlocks.BlocksMoveHelper.collideWithEntity(this, entity);
 				//this.moveSandTo(entity.posX, entity.posY + entity.height/2, entity.posZ, 100);
-				this.moveSand(this.getTargetPosition(entity), this.getTargetPosition(entity), 100);
+				this.moveSand(this.getTargetPosition(entity), this.getTargetPosition(entity), 10);
 			}
 			super.collideWithEntity(entity);
 		}
@@ -363,15 +381,75 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static class SwarmTarget {
+	public static class SandParticle extends EntityParticle.Base implements ISwarmEntity {
+		private int deathTicks;
+		private int lastUpdateTime;
+
+		public SandParticle(World w) {
+			super(w);
+		}
+
+		public SandParticle(World worldIn, double x, double y, double z, double mX, double mY, double mZ, int color, float scale, int maxAgeIn) {
+			super(worldIn, x, y, z, mX, mY, mZ, color, scale, maxAgeIn);
+		}
+				
+		@Override
+		public void onDeath() {
+			if (++this.deathTicks >= 20 && !this.world.isRemote) {
+				this.setDead();
+			}
+			this.motionY -= 0.05d;
+		}
+		
+		@Override
+		public void onUpdate() {
+			super.onUpdate();
+			double d = this.getVelocity();
+			if (this.world.isRemote) {
+				this.setParticleTextureOffset(this.texU + (d > 0.01d ? 1 : 0) % 8);
+				for (int i = 0; i < 10; i++) {
+					Particles.spawnParticle(this.world, Particles.Types.SAND,
+					 this.posX + (this.rand.nextDouble()-0.5d) * this.width,
+					 this.posY + this.rand.nextDouble() * this.height,
+					 this.posZ + (this.rand.nextDouble()-0.5d) * this.width, 1, 0d, 0d, 0d,
+					 this.motionX * (this.rand.nextDouble() * 0.2d + 0.9d),
+					 this.motionY * (this.rand.nextDouble() * 0.2d + 0.9d),
+					 this.motionZ * (this.rand.nextDouble() * 0.2d + 0.9d),
+					 this.getColorInt(), (int)(this.getScale(0f) * 8), 3);
+				}
+			} else if (this.getAge() > this.lastUpdateTime + 40) {
+				this.fallAndDie();
+			}
+		}
+
+		@Override
+		public void setLastUpdateTime() {
+			this.lastUpdateTime = this.getAge();
+		}
+
+		protected void fallAndDie() {
+			this.setAge(this.getMaxAge());
+		}
+
+		@Override
+		public float getScale(float partialTicks) {
+			return MathHelper.clamp(((float)this.getAge() + partialTicks) / 10.0F, 0.2F, 1.0F) * this.getScale();
+		}
+	}
+
+	public static interface ISwarmEntity {
+		void setLastUpdateTime();
+	}
+
+	public static class SwarmTarget<T extends Entity & ISwarmEntity> {
 		private World world;
 		private int total;
 		private Vec3d startPos;
-		//private Vec3d targetPos;
+		private AxisAlignedBB startBB;
 		private AxisAlignedBB targetBB;
 		private float speed;
 		private float inaccuracy;
-		private List<Entity> particles;
+		private List<T> particles;
 		private int spawned;
 		private int ticks;
 		private Random rand;
@@ -386,7 +464,11 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 		}
 
 		public SwarmTarget(World worldIn, int totalIn, Vec3d startPosIn, Vec3d targetPosIn, float speedIn, int colorIn) {
-			this(worldIn, totalIn, startPosIn, targetPosIn, new Vec3d(0.05d, 0.2d, 0.05d), speedIn, 0.02f, false, 1f, colorIn);
+			this(worldIn, totalIn, startPosIn, targetPosIn, speedIn, 0.02f, 1f, colorIn);
+		}
+
+		public SwarmTarget(World worldIn, int totalIn, Vec3d startPosIn, Vec3d targetPosIn, float speedIn, float inaccuracyIn, float scaleIn, int colorIn) {
+			this(worldIn, totalIn, startPosIn, targetPosIn, new Vec3d(0.05d, 0.2d, 0.05d), speedIn, inaccuracyIn, false, scaleIn, colorIn);
 		}
 
 		public SwarmTarget(World worldIn, int totalIn, Vec3d startPosIn, Vec3d targetPosIn, Vec3d initialMotion, float speedIn, float inaccuracyIn, boolean dieOnReached, float scaleIn) {
@@ -421,15 +503,45 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 			this.border = this.particles.get(0).getEntityBoundingBox();
 		}
 
-		protected Entity createParticle(double x, double y, double z, double mx, double my, double mz, int c, float sc, int life) {
-			return new EntityParticle.Base(this.world, x, y, z, mx, my, mz, c, sc, life);
+		public SwarmTarget(World worldIn, int totalIn, AxisAlignedBB startBBIn, Vec3d targetPos, Vec3d initialMotion, float speedIn, float inaccuracyIn, boolean dieOnReached, float scaleIn, int colorIn) {
+			this.world = worldIn;
+			this.total = totalIn;
+			this.startBB = startBBIn;
+			this.setTarget(targetPos, speedIn, inaccuracyIn, dieOnReached);
+			this.particles = Lists.newArrayList();
+			this.rand = new Random();
+			this.spawnMotion = initialMotion;
+			this.scale = scaleIn;
+			this.color = colorIn;
+			this.spawnNewParticles();
+			this.border = this.particles.get(0).getEntityBoundingBox();
+		}
+
+		public SwarmTarget(World worldIn, int totalIn, AxisAlignedBB startBBIn, AxisAlignedBB targetBBIn, Vec3d initialMotion, float speedIn, float inaccuracyIn, boolean dieOnReached, float scaleIn, int colorIn) {
+			this.world = worldIn;
+			this.total = totalIn;
+			this.startBB = startBBIn;
+			this.setTarget(targetBBIn, speedIn, inaccuracyIn, dieOnReached);
+			this.particles = Lists.newArrayList();
+			this.rand = new Random();
+			this.spawnMotion = initialMotion;
+			this.scale = scaleIn;
+			this.color = colorIn;
+			this.spawnNewParticles();
+			this.border = this.particles.get(0).getEntityBoundingBox();
+		}
+
+		protected T createParticle(double x, double y, double z, double mx, double my, double mz, int c, float sc, int life) {
+			return (T)new SandParticle(this.world, x, y, z, mx, my, mz, c, sc, life);
 		}
 
 		private void spawnNewParticles() {
-			for (int i = 0; this.spawned < this.total && i < 50; i++, this.spawned++) {
-				Entity p = this.createParticle(this.startPos.x, this.startPos.y, this.startPos.z,
+			for (int i = 0; this.spawned < this.total && i < 5; i++, this.spawned++) {
+				Vec3d vec = this.startPos != null ? this.startPos : this.randomPosInBB(this.startBB);
+				T p = this.createParticle(vec.x, vec.y, vec.z,
 				 (this.rand.nextDouble()-0.5d) * 2d * this.spawnMotion.x, this.spawnMotion.y,
-				 (this.rand.nextDouble()-0.5d) * 2d * this.spawnMotion.z, this.color, this.scale, 6000);
+				 (this.rand.nextDouble()-0.5d) * 2d * this.spawnMotion.z, this.color,
+				 this.scale + (this.rand.nextFloat()-0.5f) * this.scale * 0.2f, 3600);
 				this.world.spawnEntity(p);
 				this.particles.add(p);
 			}
@@ -466,10 +578,10 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 
 		public void onUpdate() {
 			if (!this.particles.isEmpty()) {
-				Entity ep = this.particles.get(0);
+				T ep = this.particles.get(0);
 				this.playFlyingSound(ep.posX, ep.posY, ep.posZ, this.particles.size() * this.speed * 0.0025f, this.rand.nextFloat() * 0.4f + 0.8f);
 				this.border = ep.getEntityBoundingBox();
-				Iterator<Entity> iter = this.particles.iterator();
+				Iterator<T> iter = this.particles.iterator();
 				while (iter.hasNext()) {
 					ep = iter.next();
 					if (ep.isEntityAlive()) {
@@ -483,6 +595,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 							ep.motionZ += vec.z + this.rand.nextGaussian() * this.inaccuracy;
 							this.updateBorderWith(ep);
 						}
+						ep.setLastUpdateTime();
 					} else {
 						iter.remove();
 					}
@@ -497,14 +610,18 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void forceRemove() {
-			Iterator<Entity> iter = this.particles.iterator();
+			Iterator<T> iter = this.particles.iterator();
 			while (iter.hasNext()) {
-				Entity ep = iter.next();
+				T ep = iter.next();
 				if (ep.isEntityAlive()) {
 					ep.setDead();
 				}
 				iter.remove();
 			}
+		}
+
+		public void setStartVec(Vec3d vec) {
+			this.startPos = vec;
 		}
 
 		public void setSpeed(float speedIn, float inaccuracyIn) {
@@ -538,14 +655,22 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 			return this.ticks;
 		}
 
-		private Vec3d getTargetPos() {
+		public Vec3d getTargetPos() {
 			return this.randomPosOnBB(this.targetBB);
 		}
 
-		private Vec3d randomPosOnBB(AxisAlignedBB aabb) {
-			final Vec3d vec0 = new Vec3d(aabb.minX + this.rand.nextDouble() * (aabb.maxX - aabb.minX),
+		public int getColor() {
+			return this.color;
+		}
+
+		private Vec3d randomPosInBB(AxisAlignedBB aabb) {
+			return new Vec3d(aabb.minX + this.rand.nextDouble() * (aabb.maxX - aabb.minX),
 			 aabb.minY + this.rand.nextDouble() * (aabb.maxY - aabb.minY),
 			 aabb.minZ + this.rand.nextDouble() * (aabb.maxZ - aabb.minZ));
+		}
+		
+		private Vec3d randomPosOnBB(AxisAlignedBB aabb) {
+			Vec3d vec0 = this.randomPosInBB(aabb);
 			final Vec3d[] vec1 = { new Vec3d(aabb.minX, vec0.y, vec0.z), new Vec3d(aabb.maxX, vec0.y, vec0.z),
 			 new Vec3d(vec0.x, aabb.minY, vec0.z), new Vec3d(vec0.x, aabb.maxY, vec0.z),
 			 new Vec3d(vec0.x, vec0.y, aabb.minZ), new Vec3d(vec0.x, vec0.y, aabb.maxZ) };

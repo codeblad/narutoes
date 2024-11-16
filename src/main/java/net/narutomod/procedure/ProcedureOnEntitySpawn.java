@@ -10,9 +10,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.Entity;
 
 import java.util.Map;
@@ -34,7 +32,6 @@ public class ProcedureOnEntitySpawn extends ElementsNarutomodMod.ModElement {
 		}
 		Entity entity = (Entity) dependencies.get("entity");
 		World world = (World) dependencies.get("world");
-		String uuid = "";
 		double age = 0;
 		boolean f1 = false;
 		boolean f2 = false;
@@ -71,10 +68,7 @@ public class ProcedureOnEntitySpawn extends ElementsNarutomodMod.ModElement {
 			}
 		}
 		if ((entity instanceof EntityPlayerMP)) {
-			if (entity instanceof EntityPlayer && !entity.world.isRemote) {
-				((EntityPlayer) entity).sendStatusMessage(
-						new TextComponentString("Check out the latest updates on our official server! IP: NarutoRepublic.com."), (false));
-			}
+			ProcedureOnLivingUpdate.setNoClip(entity, false);
 		}
 	}
 

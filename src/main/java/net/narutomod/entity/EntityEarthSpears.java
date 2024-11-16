@@ -8,19 +8,20 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
-import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.client.renderer.entity.RenderManager;
 
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
@@ -43,20 +44,25 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> {
-			return new EntitySpike.Renderer<EC>(renderManager) {
-				@Override
-				protected ResourceLocation getEntityTexture(EC entity) {
-					return new ResourceLocation("narutomod:textures/spike_stone.png");
-				}
-			};
-		});
+		class CustomRender extends EntitySpike.ClientSide.Renderer<EC> {
+			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/spike_stone.png");
+	
+			public CustomRender(RenderManager renderManagerIn) {
+				super(renderManagerIn);
+			}
+		
+			@Override
+			protected ResourceLocation getEntityTexture(EC entity) {
+				return this.texture;
+			}
+		}
+		RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new CustomRender(renderManager));
 	}
 
-	public static class EC extends EntitySpike.Base {
+	public static class EC extends EntitySpike.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 8;
 		private final float maxScale = 2.0f;
-		private float damage;
+		private final float damage = 10.0f;
 
 		public EC(World worldIn) {
 			super(worldIn);
@@ -65,7 +71,12 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 
 		public EC(EntityLivingBase userIn, float damageIn) {
 			super(userIn, 0xFFFFFFFF);
-			this.damage = damageIn;
+			//this.damage = Math.min(damageIn, 20f);
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.DOTON;
 		}
 
 		@Override
@@ -80,8 +91,9 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 				for (EntityLivingBase entity : 
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
 					if (!entity.equals(this.shootingEntity)) {
-						entity.hurtResistantTime = 0;
-						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.damage);
+						entity.hurtResistantTime = 10;
+						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
+						 this.damage * (1f - (float)(this.ticksAlive - 1) / this.growTime));
 					}
 				}
 			}
@@ -95,12 +107,13 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(30d));
 				RayTraceResult res = world.rayTraceBlocks(vec3d, vec3d2, false, true, true);
 				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK && res.sideHit == EnumFacing.UP) {
-					world.playSound(null, res.getBlockPos(), (net.minecraft.util.SoundEvent)
+					world.playSound(null, res.getBlockPos(),
 					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:hand_press")),
 					 net.minecraft.util.SoundCategory.BLOCKS, 5f, entity.getRNG().nextFloat() * 0.4f + 0.8f);
-					for (int i = 0; i < (int)(power * power * 5f); i++) {
+					float f = MathHelper.sqrt(power * 9f / 5f);
+					for (int i = 0; i < Math.round(power); i++) {
 						EC entity1 = new EC(entity, power);
-						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * power * 3d, 0d, (entity.getRNG().nextDouble() - 0.5d) * power * 3d);
+						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
 						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
 						entity1.setLocationAndAngles(vec.x, vec.y + 0.5d, vec.z, entity.getRNG().nextFloat() * 360f, (entity.getRNG().nextFloat() - 0.5f) * 60f);
@@ -109,6 +122,21 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 					return true;
 				}
 				return false;
+			}
+
+			@Override
+			public float getBasePower() {
+				return 0.5f;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 20.0f;
+			}
+	
+			@Override
+			public float getMaxPower() {
+				return 100.0f;
 			}
 		}
 	}

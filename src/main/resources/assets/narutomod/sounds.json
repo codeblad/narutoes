@@ -98,15 +98,6 @@
       }
     ]
   },
-  "MajiNaguri": {
-    "category": "master",
-    "sounds": [
-      {
-        "name": "narutomod:majinaguri",
-        "stream": false
-      }
-    ]
-  },
   "hand_shoot": {
     "category": "master",
     "sounds": [
@@ -143,15 +134,6 @@
       }
     ]
   },
-  "dojutsu_activate": {
-    "category": "master",
-    "sounds": [
-      {
-        "name": "narutomod:dojutsu",
-        "stream": false
-      }
-    ]
-  },
   "BanshoTenin": {
     "category": "master",
     "sounds": [
@@ -175,15 +157,6 @@
     "sounds": [
       {
         "name": "narutomod:yagai",
-        "stream": false
-      }
-    ]
-  },
-  "hirudora": {
-    "category": "master",
-    "sounds": [
-      {
-        "name": "narutomod:hirudora",
         "stream": false
       }
     ]
@@ -575,15 +548,6 @@
       }
     ]
   },
-  "wood_click": {
-    "category": "master",
-    "sounds": [
-      {
-        "name": "narutomod:wood_click",
-        "stream": false
-      }
-    ]
-  },
   "kairikimuso": {
     "category": "master",
     "sounds": [
@@ -877,6 +841,339 @@
     "sounds": [
       {
         "name": "narutomod:ding",
+        "stream": false
+      }
+    ]
+  },
+  "senbon": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "narutomod:senbon",
+        "stream": false
+      }
+    ]
+  },
+  "gunbaiwind": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:gunbaiwind",
+        "stream": false
+      }
+    ]
+  },
+  "chainsound": {
+    "category": "ambient",
+    "sounds": [
+      {
+        "name": "narutomod:hidansscythechain",
+        "stream": false
+      }
+    ]
+  },
+  "hiruko_tail": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:hiruko_tail",
+        "stream": false
+      }
+    ]
+  },
+  "senbon_impact": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:senbon_impact",
+        "stream": false
+      }
+    ]
+  },
+  "roar": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:roar",
+        "stream": false
+      }
+    ]
+  },
+  "hirudora": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:hirudora",
+        "stream": false
+      }
+    ]
+  },
+  "dojutsu": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:dojutsu",
+        "stream": false
+      }
+    ]
+  },
+  "swoosh": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:swoosh",
+        "stream": false
+      }
+    ]
+  },
+  "highpitch": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:highpitch",
+        "stream": false
+      }
+    ]
+  },
+  "fourtails_idle1": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:4tails_idle1",
+        "stream": false
+      }
+    ]
+  },
+  "fourtails_idle2": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:4tails_idle2",
+        "stream": false
+      }
+    ]
+  },
+  "fourtails_defeat": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:4tails_defeat",
+        "stream": false
+      }
+    ]
+  },
+  "shukaku_roar": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:1tails_roar",
+        "stream": false
+      }
+    ]
+  },
+  "chomei_flying": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:chomei_flying",
+        "stream": false
+      }
+    ]
+  },
+  "isobu_roar": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:isobu_roar",
+        "stream": false
+      }
+    ]
+  },
+  "isobu_hurt": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:isobu_hurt",
+        "stream": false
+      }
+    ]
+  },
+  "guttural": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:guttural",
+        "stream": false
+      }
+    ]
+  },
+  "fourtails_hurt": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:4tails_hurt",
+        "stream": false
+      }
+    ]
+  },
+  "spitbig": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:spitbig",
+        "stream": false
+      }
+    ]
+  },
+  "waterstream": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:waterstream",
+        "stream": false
+      }
+    ]
+  },
+  "wood_click": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:wood_click",
+        "stream": false
+      }
+    ]
+  },
+  "matatabi_roar1": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:matatabi_roar1",
+        "stream": false
+      }
+    ]
+  },
+  "matatabi_roar2": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:matatabi_roar2",
+        "stream": false
+      }
+    ]
+  },
+  "waterfall": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:waterfall",
+        "stream": false
+      }
+    ]
+  },
+  "shot": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:gal_se_decopin_shot",
+        "stream": false
+      }
+    ]
+  },
+  "gyuki_roar": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:gyuki_roar",
+        "stream": false
+      }
+    ]
+  },
+  "gyuki_snort": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:gyuki_snort",
+        "stream": false
+      }
+    ]
+  },
+  "ting": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:ting",
+        "stream": false
+      }
+    ]
+  },
+  "shuriken1": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:shuriken1",
+        "stream": false
+      }
+    ]
+  },
+  "chakraflow": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:chakraflow",
+        "stream": false
+      }
+    ]
+  },
+  "windblast": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:windblast",
+        "stream": false
+      }
+    ]
+  },
+  "toadchant": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:toadchant",
+        "stream": false
+      }
+    ]
+  },
+  "hidan": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:hidan",
+        "stream": false
+      }
+    ]
+  },
+  "groundshock": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:gal_se_groundshock",
+        "stream": false
+      }
+    ]
+  },
+  "hiramekarei_release": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:hiramekarei_release",
+        "stream": false
+      }
+    ]
+  },
+  "gunbai_deflect": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:gunbai_deflect",
         "stream": false
       }
     ]

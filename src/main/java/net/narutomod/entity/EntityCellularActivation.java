@@ -12,11 +12,12 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.DamageSource;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.item.ItemStack;
 import net.minecraft.client.renderer.entity.Render;
@@ -26,6 +27,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
 
+import net.narutomod.item.ItemIryoJutsu;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.Particles;
 import net.narutomod.Chakra;
@@ -49,21 +51,15 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 		 .id(new ResourceLocation("narutomod", "cellular_activation"), ENTITYID).name("cellular_activation").tracker(64, 3, true).build());
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
-	}
-
 	@Override
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new EC.UserHook());
 	}
 
-	public static class EC extends Entity {
+	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private static final DataParameter<Integer> USER_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private static final DataParameter<Integer> REDUCTION = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
-		private final double chakraBurn = 5.0d;
+		private final double chakraBurn = ItemIryoJutsu.MEDMODE.chakraUsage;
 
 		public EC(World worldIn) {
 			super(worldIn);
@@ -74,6 +70,11 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 			this(userIn.world);
 			this.setUser(userIn);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.IRYO;
 		}
 
 		@Override
@@ -136,8 +137,9 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 						reduction *= (float)(cp.getAmount() / chakrausage);
 						chakrausage = cp.getAmount();
 					}
-					event.setAmount(event.getAmount() - reduction);
-					cp.consume(chakrausage);
+					if (reduction > 0f && cp.consume(chakrausage)) {
+						event.setAmount(event.getAmount() - reduction);
+					}
 				}
 			}
 		}
@@ -164,11 +166,17 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 				Entity entity1 = entity.world.getEntityByID(entity.getEntityData().getInteger(ID_KEY));
 				if (entity1 instanceof EC) {
 					entity1.setDead();
+					if (entity instanceof EntityPlayer && !entity.world.isRemote) {
+						((EntityPlayer)entity).sendStatusMessage(new TextComponentString("Off"), true);
+					}
 					return false;
 				} else {
 					entity1 = new EC(entity);
 					entity.world.spawnEntity(entity1);
 					entity.getEntityData().setInteger(ID_KEY, entity1.getEntityId());
+					if (entity instanceof EntityPlayer && !entity.world.isRemote) {
+						((EntityPlayer)entity).sendStatusMessage(new TextComponentString("On"), true);
+					}
 					return true;
 				}
 			}
@@ -186,33 +194,46 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class RenderCustom extends Render<EC> {
-		public RenderCustom(RenderManager rendermanager) {
-			super(rendermanager);
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
+
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
+		@Override
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
 		}
 
-		@Override
-		public boolean shouldRender(EC livingEntity, ICamera camera, double camX, double camY, double camZ) {
-			return true;
-		}
-
-		@Override
-		public void doRender(EC entity, double x, double y, double z, float entityYaw, float partialTicks) {
-			EntityLivingBase user = entity.getUser();
-			if (user != null && entity.getReductionAmount() > 0) {
-				x = user.lastTickPosX + (user.posX - user.lastTickPosX) * partialTicks;
-				y = user.lastTickPosY + (user.posY - user.lastTickPosY) * partialTicks;
-				z = user.lastTickPosZ + (user.posZ - user.lastTickPosZ) * partialTicks;
-				Particles.spawnParticle(entity.world, Particles.Types.SMOKE, x, y+user.height/2, z,
-				 1, 0d, 0d, 0d, 0d, 0d, 0d, 0x0000fff6|((0x10+user.getRNG().nextInt(0x20))<<24),
-				 10 + user.getRNG().nextInt(25), 5, 0xF0, -1);
+		@SideOnly(Side.CLIENT)
+		public class RenderCustom extends Render<EC> {
+			public RenderCustom(RenderManager rendermanager) {
+				super(rendermanager);
 			}
-		}
-
-		@Override
-		protected ResourceLocation getEntityTexture(EC entity) {
-			return null;
+	
+			@Override
+			public boolean shouldRender(EC livingEntity, ICamera camera, double camX, double camY, double camZ) {
+				return true;
+			}
+	
+			@Override
+			public void doRender(EC entity, double x, double y, double z, float entityYaw, float partialTicks) {
+				EntityLivingBase user = entity.getUser();
+				if (user != null && entity.getReductionAmount() > 0) {
+					x = user.lastTickPosX + (user.posX - user.lastTickPosX) * partialTicks;
+					y = user.lastTickPosY + (user.posY - user.lastTickPosY) * partialTicks;
+					z = user.lastTickPosZ + (user.posZ - user.lastTickPosZ) * partialTicks;
+					Particles.spawnParticle(entity.world, Particles.Types.SMOKE, x, y+user.height/2, z,
+					 1, 0d, 0d, 0d, 0d, 0d, 0d, 0x0000fff6|((0x10+user.getRNG().nextInt(0x20))<<24),
+					 10 + user.getRNG().nextInt(25), 5, 0xF0, -1);
+				}
+			}
+	
+			@Override
+			protected ResourceLocation getEntityTexture(EC entity) {
+				return null;
+			}
 		}
 	}
 }

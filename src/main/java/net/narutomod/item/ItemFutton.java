@@ -14,27 +14,28 @@ import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.EnumAction;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.block.material.Material;
-import net.minecraft.init.Blocks;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 
 import net.narutomod.entity.EntityUnrivaledStrength;
 import net.narutomod.block.BlockAmaterasuBlock;
@@ -56,7 +57,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 281;
 	public static final ItemJutsu.JutsuEnum MIST = new ItemJutsu.JutsuEnum(0, "futton_mist", 'S', 50d, new EntityBoilingMist.Jutsu());
-	public static final ItemJutsu.JutsuEnum STRENGTH = new ItemJutsu.JutsuEnum(1, "unrivaled_strength", 'S', 50d, new EntityUnrivaledStrength.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum STRENGTH = new ItemJutsu.JutsuEnum(1, "unrivaled_strength", 'S', 100d, new EntityUnrivaledStrength.EC.Jutsu());
 
 	public ItemFutton(ElementsNarutomodMod instance) {
 		super(instance, 600);
@@ -86,14 +87,6 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			//if (this.getCurrentJutsu(stack) == MIST) {
-				return this.getPower(stack, entity, timeLeft, 0.1f, 20f);
-			//}
-			//return 1.0f;
-		}
-
-		@Override
 		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {
 		 	ItemStack stack = entity.getHeldItem(hand);
 			if (entity.isCreative() || (ProcedureUtils.hasItemInInventory(entity, ItemKaton.block) 
@@ -111,35 +104,57 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static class EntityBoilingMist extends Entity {
+	public static class EntityBoilingMist extends Entity implements ItemJutsu.IJutsu {
 		private final AirPunch airPunch = new AirPunch();
 		private EntityLivingBase user;
 		private float power;
+		private float farRadius;
+		private int damagePerSec;
+		private int duration;
 
 		public EntityBoilingMist(World world) {
 			super(world);
 			this.setSize(0.01f, 0.01f);
 		}
 
-		public EntityBoilingMist(EntityLivingBase userIn, float powerIn) {
+		public EntityBoilingMist(EntityLivingBase userIn, float powerIn, float width) {
 			this(userIn.world);
 			this.setSize(0.01f, 0.01f);
 			this.user = userIn;
 			this.power = powerIn;
+			this.farRadius = width;
+			this.damagePerSec = 15;
+			this.duration = (int)(powerIn * powerIn * 0.5f);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.FUTTON;
 		}
 
 		@Override
 		protected void entityInit() {
 		}
 
+		public void setDamagePerSec(int amount) {
+			this.damagePerSec = amount;
+		}
+
+		public void setDuration(int ticks) {
+			this.duration = ticks;
+		}
+
 		@Override
 		public void onUpdate() {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
-				this.airPunch.execute(this.user, this.power, this.power * 0.25d);
+				this.airPunch.execute(this.user, this.power, this.farRadius);
+				if (this.ticksExisted % 15 == 2) {
+					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:windecho")), this.power > 30f ? 5.0f : 0.8f, this.rand.nextFloat() * 0.4f + 0.4f);
+				}
 			}
-			if (!this.world.isRemote && this.ticksExisted > (int)(this.power * this.power * 0.5f)) {
+			if (!this.world.isRemote && this.ticksExisted > this.duration) {
 				this.setDead();
 			}
 		}
@@ -159,29 +174,31 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
-			protected void preExecuteParticles(EntityLivingBase player) {
+			protected void preExecuteParticles(Entity player) {
 				Vec3d vec0 = player.getLookVec();
-				Vec3d vec = vec0.scale(2d).addVector(player.posX, player.posY + 1.5d, player.posZ);
-				for (int i = 1; i <= 50; i++) {
-					Vec3d vec1 = vec0.scale(((EntityBoilingMist.this.rand.nextDouble() * 0.8d) + 0.2d) * this.getRange(0) * 0.06d);
-					Particles.spawnParticle(player.world, Particles.Types.SMOKE, vec.x, vec.y, vec.z, 1, 0d, 0d, 0d, 
-					 vec1.x + (EntityBoilingMist.this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
-					 vec1.y + (EntityBoilingMist.this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
-					 vec1.z + (EntityBoilingMist.this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
-					 0x20FFFFFF, 80 + EntityBoilingMist.this.rand.nextInt(20), 0, 0, -1, 0);
+				Vec3d vec = vec0.scale(2d).add(player.getPositionEyes(1f).subtract(0d, 0.1d, 0d));
+				Particles.Renderer particles = new Particles.Renderer(player.world);
+				for (int i = 1; i <= Math.max(50, (int)(this.getRange(0) * this.getFarRadius(0) * 0.5d)); i++) {
+					Vec3d vec1 = vec0.scale(((this.rand.nextDouble() * 0.8d) + 0.2d) * this.getRange(0) * 0.06d);
+					particles.spawnParticles(Particles.Types.SMOKE, vec.x, vec.y, vec.z, 1, 0d, 0d, 0d, 
+					 vec1.x + (this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
+					 vec1.y + (this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
+					 vec1.z + (this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
+					 0x20FFFFFF, 80 + Math.max(0, (int)(this.getRange(0) - 20d)) + this.rand.nextInt(20), 8 + this.rand.nextInt(33), 0, -1, 0);
 				}
+				particles.send();
 			}
 
 			@Override
-			protected void attackEntityFrom(EntityLivingBase player, Entity target) {
+			protected void attackEntityFrom(Entity player, Entity target) {
 				if (target instanceof EntityLivingBase) {
 					target.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1f, this.rand.nextFloat() + 0.5f);
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, 200, 15));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, 200, EntityBoilingMist.this.damagePerSec));
 				}
 			}
 
 			@Override
-			protected EntityItem processAffectedBlock(EntityLivingBase player, BlockPos pos, EnumFacing facing) {
+			protected EntityItem processAffectedBlock(Entity player, BlockPos pos, EnumFacing facing) {
 				if (net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(player.world, player)) {
 					Material mat = player.world.getBlockState(pos).getMaterial();
 					if (mat == Material.ICE || mat == Material.PACKED_ICE) {
@@ -198,7 +215,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
-			protected float getBreakChance(BlockPos pos, EntityLivingBase player, double range) {
+			protected float getBreakChance(BlockPos pos, Entity player, double range) {
 				return 0.0f;
 			}
 		}
@@ -206,8 +223,29 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				entity.world.spawnEntity(new EntityBoilingMist(entity, power));
+				this.createJutsu(entity, power, power * 0.25f);
 				return true;
+			}
+
+			public static EntityBoilingMist createJutsu(EntityLivingBase entity, float power, float farRadius) {
+				EntityBoilingMist entity1 = new EntityBoilingMist(entity, power, farRadius);
+				entity.world.spawnEntity(entity1);
+				return entity1;
+			}
+
+			@Override
+			public float getBasePower() {
+				return 0.1f;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 30.0f;
+			}
+	
+			@Override
+			public float getMaxPower() {
+				return 30.0f;
 			}
 		}
 	}

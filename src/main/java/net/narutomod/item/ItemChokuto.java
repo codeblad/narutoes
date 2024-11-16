@@ -24,8 +24,9 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.nbt.NBTTagCompound;
 
-import net.narutomod.entity.EntitySusanooBase;
+//import net.narutomod.entity.EntitySusanooBase;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -49,7 +50,7 @@ public class ItemChokuto extends ElementsNarutomodMod.ModElement {
 
 	public static class ItemCustom extends ItemSword implements ItemOnBody.Interface {
 		public ItemCustom() {
-			super(EnumHelper.addToolMaterial("CHOKUTO", 1, 2000, 4f, 8f, 2));
+			super(EnumHelper.addToolMaterial("CHOKUTO", 1, 2000, 4f, 5f, 2));
 		}
 
 		@Override
@@ -65,19 +66,23 @@ public class ItemChokuto extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
-			super.onUpdate(itemstack, world, entity, par4, par5);
-			if (!world.isRemote && entity instanceof EntityLivingBase 
-			 && entity.getRidingEntity() instanceof EntitySusanooBase) {
-				EntitySusanooBase susanoo = (EntitySusanooBase)entity.getRidingEntity();
-				ItemStack stack = susanoo.getHeldItemMainhand();
-				if (((EntityLivingBase)entity).getHeldItemMainhand().equals(itemstack)) {
-					if (!susanoo.shouldShowSword()) {
-						susanoo.setShowSword(true);
-					}
-				} else if (susanoo.shouldShowSword()) {
-					susanoo.setShowSword(false);
-				}
+		public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+			super.onUpdate(stack, worldIn, entityIn, itemSlot, isSelected);
+			this.setCustomChakraFlowVecs(stack);
+		}
+				
+		private void setCustomChakraFlowVecs(ItemStack stack) {
+			NBTTagCompound compound = stack.getTagCompound();
+			if (compound == null) {
+				compound = new NBTTagCompound();
+				stack.setTagCompound(compound);
+			}
+			if (!compound.hasKey("CustomChakraFlowEndVec")) {
+				NBTTagCompound cmp2 = new NBTTagCompound();
+				cmp2.setDouble("x", 0d);
+				cmp2.setDouble("y", -0.95d);
+				cmp2.setDouble("z", 1.25d);
+				compound.setTag("CustomChakraFlowEndVec", cmp2);
 			}
 		}
 

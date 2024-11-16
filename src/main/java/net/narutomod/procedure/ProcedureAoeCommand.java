@@ -16,6 +16,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 
+import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.List;
@@ -37,11 +38,13 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 	//private static List<Entity> excludedEntities = Lists.newArrayList();
 	private static List<Entity> entitiesList = Lists.newArrayList();
 	private static ProcedureAoeCommand Instance;
-	private static final Predicate<Entity> MIN_DISTANCE = Predicates.and(EntitySelectors.NOT_SPECTATING, (p) -> {
+	/*private static final Predicate<Entity> MIN_DISTANCE = Predicates.and(EntitySelectors.NOT_SPECTATING, (p) -> {
 		return p.isEntityAlive() && !p.getEntityData().getBoolean("kamui_intangible")
 			&& p.getDistanceSq(centerX, centerY, centerZ) >= minRange*minRange;
-			//&& !excludedEntities.contains(p);
-	});
+			//&& !excludedEntities.contains(p);*/
+	private static final Predicate<Entity> MIN_DISTANCE = (p) -> {
+		return ItemJutsu.canTarget(p) && p.getDistanceSq(centerX, centerY, centerZ) >= minRange*minRange;
+	};
 	
 	public ProcedureAoeCommand(ElementsNarutomodMod instance) {
 		super(instance, 169);
@@ -161,7 +164,7 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 	public ProcedureAoeCommand resetHurtResistanceTime() {
 		if (!entitiesList.isEmpty())
 			for (Entity entity : entitiesList) {
-				entity.hurtResistantTime = 0;
+				entity.hurtResistantTime = 10;
 			}
 		return this;
 	}
@@ -255,12 +258,24 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 		return this;
 	}
 
-	public ProcedureAoeCommand effect(Potion potion, int duration, int amplifier) {
+	public ProcedureAoeCommand effect(Potion potion, int duration, int amplifier, boolean showParticles) {
 		//List<EntityLivingBase> list = this.world.getEntitiesWithinAABB(EntityLivingBase.class, aabb.grow(maxRange), MIN_DISTANCE);
 		if (!entitiesList.isEmpty())
 			for (Entity entity : entitiesList) {
 				if (entity instanceof EntityLivingBase)
-					((EntityLivingBase)entity).addPotionEffect(new PotionEffect(potion, duration * 20, amplifier, false, true));
+					((EntityLivingBase)entity).addPotionEffect(new PotionEffect(potion, duration * 20, amplifier, false, showParticles));
+			}
+		return this;
+	}
+
+	public ProcedureAoeCommand effectCentered(Potion potion, int duration, int amplifier) {
+		//List<EntityLivingBase> list = this.world.getEntitiesWithinAABB(EntityLivingBase.class, aabb.grow(maxRange), MIN_DISTANCE);
+		if (!entitiesList.isEmpty())
+			for (Entity entity : entitiesList) {
+				if (entity instanceof EntityLivingBase) {
+					double d = 1.0d - entity.getDistance(centerX, centerY, centerZ) / maxRange;
+					((EntityLivingBase)entity).addPotionEffect(new PotionEffect(potion, (int)((double)duration * 20d * d), amplifier, false, true));
+				}
 			}
 		return this;
 	}
@@ -314,8 +329,9 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 					//BlockPos pos = new BlockPos(i, k, j);
 					double d = pos.setPos(i, k, j).distanceSqToCenter(this.centerX, this.centerY, this.centerZ);
 					if (d <= this.maxRange * this.maxRange && d > this.minRange * this.minRange) {
-						if (this.world.isAirBlock(pos) && this.world.getBlockState(pos.down()).isFullBlock() && Math.random() <= chance)
+						if (this.world.isAirBlock(pos) && this.world.getBlockState(pos.down()).isFullBlock() && Math.random() <= chance) {
 							this.world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+						}
 					}
 				}
 			}

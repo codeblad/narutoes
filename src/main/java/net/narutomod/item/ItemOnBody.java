@@ -28,16 +28,16 @@ import net.narutomod.ElementsNarutomodMod;
 import java.util.Map;
 import java.util.List;
 import java.util.Iterator;
-import com.google.common.collect.Maps;
 import java.io.IOException;
 import io.netty.buffer.ByteBuf;
-//import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
-//import net.minecraft.inventory.EntityEquipmentSlot;
+import com.google.common.collect.Maps;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemOnBody extends ElementsNarutomodMod.ModElement {
 	private static Vec3d RIGHT_LEG_OFFSET = new Vec3d(0.125d, -0.6875d, 0d);
 	private static Vec3d LEFT_LEG_OFFSET = new Vec3d(-0.125d, -0.6875d, 0d);
+	private static Vec3d RIGHT_ARM_OFFSET = new Vec3d(0.3125d, -0.125d, 0d);
+	private static Vec3d LEFT_ARM_OFFSET = new Vec3d(-0.3125d, -0.125d, 0d);
 	
 	public ItemOnBody(ElementsNarutomodMod instance) {
 		super(instance, 711);
@@ -56,20 +56,33 @@ public class ItemOnBody extends ElementsNarutomodMod.ModElement {
 	public interface Interface {
 		default Vec3d getOffset() {
 			switch (this.showOnBody()) {
+				case RIGHT_ARM:
+					return RIGHT_ARM_OFFSET;
 				case RIGHT_LEG:
 					return RIGHT_LEG_OFFSET;
+				case LEFT_ARM:
+					return LEFT_ARM_OFFSET;
 				case LEFT_LEG:
 					return LEFT_LEG_OFFSET;
 				case HEAD:
 				case TORSO:
-				case RIGHT_ARM:
-				case LEFT_ARM:
 				default:
 					return Vec3d.ZERO;
 			}
 		}
-		default boolean showSkinLayer() { return false; }
-		default BodyPart showOnBody() { return BodyPart.TORSO; }
+
+		default boolean showSkinLayer() {
+			return false;
+		}
+		
+ 		@Deprecated // Use ItemStack sensitive version below.
+		default BodyPart showOnBody() {
+			return BodyPart.TORSO;
+		}
+		
+		default BodyPart showOnBody(ItemStack stack) {
+			return this.showOnBody();
+		}
 	}
 
 	public enum BodyPart {
@@ -118,14 +131,14 @@ public class ItemOnBody extends ElementsNarutomodMod.ModElement {
 
 		private boolean needsUpdate() {
 			boolean update = false;
-			for (int i = 0; i < this.player.inventory.mainInventory.size(); ++i) {
-				ItemStack stack1 = this.player.inventory.mainInventory.get(i);
+			for (int i = 0; i < this.player.inventory.getSizeInventory(); ++i) {
+				ItemStack stack1 = this.player.inventory.getStackInSlot(i);
 				ItemStack stack2 = this.slotMap.get(Integer.valueOf(i));
-				if ((stack2 == null || !ItemStack.areItemsEqual(stack1, stack2))
-				 && (stack1.getItem() instanceof Interface || (stack2 != null && stack2.getItem() instanceof Interface))) {
+				boolean flag = stack2 != null && ItemStack.areItemStacksEqual(stack1, stack2);
+				if (!flag && (stack1.getItem() instanceof Interface || (stack2 != null && stack2.getItem() instanceof Interface))) {
 					this.slotMap.put(Integer.valueOf(i), stack1);
 					update = true;
-				} else if (stack2 != null && ItemStack.areItemsEqual(stack1, stack2) && !(stack2.getItem() instanceof Interface)) {
+				} else if (flag && !(stack2.getItem() instanceof Interface)) {
 					this.slotMap.remove(Integer.valueOf(i));
 				}
 			}
@@ -175,6 +188,10 @@ public class ItemOnBody extends ElementsNarutomodMod.ModElement {
 						if (entity instanceof EntityOtherPlayerMP) {
 							EntityOtherPlayerMP othermp = (EntityOtherPlayerMP)entity;
 //System.out.println("+++ from:"+entity+" to:"+mc.player.getName()+", cur:"+message.cur+", "+message.map+", old:"+othermp.inventory.currentItem+", "+othermp.inventory.mainInventory);
+							if (othermp.inventory.currentItem == 0 && message.cur != 0) {
+								ItemStack stack = message.map.get(0);
+								othermp.inventory.setInventorySlotContents(0, stack != null ? stack : ItemStack.EMPTY);
+							}
 							othermp.inventory.currentItem = message.cur;
 							for (Map.Entry<Integer, ItemStack> entry : message.map.entrySet()) {
 								othermp.inventory.setInventorySlotContents(entry.getKey(), entry.getValue());

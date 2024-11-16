@@ -3,6 +3,7 @@ package net.narutomod.item;
 
 import net.narutomod.procedure.ProcedureZzzRightClickedOnBlock;
 import net.narutomod.procedure.ProcedureZzzRightClickedInAir;
+import net.narutomod.procedure.ProcedureZzzEntitySwingsItem;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -20,6 +21,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.block.state.IBlockState;
 
@@ -95,11 +97,28 @@ public class ItemZzz extends ElementsNarutomodMod.ModElement {
 			int z = pos.getZ();
 			{
 				Map<String, Object> $_dependencies = new HashMap<>();
+				$_dependencies.put("itemstack", itemstack);
 				$_dependencies.put("x", x);
 				$_dependencies.put("y", y);
 				$_dependencies.put("z", z);
 				$_dependencies.put("world", world);
 				ProcedureZzzRightClickedOnBlock.executeProcedure($_dependencies);
+			}
+			return retval;
+		}
+
+		@Override
+		public boolean onEntitySwing(EntityLivingBase entity, ItemStack itemstack) {
+			boolean retval = super.onEntitySwing(entity, itemstack);
+			int x = (int) entity.posX;
+			int y = (int) entity.posY;
+			int z = (int) entity.posZ;
+			World world = entity.world;
+			{
+				Map<String, Object> $_dependencies = new HashMap<>();
+				$_dependencies.put("entity", entity);
+				$_dependencies.put("world", world);
+				ProcedureZzzEntitySwingsItem.executeProcedure($_dependencies);
 			}
 			return retval;
 		}

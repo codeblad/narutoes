@@ -48,6 +48,8 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 		protected int maxInGroundTime = 1200;
 		private float motionFactor;
 		private float waterSlowdown = 0.8f;
+		public float prevRotationRoll;
+		public float rotationRoll;
 		
 		public Base(World world) {
 			super(world);
@@ -81,13 +83,13 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void setEntityScale(float scale) {
+			double x = this.posX;
+			double y = this.posY;
+			double z = this.posZ;
+			this.setSize(this.ogWidth * scale, this.ogHeight * scale);
+			this.setPosition(x, y, z);
 			if (!this.world.isRemote) {
 				this.getDataManager().set(MODEL_SCALE, Float.valueOf(scale));
-				double x = this.posX;
-				double y = this.posY;
-				double z = this.posZ;
-				this.setSize(this.ogWidth * scale, this.ogHeight * scale);
-				this.setPosition(x, y, z);
 			}
 		}
 
@@ -95,8 +97,7 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 		public void notifyDataManagerChange(DataParameter<?> key) {
 			super.notifyDataManagerChange(key);
 			if (MODEL_SCALE.equals(key) && this.world.isRemote) {
-				float scale = this.getEntityScale();
-				this.setSize(this.ogWidth * scale, this.ogHeight * scale);
+				this.setEntityScale(this.getEntityScale());
 			}
 		}
 
@@ -114,6 +115,14 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 			this.motionZ = 0.0d;
 		}
 
+		protected void setMotionFactor(float f) {
+			this.motionFactor = f;
+		}
+
+		protected float getMotionFactor() {
+			return this.motionFactor;
+		}
+
 		/*public void onKillCommand() {
 		}*/
 
@@ -127,9 +136,6 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void shoot(double x, double y, double z, float speed, float inaccuracy, boolean updateRotations) {
-			//this.motionX = 0.0D;
-			//this.motionY = 0.0D;
-			//this.motionZ = 0.0D;
 			x += this.rand.nextGaussian() * inaccuracy;
 			y += this.rand.nextGaussian() * inaccuracy;
 			z += this.rand.nextGaussian() * inaccuracy;
@@ -140,6 +146,7 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 				if (this.motionFactor == 0.0f) {
 					this.prevRotationYaw = this.rotationYaw;
 					this.prevRotationPitch = this.rotationPitch;
+					this.prevRotationRoll = this.rotationRoll;
 				}
 			}
 			double d0 = MathHelper.sqrt(x * x + y * y + z * z);
@@ -152,6 +159,18 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 				this.motionY = y / d0 * speed;
 				this.motionZ = z / d0 * speed;
 			}
+			this.motionFactor = speed;
+		}
+
+		public void shootPrecise(double x, double y, double z, float speed) {
+			double d0 = MathHelper.sqrt(x * x + y * y + z * z);
+			this.accelerationX = x / d0 * 0.1D;
+			this.accelerationY = y / d0 * 0.1D;
+			this.accelerationZ = z / d0 * 0.1D;
+			double d1 = MathHelper.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+			this.motionX = x / d0 * d1;
+			this.motionY = y / d0 * d1;
+			this.motionZ = z / d0 * d1;
 			this.motionFactor = speed;
 		}
 
@@ -189,6 +208,7 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 				this.checkOnGround();
 				if (this.onGround) {
 					this.motionFactor = 0f;
+					this.ticksInAir = 0;
 					if (++this.ticksInGround > this.maxInGroundTime) {
 						this.setDead();
 					}
@@ -231,23 +251,22 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 					this.renderParticles();
 					this.setPosition(this.posX, this.posY, this.posZ);
 				}
-				//if (this.world.isRemote) {
-				//	float scale = this.getEntityScale();
-				//	if (scale != 1.0F) {
-				//		this.setSize(this.ogWidth * scale, this.ogHeight * scale);
-				//	}
-				//}
 			}
 		}
 
 		protected RayTraceResult forwardsRaycast(boolean includeEntities, boolean ignoreExcludedEntity, @Nullable Entity excludedEntity) {
-			RayTraceResult res = EntityScalableProjectile.forwardsRaycast(this, includeEntities, ignoreExcludedEntity, excludedEntity);
+			RayTraceResult res = EntityScalableProjectile.forwardsRaycast(this, ProcedureUtils.getMotion(this),
+			 includeEntities, ignoreExcludedEntity, excludedEntity);
 			return res != null && res.entityHit instanceof Base && ((Base)res.entityHit).shootingEntity != null 
 			 && ((Base)res.entityHit).shootingEntity.equals(this.shootingEntity) ? null : res;
 		}
 
-		public Random getRNG() {
+		public Random rand() {
 			return this.rand;
+		}
+
+		public int getTicksAlive() {
+			return this.ticksAlive;
 		}
 
 		protected abstract void onImpact(RayTraceResult param1RayTraceResult);
@@ -256,20 +275,15 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
             double d = (double)MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
             float yaw = -(float)(MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
             float pitch = -(float)(MathHelper.atan2(this.motionY, d) * (180D / Math.PI));
-	        while (yaw - this.prevRotationYaw < -180.0F) {
-	            this.prevRotationYaw -= 360.0F;
-	        }
-	        while (yaw - this.prevRotationYaw >= 180.0F) {
-	            this.prevRotationYaw += 360.0F;
-	        }
-	        while (pitch - this.prevRotationPitch < -180.0F) {
-	            this.prevRotationPitch -= 360.0F;
-	        }
-	        while (pitch - this.prevRotationPitch >= 180.0F) {
-	            this.prevRotationPitch += 360.0F;
-	        }
+            float deltaYaw = ProcedureUtils.subtractDegreesWrap(yaw, this.prevRotationYaw);
+            float deltaPitch = ProcedureUtils.subtractDegreesWrap(pitch, this.prevRotationPitch);
+            float roll = MathHelper.wrapDegrees(deltaYaw * 1.5f);
+            this.prevRotationYaw = yaw - deltaYaw;
+            this.prevRotationPitch = pitch - deltaPitch;
+            this.prevRotationRoll = this.rotationRoll;
             this.rotationPitch = this.prevRotationPitch + (pitch - this.prevRotationPitch) * 0.2F;
             this.rotationYaw = this.prevRotationYaw + (yaw - this.prevRotationYaw) * 0.2F;
+            this.rotationRoll = this.prevRotationRoll + (roll - this.prevRotationRoll) * 0.2F;
 		}
 
 		public void renderParticles() {
@@ -329,39 +343,52 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static RayTraceResult forwardsRaycastBlocks(Entity projectile) {
-		return forwardsRaycast(projectile, false, false, null);
+		return forwardsRaycast(projectile, ProcedureUtils.getMotion(projectile), false, false, null);
+	}
+
+	public static RayTraceResult forwardsRaycast(Entity projectile, Vec3d motion, boolean includeEntities, boolean ignoreExcludedEntity, @Nullable Entity excludedEntity) {
+		return forwardsRaycast(projectile, motion, true, includeEntities, ignoreExcludedEntity, excludedEntity);
 	}
 
 	public static RayTraceResult forwardsRaycast(Entity projectile, boolean includeEntities, boolean ignoreExcludedEntity, @Nullable Entity excludedEntity) {
+		return forwardsRaycast(projectile, ProcedureUtils.getMotion(projectile), false, includeEntities, ignoreExcludedEntity, excludedEntity);
+	}
+
+	public static RayTraceResult forwardsRaycast(Entity projectile, Vec3d motion, boolean scaleBlocks, boolean includeEntities, boolean ignoreExcludedEntity, @Nullable Entity excludedEntity) {
 		World world = projectile.world;
-		Vec3d vec3d = new Vec3d(projectile.posX, projectile.posY + (projectile.height / 2.0F), projectile.posZ);
-		Vec3d vec3d1 = new Vec3d(projectile.motionX, projectile.motionY, projectile.motionZ);
-		Vec3d vec3d2 = vec3d.add(vec3d1);
-		AxisAlignedBB bigAABB = projectile.getEntityBoundingBox().expand(vec3d1.x, vec3d1.y, vec3d1.z).grow(1.0D);
-		double d0 = 0.0D;
-		BlockPos blockpos = null;
-		EnumFacing facing = null;
+		Vec3d vec3d = new Vec3d(projectile.posX, projectile.posY + projectile.height * 0.5f, projectile.posZ);
+		Vec3d vec3d2 = vec3d.add(motion);
+		AxisAlignedBB bigAABB = projectile.getEntityBoundingBox().expand(motion.x, motion.y, motion.z).grow(1.0d);
 		RayTraceResult raytraceresult = null;
-		for (AxisAlignedBB aabb : world.getCollisionBoxes(null, bigAABB)) {
-			RayTraceResult result = aabb.grow(projectile.width / 2, projectile.height / 2, projectile.width / 2).calculateIntercept(vec3d, vec3d2);
-			if (result != null) {
- 				double d = projectile.getDistanceSq(ProcedureUtils.BB.getCenterX(aabb), ProcedureUtils.BB.getCenterY(aabb), ProcedureUtils.BB.getCenterZ(aabb));
-				if (d < d0 || d0 == 0.0D) {
-					blockpos = new BlockPos(aabb.minX, aabb.minY, aabb.minZ);
-					facing = result.sideHit;
-					d0 = d;
+		double d0 = 0.0D;
+		if (scaleBlocks) {
+			BlockPos.PooledMutableBlockPos blockpos = BlockPos.PooledMutableBlockPos.retain();
+			EnumFacing facing = null;
+			for (AxisAlignedBB aabb : world.getCollisionBoxes(null, bigAABB)) {
+				RayTraceResult result = aabb.grow(projectile.width * 0.5f, projectile.height * 0.5f, projectile.width * 0.5f).calculateIntercept(vec3d, vec3d2);
+				if (result != null) {
+	 				double d = projectile.getDistanceSq((aabb.minX + aabb.maxX) * 0.5d, (aabb.minY + aabb.maxY) * 0.5d, (aabb.minZ + aabb.maxZ) * 0.5d);
+					if (d < d0 || d0 == 0.0D) {
+						blockpos.setPos(aabb.minX, aabb.minY, aabb.minZ);
+						facing = result.sideHit;
+						d0 = d;
+					}
 				}
 			}
-		}
-		if (blockpos != null) {
-			raytraceresult = new RayTraceResult(new Vec3d(blockpos), facing, blockpos);
+			if (facing != null) {
+				BlockPos pos = blockpos.toImmutable();
+				raytraceresult = new RayTraceResult(new Vec3d(pos), facing, pos);
+			}
+			blockpos.release();
+		} else {
+			raytraceresult = world.rayTraceBlocks(vec3d, vec3d2, false, true, false);
 		}
 		if (includeEntities) {
 			Entity entity = null;
 			Vec3d hitvec = null;
 			for (Entity entity1 : world.getEntitiesWithinAABBExcludingEntity(projectile, bigAABB)) {
 				if (entity1.canBeCollidedWith() && (ignoreExcludedEntity || !entity1.equals(excludedEntity)) && !entity1.noClip) {
-					AxisAlignedBB aabb = entity1.getEntityBoundingBox().grow(projectile.width / 2, projectile.height / 2, projectile.width / 2);
+					AxisAlignedBB aabb = entity1.getEntityBoundingBox().grow(projectile.width * 0.5f, projectile.height * 0.5f, projectile.width * 0.5f);
 					RayTraceResult result = aabb.calculateIntercept(vec3d, vec3d2);
 					if (result != null) {
 						double d = vec3d.distanceTo(result.hitVec);

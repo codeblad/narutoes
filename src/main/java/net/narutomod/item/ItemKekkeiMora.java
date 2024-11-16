@@ -11,6 +11,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -31,11 +32,14 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.OpenGlHelper;
 
+import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureYomotsuHirasaka;
+import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntityScalableProjectile;
 import net.narutomod.entity.EntityTruthSeekerBall;
 import net.narutomod.creativetab.TabModTab;
+import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
 
 import com.google.common.collect.ImmutableMap;
@@ -49,6 +53,7 @@ public class ItemKekkeiMora extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum PORTAL = new ItemJutsu.JutsuEnum(1, "tooltip.byakurinnesharingan.jutsu2", 'S', 10d, new YomotsuHirasaka());
 	public static final ItemJutsu.JutsuEnum BIGBALL = new ItemJutsu.JutsuEnum(2, "tooltip.kekkeimora.expansivetsb", 'S', 10d, new ExpansiveTSB());
 	public static final ItemJutsu.JutsuEnum ASHBONE = new ItemJutsu.JutsuEnum(3, "item.ashbones.name", 'S', 10d, new AshBone());
+	public static final ItemJutsu.JutsuEnum PULSE = new ItemJutsu.JutsuEnum(4, "tooltip.byakurinnesharingan.pulse", 'S', 10d, new ChakraPulse());
 
 	public ItemKekkeiMora(ElementsNarutomodMod instance) {
 		super(instance, 731);
@@ -56,7 +61,7 @@ public class ItemKekkeiMora extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.items.add(() -> new RangedItem(EIGHTYGODS, PORTAL, BIGBALL, ASHBONE));
+		elements.items.add(() -> new RangedItem(EIGHTYGODS, PORTAL, BIGBALL, ASHBONE, PULSE));
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(Entity80Gods.class)
 				.id(new ResourceLocation("narutomod", "entity80gods"), ENTITYID).name("entity80gods").tracker(64, 1, true)
 				.build());
@@ -66,14 +71,6 @@ public class ItemKekkeiMora extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:kekkei_mora", "inventory"));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(Entity80Gods.class, renderManager -> {
-			return new Render80Gods(renderManager);
-		});
 	}
 
 	public static class RangedItem extends ItemJutsu.Base {
@@ -88,14 +85,10 @@ public class ItemKekkeiMora extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			return 1f;
-		}
-
-		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
 			if (this.getCurrentJutsu(stack) == EIGHTYGODS) {
-				if (!player.world.isRemote && player.ticksExisted % 4 == 1) {
+				if (!player.world.isRemote && player.ticksExisted % 4 == 1 && player instanceof EntityPlayer
+				 && this.canActivateJutsu(stack, EIGHTYGODS, (EntityPlayer)player) == EnumActionResult.SUCCESS) {
 					this.executeJutsu(stack, player, 1.0f);
 				}
 				return;
@@ -128,7 +121,7 @@ public class ItemKekkeiMora extends ElementsNarutomodMod.ModElement {
 		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 			if (entity.getHeldItemMainhand().getItem() != ItemAshBones.block) {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
-				 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:bonecrack"))),
+				 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")),
 				 net.minecraft.util.SoundCategory.PLAYERS, 0.5f, 1f);
 				ItemStack itemstack = new ItemStack(ItemAshBones.block);
 				if (entity instanceof EntityPlayer) {
@@ -139,6 +132,33 @@ public class ItemKekkeiMora extends ElementsNarutomodMod.ModElement {
 				return true;
 			}
 			return false;
+		}
+	}
+
+	public static class ChakraPulse implements ItemJutsu.IJutsuCallback {
+		@Override
+		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+			entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
+			 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:dojutsu")),
+			 net.minecraft.util.SoundCategory.NEUTRAL, 1f, 1f);
+			for (int i = 0; i < 1000; i++) {
+				Particles.spawnParticle(entity.world, Particles.Types.SMOKE, entity.posX, entity.posY + 1.4d, entity.posZ,
+				 1, 1d, 0d, 1d, entity.getRNG().nextGaussian(), 1d, entity.getRNG().nextGaussian(), 0x10FFFFFF, 30, 0);
+			}
+			ProcedureAoeCommand.set(entity, 0d, power / 2).exclude(entity).knockback(3f);
+			ProcedureUtils.purgeHarmfulEffects(entity);
+			entity.extinguish();
+			return true;
+		}
+
+		@Override
+		public float getBasePower() {
+			return 10.0f;
+		}
+	
+		@Override
+		public float getPowerupDelay() {
+			return 20.0f;
 		}
 	}
 
@@ -180,8 +200,8 @@ public class ItemKekkeiMora extends ElementsNarutomodMod.ModElement {
 					}
 					if (result.entityHit instanceof EntityLivingBase) {
 						//result.entityHit.onKillCommand();
-						result.entityHit.hurtResistantTime = 0;
-						result.entityHit.attackEntityFrom(DamageSource.causeIndirectDamage(this, this.shootingEntity), 500f);
+						result.entityHit.hurtResistantTime = 10;
+						result.entityHit.attackEntityFrom(DamageSource.causeIndirectDamage(this, this.shootingEntity).setDamageBypassesArmor(), 500f);
 					}
 				}
 				this.setDead();
@@ -223,68 +243,81 @@ public class ItemKekkeiMora extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class Render80Gods extends Render<Entity80Gods> {
-		private final ResourceLocation texture = new ResourceLocation("narutomod:textures/armfist.png");
-		private final ModelArmFist mainModel = new ModelArmFist();
-
-		public Render80Gods(RenderManager renderManager) {
-			super(renderManager);
-			this.shadowSize = 0.1F;
-		}
-
-		@Override
-		public void doRender(Entity80Gods entity, double x, double y, double z, float entityYaw, float pt) {
-			this.bindEntityTexture(entity);
-			GlStateManager.pushMatrix();
-			GlStateManager.disableCull();
-			float scale = entity.getEntityScale();
-			GlStateManager.translate((float) x, (float) y, (float) z);
-			GlStateManager.scale(scale, scale, scale);
-			GlStateManager.rotate(-entity.prevRotationYaw - MathHelper.wrapDegrees(entity.rotationYaw - entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * pt - 180.0F, 1.0F, 0.0F, 0.0F);
-			GlStateManager.enableBlend();
-			GlStateManager.disableLighting();
-			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-			this.mainModel.render(entity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
-			GlStateManager.enableLighting();
-			GlStateManager.disableBlend();
-			GlStateManager.enableCull();
-			GlStateManager.popMatrix();
-		}
-
-		@Override
-		protected ResourceLocation getEntityTexture(Entity80Gods entity) {
-			return texture;
-		}
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class ModelArmFist extends ModelBase {
-		private final ModelRenderer bb_main;
-	
-		public ModelArmFist() {
-			textureWidth = 32;
-			textureHeight = 32;
-	
-			bb_main = new ModelRenderer(this);
-			bb_main.setRotationPoint(0.0F, 0.0F, 0.0F);
-			bb_main.cubeList.add(new ModelBox(bb_main, 0, 12, -2.0F, -4.0F, -1.0F, 4, 4, 8, 0.0F, false));
-			bb_main.cubeList.add(new ModelBox(bb_main, 0, 12, -2.0F, -4.0F, -2.0F, 4, 4, 8, 0.1F, false));
-			bb_main.cubeList.add(new ModelBox(bb_main, 0, 12, -2.0F, -4.0F, -3.0F, 4, 4, 8, 0.2F, false));
-			bb_main.cubeList.add(new ModelBox(bb_main, 0, 0, -2.0F, -4.0F, -4.0F, 4, 4, 8, 0.3F, false));
-		}
-	
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
 		@Override
-		public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
-			bb_main.render(f5);
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(Entity80Gods.class, renderManager -> new Render80Gods(renderManager));
+		}
+
+		@SideOnly(Side.CLIENT)
+		public class Render80Gods extends Render<Entity80Gods> {
+			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/armfist.png");
+			private final ModelArmFist mainModel = new ModelArmFist();
+	
+			public Render80Gods(RenderManager renderManager) {
+				super(renderManager);
+				this.shadowSize = 0.1F;
+			}
+	
+			@Override
+			public void doRender(Entity80Gods entity, double x, double y, double z, float entityYaw, float pt) {
+				this.bindEntityTexture(entity);
+				GlStateManager.pushMatrix();
+				GlStateManager.disableCull();
+				float scale = entity.getEntityScale();
+				GlStateManager.translate((float) x, (float) y, (float) z);
+				GlStateManager.scale(scale, scale, scale);
+				GlStateManager.rotate(-entity.prevRotationYaw - MathHelper.wrapDegrees(entity.rotationYaw - entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
+				GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * pt - 180.0F, 1.0F, 0.0F, 0.0F);
+				GlStateManager.enableBlend();
+				GlStateManager.disableLighting();
+				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
+				this.mainModel.render(entity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+				GlStateManager.enableLighting();
+				GlStateManager.disableBlend();
+				GlStateManager.enableCull();
+				GlStateManager.popMatrix();
+			}
+	
+			@Override
+			protected ResourceLocation getEntityTexture(Entity80Gods entity) {
+				return this.texture;
+			}
 		}
 	
-		public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
-			modelRenderer.rotateAngleX = x;
-			modelRenderer.rotateAngleY = y;
-			modelRenderer.rotateAngleZ = z;
+		@SideOnly(Side.CLIENT)
+		public class ModelArmFist extends ModelBase {
+			private final ModelRenderer bb_main;
+		
+			public ModelArmFist() {
+				textureWidth = 32;
+				textureHeight = 32;
+		
+				bb_main = new ModelRenderer(this);
+				bb_main.setRotationPoint(0.0F, 0.0F, 0.0F);
+				bb_main.cubeList.add(new ModelBox(bb_main, 0, 12, -2.0F, -4.0F, -1.0F, 4, 4, 8, 0.0F, false));
+				bb_main.cubeList.add(new ModelBox(bb_main, 0, 12, -2.0F, -4.0F, -2.0F, 4, 4, 8, 0.1F, false));
+				bb_main.cubeList.add(new ModelBox(bb_main, 0, 12, -2.0F, -4.0F, -3.0F, 4, 4, 8, 0.2F, false));
+				bb_main.cubeList.add(new ModelBox(bb_main, 0, 0, -2.0F, -4.0F, -4.0F, 4, 4, 8, 0.3F, false));
+			}
+		
+			@Override
+			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+				bb_main.render(f5);
+			}
+		
+			public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+				modelRenderer.rotateAngleX = x;
+				modelRenderer.rotateAngleY = y;
+				modelRenderer.rotateAngleZ = z;
+			}
 		}
 	}
 }

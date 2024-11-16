@@ -50,13 +50,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				.id(new ResourceLocation("narutomod", "finger_bone"), ENTITYID).name("finger_bone").tracker(64, 3, true).build());
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
-	}
-
-	public static class EC extends EntityScalableProjectile.Base {
+	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private final float damage = 8.0f;
 
 		public EC(World worldIn) {
@@ -71,6 +65,11 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 			this.setOGSize(0.2f, 0.2f);
 			this.setEntityScale(0.4f);
 			//this.setNoGravity(false);
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.SHIKOTSUMYAKU;
 		}
 
 		@Override
@@ -117,7 +116,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
 				 1f, 0.4f + this.rand.nextFloat() * 0.6f);
 				if (result.entityHit != null) {
-					result.entityHit.hurtResistantTime = 0;
+					result.entityHit.hurtResistantTime = 10;
 					result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.shootingEntity), this.damage);
 				}
 				this.setDead();
@@ -142,77 +141,90 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				bullet.motionX = vec.x * 0.1d;
 				bullet.motionY = vec.y * 0.1d;
 				bullet.motionZ = vec.z * 0.1d;
-				bullet.shoot(vec.x, vec.y, vec.z, 0.95f, 0.05f);
+				bullet.shoot(vec.x, vec.y, vec.z, 1.2f, 0.05f);
 				entity.world.spawnEntity(bullet);
 			}
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class RenderCustom extends Render<EC> {
-		private final ResourceLocation TEXTURE = new ResourceLocation("narutomod:textures/fingerbone.png");
-		protected final ModelFingerBone model;
-
-		public RenderCustom(RenderManager renderManagerIn) {
-			super(renderManagerIn);
-			this.model = new ModelFingerBone();
-			this.shadowSize = 0.1f;
-		}
-
-		@Override
-		public void doRender(EC entity, double x, double y, double z, float entityYaw, float pt) {
-			this.bindEntityTexture(entity);
-			float scale = entity.getEntityScale();
-			GlStateManager.pushMatrix();
-			GlStateManager.translate(x, y, z);
-			GlStateManager.rotate(-entity.prevRotationYaw - (entity.rotationYaw - entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * pt - 180.0F, 1.0F, 0.0F, 0.0F);
-			GlStateManager.rotate(((float)entity.ticksExisted + pt) * 30, 0.0F, 1.0F, 0.0F);
-			GlStateManager.scale(scale, scale, scale);
-			this.model.render(entity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
-			GlStateManager.popMatrix();
-		}
-
-		@Override
-		protected ResourceLocation getEntityTexture(EC entity) {
-			return TEXTURE;
-		}
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
 	}
 
-	// Made with Blockbench 3.9.3
-	// Exported for Minecraft version 1.7 - 1.12
-	// Paste this class into your mod and generate all required imports
-	@SideOnly(Side.CLIENT)
-	public class ModelFingerBone extends ModelBase {
-		private final ModelRenderer bone2;
-		private final ModelRenderer bone;
-		public ModelFingerBone() {
-			textureWidth = 32;
-			textureHeight = 32;
-			bone2 = new ModelRenderer(this);
-			bone2.setRotationPoint(0.0F, 0.0F, 0.0F);
-			bone2.cubeList.add(new ModelBox(bone2, 12, 0, -1.5F, -1.0F, -1.5F, 3, 2, 3, 0.0F, false));
-			bone2.cubeList.add(new ModelBox(bone2, 9, 5, -1.5F, -1.5F, -1.5F, 3, 3, 3, -0.1F, false));
-			bone2.cubeList.add(new ModelBox(bone2, 0, 8, -1.5F, -2.0F, -1.5F, 3, 4, 3, -0.3F, false));
-			bone2.cubeList.add(new ModelBox(bone2, 0, 0, -1.5F, -2.5F, -1.5F, 3, 5, 3, -0.5F, false));
-			bone = new ModelRenderer(this);
-			bone.setRotationPoint(0.0F, 3.5F, 0.0F);
-			setRotationAngle(bone, 0.0F, 0.5236F, 0.0F);
-			bone.cubeList.add(new ModelBox(bone, 8, 17, -1.0F, -1.0F, -1.0F, 2, 2, 2, 0.1F, false));
-			bone.cubeList.add(new ModelBox(bone, 0, 15, -1.0F, -1.5F, -1.0F, 2, 3, 2, -0.1F, false));
-			bone.cubeList.add(new ModelBox(bone, 12, 11, -1.0F, -2.0F, -1.0F, 2, 4, 2, -0.3F, false));
-		}
-
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
 		@Override
-		public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
-			bone2.render(f5);
-			bone.render(f5);
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
 		}
 
-		public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
-			modelRenderer.rotateAngleX = x;
-			modelRenderer.rotateAngleY = y;
-			modelRenderer.rotateAngleZ = z;
+		@SideOnly(Side.CLIENT)
+		public class RenderCustom extends Render<EC> {
+			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/fingerbone.png");
+			protected final ModelFingerBone model;
+	
+			public RenderCustom(RenderManager renderManagerIn) {
+				super(renderManagerIn);
+				this.model = new ModelFingerBone();
+				this.shadowSize = 0.1f;
+			}
+	
+			@Override
+			public void doRender(EC entity, double x, double y, double z, float entityYaw, float pt) {
+				this.bindEntityTexture(entity);
+				float scale = entity.getEntityScale();
+				GlStateManager.pushMatrix();
+				GlStateManager.translate(x, y, z);
+				GlStateManager.rotate(-entity.prevRotationYaw - (entity.rotationYaw - entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
+				GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * pt - 180.0F, 1.0F, 0.0F, 0.0F);
+				GlStateManager.rotate(((float)entity.ticksExisted + pt) * 30, 0.0F, 1.0F, 0.0F);
+				GlStateManager.scale(scale, scale, scale);
+				this.model.render(entity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+				GlStateManager.popMatrix();
+			}
+	
+			@Override
+			protected ResourceLocation getEntityTexture(EC entity) {
+				return this.texture;
+			}
 		}
-	}
+	
+		// Made with Blockbench 3.9.3
+		// Exported for Minecraft version 1.7 - 1.12
+		// Paste this class into your mod and generate all required imports
+		@SideOnly(Side.CLIENT)
+		public class ModelFingerBone extends ModelBase {
+			private final ModelRenderer bone2;
+			private final ModelRenderer bone;
+			public ModelFingerBone() {
+				textureWidth = 32;
+				textureHeight = 32;
+				bone2 = new ModelRenderer(this);
+				bone2.setRotationPoint(0.0F, 0.0F, 0.0F);
+				bone2.cubeList.add(new ModelBox(bone2, 12, 0, -1.5F, -1.0F, -1.5F, 3, 2, 3, 0.0F, false));
+				bone2.cubeList.add(new ModelBox(bone2, 9, 5, -1.5F, -1.5F, -1.5F, 3, 3, 3, -0.1F, false));
+				bone2.cubeList.add(new ModelBox(bone2, 0, 8, -1.5F, -2.0F, -1.5F, 3, 4, 3, -0.3F, false));
+				bone2.cubeList.add(new ModelBox(bone2, 0, 0, -1.5F, -2.5F, -1.5F, 3, 5, 3, -0.5F, false));
+				bone = new ModelRenderer(this);
+				bone.setRotationPoint(0.0F, 3.5F, 0.0F);
+				setRotationAngle(bone, 0.0F, 0.5236F, 0.0F);
+				bone.cubeList.add(new ModelBox(bone, 8, 17, -1.0F, -1.0F, -1.0F, 2, 2, 2, 0.1F, false));
+				bone.cubeList.add(new ModelBox(bone, 0, 15, -1.0F, -1.5F, -1.0F, 2, 3, 2, -0.1F, false));
+				bone.cubeList.add(new ModelBox(bone, 12, 11, -1.0F, -2.0F, -1.0F, 2, 4, 2, -0.3F, false));
+			}
+	
+			@Override
+			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+				bone2.render(f5);
+				bone.render(f5);
+			}
+	
+			public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+				modelRenderer.rotateAngleX = x;
+				modelRenderer.rotateAngleY = y;
+				modelRenderer.rotateAngleZ = z;
+			}
+		}
+	}
 }

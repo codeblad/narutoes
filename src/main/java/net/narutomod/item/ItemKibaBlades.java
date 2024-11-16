@@ -6,7 +6,11 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.event.entity.item.ItemTossEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
@@ -43,15 +47,16 @@ import net.minecraft.client.util.ITooltipFlag;
 
 import net.narutomod.entity.EntityLightningArc;
 import net.narutomod.entity.EntityFalseDarkness;
+import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Random;
 import com.google.common.collect.Multimap;
-import java.util.List;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemKibaBlades extends ElementsNarutomodMod.ModElement {
@@ -77,10 +82,32 @@ public class ItemKibaBlades extends ElementsNarutomodMod.ModElement {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:kiba_blades", "inventory"));
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager -> new RenderCustom(renderManager));
+	public void init(FMLInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(new PlayerHook());
+	}
+
+	public static class PlayerHook {
+		@SubscribeEvent
+		public void onToss(ItemTossEvent event) {
+			ItemStack itemstack = event.getEntityItem().getItem();
+			if (itemstack.getItem() == block && !((RangedItem)itemstack.getItem()).isMain(itemstack)) {
+				event.setCanceled(true);
+			}
+		}
+	}
+	
+	public static void setAsMain(ItemStack stack) {
+		if (stack.getItem() == block) {
+			if (!stack.hasTagCompound()) {
+				stack.setTagCompound(new NBTTagCompound());
+			}
+			NBTTagCompound compound = new NBTTagCompound();
+			long l = new Random().nextLong();
+			compound.setLong("id", l);
+			stack.getTagCompound().setTag("id", compound);
+			stack.getTagCompound().setInteger("id1", compound.hashCode());
+		}
 	}
 
 	public static class RangedItem extends Item implements ItemOnBody.Interface {
@@ -99,7 +126,7 @@ public class ItemKibaBlades extends ElementsNarutomodMod.ModElement {
 			Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(slot);
 			if (slot == EntityEquipmentSlot.MAINHAND) {
 				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
-						new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Ranged item modifier", 12d, 0));
+						new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Ranged item modifier", 15d, 0));
 				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
 						new AttributeModifier(ATTACK_SPEED_MODIFIER, "Ranged item modifier", -2.4, 0));
 			}
@@ -144,22 +171,42 @@ public class ItemKibaBlades extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
-			super.onUpdate(itemstack, world, entity, par4, par5);
+		public void onUpdate(ItemStack itemstack, World world, Entity entity, int inventorySlot, boolean isCurrentItem) {
+			super.onUpdate(itemstack, world, entity, inventorySlot, isCurrentItem);
 			if (!world.isRemote && entity instanceof EntityLivingBase) {
-				if (((EntityLivingBase)entity).getHeldItemMainhand().equals(itemstack)) {
+				if (entity instanceof EntityPlayer && ((EntityPlayer)entity).isCreative() && isCurrentItem && !this.isMain(itemstack)) {
+					setAsMain(itemstack);
+				}
+				ItemStack mainhandStack = ((EntityLivingBase)entity).getHeldItemMainhand();
+				ItemStack offhandStack = ((EntityLivingBase)entity).getHeldItemOffhand();
+				boolean inMainHand = mainhandStack.equals(itemstack);
+				boolean inOffHand = offhandStack.equals(itemstack);
+				boolean ismain = this.isMain(itemstack);
+//System.out.println(">>>>>> inMainHand:"+inMainHand+", inOffHand:"+inOffHand+", slot:"+inventorySlot+", isCurrentItem:"+isCurrentItem+", isMain:"+ismain);
+				if (inMainHand) {
 					EntityCustom entity1 = this.getEntity(itemstack, world);
 					if (entity1 == null) {
 						entity1 = new EntityCustom((EntityLivingBase)entity);
 						world.spawnEntity(entity1);
 						this.setEntity(itemstack, entity1);
 					}
-					if (entity instanceof EntityPlayer && ((EntityLivingBase)entity).getHeldItemOffhand().getItem() != block) {
-						ProcedureUtils.swapItemToSlot((EntityPlayer)entity, EntityEquipmentSlot.OFFHAND, ItemStack.EMPTY);
-						((EntityLivingBase)entity).setItemStackToSlot(EntityEquipmentSlot.OFFHAND, itemstack);
+					if (entity instanceof EntityPlayer && offhandStack.getItem() != block) {
+						if (ismain) {
+							ProcedureUtils.swapItemToSlot((EntityPlayer)entity, EntityEquipmentSlot.OFFHAND, new ItemStack(block));
+						} else {
+							itemstack.shrink(1);
+						}
 					}
-				} else if (((EntityLivingBase)entity).getHeldItemOffhand().getItem() == block) {
-					((EntityLivingBase)entity).setItemStackToSlot(EntityEquipmentSlot.OFFHAND, ItemStack.EMPTY);
+				} else if (inOffHand) {
+					if (entity instanceof EntityPlayer) {
+						if (ismain) {
+							ProcedureUtils.swapItemToSlot((EntityPlayer)entity, EntityEquipmentSlot.MAINHAND, itemstack);
+						} else if (mainhandStack.getItem() != block) {
+							itemstack.shrink(1);
+						}
+					}
+				} else if (!ismain) {
+					itemstack.shrink(1);
 				}
 			}
 		}
@@ -178,6 +225,20 @@ public class ItemKibaBlades extends ElementsNarutomodMod.ModElement {
 				return (entity instanceof EntityCustom && entity.isEntityAlive()) ? (EntityCustom) entity : null;
 			}
 			return null;
+		}
+
+		private boolean isMain(ItemStack stack) {
+			if (stack.hasTagCompound() && stack.getTagCompound().hasKey("id", 10)) {
+				NBTTagCompound compound = stack.getTagCompound().getCompoundTag("id");
+//System.out.println("++++++ hash:"+compound.hashCode()+", id1:"+stack.getTagCompound().getInteger("id1"));
+				return compound.hashCode() == stack.getTagCompound().getInteger("id1");
+			}
+			return false;
+		}
+
+		@Override
+		public boolean canDisableShield(ItemStack stack, ItemStack shield, EntityLivingBase entity, EntityLivingBase attacker) {
+			return true;
 		}
 
 		@Override
@@ -246,7 +307,7 @@ public class ItemKibaBlades extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && (this.summoner == null || !this.isHoldingWeapon(EnumHand.MAIN_HAND))) {
 				this.setDead();
 			} else if (this.rand.nextFloat() < 0.01f) {
-				this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:electricity"))),
+				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")),
 				  0.1f, this.rand.nextFloat() * 0.5f + 0.4f);
 			}
 		}
@@ -270,53 +331,67 @@ public class ItemKibaBlades extends ElementsNarutomodMod.ModElement {
 	}
 
 	@SideOnly(Side.CLIENT)
-	public class RenderCustom extends Render<EntityCustom> {
-		public RenderCustom(RenderManager renderManagerIn) {
-			super(renderManagerIn);
-		}
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
 
-		private Vec3d transform3rdPerson(Vec3d startvec, Vec3d angles, EntityLivingBase entity, EnumHandSide side) {
-			return ProcedureUtils.rotateRoll(startvec, (float)-angles.z)
-			   .rotateYaw((float)-angles.y).rotatePitch((float)-angles.x)
-			   .addVector(0.0625F * (side==EnumHandSide.RIGHT?-5:5), 1.5F-(entity.isSneaking()?0.3f:0f), -0.05F)
-			   .rotateYaw(-entity.renderYawOffset * (float)(Math.PI / 180d))
-			   .addVector(entity.posX, entity.posY, entity.posZ);
-		}
-
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
 		@Override
-		public void doRender(EntityCustom entity, double x, double y, double z, float f, float partialTicks) {
-			EntityLivingBase user = entity.getOwner();
-			if (user != null) {
-				RenderLivingBase<?> renderer = (RenderLivingBase<?>)this.renderManager.getEntityRenderObject(user);
-				ModelRenderer rightarmModel = ((ModelBiped)renderer.getMainModel()).bipedRightArm;
-				Vec3d rightarmAngles = new Vec3d(rightarmModel.rotateAngleX, rightarmModel.rotateAngleY, rightarmModel.rotateAngleZ);
-				ModelRenderer leftarmModel = ((ModelBiped)renderer.getMainModel()).bipedLeftArm;
-				Vec3d leftarmAngles = new Vec3d(leftarmModel.rotateAngleX, leftarmModel.rotateAngleY, leftarmModel.rotateAngleZ);
-				EnumHandSide mainhandside = user.getPrimaryHand();
-				Vec3d mainarmAngles = mainhandside == EnumHandSide.RIGHT ? rightarmAngles : leftarmAngles;
-				Vec3d offarmAngles = mainhandside == EnumHandSide.RIGHT ? leftarmAngles : rightarmAngles;
-				boolean flag1 = entity.isHoldingWeapon(EnumHand.MAIN_HAND);
-				boolean flag2 = entity.isHoldingWeapon(EnumHand.OFF_HAND);
-				if (flag1 && entity.getRNG().nextFloat() < 0.01f) {
-					Vec3d vec0 = this.transform3rdPerson(new Vec3d(0d, -0.725d, 0.2d), mainarmAngles, user, mainhandside);
-					Vec3d vec1 = this.transform3rdPerson(new Vec3d(0d, -0.725d, 1.6d), mainarmAngles, user, mainhandside)
-					 .subtract(vec0).scale(0.2);
-					vec0 = vec0.add(vec1);
-					EntityLightningArc.spawnAsParticle(entity.world, vec0.x, vec0.y, vec0.z, 0.01d, vec1.x, vec1.y, vec1.z);
-				}
-				if (flag2 && entity.getRNG().nextFloat() < 0.01f) {
-					Vec3d vec0 = this.transform3rdPerson(new Vec3d(0d, -0.725d, 0.2d), offarmAngles, user, mainhandside.opposite());
-					Vec3d vec1 = this.transform3rdPerson(new Vec3d(0d, -0.725d, 1.6d), offarmAngles, user, mainhandside.opposite())
-					 .subtract(vec0).scale(0.2);
-					vec0 = vec0.add(vec1);
-					EntityLightningArc.spawnAsParticle(entity.world, vec0.x, vec0.y, vec0.z, 0.01d, vec1.x, vec1.y, vec1.z);
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager -> new RenderCustom(renderManager));
+		}
+
+		@SideOnly(Side.CLIENT)
+		public class RenderCustom extends Render<EntityCustom> {
+			public RenderCustom(RenderManager renderManagerIn) {
+				super(renderManagerIn);
+			}
+
+			private Vec3d transform3rdPerson(Vec3d startvec, Vec3d angles, EntityLivingBase entity, EnumHandSide side) {
+				return ProcedureUtils.rotateRoll(startvec, (float)-angles.z)
+						.rotateYaw((float)-angles.y).rotatePitch((float)-angles.x)
+						.addVector(0.0625F * (side==EnumHandSide.RIGHT?-5:5), 1.5F-(entity.isSneaking()?0.3f:0f), -0.05F)
+						.rotateYaw(-entity.renderYawOffset * (float)(Math.PI / 180d))
+						.addVector(entity.posX, entity.posY, entity.posZ);
+			}
+
+			@Override
+			public void doRender(EntityCustom entity, double x, double y, double z, float f, float partialTicks) {
+				EntityLivingBase user = entity.getOwner();
+				if (user != null) {
+					RenderLivingBase<?> renderer = (RenderLivingBase<?>)this.renderManager.getEntityRenderObject(user);
+					ModelRenderer rightarmModel = ((ModelBiped)renderer.getMainModel()).bipedRightArm;
+					Vec3d rightarmAngles = new Vec3d(rightarmModel.rotateAngleX, rightarmModel.rotateAngleY, rightarmModel.rotateAngleZ);
+					ModelRenderer leftarmModel = ((ModelBiped)renderer.getMainModel()).bipedLeftArm;
+					Vec3d leftarmAngles = new Vec3d(leftarmModel.rotateAngleX, leftarmModel.rotateAngleY, leftarmModel.rotateAngleZ);
+					EnumHandSide mainhandside = user.getPrimaryHand();
+					Vec3d mainarmAngles = mainhandside == EnumHandSide.RIGHT ? rightarmAngles : leftarmAngles;
+					Vec3d offarmAngles = mainhandside == EnumHandSide.RIGHT ? leftarmAngles : rightarmAngles;
+					boolean flag1 = entity.isHoldingWeapon(EnumHand.MAIN_HAND);
+					boolean flag2 = entity.isHoldingWeapon(EnumHand.OFF_HAND);
+					if (flag1 && entity.getRNG().nextFloat() < 0.01f) {
+						Vec3d vec0 = this.transform3rdPerson(new Vec3d(0d, -0.725d, 0.2d), mainarmAngles, user, mainhandside);
+						Vec3d vec1 = this.transform3rdPerson(new Vec3d(0d, -0.725d, 1.6d), mainarmAngles, user, mainhandside)
+								.subtract(vec0).scale(0.2);
+						vec0 = vec0.add(vec1);
+						EntityLightningArc.spawnAsParticle(entity.world, vec0.x, vec0.y, vec0.z, 0.01d, vec1.x, vec1.y, vec1.z);
+					}
+					if (flag2 && entity.getRNG().nextFloat() < 0.01f) {
+						Vec3d vec0 = this.transform3rdPerson(new Vec3d(0d, -0.725d, 0.2d), offarmAngles, user, mainhandside.opposite());
+						Vec3d vec1 = this.transform3rdPerson(new Vec3d(0d, -0.725d, 1.6d), offarmAngles, user, mainhandside.opposite())
+								.subtract(vec0).scale(0.2);
+						vec0 = vec0.add(vec1);
+						EntityLightningArc.spawnAsParticle(entity.world, vec0.x, vec0.y, vec0.z, 0.01d, vec1.x, vec1.y, vec1.z);
+					}
 				}
 			}
-		}
 
-		@Override
-		protected ResourceLocation getEntityTexture(EntityCustom entity) {
-			return null;
+			@Override
+			protected ResourceLocation getEntityTexture(EntityCustom entity) {
+				return null;
+			}
 		}
 	}
 }

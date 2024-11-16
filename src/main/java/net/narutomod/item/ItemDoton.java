@@ -39,6 +39,7 @@ import net.minecraft.block.Block;
 import net.narutomod.entity.EntityEarthSpears;
 import net.narutomod.entity.EntitySwampPit;
 import net.narutomod.entity.EntityEarthSandwich;
+import net.narutomod.entity.EntityEarthGolem;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.procedure.ProcedureUtils;
@@ -63,7 +64,8 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum EARTHWALL = new ItemJutsu.JutsuEnum(1, "entityearthwall", 'B', 20d, new EntityEarthWall.Jutsu());
 	public static final ItemJutsu.JutsuEnum SANDWICH = new ItemJutsu.JutsuEnum(2, "earth_sandwich", 'B', 100d, new EntityEarthSandwich.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SWAMPPIT = new ItemJutsu.JutsuEnum(3, "swamp_pit", 'A', 100d, new EntitySwampPit.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum SPEARS = new ItemJutsu.JutsuEnum(4, "earth_spears", 'C', 50d, new EntityEarthSpears.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SPEARS = new ItemJutsu.JutsuEnum(4, "earth_spears", 'C', 20d, new EntityEarthSpears.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum GOLEM = new ItemJutsu.JutsuEnum(5, "earth_golem", 'B', 100d, new EntityEarthGolem.EC.Jutsu());
 
 	public ItemDoton(ElementsNarutomodMod instance) {
 		super(instance, 378);
@@ -71,7 +73,7 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.items.add(() -> new RangedItem(HIDINGINROCK, EARTHWALL, SANDWICH, SWAMPPIT, SPEARS));
+		elements.items.add(() -> new RangedItem(HIDINGINROCK, EARTHWALL, SANDWICH, SWAMPPIT, SPEARS, GOLEM));
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityEarthWall.class)
 				.id(new ResourceLocation("narutomod", "entityearthwall"), ENTITYID).name("entityearthwall").tracker(64, 1, true).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityHidingInRock.class)
@@ -95,36 +97,6 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			float base = 2f;
-			if (this.getCurrentJutsu(stack) == EARTHWALL) {
-				return this.getPower(stack, entity, timeLeft, base, 15f);
-				//return Math.min(base + (float)(this.getMaxUseDuration() - timeLeft) / 10, this.getMaxPower(stack, entity));
-			} else if (this.getCurrentJutsu(stack) == SANDWICH) {
-				return this.getPower(stack, entity, timeLeft, base, 75f);
-				//return Math.min(base + (float)(this.getMaxUseDuration() - timeLeft) / 50, this.getMaxPower(stack, entity));
-			} else if (this.getCurrentJutsu(stack) == SWAMPPIT) {
-				return this.getPower(stack, entity, timeLeft, 1f, 30f);
-				//return MathHelper.floor(Math.min(1f + (float)(this.getMaxUseDuration() - timeLeft) / 20, this.getMaxPower(stack, entity)));
-			} else if (this.getCurrentJutsu(stack) == SPEARS) {
-				return this.getPower(stack, entity, timeLeft, 0.5f, 150f);
-			}
-			return base;
-		}
-
-		@Override
-		protected float getMaxPower(ItemStack stack, EntityLivingBase entity) {
-			float f = super.getMaxPower(stack, entity);
-			if (this.getCurrentJutsu(stack) == EARTHWALL) {
-				return Math.min(f, 50f);
-			}
-			if (this.getCurrentJutsu(stack) == SANDWICH) {
-				return Math.min(f, 8f);
-			}
-			return f;
-		}
-
-		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
 			if (this.getCurrentJutsu(stack) != HIDINGINROCK) {
 				super.onUsingTick(stack, player, count);
@@ -136,7 +108,7 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 		return earthenMaterials.contains(material);
 	}
 
-	public static class EntityHidingInRock extends Entity {
+	public static class EntityHidingInRock extends Entity implements ItemJutsu.IJutsu {
 		private final int waitTime = 60;
 		private EntityLivingBase user;
 
@@ -152,12 +124,20 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 		}
 		
 		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.DOTON;
+		}
+
+		@Override
 		protected void entityInit() {
 		}
 
 		@Override
 		public void setDead() {
 			super.setDead();
+			if (this.user != null) {
+				this.user.getEntityData().removeTag(Jutsu.ID_KEY);
+			}
 			if (this.isUserIntangible()) {
 				this.setUserIntangible(false);
 			}
@@ -211,21 +191,27 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 		}
 
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
-			//private static final String ID_KEY = "HidingInRockEntityIdKey";
+			private static final String ID_KEY = "HidingInRockIdKey";
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (!ProcedureOnLivingUpdate.isNoClip(entity)) {
-					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, (SoundEvent) SoundEvent.REGISTRY
-					 .getObject(new ResourceLocation(("narutomod:jutsu"))), SoundCategory.NEUTRAL, 1, 1f);
+					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
+					 .getObject(new ResourceLocation("narutomod:jutsu")), SoundCategory.NEUTRAL, 1, 1f);
 					entity.world.spawnEntity(new EntityHidingInRock(entity));
+					entity.getEntityData().setBoolean(ID_KEY, true);
 					return true;
 				}
 				return false;
 			}
+
+			@Override
+			public boolean isActivated(EntityLivingBase entity) {
+				return entity.getEntityData().getBoolean(ID_KEY);
+			}
 		}
 	}
 
-	public static class EntityEarthWall extends Entity {
+	public static class EntityEarthWall extends Entity implements ItemJutsu.IJutsu {
 		private final int blockChunk = 128;
 		private final int duration = 200;
 		private double wallHeight;
@@ -263,7 +249,7 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 				BlockPos pos = new BlockPos(ProcedureUtils.BB.getCenter(aabb));
 				if (autoIn) {
 					RayTraceResult r = aabb.grow(thickness, this.wallHeight, thickness).calculateIntercept(vec3d, vec3d1);
-					if (r != null && this.isNeighborEarthenMaterial(pos) && !this.world.getBlockState(pos.up()).isTopSolid()) {
+					if (r != null && this.isNeighborEarthenMaterial(pos) && this.world.isAirBlock(pos.up())) {
 						this.affectedList.add(pos);
 					}
 				} else {
@@ -278,6 +264,11 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 
 		public EntityEarthWall(World worldIn, double x, double y, double z, float yaw, double widthIn) {
 			this(worldIn, x, y, z, yaw, widthIn, widthIn * 0.6d, widthIn * 0.25d, true);
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.DOTON;
 		}
 
 		private boolean isNeighborEarthenMaterial(BlockPos pos) {
@@ -315,29 +306,32 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:rocks"))), 
 					 5.0f, (this.rand.nextFloat() * 0.5f) + 0.3f);
 				}
+				BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
 				for (int i = 0; i < this.blockChunk && this.vindex < (int)this.wallHeight; ) {
 					Iterator<BlockPos> iter = this.affectedList.iterator();
 					while (i < this.blockChunk && iter.hasNext()) {
-						BlockPos pos = iter.next().up();
+						pos.setPos(iter.next().up());
 						iter.remove();
-						if (pos.getY() < 255 && (this.world.isAirBlock(pos) || this.isBlockBreakable(pos))) {
+						this.tempList.add(pos.toImmutable());
+						if (pos.getY() < 255 && this.world.isAirBlock(pos)) {
 							this.moveUpEntitiesInAABB(new AxisAlignedBB(pos), 1d);
 							IBlockState state = this.getNeightborEarthenBlock(pos.down());
 							((WorldServer)this.world).spawnParticle(EnumParticleTypes.BLOCK_DUST,
 							 pos.getX()+0.5d, pos.getY(), pos.getZ()+0.5d, 5, 0D, 0D, 0D, 0.15D,
 							 Block.getIdFromBlock(state.getBlock()));
 							this.world.setBlockState(pos, state, 3);
-							this.tempList.add(pos);
+							this.allBlocks.add(pos.toImmutable());
 							++i;
 						}
 					}
 					if (this.affectedList.isEmpty()) {
 						this.affectedList = Lists.newArrayList(this.tempList);
-						this.allBlocks.addAll(this.tempList);
+						//this.allBlocks.addAll(this.tempList);
 						this.tempList.clear();
 						++this.vindex;
 					}
 				}
+				pos.release();
 				if (this.vindex >= (int)this.wallHeight) {
 					this.affectedList.clear();
 					//this.removeTime = this.ticksExisted + 1200;
@@ -428,6 +422,21 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				return false;
+			}
+
+			@Override
+			public float getBasePower() {
+				return 2.0f;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 15.0f;
+			}
+	
+			@Override
+			public float getMaxPower() {
+				return 50.0f;
 			}
 		}
 	}

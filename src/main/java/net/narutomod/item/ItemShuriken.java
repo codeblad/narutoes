@@ -34,19 +34,18 @@ import net.minecraft.util.math.Vec3d;
 
 import net.narutomod.entity.EntitySusanooBase;
 import net.narutomod.procedure.ProcedureShurikenBulletHitsBlock;
-import net.narutomod.procedure.ProcedureKunaiBulletHitsLivingEntity;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.Map;
 import java.util.HashMap;
-import net.minecraft.client.renderer.GlStateManager;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemShuriken extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:shuriken")
 	public static final Item block = null;
 	public static final int ENTITYID = 113;
+
 	public ItemShuriken(ElementsNarutomodMod instance) {
 		super(instance, 324);
 	}
@@ -72,6 +71,7 @@ public class ItemShuriken extends ElementsNarutomodMod.ModElement {
 					Minecraft.getMinecraft().getRenderItem());
 		});
 	}
+
 	public static class RangedItem extends Item implements ItemOnBody.Interface {
 		public RangedItem() {
 			super();
@@ -100,8 +100,7 @@ public class ItemShuriken extends ElementsNarutomodMod.ModElement {
 					entityarrow.setKnockbackStrength(0);
 					entityarrow.pickupStatus = entity.isCreative() ? EntityArrow.PickupStatus.DISALLOWED : EntityArrow.PickupStatus.ALLOWED;
 					world.playSound(null, entity.posX, entity.posY, entity.posZ,
-							(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY
-							.getObject(new ResourceLocation(("entity.arrow.shoot"))),
+							net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.arrow.shoot")),
 							SoundCategory.NEUTRAL, 1, 1f / (itemRand.nextFloat() * 0.5f + 1f) + (power / 2));
 					world.spawnEntity(entityarrow);
 				}
@@ -111,7 +110,7 @@ public class ItemShuriken extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		@Override
+		/*@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (!world.isRemote && entity instanceof EntityLivingBase 
@@ -123,7 +122,7 @@ public class ItemShuriken extends ElementsNarutomodMod.ModElement {
 					susanoo.killBullet();
 				}
 			}
-		}
+		}*/
 
 		@Override
 		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {
@@ -164,16 +163,6 @@ public class ItemShuriken extends ElementsNarutomodMod.ModElement {
 		protected void arrowHit(EntityLivingBase entity) {
 			super.arrowHit(entity);
 			entity.setArrowCountInEntity(entity.getArrowCountInEntity() - 1);
-			Entity sourceentity = this.shootingEntity;
-			int x = (int) this.posX;
-			int y = (int) this.posY;
-			int z = (int) this.posZ;
-			World world = this.world;
-			{
-				Map<String, Object> $_dependencies = new HashMap<>();
-				$_dependencies.put("sourceentity", sourceentity);
-				ProcedureKunaiBulletHitsLivingEntity.executeProcedure($_dependencies);
-			}
 		}
 
 		@Override
@@ -195,6 +184,10 @@ public class ItemShuriken extends ElementsNarutomodMod.ModElement {
 					ProcedureShurikenBulletHitsBlock.executeProcedure($_dependencies);
 				}
 				this.world.removeEntity(this);
+			} else if (this.ticksExisted % 2 == 0) {
+				this.world.playSound(null, this.posX, this.posY, this.posZ,
+				 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:shuriken1")),
+				 SoundCategory.NEUTRAL, 0.5f, 1f / (this.rand.nextFloat() * 0.5f + 1f) + 0.4f);
 			}
 		}
 	}

@@ -1,17 +1,18 @@
 package net.narutomod.event;
 
 import net.minecraft.world.World;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.world.WorldServer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.material.Material;
+import net.minecraft.nbt.NBTTagCompound;
 
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureCameraShake;
@@ -70,6 +71,7 @@ public class EventSphericalExplosion extends SpecialEvent {
 		if (!this.shouldExecute())
 			return;
 		super.onUpdate();
+		this.doOnTick(this.tick);
 		if (this.sound) {
 			if (this.tick == 1) {
 				this.world.playSound(null, this.x0, this.y0, this.z0, SoundEvents.ENTITY_GENERIC_EXPLODE,
@@ -83,9 +85,8 @@ public class EventSphericalExplosion extends SpecialEvent {
 		if (this.radius > 20) {
 			float f = 1f - this.tr / this.radius;
 			ProcedureCameraShake.sendToClients(this.world.provider.getDimension(), this.x0, this.y0, this.z0,
-			 32f * f + this.radius, 80, 8f * f);
+			 8f * MathHelper.sqrt(f) + this.tr, 80, 8f * f);
 		}
-		this.doOnTick(this.tick);
 		for (int i = 0; i < 1024; ) {
 			this.posList[0].setPos(this.x0 + this.tx, this.y0 + this.ty, this.z0 + this.tz);
 			this.posList[1].setPos(this.x0 - this.tx, this.y0 + this.ty, this.z0 + this.tz);
@@ -105,7 +106,8 @@ public class EventSphericalExplosion extends SpecialEvent {
 			this.posList[15].setPos(this.x0 - this.tz, this.y0 + this.ty, this.z0 - this.tx + 1);
 			for (BlockPos pos : this.posList) {
 				IBlockState blockstate = this.world.getBlockState(pos);
-				if (blockstate.getMaterial() != Material.AIR && this.rand.nextFloat() <= 1.75f - (float)this.tr / this.radius) {
+				if (blockstate.getMaterial() != Material.AIR
+				 && this.rand.nextFloat() <= 1.75f - pos.getDistance(this.x0, this.y0, this.z0) / this.radius) {
 					if (this.mobGriefing && blockstate.getBlockHardness(this.world, pos) >= 0.0F) {
 						float f = this.radius * (0.7F + this.rand.nextFloat() * 0.6F);
 						float f1 = blockstate.getBlock().getExplosionResistance(null);

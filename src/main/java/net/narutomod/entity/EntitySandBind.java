@@ -9,17 +9,17 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 
 import net.narutomod.potion.PotionParalysis;
@@ -30,7 +30,6 @@ import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
-import net.minecraft.entity.MultiPartEntityPart;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntitySandBind extends ElementsNarutomodMod.ModElement {
@@ -47,27 +46,34 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 		 .id(new ResourceLocation("narutomod", "sand_bind"), ENTITYID).name("sand_bind").tracker(64, 3, true).build());
 	}
 
-	@SideOnly(Side.CLIENT)
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new CustomRender(renderManager));
+		new Renderer().register();
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class CustomRender extends Render<EC> {
-		public CustomRender(RenderManager renderManagerIn) {
-			super(renderManagerIn);
-		}
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
 		@Override
-		public void doRender(EC entity, double x, double y, double z, float entityYaw, float partialTicks) {
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new CustomRender(renderManager));
 		}
-		@Override
-		protected ResourceLocation getEntityTexture(EC entity) {
-			return null;
+
+		@SideOnly(Side.CLIENT)
+		public class CustomRender extends Render<EC> {
+			public CustomRender(RenderManager renderManagerIn) {
+				super(renderManagerIn);
+			}
+			@Override
+			public void doRender(EC entity, double x, double y, double z, float entityYaw, float partialTicks) {
+			}
+			@Override
+			protected ResourceLocation getEntityTexture(EC entity) {
+				return null;
+			}
 		}
 	}
 
-	public static class EC extends Entity {
+	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private EntityLivingBase user;
 		private EntityLivingBase targetEntity;
 		private ItemJiton.SwarmTarget sandTarget;
@@ -89,8 +95,13 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 			this.targetEntity = targetIn;
 			Vec3d vec = this.getGourdMouthPos();
 			this.setPosition(vec.x, vec.y, vec.z);
-			this.sandTarget = new ItemJiton.SwarmTarget(this.world, 1000, vec, 
-			 this.getTargetVector(), new Vec3d(0.1d, 0.4d, 0.1d), 0.95f, 0.03f, false, 2f, sandType.getColor());
+			this.sandTarget = new ItemJiton.SwarmTarget(this.world, 100, vec, 
+			 this.getTargetVector(), new Vec3d(0.1d, 0.4d, 0.1d), 0.95f, 0.03f, false, 3f, sandType.getColor());
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.JITON;
 		}
 
 		@Override
@@ -110,12 +121,15 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 		}
 
 		private boolean isTargetCaptured() {
-			boolean flag = false;
-			if (!this.targetEntity.getEntityData().getBoolean("kamui_intangible")
-			 && this.getEntityBoundingBox().intersects(this.targetEntity.getEntityBoundingBox())) {
-				double d = this.getEntityBoundingBox().intersect(this.targetEntity.getEntityBoundingBox()).getAverageEdgeLength();
-				flag = d > this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 0.5d 
-				 && d > this.getEntityBoundingBox().getAverageEdgeLength() * 0.2d;
+			if (!ItemJutsu.canTarget(this.targetEntity)) {
+				this.capturedVec = null;
+				return false;
+			}
+			boolean flag = this.capturedVec != null;
+			if (!flag && this.getEntityBoundingBox().intersects(this.targetEntity.getEntityBoundingBox())) {
+				AxisAlignedBB bb = this.getEntityBoundingBox().intersect(this.targetEntity.getEntityBoundingBox());
+				flag = bb.equals(this.targetEntity.getEntityBoundingBox())
+				 && this.getEntityBoundingBox().getAverageEdgeLength() < this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 2.5d;
 			}
 			if (flag && this.capturedVec == null) {
 				this.capturedVec = this.targetEntity.getPositionVector();
@@ -127,6 +141,10 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 
 		public void sandFuneral() {
 			this.funeralTime = 20;
+		}
+
+		private boolean canFuneral() {
+			return this.funeralTime < 0 && this.targetEntity != null && this.targetEntity.isEntityAlive() && this.isTargetCaptured();
 		}
 
 		@Override
@@ -148,41 +166,44 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 			// && ((MultiPartEntityPart)this.targetEntity).parent instanceof Entity) {
 			//	((Entity)((MultiPartEntityPart)this.targetEntity).parent).hurtResistantTime = 0;
 			//} else {
-				this.targetEntity.hurtResistantTime = 0;
+				this.targetEntity.hurtResistantTime = 10;
 			//}
 			this.targetEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user)
 			 .setDamageBypassesArmor(), amount);
 		}
 
 		private void holdTarget() {
-			EntityLivingBase entity = this.targetEntity;
+			//EntityLivingBase entity = this.targetEntity;
 			//if (entity instanceof MultiPartEntityPart && ((MultiPartEntityPart)entity).parent instanceof EntityLivingBase) {
 			//	entity = (EntityLivingBase)((MultiPartEntityPart)entity).parent;
 			//}
-			entity.addPotionEffect(new PotionEffect(PotionParalysis.potion, 2, 0, false, false));
-			entity.setPositionAndUpdate(this.capturedVec.x, this.capturedVec.y, this.capturedVec.z);
+			this.targetEntity.addPotionEffect(new PotionEffect(PotionParalysis.potion, 2, 0, false, false));
+			this.targetEntity.setPositionAndUpdate(this.capturedVec.x, this.capturedVec.y, this.capturedVec.z);
 		}
 
 		@Override
 		public void onUpdate() {
 			if (this.user != null && this.user.isEntityAlive() 
 			 && this.sandTarget != null && !this.sandTarget.shouldRemove() && this.targetEntity != null) {
+				Vec3d gourdVec = this.getGourdMouthPos();
 				if (this.targetEntity.isEntityAlive() && this.funeralTime != 0 && this.ticksExisted < MAXTIME) {
+					AxisAlignedBB targetBB = this.getTargetVector();
 					if (this.isTargetCaptured()) {
-						if (this.funeralTime < 0 && this.sandTarget.allParticlesReachedTarget()) {
-							this.sandTarget.setTarget(this.capturedVec, 0.0f, 0.0f, false);
-						} else if (this.funeralTime > 0) {
-							this.sandTarget.setTarget(this.getTargetVector(), 0.95f, 0.03f, false);
+						if (this.funeralTime > 0) {
+							this.sandTarget.setTarget(targetBB, 0.95f, 0.03f, false);
 							this.attackTargetEntity(this.funeralDamage);
 							--this.funeralTime;
+						} else {
+							this.sandTarget.setTarget(targetBB, this.getEntityBoundingBox().getAverageEdgeLength() < this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 2.0d ? 0.0f : 0.3f, 0.0f, false);
 						}
 						this.holdTarget();
 					} else {
-						this.sandTarget.setTarget(this.getTargetVector(), false);
+						this.sandTarget.setTarget(targetBB, 2.5f, 0.03f, false);
 					}
 				} else {
-					this.sandTarget.setTarget(this.getGourdMouthPos(), 0.8f, 0.02f, true);
+					this.sandTarget.setTarget(gourdVec, 0.8f, 0.02f, true);
 				}
+				this.sandTarget.setStartVec(gourdVec);
 				this.sandTarget.onUpdate();
 				this.setEntityBoundingBox(this.sandTarget.getBorders());
 				this.resetPositionToBB();
@@ -217,13 +238,18 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity, 30d, true);
+				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity, 30d, 3d, true);
 				if (result != null) {
 					if (result.entityHit instanceof EC) {
 						result.entityHit.ticksExisted = EC.MAXTIME;
 						return false;
 					}
 					if (result.entityHit instanceof EntityLivingBase) {
+						for (EC ec : entity.world.getEntitiesWithinAABB(EC.class, entity.getEntityBoundingBox().grow(30d))) {
+							if (result.entityHit.equals(ec.targetEntity)) {
+								return false;
+							}
+						}
 						EC entity1 = new EC(entity, (EntityLivingBase)result.entityHit, ItemJiton.getSandType(stack));
 						entity.world.spawnEntity(entity1);
 						return true;
@@ -236,8 +262,9 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 
 	public static boolean sandFuneral(EntityLivingBase attacker) {
 		RayTraceResult res = ProcedureUtils.objectEntityLookingAt(attacker, 50, true);
-		if (res != null && res.entityHit instanceof EC && Chakra.pathway(attacker).consume(50d)) {
-			attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ, (net.minecraft.util.SoundEvent) 
+		if (res != null && res.entityHit instanceof EC && ((EC)res.entityHit).canFuneral()
+		 && Chakra.pathway(attacker).consume(50d)) {
+			attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ,
 			 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:sabakusoso")),
 			 net.minecraft.util.SoundCategory.PLAYERS, 1f, 1f);
 			((EC)res.entityHit).sandFuneral();

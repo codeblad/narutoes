@@ -1,21 +1,17 @@
 
 package net.narutomod.item;
 
-import net.narutomod.procedure.ProcedureFoldingFanRangedItemUsed;
+import net.narutomod.entity.EntityFutonGreatBreakthrough;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumActionResult;
@@ -24,21 +20,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.item.EnumAction;
 import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.init.Blocks;
-import net.minecraft.entity.projectile.EntityTippedArrow;
-import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.client.renderer.entity.RenderSnowball;
+import net.minecraft.client.renderer.block.model.ModelBakery;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.Minecraft;
-
-import java.util.Map;
-import java.util.HashMap;
+import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraft.nbt.NBTTagCompound;
 
 import com.google.common.collect.Multimap;
 
@@ -47,6 +37,8 @@ public class ItemFoldingFan extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:folding_fan")
 	public static final Item block = null;
 	public static final int ENTITYID = 352;
+	private static final String CUSTOM_MODEL_KEY = "CustomRenderedModel";
+
 	public ItemFoldingFan(ElementsNarutomodMod instance) {
 		super(instance, 706);
 	}
@@ -54,25 +46,30 @@ public class ItemFoldingFan extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.items.add(() -> new RangedItem());
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityArrowCustom.class)
-				.id(new ResourceLocation("narutomod", "entitybulletfolding_fan"), ENTITYID).name("entitybulletfolding_fan").tracker(64, 1, true)
-				.build());
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {
-		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:folding_fan", "inventory"));
+		class MeshDef implements ItemMeshDefinition {
+			final ModelResourceLocation[] resources = {
+		   	    new ModelResourceLocation("narutomod:folding_fan_0", "inventory"),
+		   	    new ModelResourceLocation("narutomod:folding_fan_1", "inventory")
+			};
+	        @Override
+	        public ModelResourceLocation getModelLocation(ItemStack stack) {
+	            if (stack.hasTagCompound() && stack.getTagCompound().getBoolean(CUSTOM_MODEL_KEY)) {
+	                return this.resources[1];
+	            }
+	            return this.resources[0];
+	        }
+	    }
+	    MeshDef meshDef = new MeshDef();
+   	    ModelBakery.registerItemVariants(block, meshDef.resources);
+	    ModelLoader.setCustomMeshDefinition(block, meshDef);
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntityArrowCustom.class, renderManager -> {
-			return new RenderSnowball(renderManager, new ItemStack(Blocks.AIR, (int) (1)).getItem(), Minecraft.getMinecraft().getRenderItem());
-		});
-	}
-	public static class RangedItem extends Item {
+	public static class RangedItem extends Item implements ItemOnBody.Interface {
 		public RangedItem() {
 			super();
 			setMaxDamage(500);
@@ -96,32 +93,29 @@ public class ItemFoldingFan extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityLivingBase entityLivingBase, int timeLeft) {
-			if (!world.isRemote && entityLivingBase instanceof EntityPlayerMP) {
-				EntityPlayerMP entity = (EntityPlayerMP) entityLivingBase;
-				float power = 1f;
-				EntityArrowCustom entityarrow = new EntityArrowCustom(world, entity);
-				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 2, 0);
-				entityarrow.setSilent(true);
-				entityarrow.setIsCritical(false);
-				entityarrow.setDamage(5);
-				entityarrow.setKnockbackStrength(5);
-				itemstack.damageItem(1, entity);
-				int x = (int) entity.posX;
-				int y = (int) entity.posY;
-				int z = (int) entity.posZ;
-				world.playSound((EntityPlayer) null, (double) x, (double) y, (double) z,
-						(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation((""))),
-						SoundCategory.NEUTRAL, 1, 1f / (itemRand.nextFloat() * 0.5f + 1f) + (power / 2));
-				entityarrow.pickupStatus = EntityArrow.PickupStatus.DISALLOWED;
-				if (!world.isRemote)
-					world.spawnEntity(entityarrow);
-				{
-					Map<String, Object> $_dependencies = new HashMap<>();
-					$_dependencies.put("entity", entity);
-					$_dependencies.put("itemstack", itemstack);
-					ProcedureFoldingFanRangedItemUsed.executeProcedure($_dependencies);
+		public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected) {
+			if (!stack.hasTagCompound()) {
+				stack.setTagCompound(new NBTTagCompound());
+			}
+			if (isSelected) {
+				if (!stack.getTagCompound().getBoolean(CUSTOM_MODEL_KEY)) {
+					stack.getTagCompound().setBoolean(CUSTOM_MODEL_KEY, true);
+					worldIn.playSound(null, entityIn.posX, entityIn.posY, entityIn.posZ,
+					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:movement")),
+					 net.minecraft.util.SoundCategory.NEUTRAL, 0.6f, worldIn.rand.nextFloat() * 0.3f + 0.8f);
 				}
+			} else if (stack.getTagCompound().hasKey(CUSTOM_MODEL_KEY)) {
+				stack.getTagCompound().removeTag(CUSTOM_MODEL_KEY);
+			}
+		}
+
+		@Override
+		public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityLivingBase entity, int timeLeft) {
+			if (!world.isRemote) {
+				entity.extinguish();
+				new EntityFutonGreatBreakthrough.EC.Jutsu().createJutsu(itemstack, entity,
+						Math.min(60f, 0.5f * ((float)this.getMaxItemUseDuration(itemstack) - timeLeft)));
+				itemstack.damageItem(1, entity);
 			}
 		}
 
@@ -141,37 +135,4 @@ public class ItemFoldingFan extends ElementsNarutomodMod.ModElement {
 			return 72000;
 		}
 	}
-
-	public static class EntityArrowCustom extends EntityTippedArrow {
-		public EntityArrowCustom(World a) {
-			super(a);
-		}
-
-		public EntityArrowCustom(World worldIn, double x, double y, double z) {
-			super(worldIn, x, y, z);
-		}
-
-		public EntityArrowCustom(World worldIn, EntityLivingBase shooter) {
-			super(worldIn, shooter);
-		}
-
-		@Override
-		protected void arrowHit(EntityLivingBase entity) {
-			super.arrowHit(entity);
-			entity.setArrowCountInEntity(entity.getArrowCountInEntity() - 1);
-		}
-
-		@Override
-		public void onUpdate() {
-			super.onUpdate();
-			int x = (int) this.posX;
-			int y = (int) this.posY;
-			int z = (int) this.posZ;
-			World world = this.world;
-			Entity entity = (Entity) shootingEntity;
-			if (this.inGround) {
-				this.world.removeEntity(this);
-			}
-		}
-	}
-}
+}
