@@ -43,7 +43,6 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 
 import java.util.Random;
 import javax.annotation.Nullable;
-import com.google.common.base.Predicate;
 //import net.minecraft.network.datasync.DataParameter;
 //import net.minecraft.network.datasync.EntityDataManager;
 //import net.minecraft.network.datasync.DataSerializers;
@@ -72,6 +71,7 @@ public class EntityKakuzu extends ElementsNarutomodMod.ModElement {
 		public EntityCustom(World world) {
 			super(world, 120, 7000d);
 			this.setSize(0.6f, 2.0f);
+			this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 10, true, false, this.playerTargetSelectorAkatsuki));
 		}
 
 		@Override
@@ -141,12 +141,6 @@ public class EntityKakuzu extends ElementsNarutomodMod.ModElement {
 		protected void initEntityAI() {
 			super.initEntityAI();
 			this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));
-			this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 10, true, false,
-				new Predicate<EntityPlayer>() {
-					public boolean apply(@Nullable EntityPlayer p_apply_1_) {
-						return p_apply_1_ != null && (ModConfig.AGGRESSIVE_BOSSES || EntityBijuManager.isJinchuriki(p_apply_1_));
-					}
-				}));
 			this.tasks.addTask(0, new EntityAISwimming(this));
 			this.tasks.addTask(2, new EntityNinjaMob.AILeapAtTarget(this, 1.0F));
 			this.tasks.addTask(4, new EntityAIAttackMelee(this, 1.2d, true));
@@ -274,6 +268,11 @@ public class EntityKakuzu extends ElementsNarutomodMod.ModElement {
 			public void doRender(EntityCustom entity, double x, double y, double z, float entityYaw, float partialTicks) {
 				((ModelKakuzu)this.mainModel).clothesOffProgress = entity.getRobeOffProgress(partialTicks);
 				super.doRender(entity, x, y, z, entityYaw, partialTicks);
+			}
+
+			@Override
+			protected void preRenderCallback(EntityCustom entity, float partialTickTime) {
+				GlStateManager.scale(0.9375F, 1.0F, 0.9375F);
 			}
 
 			@Override
