@@ -63,7 +63,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> SCALE = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private final int growTime = 20;
 		private EntityLivingBase user;
-		private final float contactDamage = 20.0f;
+		private final float contactDamage = 1.0f;
 
 		public EC(World world) {
 			super(world);
@@ -80,7 +80,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public ItemJutsu.JutsuEnum.Type getJutsuType() {
-			return ItemJutsu.JutsuEnum.Type.RAITON;
+			return ItemJutsu.JutsuEnum.Type.KATON;
 		}
 
 		@Override
@@ -118,7 +118,8 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void applyEntityCollision(Entity entityIn) {
-			entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user), this.contactDamage + this.rand.nextFloat() * 5.0f);
+			float newDMG = this.contactDamage + this.rand.nextFloat() * 2.0f;
+			entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user), newDMG*ItemJutsu.getDmgMult(this.user));
 			entityIn.setFire(15);
 		}
 
@@ -193,12 +194,12 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 20.0f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 20.0f;
+				return 50.0f;
 			}
 		}
 

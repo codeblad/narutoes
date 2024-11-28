@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
-
+
+
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -405,7 +406,8 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected float getSoundVolume() {
 			return 1.0F;
-		}
+		}
+
 
 		@Override
 		public Vec3d getLookVec() {

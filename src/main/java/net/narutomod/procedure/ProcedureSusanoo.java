@@ -35,7 +35,7 @@ import net.narutomod.ElementsNarutomodMod;
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureSusanoo extends ElementsNarutomodMod.ModElement {
 	private static final String SUMMONED_SUSANOO = "summonedSusanooID";
-	public static final double BASE_CHAKRA_USAGE = 500d;
+	public static final double BASE_CHAKRA_USAGE = 150d;
 
 	public ProcedureSusanoo(ElementsNarutomodMod instance) {
 		super(instance, 168);
@@ -55,13 +55,18 @@ public class ProcedureSusanoo extends ElementsNarutomodMod.ModElement {
 		boolean flag = (player.isCreative() || ProcedureUtils.hasItemInInventory(player, ItemRinnegan.helmet));
 		ItemStack helmet = player.inventory.armorInventory.get(3);
 		if (!player.getEntityData().getBoolean("susanoo_activated")) {
+			if (NarutomodModVariables.world_tick < player.getEntityData().getDouble("susanoo_cd")) {
+				player.sendStatusMessage(new TextComponentString(net.minecraft.client.resources.I18n.format("cooldown: ") +
+						String.format("%.2f", (player.getEntityData().getDouble("susanoo_cd") - NarutomodModVariables.world_tick) / 20.0D)), true);
+				return;
+			}
 			if (helmet.hasTagCompound() && !helmet.getTagCompound().getBoolean("sharingan_blinded")) {
 				//if (flag || NarutomodModVariables.world_tick < player.getEntityData().getDouble("susanoo_cd") - 2400.0D
 				//		|| NarutomodModVariables.world_tick > player.getEntityData().getDouble("susanoo_cd")) {
 					if (PlayerTracker.getBattleXp(player) >= EntitySusanooBase.BXP_REQUIRED_L0
 					 && Chakra.pathway(player).consume(BASE_CHAKRA_USAGE)) {
 						player.getEntityData().setBoolean("susanoo_activated", true);
-						player.getEntityData().setDouble("susanoo_cd", NarutomodModVariables.world_tick + 2400.0D);
+						//player.getEntityData().setDouble("susanoo_cd", NarutomodModVariables.world_tick + 20.0D);
 						EntitySusanooBase entityCustom = new EntitySusanooSkeleton.EntityCustom(player);
 						world.spawnEntity(entityCustom);
 						player.getEntityData().setInteger(SUMMONED_SUSANOO, entityCustom.getEntityId());
@@ -88,11 +93,14 @@ public class ProcedureSusanoo extends ElementsNarutomodMod.ModElement {
 			//				* player.getEntityData().getDouble("susanoo_ticks") / 820.0D;
 			double cooldown = player.getEntityData().getDouble("susanoo_ticks") * 0.25d;
 			cooldown *= ProcedureUtils.getCooldownModifier(player);
-			//player.getEntityData().setDouble("susanoo_cd", NarutomodModVariables.world_tick + cooldown);
+			double susancool = 20*3d;
+			//double susancool = 30.0d*20.0d + player.getEntityData().getDouble("susanoo_ticks")*1.5d;
+			player.getEntityData().setDouble("susanoo_cd", NarutomodModVariables.world_tick + susancool);
 			player.getEntityData().removeTag("susanoo_activated");
 			player.getEntityData().removeTag("susanoo_ticks");
 			Entity entitySpawned = world.getEntityByID(getSummonedSusanooId(player));
 			player.getEntityData().removeTag(SUMMONED_SUSANOO);
+			//player.sendStatusMessage(new TextComponentString(net.minecraft.client.resources.I18n.format("SUSANOO GONE")), true);
 			if (entitySpawned != null) {
 				entitySpawned.setDead();
 			}

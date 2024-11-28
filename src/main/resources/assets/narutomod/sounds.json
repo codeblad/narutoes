@@ -359,6 +359,15 @@
       }
     ]
   },
+  "deep_forest": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:deep_forest",
+        "stream": false
+      }
+    ]
+  },
   "bijudama": {
     "category": "master",
     "sounds": [

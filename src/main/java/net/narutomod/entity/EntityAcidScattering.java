@@ -52,6 +52,7 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 		private EntityLivingBase shooter;
 		private float width, range;
 		private int potionAmplifier;
+		public float dmg = 2.0f;
 
 		public EC(World world) {
 			super(world);
@@ -67,6 +68,7 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 			this.setIdlePosition();
 			this.width = widthIn;
 			this.range = rangeIn;
+			this.dmg *= 1+1*(rangeIn/30);
 			this.potionAmplifier = (int)(rangeIn * 0.5f);
 		}
 
@@ -230,7 +232,7 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 					this.hitTime = age;
 					if (!this.world.isRemote && this.ecEntity != null) {
 						this.hitEntity.getEntityData().setBoolean("TempData_disableKnockback", true);
-						this.hitEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, shooter), 2.0f * this.ecEntity.potionAmplifier);
+						this.hitEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, shooter), ecEntity.dmg*ItemJutsu.getDmgMult(shooter));
 						this.hitEntity.addPotionEffect(new PotionEffect(PotionCorrosion.potion, 100, this.ecEntity.potionAmplifier, false, false));
 					}
 				}

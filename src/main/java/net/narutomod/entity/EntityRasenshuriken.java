@@ -160,7 +160,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			if (this.ticksAlive % 80 == 79) {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:wind")), 1, 1f);
 			}
-			if (this.ticksInAir > 200 || (!this.world.isRemote && this.shootingEntity == null && !this.isLaunched())) {
+			if (this.ticksInAir > 140 || (!this.world.isRemote && this.shootingEntity == null && !this.isLaunched())) {
 				this.setDead();
 			}
 		}
@@ -188,7 +188,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 		protected void doImpactDamage() {
 			ProcedureAoeCommand.set(this.world, this.impactVec.x, this.impactVec.y, this.impactVec.z, 0d, this.width/2)
 			  .exclude(this.shootingEntity).exclude(EntityTruthSeekerBall.EntityCustom.class).resetHurtResistanceTime()
-			  .damageEntities(this.damageSource, this.fullScale * this.impactDamageMultiplier)
+			  .damageEntities(this.damageSource, 0.25f*1+0.25f*(this.fullScale/2) * this.impactDamageMultiplier * ItemJutsu.getDmgMult(this.shootingEntity))
 			  .motion(0d, 0d, 0d);
 		}
 
@@ -294,7 +294,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 300.0f;
+				return 150.0f;
 			}
 	
 			@Override

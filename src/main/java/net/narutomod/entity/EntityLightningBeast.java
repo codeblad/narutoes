@@ -71,12 +71,13 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			this.isImmuneToFire = true;
 			this.stepHeight = 8f;
 			this.enablePersistence();
+			this.noClip = true;
 			this.setNoGravity(true);
 		}
 
 		public EC(EntityPlayer player, float powerIn) {
 			this(player.world);
-			RayTraceResult res = ProcedureUtils.raytraceBlocks(player, 4.0D);
+			RayTraceResult res = ProcedureUtils.raytraceBlocks(player, 8.0D);
 			double x = res.getBlockPos().getX();
 			double z = res.getBlockPos().getZ();
 			this.setPosition(x + 0.5, player.posY, z + 0.5);
@@ -138,13 +139,13 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
-			return EntityLightningArc.onStruck(entityIn, ItemJutsu.causeJutsuDamage(this, this.getOwner()), this.power);
+			return EntityLightningArc.onStruck(entityIn, ItemJutsu.causeJutsuDamage(this, this.getOwner()), (2.5f+2*this.power/100)*ItemJutsu.getDmgMult(this.getOwner()));
 		}
 
 		private BlockPos findDestination() {
 			EntityLivingBase owner = this.getOwner();
 			if (owner != null) {
-				RayTraceResult rtr = ProcedureUtils.objectEntityLookingAt(owner, 30d, this);
+				RayTraceResult rtr = ProcedureUtils.objectEntityLookingAt(owner, 80d, this);
 				if (rtr != null) {
 					if (rtr.entityHit != null) {
 						this.startVec = this.getPositionVector();
@@ -165,7 +166,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void updateAITasks() {
 			super.updateAITasks();
-			if (this.ticksExisted % 10 == 0) {
+			if (this.ticksExisted % 5 == 0) {
 				if (this.destPos != null) {
 					Vec3d vec = new Vec3d(this.destPos).subtract(this.getPositionVector()).normalize().scale(this.ogSpeed);
 					this.motionX = vec.x;
@@ -201,24 +202,25 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 				EntityLightningArc.spawnAsParticle(this.world, this.posX + this.rand.nextGaussian() * this.width * 0.5d,
 				 this.posY + this.rand.nextDouble() * this.height, this.posZ + this.rand.nextGaussian() * this.width * 0.5d);
 			}
-			if (!this.world.isRemote && (this.ticksExisted > 20 + (int)(this.power * 2) || owner == null || !owner.isEntityAlive())) {
+			if (!this.world.isRemote && (this.ticksExisted > 80 + (int)(this.power * 2.5) || owner == null || !owner.isEntityAlive())) {
 				this.setDead();
 			}
 		}
 
-		@Override
+		/*@Override
 		protected void collideWithNearbyEntities() {
 			Vec3d vec1 = this.getPositionVector().addVector(0d, 0.5d * this.height, 0d);
 			Vec3d vec2 = vec1.add(ProcedureUtils.getMotion(this));
 			for (Entity entity : this.world.getEntitiesInAABBexcluding(this,
-			 this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ),
+			 this.getEntityBoundingBox().expand(2, 2, 2),
 			 EntitySelectors.getTeamCollisionPredicate(this))) {
-				if (entity.getEntityBoundingBox().grow(this.width * 0.5, this.height * 0.5, this.width * 0.5)
+				this.collideWithEntity(entity);
+				if (entity.getEntityBoundingBox().grow(this.width * 0.25, this.height * 0.25, this.width * 0.25)
 				 .calculateIntercept(vec1, vec2) != null) {
-					this.collideWithEntity(entity);
+
 				}
 			}
-		}
+		}*/
 
 		@Override
 		protected void collideWithEntity(Entity entityIn) {
@@ -256,6 +258,12 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			@Override
 			public float getPowerupDelay() {
 				return 30.0f;
+			}
+
+
+			@Override
+			public float getMaxPower() {
+				return 100.0f;
 			}
 		}
 	}

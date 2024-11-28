@@ -69,6 +69,8 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 		//public float limbSwing;
 		private Vec3d lastVec;
 		private double yOrigin;
+		public float power;
+		public float mult;
 		private final List<ProcedureUtils.Vec2f> partRot = Lists.newArrayList(
 			new ProcedureUtils.Vec2f(0.0f, 0.0f), new ProcedureUtils.Vec2f(0.0f, 30.0f), new ProcedureUtils.Vec2f(0.0f, 30.0f),
 			new ProcedureUtils.Vec2f(0.0f, 30.0f), new ProcedureUtils.Vec2f(0.0f, 30.0f), new ProcedureUtils.Vec2f(0.0f, -15.0f),
@@ -84,6 +86,8 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 			super(shooter);
 			this.setOGSize(1.0F, 1.0F);
 			this.setEntityScale(power);
+			this.power = power;
+			this.mult = 1.5f+1.5f*(power/5);
 			this.setLocationAndAngles(shooter.posX, shooter.posY, shooter.posZ, shooter.rotationYaw, shooter.rotationPitch);
 			this.yOrigin = shooter.posY;
 		}
@@ -127,7 +131,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 				this.prevHeadPitch = this.rotationPitch;
 			}
 			super.onUpdate();
-			if (!this.world.isRemote && (this.ticksAlive > 100 || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
+			if (!this.world.isRemote && (this.ticksAlive > 200 || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
 				this.setDead();
 			} else {
 				if (this.ticksAlive <= this.wait) {
@@ -136,12 +140,12 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 					//this.setEntityScale(this.fullScale * MathHelper.clamp((float)this.ticksAlive / (float) this.wait, 0.1F, 1.0F));
 				} else if (!this.isLaunched()) {
 					if (this.shootVec != null) {
-						this.shoot(this.shootVec.x, this.shootVec.y, this.shootVec.z, 0.95f, 0f);
+						this.shoot(this.shootVec.x, this.shootVec.y, this.shootVec.z, 0.98f, 0f);
 					} else if (this.shootingEntity != null) {
 						Vec3d vec = this.shootingEntity instanceof EntityLiving && ((EntityLiving)this.shootingEntity).getAttackTarget() != null
 						 ? ((EntityLiving)this.shootingEntity).getAttackTarget().getPositionVector().subtract(this.getPositionVector())
 						 : ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 50d).hitVec.subtract(this.getPositionVector());
-						this.shoot(vec.x, vec.y, vec.z, 0.95f, 0f);
+						this.shoot(vec.x, vec.y, vec.z, 0.98f, 0f);
 					}
 				}
 				this.updateSegments();
@@ -193,10 +197,10 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 				return;
 			if (!this.world.isRemote) {
 				float size = this.getEntityScale();
-				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 5.0F * size, false,
+				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 6.0F * size, false,
 				  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
-				ProcedureAoeCommand.set(this, 0.0D, 3.0D).exclude(this.shootingEntity)
-				  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 20f * size);
+				ProcedureAoeCommand.set(this, 1.0D, 5.0D).exclude(this.shootingEntity)
+				  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (12f*this.mult)*ItemJutsu.getDmgMult(this.shootingEntity));
 				Map<BlockPos, IBlockState> map = Maps.newHashMap();
 				for (BlockPos pos : ProcedureUtils.getAllAirBlocks(this.world, this.getEntityBoundingBox().contract(0d, this.height-1, 0d))) {
 					map.put(pos, Blocks.FLOWING_WATER.getDefaultState().withProperty(BlockLiquid.LEVEL, Integer.valueOf(1)));
@@ -218,7 +222,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				if (power >= 1.0f && entity.onGround
+				if (power >= 1.0f //&& entity.onGround
 				 && (entity.isOverWater() || Chakra.pathway(entity).consume(ItemSuiton.WATERDRAGON.chakraUsage * 2))) {
 				 	this.createJutsu(entity, power);
 					return true;
@@ -240,7 +244,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 150.0f;
+				return 100.0f;
 			}
 	
 			@Override

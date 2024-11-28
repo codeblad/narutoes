@@ -60,7 +60,7 @@ public class EntitySandLevitation extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Integer> SUMMONER_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private ItemJiton.SwarmTarget sandCloud;
 		private boolean firstRidden;
-		private final int waitTime = 40;
+		private final int waitTime = 10;
 
 		public EC(World world) {
 			super(world);
@@ -212,9 +212,9 @@ public class EntitySandLevitation extends ElementsNarutomodMod.ModElement {
 				if (this.world.isRemote || Chakra.pathway(rider).consume(ItemJiton.SANDFLY.chakraUsage)) {
 					this.rotationYaw = rider.rotationYaw;
 					this.prevRotationYaw = this.rotationYaw;
-					this.motionX *= 0.9d;
-					this.motionY *= 0.9d;
-					this.motionZ *= 0.9d;
+					this.motionX *= 0.975d;
+					this.motionY *= 0.975d;
+					this.motionZ *= 0.975d;
 					this.isAirBorne = true;
 					float up = rider.moveForward > 0.0F ? -rider.rotationPitch / 45.0f : 0f;
 					float strafe = rider.moveStrafing;

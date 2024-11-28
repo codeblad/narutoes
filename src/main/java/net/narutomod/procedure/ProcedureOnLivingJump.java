@@ -11,6 +11,7 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.entity.player.EntityPlayer;
 
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.entity.EntitySusanooBase;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
@@ -20,6 +21,10 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 
 	public static void lunge(EntityPlayer entity) {
 		double speed = ProcedureUtils.getModifiedSpeed(entity);
+		if (entity.getEntityData().getLong("jumpCool") > entity.world.getTotalWorldTime()) {
+			return;
+		}
+		boolean leapt = false;
 		if (entity.isPotionActive(MobEffects.JUMP_BOOST) && speed >= 0.14d
 		 && entity.isSneaking() && entity.getFoodStats().getFoodLevel() > 8.0f) {
 			double motionY = 0.42d + (double) (entity.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1d;
@@ -30,20 +35,23 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 					Vec3d vec = t.entityHit != null ? t.entityHit.getPositionVector() : t.hitVec;
 					Vec3d vec3d = entity.getPositionVector().subtract(vec).normalize();
 					entity.setPosition(vec.x + vec3d.x, vec.y + vec3d.y + 0.1d, vec.z + vec3d.z);
+					leapt = true;
 					if (entity.world.isRemote) {
 						ProcedureSync.ResetBoundingBox.sendToServer(entity);
 					}
 				}
-			} else {
+			}
+			entity.getEntityData().setLong("jumpCool",entity.world.getTotalWorldTime()+10);
+			if (!leapt) {
 				speed += 0.8d;
 				float yaw = entity.rotationYaw * 0.017453292F;
 				float pitch = entity.rotationPitch * -0.017453292F;
 				double d0 = Math.min(Math.cos(pitch) / 0.7071d, 1.0d);
 				entity.motionX += -Math.sin(yaw) * d0 * speed * 2.5d;
 				entity.motionZ += Math.cos(yaw) * d0 * speed * 2.5d;
-				entity.motionY = Math.max(motionY * Math.sin(pitch) * 2.0d, 0.42d);
+				entity.motionY = Math.max(motionY * Math.sin(pitch) * 2.0d, 0.8d);
 			}
-			entity.addExhaustion(1.0f);
+			entity.addExhaustion(0.5f);
 		}
 	}
 

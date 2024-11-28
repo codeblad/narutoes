@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.item.Item;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
@@ -46,9 +47,11 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 		public EC(World world) {
 			super(world);
 		}
+		public float power;
 
 		public EC(EntityLivingBase shooter, float scale, int index) {
 			super(shooter, -1, scale);
+			this.power = scale;
 			this.setIndex(index);
 		}
 
@@ -99,14 +102,14 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 					}
 					this.setDead();
 				} else if (this.ticksExisted > this.maxAge - 2) {
-					for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().expand(0d, -this.height, 0d))) {
+					for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().expand(5d, -this.height, 5d))) {
 						if (entity != this.shootingEntity && !entity.equals(this)
-						 && entity.getDistance(this) <= 0.5d * this.width) {
+						 && entity.getDistance(this) <= 1.5d * this.width) {
 							ProcedureUtils.Vec2f vec = ProcedureUtils.getYawPitchFromVec(entity.getPositionVector().subtract(this.getPositionVector()));
 							vec = vec.subtract(this.rotationYaw, this.rotationPitch);
 				            if (Math.abs(vec.x) <= 90f && Math.abs(vec.y) <= 90f) {
 							 	entity.hurtResistantTime = 10;
-								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 17.0f + MathHelper.sqrt(scale));
+								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 4*(1+0.25f*(this.power/10))* ItemJutsu.getDmgMult(this.shootingEntity));
 				            }
 						}
 					}

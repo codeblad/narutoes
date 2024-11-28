@@ -38,6 +38,7 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 
+import net.narutomod.PlayerTracker;
 import net.narutomod.procedure.ProcedureTotsukaSwordToolInHandTick;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureAoeCommand;
@@ -82,7 +83,7 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 			this.setSize(MODELSCALE * 0.8F, MODELSCALE * (this.hasLegs() ? 2.0F : 1.25F));
 			this.getEntityData().setDouble("entityModelScale", (double)MODELSCALE);
 			this.lifeSpan = Integer.MAX_VALUE;
-			this.chakraUsage = this.hasLegs() ? 70d : 60d;
+			this.chakraUsage = this.hasLegs() ? 20d : 15d;
 		}
 
 		public EntityCustom(EntityLivingBase entity, boolean fullBody) {
@@ -92,7 +93,7 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 			//this.setFlameColor(0x20b83dba);
 			if (this.hasLegs()) {
 				this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("susanoo.reachExtension", 3.0D, 0));
-				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier("susanoo.speedboost", 0.2D, 0));
+				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier("susanoo.speedboost", 0.5D, 0));
 			}
 			if (!(entity instanceof EntityPlayer)) {
 				this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("susanoo.maxhealth", 400.0d, 0));
@@ -101,13 +102,21 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 				this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(ItemTotsukaSword.block));
 				this.setNoAI(false);
 			} else {
-				this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-				 .applyModifier(new AttributeModifier("susanoo.maxhealth", this.hasLegs() ? 10d : 3d, 2));
+				//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
+				 //.applyModifier(new AttributeModifier("susanoo.maxhealth", this.hasLegs() ? 10d : 3d, 2));
+				float health = (20+ (80*(ItemJutsu.getDmgMult(entity)/63))) * PlayerTracker.getDefense(entity);
+				//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*10);
+				if (this.hasLegs()) {
+					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*4+300);
+				} else {
+					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*3+200);
+				}
 				this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
 				 .setBaseValue(Math.min(this.playerXp, this.hasLegs() ? EntitySusanooBase.BXP_REQUIRED_L4 : EntitySusanooBase.BXP_REQUIRED_L3) * 0.003d);
 			}
-			this.setHealth(this.getMaxHealth());
-			this.chakraUsage = this.hasLegs() ? 70d : 60d;
+			float ratio = entity.getHealth()/entity.getMaxHealth();
+			this.setHealth(this.getMaxHealth()*ratio);
+			this.chakraUsage = this.hasLegs() ? 20d : 15d;
 			this.stepHeight = this.height / 3.0F;
 			this.lifeSpan = Integer.MAX_VALUE;
 		}
@@ -161,11 +170,11 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 		    	if (show) {
 					this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(SWORD_REACH);
 					this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(SWORD_ATTACK);
-					this.chakraUsage += 15.0d;
+					this.chakraUsage += 5.0d;
 		    	} else {
 		    		this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).removeModifier(SWORD_REACH);
 		    		this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(SWORD_ATTACK);
-		    		this.chakraUsage -= 15.0d;
+		    		this.chakraUsage -= 5.0d;
 		    	}
 		    	this.getDataManager().set(SHOW_SWORD, Boolean.valueOf(show));
 	    	}
@@ -214,6 +223,7 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onEntityUpdate() {
 			super.onEntityUpdate();
+
 			if (this.lifeSpan-- <= 0) {
 				this.setDead();
 			}

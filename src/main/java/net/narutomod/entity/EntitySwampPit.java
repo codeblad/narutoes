@@ -56,7 +56,7 @@ public class EntitySwampPit extends ElementsNarutomodMod.ModElement {
 
 		public EC(EntityLivingBase summonerIn, BlockPos centerPos, int radiusIn) {
 			this(summonerIn.world);
-			this.center = centerPos.add(0, radiusIn, 0);
+			this.center = centerPos.add(0, 2, 0);
 			this.radius = radiusIn;
 			int y = 0;
 			for (int j = 0; j > -radiusIn * 2 && this.center.getY() + j > 0; j--) {
@@ -70,7 +70,7 @@ public class EntitySwampPit extends ElementsNarutomodMod.ModElement {
 					}
 				}
 			}
-			this.offsetY = y;
+			this.offsetY = -2;
 			this.setPosition(centerPos.getX() + 0.5d, centerPos.getY(), centerPos.getZ() + 0.5d);
 		}
 
@@ -102,7 +102,7 @@ public class EntitySwampPit extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				}
-				new net.narutomod.event.EventSetBlocks(this.world, map, 0, 600, false, false);
+				new net.narutomod.event.EventSetBlocks(this.world, map, 0, 200, false, false);
 			}
 			if (!this.world.isRemote && this.ticksExisted >= this.radius - this.offsetY) {
 				this.setDead();
@@ -120,7 +120,7 @@ public class EntitySwampPit extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult rtr = ProcedureUtils.raytraceBlocks(entity, 50d);
+				RayTraceResult rtr = ProcedureUtils.raytraceBlocks(entity, 100d);
 				if (rtr != null && rtr.typeOfHit != RayTraceResult.Type.MISS) {
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:yominuma")), SoundCategory.PLAYERS, 1, 1f);
@@ -132,12 +132,12 @@ public class EntitySwampPit extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 50.0f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 30.0f;
+				return 15.0f;
 			}
 		}
 	}

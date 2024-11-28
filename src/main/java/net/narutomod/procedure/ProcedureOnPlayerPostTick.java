@@ -1,25 +1,8 @@
 package net.narutomod.procedure;
 
-import net.narutomod.item.ItemYooton;
-import net.narutomod.item.ItemSuiton;
-import net.narutomod.item.ItemShikotsumyaku;
-import net.narutomod.item.ItemSharingan;
-import net.narutomod.item.ItemShakuton;
-import net.narutomod.item.ItemRanton;
-import net.narutomod.item.ItemRaiton;
-import net.narutomod.item.ItemNinjutsu;
-import net.narutomod.item.ItemKaton;
-import net.narutomod.item.ItemJutsu;
-import net.narutomod.item.ItemJiton;
-import net.narutomod.item.ItemJinton;
-import net.narutomod.item.ItemIryoJutsu;
-import net.narutomod.item.ItemHyoton;
-import net.narutomod.item.ItemFutton;
-import net.narutomod.item.ItemFuton;
-import net.narutomod.item.ItemDoton;
-import net.narutomod.item.ItemDojutsu;
-import net.narutomod.item.ItemByakugan;
-import net.narutomod.item.ItemBakuton;
+import net.minecraft.item.Item;
+import net.narutomod.gui.GuiScrollKG;
+import net.narutomod.item.*;
 import net.narutomod.gui.GuiScrollGenjutsuGui;
 import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.PlayerTracker;
@@ -86,8 +69,43 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 		double rand = 0;
 		double rngbase = 0;
 		boolean achievedMedical = false;
-		if (((((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).experienceLevel : 0) >= 10)
-				&& ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) > 0))) {
+		/*Advancement _adv = ((EntityPlayerMP) entity).getAdvancements()
+						.getProgress(((WorldServer) (entity).world).getAdvancementManager()
+								.getAdvancement(new ResourceLocation("narutomod:ninjaachievement")));*/
+
+		/*Advancement ninjaA = ((MinecraftServer) ((EntityPlayerMP) entity).mcServer).getAdvancementManager()
+				.getAdvancement(new ResourceLocation("narutomod:ninjaachievement"));
+		AdvancementProgress aProg = ((EntityPlayerMP) entity).getAdvancements().getProgress(ninjaA);
+		if (!aProg.isDone()) {
+			Iterator _iterator = aProg.getRemaningCriteria().iterator();
+			while (_iterator.hasNext()) {
+				String criter = (String) _iterator.next();
+				((EntityPlayerMP) entity).getAdvancements().grantCriterion(ninjaA, criter);
+			}
+		}*/
+		if (!(world.isRemote) && entity instanceof EntityPlayerMP) {
+			Advancement _adv = ((MinecraftServer) ((EntityPlayerMP) entity).mcServer).getAdvancementManager()
+					.getAdvancement(new ResourceLocation("narutomod:ninjaachievement"));
+			AdvancementProgress _ap = ((EntityPlayerMP) entity).getAdvancements().getProgress(_adv);
+			if (!_ap.isDone()) {
+				Iterator _iterator = _ap.getRemaningCriteria().iterator();
+				while (_iterator.hasNext()) {
+					String _criterion = (String) _iterator.next();
+					((EntityPlayerMP) entity).getAdvancements().grantCriterion(_adv, _criterion);
+				}
+			}
+		}
+
+
+		if ((//(((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).experienceLevel : 0) >= 10)
+				/*&&*/ ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 0))) {
+			if (!world.isRemote && (entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 1000 && !(entity.getEntityData().getBoolean("kgReceived"))) {
+				Item jutsu = GuiScrollKG.GuiContainerMod.kgArray[entity.getEntityData().getInteger("KekkeiGenkai")];
+				entity.getEntityData().setBoolean("kgReceived",true);
+				if (jutsu != ItemMokuton.block && jutsu != ItemIryoJutsu.block) {
+					GuiScrollKG.GuiContainerMod.giveJutsu(jutsu, (EntityPlayer)entity);
+				}
+			}
 			if (((!(world.isRemote)) && (!(entity.getEntityData().getBoolean((NarutomodModVariables.FirstGotNinjutsu)))))) {
 				entity.getEntityData().setBoolean((NarutomodModVariables.FirstGotNinjutsu), (true));
 				if ((!((entity instanceof EntityPlayer)
@@ -95,13 +113,20 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 						: false))) {
 					stack = new ItemStack(ItemNinjutsu.block, (int) (1));
 					((ItemJutsu.Base) stack.getItem()).setIsAffinity(stack, true);
+					ItemStack stack2 = new ItemStack(ItemScrollSelectKG.block, (int) (1));
 					if (entity instanceof EntityPlayer) {
+
 						ItemStack _setstack = (stack);
 						_setstack.setCount(1);
 						ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack);
+
+						ItemStack _setstack2 = (stack2);
+						_setstack2.setCount(1);
+						ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack2);
 					}
 				}
-				if (((((!((entity instanceof EntityPlayer)
+
+				/*if (((((!((entity instanceof EntityPlayer)
 						? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemKaton.block, (int) (1)))
 						: false))
 						&& (!((entity instanceof EntityPlayer)
@@ -370,8 +395,8 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 							ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack);
 						}
 					}
-				}
-				if ((!((entity instanceof EntityPlayer)
+				}*/
+				/*if ((!((entity instanceof EntityPlayer)
 						? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemIryoJutsu.block, (int) (1)))
 						: false))) {
 					achievedMedical = (boolean) (((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
@@ -405,7 +430,7 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 						}
 					}
 					entity.getEntityData().setBoolean("MedicalNinjaChecked", (true));
-				}
+				}*/
 			}
 			{
 				Map<String, Object> $_dependencies = new HashMap<>();
@@ -426,7 +451,7 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 				}
 				if (ItemSharingan.isBlinded((EntityPlayer) entity)) {
 					if (entity instanceof EntityLivingBase)
-						((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 1200, (int) 0, (false), (false)));
+						((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 22, (int) 0, (false), (false)));
 				}
 			} else if ((((!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemYooton.block)
 					&& !ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemRanton.block))
@@ -451,9 +476,9 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 					if ((!((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).capabilities.isCreativeMode : false))) {
 						if (entity instanceof EntityLivingBase)
 							((EntityLivingBase) entity)
-									.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 1200, (int) 0, (false), (false)));
+									.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 22, (int) 0, (false), (false)));
 					}
-				} else if ((((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 300)
+				} /*else if ((((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 300)
 						&& (((((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
 								? ((EntityPlayerMP) entity).getAdvancements()
 										.getProgress(((WorldServer) (entity).world).getAdvancementManager()
@@ -539,7 +564,7 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 							ProcedureKGDistribution.executeProcedure($_dependencies);
 						}
 					}
-				}
+				}*/
 			}
 		}
 		{

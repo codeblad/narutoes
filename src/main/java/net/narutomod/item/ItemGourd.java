@@ -79,7 +79,7 @@ public class ItemGourd extends ElementsNarutomodMod.ModElement {
 				if (!world.isRemote && ProcedureUtils.hasItemInInventory(entity, ItemJiton.block)) {
 					entity.extinguish();
 					if (entity.ticksExisted % 20 == 3) {
-						entity.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, 2, false, false));
+						//entity.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, 2, false, false));
 						itemstack.setItemDamage(itemstack.getItemDamage() - 1);
 					}
 					//if (!itemstack.hasTagCompound())

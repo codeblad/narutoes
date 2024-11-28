@@ -48,6 +48,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private RayTraceResult targetTrace;
+		public float power;
 
 		public EC(World a) {
 			super(a);
@@ -61,6 +62,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 			Vec3d vec = shooter.getLookVec().scale(scale * 0.3f + 0.3f).add(shooter.getPositionEyes(1f));
 			this.setLocationAndAngles(vec.x, vec.y, vec.z, shooter.rotationYaw, shooter.rotationPitch);
 			this.setEntityScale(scale);
+			this.power = scale;
 			this.isImmuneToFire = true;
 		}
 
@@ -104,7 +106,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 				if (result.entityHit != null) {
 					if (!result.entityHit.equals(this.shootingEntity) && !(result.entityHit instanceof EC)) {
 						result.entityHit.hurtResistantTime = 10;
-						result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), scale * 20f);
+						result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 2*(1+2*(this.power/5))*ItemJutsu.getDmgMult(this.shootingEntity));
 						this.setDead();
 					}
 				} else {
@@ -149,7 +151,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 50.0f;
 			}
 	
 			@Override

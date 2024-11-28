@@ -57,6 +57,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		private int attackTimer;
 		private int nextStepDistance;
 		private int deathTicks;
+		float power;
 		
 		public EC(World w) {
 			super(w);
@@ -69,6 +70,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			super(summonerIn);
 			this.setOGSize(1f, 2.875f);
 			this.isImmuneToFire = true;
+			this.power = size;
 			this.setScale(size);
 			this.setLocationAndAngles(summonerIn.posX + summonerIn.getLookVec().x, summonerIn.posY, summonerIn.posZ + summonerIn.getLookVec().z, summonerIn.rotationYaw, 0f);
 		}
@@ -81,9 +83,10 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void postScaleFixup() {
 			float f = this.getScale();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D * f);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(80.0D * f);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D * f);
+			float newPower = (1+4*(this.power/5)) * ItemJutsu.getDmgMult(this.getSummoner());
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(60.0D + 8*newPower);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D + 0.75*newPower);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(10.0D + 6.0D * f);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D + (f - 1F) * 0.1D);
 			super.postScaleFixup();
@@ -227,7 +230,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 150.0f;
+				return 80.0f;
 			}
 	
 			@Override

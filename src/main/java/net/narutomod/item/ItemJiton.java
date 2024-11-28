@@ -29,7 +29,8 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.DamageSource;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.inventory.EntityEquipmentSlot;
+
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.SoundEvent;
@@ -268,7 +269,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 				while (iter.hasNext()) {
 					SwarmTarget st = iter.next();
 					if (!st.shouldRemove()) {
-						st.setTarget(this.getGourdMouthPos(), 0.6f, 0.02f, true);
+						st.setTarget(this.getGourdMouthPos(), 0.8f, 0.02f, true);
 						st.onUpdate();
 					} else {
 						iter.remove();
@@ -335,7 +336,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 					iter.remove();
 				} else {
 					if (st.getTicks() == 20) {
-						st.setTarget(this.getGourdMouthPos(), 0.6f, 0.02f, true);
+						st.setTarget(this.getGourdMouthPos(), 0.8f, 0.02f, true);
 					}
 					st.onUpdate();
 				}

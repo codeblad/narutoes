@@ -127,7 +127,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 		public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityLivingBase entity, int timeLeft) {
 			if (!world.isRemote) {
 				float power = this.getPower(itemstack, entity, timeLeft);
-				if (power >= 1f && this.executeJutsu(itemstack, entity, power)
+				if (power >= 1.0f && this.executeJutsu(itemstack, entity, power)
 				 && entity instanceof EntityPlayer && !((EntityPlayer)entity).isCreative()) {
 					((EntityPlayer)entity).getCooldownTracker().setCooldown(itemstack.getItem(), 
 					 (int)(this.getUsePercent(timeLeft) * 12000 * ProcedureUtils.getCooldownModifier(((EntityPlayer)entity))));
@@ -156,6 +156,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> SCALE = EntityDataManager.<Float>createKey(EntityBeam.class, DataSerializers.FLOAT);
 		private final AirPunch beam = new AirPunch();
 		private final int wait = 60;
+		public float power = 1;
 
 		public EntityBeam(World a) {
 			super(a);
@@ -165,6 +166,8 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 		public EntityBeam(EntityLivingBase shooter, float scale) {
 			super(shooter);
 			this.setScale(scale);
+			this.power = scale;
+			beam.power = scale;
 			this.isImmuneToFire = true;
 		}
 
@@ -214,7 +217,8 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 					this.beam.execute2(this.shootingEntity, (double)this.getBeamLength(), (double)this.getScale() / 2);
 				}
 			}
-			if (!this.world.isRemote && this.ticksAlive > this.wait + 60) {
+			if (!this.world.isRemote && this.ticksAlive > this.wait + 60)
+ {
 				this.setDead();
 			}
 		}
@@ -228,6 +232,8 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 		}
 
 		public class AirPunch extends ProcedureAirPunch {
+			float power = 1f;
+
 			public AirPunch() {
 				this.blockDropChance = -1.0F;
 				this.blockHardnessLimit = 100f;
@@ -238,8 +244,9 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
-				double d = this.getFarRadius(0) / target.getEntityBoundingBox().getAverageEdgeLength() * 0.2d;
-				float f = target instanceof EntityLivingBase ? ((EntityLivingBase)target).getMaxHealth() * (float)d : Float.MAX_VALUE;
+				/*double d = this.getFarRadius(0) / target.getEntityBoundingBox().getAverageEdgeLength() * 0.2d;
+				float f = target instanceof EntityLivingBase ? ((EntityLivingBase)target).getMaxHealth() * (float)d : Float.MAX_VALUE;*/
+				float f = ( 6* (1+2*(this.power/10f)) * ItemJutsu.getDmgMult(player)/20 );
 				attackEntityWithJutsu(EntityBeam.this, player, target, f);
 			}
 
@@ -253,7 +260,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity instanceof EntityPlayer) {
-					power = Math.min(power / 2 + 0.5f, 10f);
+					//power = Math.min(power / 2 + 0.5f, 10f);
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 					  .getObject(new ResourceLocation("narutomod:genkaihakurinojutsu")), SoundCategory.PLAYERS, 1, 1f);
 					Vec3d vec3d = entity.getLookVec();
@@ -267,7 +274,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 40.0f;
 			}
 
 			@Override
@@ -288,10 +295,11 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityCube extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private final int wait = 60;
-		private final int growTime = 30;
+		private final int growTime = 20;
 		private final int idleTime = 40;
-		private final int shrinkTime = 40;
+		private final int shrinkTime = 10;
 		private float fullScale = 1f;
+		public float power = 1f;
 		
 		public EntityCube(World a) {
 			super(a);
@@ -304,7 +312,8 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			super(shooter);
 			this.setOGSize(0.5F, 0.5F);
 			this.setEntityScale(0.01F);
-			this.fullScale = scale;
+			this.fullScale = scale*2f+1.5f;
+			this.power = scale;
 			this.setWaitPosition(shooter);
 			this.isImmuneToFire = true;
 		}
@@ -339,8 +348,9 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this, bb)) {
 				double d = ProcedureUtils.BB.getVolume(bb.intersect(entity.getEntityBoundingBox()))
 				 / ProcedureUtils.BB.getVolume(entity.getEntityBoundingBox()) * 0.025d;
-				attackEntityWithJutsu(this, this.shootingEntity, entity, 
-				 entity instanceof EntityLivingBase ? ((EntityLivingBase)entity).getMaxHealth() * (float)d : Float.MAX_VALUE);
+				attackEntityWithJutsu(this, this.shootingEntity, entity,
+						(6*(1+5*(this.power/25f))*ItemJutsu.getDmgMult(this.shootingEntity))/20);
+				 //entity instanceof EntityLivingBase ? ((EntityLivingBase)entity).getMaxHealth() * (float)d : Float.MAX_VALUE);
 			}
 		}
 
@@ -429,7 +439,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 60.0f;
 			}
 
 			@Override

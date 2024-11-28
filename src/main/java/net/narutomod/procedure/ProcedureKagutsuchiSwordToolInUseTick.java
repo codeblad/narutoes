@@ -60,7 +60,7 @@ public class ProcedureKagutsuchiSwordToolInUseTick extends ElementsNarutomodMod.
 		} else {
 			entity_scale = (double) 1;
 			if (((entity.ticksExisted % 20) == 0)) {
-				Chakra.pathway((EntityPlayer) entity).consume(20.0d);
+				//Chakra.pathway((EntityPlayer) entity).consume(20.0d);
 			}
 		}
 		renderYawOffset = (double) ((EntityLivingBase) entity).renderYawOffset;

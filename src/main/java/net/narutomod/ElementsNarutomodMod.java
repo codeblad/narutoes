@@ -6,57 +6,7 @@
  */
 package net.narutomod;
 
-import net.narutomod.gui.GuiTeamManager;
-import net.narutomod.gui.GuiScrollWindBladeGui;
-import net.narutomod.gui.GuiScrollWaterStreamGui;
-import net.narutomod.gui.GuiScrollWaterShockwaveGui;
-import net.narutomod.gui.GuiScrollWaterSharkGui;
-import net.narutomod.gui.GuiScrollWaterPrisonGui;
-import net.narutomod.gui.GuiScrollWaterDragonGui;
-import net.narutomod.gui.GuiScrollWaterCannonGui;
-import net.narutomod.gui.GuiScrollVacuumWaveGui;
-import net.narutomod.gui.GuiScrollTransformationGui;
-import net.narutomod.gui.GuiScrollSwampPitGui;
-import net.narutomod.gui.GuiScrollShadowImitationGui;
-import net.narutomod.gui.GuiScrollSealingChainsGui;
-import net.narutomod.gui.GuiScrollSealing4SymbolsGui;
-import net.narutomod.gui.GuiScrollRasenshurikenGui;
-import net.narutomod.gui.GuiScrollRasenganGui;
-import net.narutomod.gui.GuiScrollPuppetGui;
-import net.narutomod.gui.GuiScrollPoisonMistGui;
-import net.narutomod.gui.GuiScrollMultiSizeGui;
-import net.narutomod.gui.GuiScrollMindTransferGui;
-import net.narutomod.gui.GuiScrollLightningPantherGui;
-import net.narutomod.gui.GuiScrollLightningChakraModeGui;
-import net.narutomod.gui.GuiScrollLightningBeastGui;
-import net.narutomod.gui.GuiScrollKirinGui;
-import net.narutomod.gui.GuiScrollKikaichuSphereGui;
-import net.narutomod.gui.GuiScrollKageBunshinGui;
-import net.narutomod.gui.GuiScrollHiraishinGui;
-import net.narutomod.gui.GuiScrollHidingInRockGui;
-import net.narutomod.gui.GuiScrollHidingInMistGui;
-import net.narutomod.gui.GuiScrollHidingInCamouflageGui;
-import net.narutomod.gui.GuiScrollHidingInAshGui;
-import net.narutomod.gui.GuiScrollHealingGui;
-import net.narutomod.gui.GuiScrollGreatFireballGui;
-import net.narutomod.gui.GuiScrollGenjutsuGui;
-import net.narutomod.gui.GuiScrollFutonVacuumGui;
-import net.narutomod.gui.GuiScrollFutonChakraFlowGui;
-import net.narutomod.gui.GuiScrollFlameSliceGui;
-import net.narutomod.gui.GuiScrollFlameFormationGui;
-import net.narutomod.gui.GuiScrollFireStreamGui;
-import net.narutomod.gui.GuiScrollFireAnnihilationGui;
-import net.narutomod.gui.GuiScrollFalseDarknessGui;
-import net.narutomod.gui.GuiScrollEnhancedStrengthGui;
-import net.narutomod.gui.GuiScrollEarthWallGui;
-import net.narutomod.gui.GuiScrollEarthSpearsGui;
-import net.narutomod.gui.GuiScrollEarthSandwichGui;
-import net.narutomod.gui.GuiScrollEarthGolemGui;
-import net.narutomod.gui.GuiScrollChidoriGui;
-import net.narutomod.gui.GuiScrollCellularActivationGui;
-import net.narutomod.gui.GuiScrollBodyReplacementGui;
-import net.narutomod.gui.GuiScrollBigBlowGui;
-import net.narutomod.gui.GuiMedicalScrollGUI;
+import net.narutomod.gui.*;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntry;
@@ -285,6 +235,8 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "shukaku_roar")));
 		sounds.put(new ResourceLocation("narutomod", "chomei_flying"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "chomei_flying")));
+		sounds.put(new ResourceLocation("narutomod", "deep_forest"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "deep_forest")));
 		sounds.put(new ResourceLocation("narutomod", "isobu_roar"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "isobu_roar")));
 		sounds.put(new ResourceLocation("narutomod", "isobu_hurt"),
@@ -490,6 +442,8 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				return new GuiScrollWindBladeGui.GuiContainerMod(world, x, y, z, player);
 			if (id == GuiScrollVacuumWaveGui.GUIID)
 				return new GuiScrollVacuumWaveGui.GuiContainerMod(world, x, y, z, player);
+			if (id == GuiScrollKG.GUIID)
+				return new GuiScrollKG.GuiContainerMod(world, x, y, z, player);
 			return null;
 		}
 
@@ -597,6 +551,8 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				return new GuiScrollWindBladeGui.GuiWindow(world, x, y, z, player);
 			if (id == GuiScrollVacuumWaveGui.GUIID)
 				return new GuiScrollVacuumWaveGui.GuiWindow(world, x, y, z, player);
+			if (id == GuiScrollKG.GUIID)
+				return new GuiScrollKG.GuiWindow(world, x, y, z, player);
 			return null;
 		}
 	}

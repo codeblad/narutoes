@@ -102,7 +102,8 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 				super.onUsingTick(stack, player, count);
 			}
 		}
-	}
+
+	}
 
 	private static boolean isEarthenMaterial(Material material) {
 		return earthenMaterials.contains(material);
@@ -426,12 +427,12 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getBasePower() {
-				return 2.0f;
+				return 5.0f;
 			}
 	
 			@Override
 			public float getPowerupDelay() {
-				return 15.0f;
+				return 5.0f;
 			}
 	
 			@Override

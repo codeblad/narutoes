@@ -51,7 +51,7 @@ public class ProcedureKGDistribution extends ElementsNarutomodMod.ModElement {
 		super(instance, 847);
 	}
 
-	public static void executeProcedure(Map<String, Object> dependencies) {
+	/*public static void executeProcedure(Map<String, Object> dependencies) {
 		if (dependencies.get("entity") == null) {
 			System.err.println("Failed to load dependency entity for procedure KGDistribution!");
 			return;
@@ -612,5 +612,5 @@ public class ProcedureKGDistribution extends ElementsNarutomodMod.ModElement {
 			_setstack.setCount(1);
 			ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack);
 		}
-	}
+	}*/
 }

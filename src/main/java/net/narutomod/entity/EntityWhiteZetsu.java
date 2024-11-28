@@ -250,7 +250,7 @@ public class EntityWhiteZetsu extends ElementsNarutomodMod.ModElement {
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			if (this.getEntityAttribute(SharedMonsterAttributes.ARMOR) != null)
-				this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0.5D);
+				this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0D);
 			if (this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED) != null)
 				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D);
 			if (this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH) != null)

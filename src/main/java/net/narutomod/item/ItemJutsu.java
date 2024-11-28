@@ -33,13 +33,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.Minecraft;
 
-import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.*;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureUpdateworldtick;
-import net.narutomod.Chakra;
-import net.narutomod.Particles;
-import net.narutomod.PlayerTracker;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -66,6 +63,13 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 	public static DamageSource causeJutsuDamage(Entity source, @Nullable Entity indirectEntityIn) {
 		return indirectEntityIn != null ? new EntityDamageSourceIndirect(NINJUTSU_TYPE, source, indirectEntityIn)
 		 : new EntityDamageSource(NINJUTSU_TYPE, source);
+	}
+
+	public static float getDmgMult(Entity entity) {
+		if (entity instanceof EntityPlayer) {
+			return MathHelper.clamp((float)PlayerTracker.getNinjaLevel((EntityPlayer)entity) / 5f,1.0f,10000000f);
+		}
+		return 1.0f;
 	}
 
 	public static DamageSource causeSenjutsuDamage(Entity source, @Nullable Entity indirectEntityIn) {
@@ -129,7 +133,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			stack = player.getHeldItemOffhand();
 		}
 		if (stack.getItem() instanceof Base) {
-			((Base)stack.getItem()).addCurrentJutsuXp(stack, xp);
+			((Base)stack.getItem()).addCurrentJutsuXp(stack, xp* ModConfig.JUTSUXP_MULTIPLIER);
 		}
 	}
 
@@ -476,6 +480,25 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
+		private void setLastJutsu(ItemStack stack, EntityLivingBase entity) {
+			if (!stack.hasTagCompound())
+				stack.setTagCompound(new NBTTagCompound());
+			int i = 0;
+			int next = this.getCurrentJutsuIndex(stack);
+			for ( ; i < this.jutsuList.size(); i++) {
+				--next;
+				if (next < 0)
+					next = this.jutsuList.size()-1;
+				if (this.canUseJutsu(stack, next, entity))
+					break;
+			}
+			if (i < this.jutsuList.size()) {
+				this.setCurrentJutsu(stack, next);
+				if (entity instanceof EntityPlayer && !entity.world.isRemote)
+					((EntityPlayer) entity).sendStatusMessage(new TextComponentString(this.jutsuList.get(next).getName()), true);
+			}
+		}
+
 		public void setIsAffinity(ItemStack stack, boolean b) {
 			if (!stack.hasTagCompound())
 				stack.setTagCompound(new NBTTagCompound());
@@ -549,7 +572,8 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			public void onEquipmentChange(LivingEquipmentChangeEvent event) {
 				EntityLivingBase entity = event.getEntityLiving();
 				ItemStack stack = event.getTo();
-				if (entity instanceof EntityPlayer && !entity.world.isRemote && stack.getItem() instanceof Base
+				if (entity instanceof EntityPlayer && !entity.world.isRemote
+ && stack.getItem() instanceof Base
 				 && event.getSlot().getSlotType() == EntityEquipmentSlot.Type.HAND && stack.getItem() != event.getFrom().getItem()) {
 					if (event.getSlot() == EntityEquipmentSlot.MAINHAND || !(entity.getHeldItemMainhand().getItem() instanceof Base)) {
 						((EntityPlayer)entity).sendStatusMessage(new TextComponentString(ItemJutsu.getCurrentJutsu(stack).getName()), true);
@@ -561,6 +585,12 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		public static void switchNextJutsu(ItemStack stack, EntityLivingBase entity) {
 			if (stack.getItem() instanceof Base) {
 				((Base)stack.getItem()).setNextJutsu(stack, entity);
+			}
+		}
+
+		public static void switchLastJutsu(ItemStack stack, EntityLivingBase entity) {
+			if (stack.getItem() instanceof Base) {
+				((Base)stack.getItem()).setLastJutsu(stack, entity);
 			}
 		}
 

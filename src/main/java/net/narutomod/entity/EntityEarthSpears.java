@@ -25,7 +25,8 @@ import net.minecraft.client.renderer.entity.RenderManager;
 
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
-
+
+
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 243;
@@ -61,8 +62,8 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends EntitySpike.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 8;
-		private final float maxScale = 2.0f;
-		private final float damage = 10.0f;
+		private final float maxScale = 5.0f;
+		public float damage = 4f;
 
 		public EC(World worldIn) {
 			super(worldIn);
@@ -92,8 +93,10 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
 					if (!entity.equals(this.shootingEntity)) {
 						entity.hurtResistantTime = 10;
-						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
-						 this.damage * (1f - (float)(this.ticksAlive - 1) / this.growTime));
+						if (ticksAlive < 5) {
+							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
+									this.damage);
+						}
 					}
 				}
 			}
@@ -104,15 +107,16 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				World world = entity.world;
 				Vec3d vec3d = entity.getPositionEyes(1f);
-				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(30d));
+				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(100d));
 				RayTraceResult res = world.rayTraceBlocks(vec3d, vec3d2, false, true, true);
 				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK && res.sideHit == EnumFacing.UP) {
 					world.playSound(null, res.getBlockPos(),
 					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:hand_press")),
 					 net.minecraft.util.SoundCategory.BLOCKS, 5f, entity.getRNG().nextFloat() * 0.4f + 0.8f);
-					float f = MathHelper.sqrt(power * 9f / 5f);
+					float f = MathHelper.sqrt(power * 18f / 4f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EC entity1 = new EC(entity, power);
+						entity1.damage = 6 * ((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
 						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
 						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
@@ -131,7 +135,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 20.0f;
+				return 10.0f;
 			}
 	
 			@Override
@@ -139,5 +143,6 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 				return 100.0f;
 			}
 		}
-	}
+	}
+
 }

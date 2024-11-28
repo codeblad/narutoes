@@ -85,7 +85,8 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-		 .id(new ResourceLocation("narutomod", "sasori"), ENTITYID).name("sasori").tracker(64, 3, true).egg(-16777216, -65485).build());
+		 .id(new ResourceLocation("narutomod", "sasori"), ENTITYID)
+.name("sasori").tracker(64, 3, true).egg(-16777216, -65485).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCore.class)
 		 .id(new ResourceLocation("narutomod", "sasori_core"), ENTITYID_RANGED).name("sasori_core").tracker(64, 3, true).build());
 	}
@@ -241,12 +242,12 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 		protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source) {
 			if (this.rand.nextFloat() < 0.5f) {
 				ItemStack stack = new ItemStack(ItemScrollHiruko.block);
-				stack.setItemDamage(10 + this.rand.nextInt((int)EntityPuppetHiruko.EntityCustom.MAXHEALTH - 10));
+				//stack.setItemDamage(10 + this.rand.nextInt((int)EntityPuppetHiruko.EntityCustom.MAXHEALTH - 10));
 				this.entityDropItem(stack, 0.0f);
 			}
 			if (this.rand.nextFloat() < 0.25f) {
 				ItemStack stack = new ItemStack(ItemScroll3rdKazekage.block);
-				stack.setItemDamage(10 + this.rand.nextInt((int)EntityPuppet3rdKazekage.EntityCustom.MAXHEALTH - 10));
+				//stack.setItemDamage(10 + this.rand.nextInt((int)EntityPuppet3rdKazekage.EntityCustom.MAXHEALTH - 10));
 				this.entityDropItem(stack, 0.0f);
 			}
 		}
@@ -290,7 +291,8 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 			if (this.actionsHalted()) {
 				// do nothing
 			} else if (this.getAttackTarget() != null) {
-				if (this.isRidingHiruko() && this.hirukoEntity.getHealth() < this.hirukoEntity.getMaxHealth() * 0.5f
+				if (this.isRidingHiruko()
+ && this.hirukoEntity.getHealth() < this.hirukoEntity.getMaxHealth() * 0.5f
 			 	 && inv1Stack.getItem() == ItemSenbonArm.block && this.rand.nextFloat() < 0.01f) {
 					this.swapWithInventory(EntityEquipmentSlot.OFFHAND, 1);
 			 	} else if (!this.isRidingHiruko() && !this.thirdScrollUsed) {
@@ -495,9 +497,10 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 			 && this.ticksExisted - this.lastElementalJutsuTime > 150) {
 				if (this.rand.nextFloat() <= 0.3333f && this.consumeChakra(this.chakra4elementals)) {
 					this.fireImmuneTicks = 300;
-					this.lastElementalJutsu = new EntityFirestream.EC.Jutsu2().createJutsu(this, 25.0f, 200);
+					this.lastElementalJutsu = new EntityFirestream.EC.Jutsu2().createJutsu(this, 25.0f, 100);
 					this.lastElementalJutsuTime = this.ticksExisted;
-				} else if (this.rand.nextFloat() < 0.5f && this.consumeChakra(this.chakra4elementals)) {
+				}
+ else if (this.rand.nextFloat() < 0.5f && this.consumeChakra(this.chakra4elementals)) {
 					this.lastElementalJutsu = new EntityWaterStream.EC.Jutsu().createJutsu(this, 25.0f, 200);
 					this.lastElementalJutsuTime = this.ticksExisted;
 				} else if (this.consumeChakra(this.chakra4elementals)) {

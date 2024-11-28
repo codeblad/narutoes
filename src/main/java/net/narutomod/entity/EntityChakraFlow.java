@@ -3,7 +3,8 @@ package net.narutomod.entity;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -34,6 +35,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.init.MobEffects;
 
+import net.narutomod.item.ItemJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.NarutomodMod;
 import net.narutomod.ElementsNarutomodMod;
@@ -60,7 +62,7 @@ public class EntityChakraFlow extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Integer> USER_ID = EntityDataManager.<Integer>createKey(Base.class, DataSerializers.VARINT);
 		protected static final UUID DAMAGE_MODIFIER = UUID.fromString("ef834eb3-67d2-48cf-8d75-1530ee1ed81f");
 		private EntityLivingBase user;
-		protected double damageModifier = 6d;
+		protected double damageModifier = 5d;
 		private ItemStack lastHeldWeapon;
 
 		public Base(World world) {
@@ -107,7 +109,7 @@ public class EntityChakraFlow extends ElementsNarutomodMod.ModElement {
 						if (attributemodifier != null) {
 							aInstance.removeModifier(attributemodifier);
 						}
-						aInstance.applyModifier(new AttributeModifier(DAMAGE_MODIFIER, "chakraflow.damage", this.damageModifier, 0));
+						aInstance.applyModifier(new AttributeModifier(DAMAGE_MODIFIER, "chakraflow.damage", this.damageModifier+ 0.5*ItemJutsu.getDmgMult(user), 0));
 					}
 				}
 			}

@@ -127,7 +127,7 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (entity.ticksExisted % 10 == 2 && entity instanceof EntityLivingBase && JIRAIKEN.jutsu.isActivated(itemstack)) {
 				((EntityLivingBase)entity).addPotionEffect(new PotionEffect(
-				 PotionChakraEnhancedStrength.potion, 12, (int)(((Jiraiken)JIRAIKEN.jutsu).getPower(itemstack) * 19), false, false));
+				 PotionChakraEnhancedStrength.potion, 12, (int)(5+(1+1*((Jiraiken)JIRAIKEN.jutsu).getPower(itemstack)/20)*(ItemJutsu.getDmgMult(entity)*1.5)), false, false));
 			}
 		}
 
@@ -183,7 +183,7 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public float getPowerupDelay() {
-			return 200.0f;
+			return 40.0f;
 		}
 
 		@Override

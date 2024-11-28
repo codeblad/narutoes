@@ -69,12 +69,14 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 		private final double ogSpeed = 2.0D;
 		private BlockPos destPos;
 		private Vec3d startVec;
+		float power;
 
 		public EC(World world) {
 			super(world);
 			this.setSize(this.ogWidth, this.ogHeight);
 			this.isImmuneToFire = true;
 			this.stepHeight = 8f;
+			this.noClip = false;
 			this.enablePersistence();
 			this.setNoGravity(true);
 		}
@@ -85,6 +87,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			this.setLocationAndAngles(player.posX, player.posY, player.posZ, player.rotationYaw, 0f);
 			this.setTamedBy(player);
 			this.setPower(powerIn);
+			this.power = powerIn;
 			Vec3d vec = player.getLookVec();
 			this.motionX = vec.x * 0.2d;
 			this.motionZ = vec.z * 0.2d;
@@ -170,7 +173,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
-			return EntityLightningArc.onStruck(entityIn, ItemJutsu.causeJutsuDamage(this, null), this.getPower() * 20.0f);
+			return EntityLightningArc.onStruck(entityIn, ItemJutsu.causeJutsuDamage(this, null), (5+2*this.power/5)*ItemJutsu.getDmgMult(this.getOwner()));
 		}
 
 		private BlockPos findDestination() {
@@ -197,7 +200,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void updateAITasks() {
 			super.updateAITasks();
-			if (this.ticksExisted % 10 == 0) {
+			if (this.ticksExisted % 4 == 0) {
 				if (this.destPos != null) {
 					Vec3d vec = new Vec3d(this.destPos).subtract(this.getPositionVector()).normalize().scale(this.ogSpeed);
 					this.motionX = vec.x;
@@ -250,17 +253,17 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		@Override
+		/*@Override
 		protected void collideWithNearbyEntities() {
 			Vec3d vec1 = this.getPositionVector().addVector(0d, 0.5d * this.height, 0d);
 			Vec3d vec2 = vec1.add(ProcedureUtils.getMotion(this));
 			for (Entity entity : this.world.getEntitiesInAABBexcluding(this,
 			 this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ), EntitySelectors.getTeamCollisionPredicate(this))) {
-				if (entity.getEntityBoundingBox().grow(this.width * 0.5, this.height * 0.5, this.width * 0.5).calculateIntercept(vec1, vec2) != null) {
+				if (entity.getEntityBoundingBox().grow(this.width * 1.5, this.height * 1.5, this.width * 1.5).calculateIntercept(vec1, vec2) != null) {
 					this.collideWithEntity(entity);
 				}
 			}
-		}
+		}*/
 
 		@Override
 		protected void collideWithEntity(Entity entityIn) {
@@ -297,7 +300,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 50.0f;
 			}
 	
 			@Override

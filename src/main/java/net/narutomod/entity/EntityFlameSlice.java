@@ -73,7 +73,7 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public ItemJutsu.JutsuEnum.Type getJutsuType() {
-			return ItemJutsu.JutsuEnum.Type.RAITON;
+			return ItemJutsu.JutsuEnum.Type.KATON;
 		}
 
 		@Override
@@ -85,14 +85,14 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 					EntityLivingBase user = this.getUser();
 					if (user instanceof EntityPlayer && user.swingProgressInt == 1) {
 						this.world.spawnEntity(new EntitySweepParticle(user, 8.0f));
-						double d = ProcedureUtils.getReachDistance(user);
-						float damage = (float)ProcedureUtils.getModifiedAttackDamage(user) * this.getCooledAttackStrength(user, 0.5f);
+						double d = ProcedureUtils.getReachDistance(user)+4;
+						float damage = (float)ProcedureUtils.getModifiedAttackDamage(user) * this.getCooledAttackStrength(user, 0.5f)+ (1.75f*ItemJutsu.getDmgMult(user)*this.getCooledAttackStrength(user, 0.5f));
 						this.ticksSinceLastSwing = 0;
 						Entity directTarget = ProcedureUtils.objectEntityLookingAt(user, 4d, this).entityHit;
 						for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, user.getEntityBoundingBox().grow(d, 0.25D, d))) {
 							if (entity != user && entity != directTarget && !user.isOnSameTeam(entity) && user.getDistanceSq(entity) <= d * d) {
 								entity.knockBack(user, 0.5F, MathHelper.sin(user.rotationYaw * 0.017453292F), -MathHelper.cos(user.rotationYaw * 0.017453292F));
-								entity.attackEntityFrom(DamageSource.causePlayerDamage((EntityPlayer)user), damage);
+								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(entity,user), damage);
 								entity.setFire(15);
 							}
 						}
@@ -103,7 +103,7 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 					} else if (this.rand.nextFloat() < 0.05f) {
 						this.playSound(SoundEvents.BLOCK_FIRE_AMBIENT, 0.4f, this.rand.nextFloat() * 0.4f + 0.7f);
 					}
-					if (this.ticksExisted % 10 == 1 && !net.narutomod.Chakra.pathway(this.getUser()).consume(ItemKaton.FLAMESLICE.chakraUsage * 0.1d)) {
+					if (this.ticksExisted % 10 == 1 && !net.narutomod.Chakra.pathway(this.getUser()).consume(ItemKaton.FLAMESLICE.chakraUsage * 0.5d)) {
 						this.setDead();
 					}
 				}

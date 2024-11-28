@@ -50,18 +50,17 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 
+import net.narutomod.*;
 import net.narutomod.potion.PotionFeatherFalling;
 import net.narutomod.item.ItemSenjutsu;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.Particles;
-import net.narutomod.Chakra;
-import net.narutomod.NarutomodMod;
-import net.narutomod.ElementsNarutomodMod;
 
 import java.util.List;
 import io.netty.buffer.ByteBuf;
+
+import static net.narutomod.item.ItemSenjutsu.WOODBUDDHA;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
@@ -104,7 +103,12 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 			this.setSize(0.6f * MODELSCALE, 2.0f * MODELSCALE);
 			this.setSitting(true);
 			this.stepHeight = this.height / 3;
-			this.setHealth(this.getMaxHealth());
+
+			float health = (20+ (80*(ItemJutsu.getDmgMult(summonerIn)/63))) * PlayerTracker.getDefense(summonerIn);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*8+4000);
+
+			float ratio = summonerIn.getHealth()/summonerIn.getMaxHealth();
+			this.setHealth(this.getMaxHealth()*ratio);
 			this.chakraBurn = chakraUsagePerSec;
 		}
 
@@ -156,7 +160,6 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(500.0D);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(2.5D * MODELSCALE);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20000.0D);
 		}
 
 		private float getGrowth(float ageInTicks) {
@@ -234,6 +237,7 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 					List<Entity> list = this.getPassengers();
 					if (list.size() < 2 || !(list.get(1) instanceof EntityWoodGolem.EC)) {
 						EntityWoodGolem.EC entity = new EntityWoodGolem.EC(this.world);
+						entity.canTick = false;
 						entity.setLocationAndAngles(this.posX, this.posY, this.posZ, 0f, 0f);
 						entity.startRiding(this);
 						this.world.spawnEntity(entity);
@@ -264,6 +268,9 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 				 this.posZ + (this.rand.nextDouble()-0.5d) * this.width * 5,
 				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodspawn")),
 				 SoundCategory.BLOCKS, 2f, this.rand.nextFloat() * 0.6f + 0.6f);
+			}
+			if (!this.isSageModeActive(this.getSummoner())) {
+				this.setDead();
 			}
 			if (this.chakraBurn > 0.0d && this.ticksExisted % 20 == 19) {
 				EntityLivingBase summoner = this.getSummoner();
@@ -321,6 +328,9 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 				if (summoner != null) {
 					summoner.addPotionEffect(new PotionEffect(PotionFeatherFalling.potion, 60, 5));
 				}
+				float ratio = this.getHealth()/this.getMaxHealth();
+				this.getSummoner().setHealth(this.getSummoner().getMaxHealth()*ratio);
+
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:poof")), 2.0F, 1.0F);
 				Particles.spawnParticle(this.world, Particles.Types.SMOKE, this.posX, this.posY+this.height/2, this.posZ, 300,
 				 this.width * 0.5d, this.height * 0.3d, this.width * 0.5d, 0d, 0d, 0d, 0xD0FFFFFF, 20 + (int)(MODELSCALE * 5));
@@ -351,7 +361,7 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, 
 					 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:shinsusenju")),
 					 SoundCategory.PLAYERS, 5f, 1f);
-					entity.world.spawnEntity(new EC(entity, ItemSenjutsu.WOODBUDDHA.chakraUsage * 0.02d *
+					entity.world.spawnEntity(new EC(entity, WOODBUDDHA.chakraUsage * 0.01d *
 					 ((ItemSenjutsu.RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity)));
 					ItemJutsu.setCurrentJutsuCooldown(stack, 3600);
 					return true;
@@ -362,6 +372,18 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 			private static void dismountFrom1000Arms(EC entity) {
 				entity.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodspawn")), 5f, entity.getRNG().nextFloat() * 0.6f + 0.6f);
 				entity.setSitting(false);
+			}
+
+			private static void coolDown(EC entity, EntityLivingBase rider) {
+				if (rider instanceof EntityPlayer) {
+					ItemStack stack = ProcedureUtils.getMatchingItemStack(rider, ItemSenjutsu.block);
+					if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
+						ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
+						//int l = 30*20+entity.getTicksAlive()+entity.getTicksAlive()/2;
+						int l = 20*3;
+						item.setJutsuCooldown(stack, WOODBUDDHA, l);
+					}
+				}
 			}
 		}
 	}
@@ -444,6 +466,8 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 		public void onDismount(EntityMountEvent event) {
 			if (!event.getWorldObj().isRemote && event.getEntityBeingMounted() instanceof EC && event.isDismounting()) {
 				EC entity = (EC)event.getEntityBeingMounted();
+				EntityLivingBase rider = entity.getSummoner();
+				EC.Jutsu.coolDown(entity,rider);
 				if (entity.isSitting()) {
 					EC.Jutsu.dismountFrom1000Arms(entity);
 					event.setCanceled(true);

@@ -57,7 +57,7 @@ public class EntityWaterShockwave extends ElementsNarutomodMod.ModElement {
 		private final List<BlockPos> domeBlocks = Lists.<BlockPos>newArrayList();
 		private boolean shouldDie;
 		private int deathTicks;
-		private static final AttributeModifier SWIM_SPEED_MODIFIER = new AttributeModifier("watershockwave.swimspeed", 1.2d, 0);
+		private static final AttributeModifier SWIM_SPEED_MODIFIER = new AttributeModifier("watershockwave.swimspeed", 1.65d, 0);
 
 		public EC(World world) {
 			super(world);

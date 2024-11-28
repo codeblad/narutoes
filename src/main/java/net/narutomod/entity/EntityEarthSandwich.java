@@ -66,7 +66,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Integer> AGE = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private final float ogWidth = 0.875F;
 		private final float ogHeight = 0.375F;
-		private final int growTime = 30;
+		private final int growTime = 15;
 		private final Map<EntityLivingBase, Vec3d> caughtEntities = Maps.newHashMap();
 		private EntityLivingBase user;
 
@@ -155,7 +155,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 						 	Vec3d vec = entry.getValue();
 							entity.setPositionAndUpdate(vec.x, vec.y, vec.z);
 							if (age > this.growTime - 5) {
-								entity.attackEntityFrom(DamageSource.IN_WALL, age > this.growTime ? 3f : (f * f * 0.5f));
+								entity.attackEntityFrom(DamageSource.IN_WALL, 2f*ItemJutsu.getDmgMult(this.user));
 							}
 						} else if (!entity.isEntityAlive() || !entity.getEntityBoundingBox().intersects(this.getEntityBoundingBox())) {
 							iter.remove();
@@ -167,7 +167,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 					 this.posX, this.posY, this.posZ, (int)(f * f * 6f), this.width * 0.2, 0.5d, this.width * 0.2,
 					 0.15d, Block.getIdFromBlock(Blocks.DIRT));
 				}
-				if (age > 600) {
+				if (age > 100) {
 					this.setDead();
 				}
 			}
@@ -213,7 +213,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 150.0f;
+				return 60.0f;
 			}
 	
 			@Override

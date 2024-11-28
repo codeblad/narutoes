@@ -78,7 +78,8 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 			//this.defaultCooldownMap[HIDINGINMIST.index] = 0;
 			//this.defaultCooldownMap[WATERBULLET.index] = 0;
 		}
-	}
+
+	}
 
 	public static class EntityMist extends Entity implements ItemJutsu.IJutsu {
 		private static final UUID FOLLOW_MODIFIER = UUID.fromString("7c3e5536-e32d-4ef7-8cf2-e5ef57f9d48f");
@@ -99,13 +100,13 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 			this(world);
 			this.setPosition(x, y, z);
 			this.radius = r;
-			this.idleTime = this.buildTime + (world.containsAnyLiquid(new AxisAlignedBB(x-20, y-10, z-20, x+20, y+10, z+20)) ? 800 : 400);
+			this.idleTime = this.buildTime + (world.containsAnyLiquid(new AxisAlignedBB(x-20, y-10, z-20, x+20, y+10, z+20)) ? 200 : 100);
 			this.dissipateTime = this.idleTime + this.DISSIPATE;
 		}
 
 		public EntityMist(EntityLivingBase userIn) {
 			this(userIn.world, userIn.posX, userIn.posY, userIn.posZ,
-					userIn instanceof EntityPlayer ? Math.min(1.5d*((EntityPlayer)userIn).experienceLevel, 60d) : 32);
+					50);
 			this.user = userIn;
 		}
 
@@ -130,7 +131,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			if (!this.world.isRemote) {
-				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(this.radius+100))) {
+				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(this.radius+5))) {
 					if (entity.equals(this.user) && !(this.user instanceof EntityPlayer)) {
 						continue;
 					}

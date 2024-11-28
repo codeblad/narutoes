@@ -81,7 +81,8 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-		 .id(new ResourceLocation("narutomod", "hidan"), ENTITYID).name("hidan").tracker(64, 3, true).egg(-16777216, -6750157).build());
+		 .id(new ResourceLocation("narutomod", "hidan"), ENTITYID)
+.name("hidan").tracker(64, 3, true).egg(-16777216, -6750157).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityJashinSymbol.class)
 		 .id(new ResourceLocation("narutomod", "hidan_symbol"), ENTITYID_RANGED).name("hidan_symbol").tracker(64, 3, true).build());
 	}
@@ -212,7 +213,8 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 			this.tasks.addTask(7, new EntityAIWander(this, 0.5d));
 			this.tasks.addTask(8, new EntityAILookIdle(this));
 		}
-
+
+
 		@Override
 		protected void updateAITasks() {
 			ItemStack stack = this.getHeldItemMainhand();

@@ -771,7 +771,8 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				float maxhp = this.getMaxHealth();
 				if (hp > maxhp * 0.1f && this.isFaceDown()) {
 					this.setFaceDown(false);
-				} else if (hp <= maxhp * 0.1f && !this.isFaceDown()) {
+				}
+ else if (hp <= maxhp * 0.1f && !this.isFaceDown()) {
 					this.setFaceDown(true);
 				}
 				if (this.isAIDisabled() && jinchuriki != null && jinchuriki.getHealth() <= 0.0F) {
@@ -1153,7 +1154,8 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 	public static class NavigateGround extends PathNavigateGround {
 		protected Base baseEntity; 
 		private BlockPos targetPos;
-	    private int ticksAtLastPos;
+	
+    private int ticksAtLastPos;
 	    private Vec3d lastPosCheck = Vec3d.ZERO;
 
 		public NavigateGround(Base entityLivingIn, World worldIn) {

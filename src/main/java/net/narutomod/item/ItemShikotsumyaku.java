@@ -94,7 +94,8 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 				this.defaultCooldownMap[i] = 0;
 			}
 		}
-	}
+
+	}
 
 	public static class LarchDance implements ItemJutsu.IJutsuCallback {
 		@Override
@@ -211,7 +212,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 	public static class EntityBrackenDance extends EntitySpike.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 8;
 		private final float maxScale = 2.0f;
-		private final float damage = 20.0f;
+		private float damage = 6.0f;
 
 		public EntityBrackenDance(World worldIn) {
 			super(worldIn);
@@ -237,8 +238,10 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
 					if (!entity.equals(this.shootingEntity)) {
 						entity.hurtResistantTime = 10;
-						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
-						 this.damage * (1f - (float)(this.ticksAlive - 1) / this.growTime));
+						if (ticksAlive < 5) {
+							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
+									this.damage);
+						}
 					}
 				}
 			}
@@ -255,6 +258,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 					float f = MathHelper.sqrt(power * 9f / 5f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EntityBrackenDance entity1 = new EntityBrackenDance(entity, power);
+						entity1.damage = 6* ((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
 						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
 						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
@@ -276,7 +280,12 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 10.0f;
+				return 5.0f;
+			}
+
+			@Override
+			public float getMaxPower() {
+				return 100.0f;
 			}
 		}
 	}

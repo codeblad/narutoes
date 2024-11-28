@@ -111,7 +111,8 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 
 			public Punch(World world) {
 				this.blockDropChance = 0.1F;
-				this.griefing = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, null);
+				//this.griefing = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, null);
+				this.griefing = false;
 			}
 
 			@Override
@@ -148,9 +149,10 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 
 			@Override
 			protected float getBreakChance(BlockPos pos, Entity player, double range) {
-				return player instanceof EntityLivingBase && ((EntityLivingBase)player).getActivePotionEffect(potion).getIsAmbient()
+				return 0.0f;
+				/*return player instanceof EntityLivingBase && ((EntityLivingBase)player).getActivePotionEffect(potion).getIsAmbient()
 				 ? 1.0F - (float)((Math.sqrt(player.getDistanceSqToCenter(pos)) - 4.0D) / range)
-				 : 0.0F;
+				 : 0.0F;*/
 			}
 		}
 
@@ -165,7 +167,7 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 						EntityLivingBase target = event.getEntityLiving();
 						target.world.playSound(null, target.posX, target.posY, target.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE,
 						  SoundCategory.BLOCKS, 1.0F, (1.0F + (target.getRNG().nextFloat() - target.getRNG().nextFloat()) * 0.2F) * 0.7F);
-						new Punch(attacker.world).execute(attacker, (double)amplifier * 0.4d, 0.1d * amplifier);
+						new Punch(attacker.world).execute(attacker, MathHelper.clamp((double)amplifier * 0.4d,0.0d,50d), MathHelper.clamp(0.1d * amplifier,0.0d,50d));
 						event.setAmount(event.getAmount() + amplifier);
 					}
 				}

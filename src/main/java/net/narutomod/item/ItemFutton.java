@@ -57,7 +57,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 281;
 	public static final ItemJutsu.JutsuEnum MIST = new ItemJutsu.JutsuEnum(0, "futton_mist", 'S', 50d, new EntityBoilingMist.Jutsu());
-	public static final ItemJutsu.JutsuEnum STRENGTH = new ItemJutsu.JutsuEnum(1, "unrivaled_strength", 'S', 100d, new EntityUnrivaledStrength.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum STRENGTH = new ItemJutsu.JutsuEnum(1, "unrivaled_strength", 'S', 65d, new EntityUnrivaledStrength.EC.Jutsu());
 
 	public ItemFutton(ElementsNarutomodMod instance) {
 		super(instance, 600);
@@ -123,7 +123,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			this.user = userIn;
 			this.power = powerIn;
 			this.farRadius = width;
-			this.damagePerSec = 15;
+			this.damagePerSec = (int) (1.25*ItemJutsu.getDmgMult(userIn));
 			this.duration = (int)(powerIn * powerIn * 0.5f);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
 		}
@@ -193,7 +193,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				if (target instanceof EntityLivingBase) {
 					target.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1f, this.rand.nextFloat() + 0.5f);
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, 200, EntityBoilingMist.this.damagePerSec));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, 100, EntityBoilingMist.this.damagePerSec));
 				}
 			}
 
@@ -240,7 +240,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 30.0f;
+				return 20.0f;
 			}
 	
 			@Override

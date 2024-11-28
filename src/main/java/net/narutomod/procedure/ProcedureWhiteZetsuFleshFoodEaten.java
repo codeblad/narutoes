@@ -1,13 +1,6 @@
 package net.narutomod.procedure;
 
-import net.narutomod.item.ItemSuiton;
-import net.narutomod.item.ItemSharingan;
-import net.narutomod.item.ItemRinnegan;
-import net.narutomod.item.ItemNinjutsu;
-import net.narutomod.item.ItemMokuton;
-import net.narutomod.item.ItemMangekyoSharinganEternal;
-import net.narutomod.item.ItemDoton;
-import net.narutomod.item.ItemDojutsu;
+import net.narutomod.item.*;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -112,14 +105,15 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 							: false)))
 					&& (entity.isEntityAlive()))) {
 				if ((world.getGameRules().getBoolean("keepInventory") || world.getGameRules().getBoolean("keepNinjaXp"))) {
-					flag = (boolean) (Math.random() < 0.01);
+					flag = (boolean) (Math.random() < 0.25);
 				} else {
-					flag = (boolean) (Math.random() < 0.1);
+					flag = (boolean) (Math.random() < 0.25);
 				}
 				if ((flag)) {
 					if (entity instanceof EntityPlayer) {
 						ItemStack _setstack = new ItemStack(ItemMokuton.block, (int) (1));
 						_setstack.setCount(1);
+						((ItemJutsu.Base)_setstack.getItem()).setIsAffinity(_setstack,true);
 						ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack);
 					}
 					if (((entity instanceof EntityPlayer)

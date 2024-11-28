@@ -27,7 +27,7 @@ import net.narutomod.ElementsNarutomodMod;
 public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 241;
 	public static final int ENTITYID_RANGED = 242;
-	private static final float BASE_DAMAGE = 30f;
+	private static final float BASE_DAMAGE = 3f;
 
 	public EntityFalseDarkness(ElementsNarutomodMod instance) {
 		super(instance, 568);
@@ -43,6 +43,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		private EntityLivingBase user;
 		private EntityLivingBase target;
 		private float power;
+
 
 		public EC(World world) {
 			super(world);
@@ -71,7 +72,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY + this.user.getEyeHeight() - 0.2d, this.user.posZ);
-				int buildtime = (int)(this.power * 20f);
+				int buildtime = (int)(20* (1+2*(this.power/20)));
 				if (this.ticksExisted <= buildtime) {
 					float f = Math.min((float)this.ticksExisted / buildtime, 1.0f);
 					if (this.rand.nextFloat() <= f * 0.2f) {
@@ -90,13 +91,14 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 					 SoundEvents.ENTITY_LIGHTNING_IMPACT, SoundCategory.WEATHER, 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, this.getPositionVector(), 
 					 this.target.getPositionEyes(1f), 0x000000FF, 40, 0f);
-					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.user), BASE_DAMAGE * this.power, this.user);
+					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.user), (BASE_DAMAGE * (1+1*(this.power/20))) *ItemJutsu.getDmgMult(this.user), this.user);
 					this.world.spawnEntity(entity);
 					this.setDead();
 				}
 			} else if (!this.world.isRemote) {
 				this.setDead();
 			}
+
 		}
 
 		@SideOnly(Side.CLIENT)
@@ -117,7 +119,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 20d, 3d);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 80d, 3d);
 				if (res != null && res.entityHit instanceof EntityLivingBase) {
 					entity.world.spawnEntity(new EC(entity, (EntityLivingBase)res.entityHit, power));
 					return true;
@@ -127,7 +129,13 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 150.0f;
+				return 60.0f;
+			}
+
+
+			@Override
+			public float getMaxPower() {
+				return 20.0f;
 			}
 		}
 	}

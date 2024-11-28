@@ -140,10 +140,10 @@ public class ProcedureRinneganHelmetTickEvent extends ElementsNarutomodMod.ModEl
 								ProcedureUtils.rngBoolean() ? ItemNinjutsu.LIMBOCLONE : ItemNinjutsu.AMENOTEJIKARA, true);
 					}
 				}
-				if (((entity.ticksExisted % 20) == 2)) {
+				/*if (((entity.ticksExisted % 20) == 2)) {
 					if (entity instanceof EntityLivingBase)
 						((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, (int) 22, (int) 2, (false), (false)));
-				}
+				}*/
 				if (entity.equals(EntityTenTails.getBijuManager().getJinchurikiPlayer())) {
 					{
 						ItemStack _stack = (itemstack);

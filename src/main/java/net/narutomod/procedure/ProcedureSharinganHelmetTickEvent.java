@@ -91,8 +91,8 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 		if ((!((itemstack).hasTagCompound() && (itemstack).getTagCompound().getBoolean("sharingan_blinded")))) {
 			not_my_sharingan = (boolean) !((ItemDojutsu.Base) itemstack.getItem()).isOwner(itemstack, (EntityLivingBase) entity);;
 			if ((not_my_sharingan)) {
-				if (((((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).experienceLevel : 0) < 10)
-						|| ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) < 300))) {
+				if ((
+						((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) < 300))) {
 					if ((!(world.isRemote))) {
 						if (entity instanceof EntityPlayer) {
 							ItemStack _setstack = (itemstack);
@@ -139,6 +139,7 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 					}
 				}
 			}
+			//MANGENKYO OBTAINMENT METHOD
 			if ((((itemstack).getItem() == new ItemStack(ItemSharingan.helmet, (int) (1)).getItem())
 					&& ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 1000))) {
 				if ((PlayerTracker.Deaths.hasRecentNearby((EntityPlayer) entity, 40D, 6000D) && (!(world.isRemote)))) {
@@ -185,7 +186,7 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 			}
 		} else {
 			if (entity instanceof EntityLivingBase)
-				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 1200, (int) 0, (false), (false)));
+				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 22, (int) 0, (false), (false)));
 			if ((entity.getEntityData().getBoolean("susanoo_activated"))) {
 				{
 					Map<String, Object> $_dependencies = new HashMap<>();

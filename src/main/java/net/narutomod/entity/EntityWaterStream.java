@@ -30,7 +30,8 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 
 import com.google.common.collect.ImmutableMap;
-
+
+
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 439;
@@ -121,7 +122,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				target.extinguish();
 				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player),
-						EC.this.power * EC.this.damageModifier);
+						(1.25f* (1+2*(EC.this.power/30)) * EC.this.damageModifier)*ItemJutsu.getDmgMult(player));
 			}
 
 			@Override
@@ -166,7 +167,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 20.0f;
+				return 10.0f;
 			}
 	
 			@Override

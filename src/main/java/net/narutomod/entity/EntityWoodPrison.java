@@ -80,6 +80,7 @@ public class EntityWoodPrison extends ElementsNarutomodMod.ModElement {
 		private BlockPos blockpos;
 		private int radius;
 		private int tHeight;
+		private Entity owner;
 
 		public EC(World worldIn) {
 			super(worldIn);
@@ -87,12 +88,13 @@ public class EntityWoodPrison extends ElementsNarutomodMod.ModElement {
 			this.isImmuneToFire = false;
 		}
 
-		public EC(World worldIn, Vec3d targetVecIn, float power) {
+		public EC(World worldIn, Vec3d targetVecIn, float power, Entity entity) {
 			this(worldIn);
 			this.setPosition(targetVecIn.x, targetVecIn.y, targetVecIn.z);
 			this.blockpos = new BlockPos(targetVecIn);
 			this.radius = MathHelper.ceil(power * 0.5f);
 			this.tHeight = MathHelper.ceil(power - 0.5f);
+			this.owner = entity;
 		}
 
 		@Override
@@ -105,8 +107,10 @@ public class EntityWoodPrison extends ElementsNarutomodMod.ModElement {
 				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class,
 				 new AxisAlignedBB(this.posX - this.radius, this.posY, this.posZ - this.radius, 
 				 this.posX + this.radius, this.posY + this.tHeight, this.posZ + this.radius))) {
-				 	entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 100, 3, false, false));
-					entity.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 1200, 2, false, false));
+					if (entity != this.owner) {
+						entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 100, 3, false, false));
+						entity.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 1200, 2, false, false));
+					}
 				}
 				Map<BlockPos, IBlockState> map = Maps.newHashMap();
 				for (BlockPos pos : Iterables.concat(BlockPos.getAllInBoxMutable(this.blockpos.add(-this.radius, -3, -this.radius), this.blockpos.add(-this.radius, this.tHeight, this.radius)),
@@ -149,7 +153,7 @@ public class EntityWoodPrison extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				RayTraceResult result = ProcedureUtils.raytraceBlocks(entity, Math.max(2d * power, 20d));
 				if (result != null && result.typeOfHit != RayTraceResult.Type.MISS) {
-					entity.world.spawnEntity(new EC(entity.world, result.hitVec, power));
+					entity.world.spawnEntity(new EC(entity.world, result.hitVec, power, entity));
 					return true;
 				}
 				return false;
@@ -165,5 +169,6 @@ public class EntityWoodPrison extends ElementsNarutomodMod.ModElement {
 				return 40.0f;
 			}
 		}
-	}
+
+	}
 }

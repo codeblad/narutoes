@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.io.IOException;
 import com.google.common.collect.Maps;
 
+
 @ElementsNarutomodMod.ModElement.Tag
 public class GuiNinjaScroll extends ElementsNarutomodMod.ModElement {
 	private static Map<Integer, GuiContainerMod> guiMap = Maps.<Integer, GuiContainerMod>newHashMap();
@@ -95,9 +96,9 @@ public class GuiNinjaScroll extends ElementsNarutomodMod.ModElement {
 				} else if (player.getHeldItemOffhand().getMaxDamage() == 1) {
 					player.getHeldItemOffhand().shrink(1);
 				}
-				if (!ProcedureUtils.advancementAchieved((EntityPlayerMP)player, "narutomod:learned_1st_jutsu")) {
+				/*if (!ProcedureUtils.advancementAchieved((EntityPlayerMP)player, "narutomod:learned_1st_jutsu")) {
 					ProcedureUtils.grantAdvancement((EntityPlayerMP)player, "narutomod:learned_1st_jutsu", true);
-				}
+				}*/
 			}
 		}
 	}
@@ -185,6 +186,7 @@ public class GuiNinjaScroll extends ElementsNarutomodMod.ModElement {
 
 	public static ItemStack enableJutsu(EntityPlayer player, ItemJutsu.Base item, ItemJutsu.JutsuEnum jutsu, boolean enable) {
 		ItemStack stack = ProcedureUtils.getMatchingItemStack(player, item);
+		PlayerTracker.addBattleXp(player, 1);
 		if (stack == null && PlayerTracker.isNinja(player) && enable) {
 			stack = new ItemStack(item, 1);
 			((ItemJutsu.Base)stack.getItem()).setOwner(stack, player);

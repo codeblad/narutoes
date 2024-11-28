@@ -68,6 +68,8 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 		private float fullScale;
 		private Entity target;
 		private float health;
+		public float power;
+		public float dmg = 8f;
 		
 		public EC(World a) {
 			super(a);
@@ -83,6 +85,8 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 			this.setEntityScale(0.2f);
 			this.fullScale = power;
 			this.health = power * 20f;
+			this.power = power;
+			this.dmg = dmg*(1+2*(power/5));
 			this.setWaterSlowdown(1.0f);
 			this.isImmuneToFire = true;
 		}
@@ -153,14 +157,14 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 					}
 				} else {
 					if (this.target != null) {
-						Vec3d vec = this.target.getPositionEyes(1f).subtract(this.getPositionVector());
-						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.95f : 0.9f, 0f);
+						Vec3d vec = this.target.getPositionEyes(1f).subtract(this.getPositionVector()).subtract(0,this.target.getEyeHeight()/2,0);
+						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.98f : 0.95f, 0f);
 					} else {
 						this.target = this.shootingEntity instanceof EntityLiving ? ((EntityLiving)this.shootingEntity).getAttackTarget()
 						 : ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 50d, 3d, this).entityHit;
 						Vec3d vec = this.target != null ? this.target.getPositionEyes(1f).subtract(this.getPositionVector())
 						 : this.shootingEntity.getLookVec();
-						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.95f : 0.9f, 0f);
+						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.98f : 0.95f, 0f);
 					}
 					if (this.ticksAlive <= this.wait + this.mouthOpenTime) {
 						this.setMOA((float)(this.ticksAlive - this.wait) / this.mouthOpenTime);
@@ -209,14 +213,14 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 				 || (result.entityHit != null && result.entityHit.equals(this.target))) {
 					float size = this.getEntityScale();
 					ProcedureAoeCommand.set(this, 0.0D, size).exclude(this.shootingEntity)
-					  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), size * (this.isInWater() ? 24f : 16f));
+					  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (dmg * (this.isInWater() ? 2f : 1f))*ItemJutsu.getDmgMult(this.shootingEntity));
 					this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, size * 2.0F, false,
 					  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
-					Map<BlockPos, IBlockState> map = Maps.newHashMap();
+					/*Map<BlockPos, IBlockState> map = Maps.newHashMap();
 					for (BlockPos pos : ProcedureUtils.getAllAirBlocks(this.world, this.getEntityBoundingBox().contract(0d, this.height-1, 0d))) {
 						map.put(pos, Blocks.FLOWING_WATER.getDefaultState().withProperty(BlockLiquid.LEVEL, Integer.valueOf(1)));
 					}
-					new net.narutomod.event.EventSetBlocks(this.world, map, 0, 10, false, false);
+					new net.narutomod.event.EventSetBlocks(this.world, map, 0, 10, false, false);*/
 					this.setDead();
 				}
 			}
@@ -275,7 +279,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 150.0f;
+				return 100.0f;
 			}
 	
 			@Override

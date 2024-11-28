@@ -25,6 +25,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.init.MobEffects;
 
+import net.narutomod.item.ItemJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.gui.overlay.OverlayChakraDisplay;
@@ -210,7 +211,7 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		protected void resetMax() {
-			this.setMax(PlayerTracker.getBattleXp(this.user) * 0.5d);
+			this.setMax(500d + 15000*(ItemJutsu.getDmgMult(this.user)/63));
 		}
 
 		@Override
@@ -243,14 +244,20 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 			 || !this.user.onGround || this.user.isSwingInProgress) {
 			 	this.motionlessTime = 0;
 			}
-			if (this.motionlessTime > 80) {
-				this.consume(-ModConfig.CHAKRA_REGEN_RATE - 0.001f * this.user.getFoodStats().getSaturationLevel());
+			if (this.motionlessTime > 20 && this.user.isSneaking() && !this.user.isAirBorne) {
+				this.consume((-ModConfig.CHAKRA_REGEN_RATE - 0.001f )*10);
+				//* this.user.getFoodStats().getSaturationLevel()
 			}
-			double d = PlayerTracker.getBattleXp(this.user) * 0.5d;
+			//double d = 500d + PlayerTracker.getBattleXp(this.user) * 0.1d;
+			double d = 500d + 15000*(ItemJutsu.getDmgMult(this.user)/63);
 			if (d != this.getMax() || this.forceSync) {
 				this.forceSync = false;
 				this.setMax(d);
 				this.sendToClient();
+			}
+			if (!this.user.getEntityData().getBoolean("chakraSpawn")) {
+				this.user.getEntityData().setBoolean("chakraSpawn",true);
+				this.set(d);
 			}
 			this.prevX = this.user.posX;
 			this.prevZ = this.user.posZ;
@@ -280,7 +287,7 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 						Pathway p = playerMap.get(event.player);
 						if (p != null) {
 							p.onUpdate();
-						} else if (event.player.experienceLevel >= 10) {
+						} else {
 							pathway(event.player);
 						}
 					}
@@ -302,7 +309,7 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 	
 			@SubscribeEvent
 			public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-				if (!event.player.world.isRemote && PlayerTracker.isNinja(event.player) && event.player.experienceLevel >= 10) {
+				if (!event.player.world.isRemote && PlayerTracker.isNinja(event.player)) {
 					pathway(event.player);
 				}
 			}

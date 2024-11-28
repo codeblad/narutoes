@@ -41,6 +41,7 @@ import net.narutomod.PlayerTracker;
 import net.narutomod.Particles;
 import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
+import org.lwjgl.input.Keyboard;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -56,16 +57,17 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	public static final double BXP_REQUIRED_L2 = 10000.0d;
 	public static final double BXP_REQUIRED_L3 = 20000.0d;
 	public static final double BXP_REQUIRED_L4 = 40000.0d;
-	protected double chakraUsage = 30d; // per second
+	protected double chakraUsage = 10d; // per second
 	protected double chakraUsageModifier = 2d;
 	protected double playerXp;
-	
+	public float jumpPower = 0;
+
 	public EntitySusanooBase(World world) {
 		super(world);
 		this.experienceValue = 5;
 		this.isImmuneToFire = true;
 		//this.noClip = true;
-		this.stepHeight = 0.5F;
+		this.stepHeight = 1.0F;
 		this.setNoAI(true);
 		this.enablePersistence();
 		this.tasks.addTask(1, new EntityAILookIdle(this));
@@ -77,7 +79,9 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		this.setOwnerPlayer(player);
 		if (player instanceof EntityPlayer) {
 			this.playerXp = PlayerTracker.getBattleXp((EntityPlayer)player);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(MathHelper.sqrt(this.playerXp));
+			float health = (20+ (80*(ItemJutsu.getDmgMult(player)/63))) * PlayerTracker.getDefense(player);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2+100);
+			//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(MathHelper.sqrt(this.playerXp));
 			 //.applyModifier(new AttributeModifier("susanoo.health", 2d * ((EntityPlayer)player).experienceLevel, 0));
 			//this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
 			 //.applyModifier(new AttributeModifier("susanoo.damage", ((EntityPlayer)player).experienceLevel, 0));
@@ -93,7 +97,8 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 			}
 		}
 		//this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(ProcedureUtils.getModifiedSpeed(player) * 0.3d);
-		this.setHealth(this.getMaxHealth());
+		float ratio = player.getHealth()/player.getMaxHealth();
+		this.setHealth(this.getMaxHealth()*ratio);
 		this.setAlwaysRenderNameTag(false);
 		player.startRiding(this);
 	}
@@ -149,7 +154,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
 		this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
 		//this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100.0D);
-		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.1D);
+		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
 		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(100.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0D);
@@ -253,7 +258,30 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 				this.setAIMoveSpeed((float) this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
 				float forward = ((EntityLivingBase) entity).moveForward;
 				float strafe = ((EntityLivingBase) entity).moveStrafing;
-				super.travel(strafe, 0.0F, forward);
+				float terminal = -200f;
+				if (this.getEntityData().getBoolean("winged")) {
+					terminal = 0;
+				}
+				if (this.onGround) {
+					this.jumpPower = 0;
+				}
+				/*
+				if (Keyboard.isKeyDown(Keyboard.KEY_SPACE) && this.onGround) {
+					this.jumpPower = 10f;
+				}
+				 */
+				// susanoo jump here
+				if (this.onGround && this.rotationPitch < -30 && terminal != 0) {
+					this.jumpPower = 10f;
+				}
+				if (this.jumpPower >= 0 && !this.onGround) {
+					this.jumpPower-= 1.6f;
+				}
+				if (this.jumpPower < terminal) {
+					this.jumpPower = terminal;
+				}
+
+				super.travel(strafe, this.jumpPower, forward);
 			}
 		} else {
 			this.jumpMovementFactor = 0.02F;
@@ -290,7 +318,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 
 	@Override
 	public double getMountedYOffset() {
-		return 0.35D;
+		return 0.5D;
 	}
 
 	@Override
@@ -356,6 +384,15 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	}
 
 	@Override
+	public void setDead() {
+		super.setDead();
+		if (!this.world.isRemote && this.getOwnerPlayer() != null) {
+			float ratio = this.getHealth()/this.getMaxHealth();
+			this.getOwnerPlayer().setHealth(this.getOwnerPlayer().getMaxHealth()*ratio);
+		}
+	}
+
+	@Override
 	public void onLivingUpdate() {
 		EntityLivingBase ownerPlayer = this.getOwnerPlayer();
 		boolean flag = ownerPlayer instanceof EntityPlayer;
@@ -385,9 +422,11 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		
 		this.clampMotion(0.05D);
 
-		if (this.ticksExisted % 30 == 0) {
+		if (this.ticksExisted % 30 == 0)
+ {
 			this.playSound(net.minecraft.util.SoundEvent.REGISTRY
-			 .getObject(new ResourceLocation("block.fire.ambient")), 1.0F, this.rand.nextFloat() * 0.7F + 0.3F);
+			 .getObject(new ResourceLocation("block.fire.ambient")),
+ 1.0F, this.rand.nextFloat() * 0.7F + 0.3F);
 		}
 		for (int i = 0; i < (int) this.height; i++) {
 			double d0 = this.posX + (this.rand.nextFloat() - 0.5D) * this.width;

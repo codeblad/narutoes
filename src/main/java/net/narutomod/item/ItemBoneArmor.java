@@ -33,6 +33,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
+import net.narutomod.Chakra;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -56,9 +57,10 @@ public class ItemBoneArmor extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		UUID damageUuid = UUID.fromString("5b347d9c-9d09-4e9a-96bd-992364981042");
-		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("BONE_ARMOR", "narutomod:sasuke_", 20,
-		 new int[]{2, 5, 20, 2}, 0, net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")), 5f);
+		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("BONE_ARMOR", "narutomod:sasuke_", 10000,
+		 new int[]{2, 5, 10, 2}, 0, net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")), 5f);
 		elements.items.add(() -> new ItemArmor(enuma, 0, EntityEquipmentSlot.CHEST) {
+			private double willowDamage = 15d;
 			@SideOnly(Side.CLIENT)
 			private ModelBiped armorModel;
 
@@ -78,8 +80,10 @@ public class ItemBoneArmor extends ElementsNarutomodMod.ModElement {
 			public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
 				Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
 				if (slot == EntityEquipmentSlot.CHEST && isWillowActive(stack)) {
+
 					multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
-					 new AttributeModifier(damageUuid, "shikotsumyaku.damage", 15.0d, 0));
+
+					 new AttributeModifier(damageUuid, "shikotsumyaku.damage", this.willowDamage, 0));
 				}
 				return multimap;
 			}
@@ -94,7 +98,16 @@ public class ItemBoneArmor extends ElementsNarutomodMod.ModElement {
 					itemstack.shrink(1);
 				} else if (!world.isRemote && entity.ticksExisted % 20 == 3) {
 					EntityLivingBase living = (EntityLivingBase)entity;
-					living.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, isLarchActive(itemstack) ? 3 : 2, false, false));
+					if (isLarchActive(itemstack)) {
+						if (!Chakra.pathway((EntityLivingBase) entity).consume(10d)) {
+							setLarchActive(itemstack,false);
+						}
+					}
+					if (isWillowActive(itemstack)) {
+						Chakra.pathway((EntityLivingBase) entity).consume(5d);
+						this.willowDamage = 10d + ItemJutsu.getDmgMult(entity);
+					}
+					//living.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, isLarchActive(itemstack) ? 3 : 2, false, false));
  				}
 			}
 

@@ -500,7 +500,10 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 			if (level < 3) {
 				ItemBijuCloak.setWearingTicks(this.jinchurikiPlayer, 0);
 			}
-			this.cloakCD += i + (int)((float)level * 2f * i / Math.max(MathHelper.sqrt(MathHelper.sqrt((float)this.cloakXp[level-1])) - 3f, 1f));
+			if (level == 3) {
+				long l = this.jinchurikiPlayer.world.getTotalWorldTime();
+				this.cloakCD = l+(i+i/2)+30*20;
+			}
 			this.markDirty();
 		}
 	}
@@ -529,14 +532,6 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 			Chakra.Pathway cp = Chakra.pathway(this.jinchurikiPlayer);
 			int i = this.cloakLevel <= 0 ? 1 : 0;
 			if (i == 1) {
-				long l = this.jinchurikiPlayer.world.getTotalWorldTime();
-				if (l < this.cloakCD && !this.jinchurikiPlayer.isCreative()) {
-					if (!this.jinchurikiPlayer.world.isRemote) {
-						this.jinchurikiPlayer.sendStatusMessage(
-						 new TextComponentTranslation("chattext.cooldown.formatted", (this.cloakCD - l) / 20L), true);
-					}
-					return;
-				}
 				if (ItemSenjutsu.isSageModeActivated(this.jinchurikiPlayer) && this.cloakXp[1] < 800) {
 					ItemSenjutsu.deactivateSageMode(this.jinchurikiPlayer);
 				}
@@ -550,7 +545,6 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 				d1 = d <= d1 || this.jinchurikiPlayer.isCreative() ? d : d1;
 				this.chakraBeforeCloak = cp.getAmount();
 				cp.consume(-d1, true);
-				this.cloakCD = l;
 				if (this.jinchurikiPlayer.inventory.armorInventory.get(3).getItem() != ItemBijuCloak.helmet) {
 					ItemStack stack = new ItemStack(ItemBijuCloak.helmet);
 					stack.setTagCompound(new NBTTagCompound());
@@ -607,11 +601,24 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 			this.cloakLevel = 3;
 		}
 		if (this.cloakLevel == 3 && this.jinchurikiPlayer != null) {
+			long l = this.jinchurikiPlayer.world.getTotalWorldTime();
+			if (l < this.cloakCD && !this.jinchurikiPlayer.isCreative()) {
+				if (!this.jinchurikiPlayer.world.isRemote) {
+					this.jinchurikiPlayer.sendStatusMessage(
+							new TextComponentTranslation("chattext.cooldown.formatted", (this.cloakCD - l) / 20L), true);
+				}
+				this.cloakLevel = 2;
+				double d = 5000d + this.getCloakXp();
+				Chakra.Pathway chakra = Chakra.pathway(this.jinchurikiPlayer);
+				chakra.consume(d, true);
+				return this.cloakLevel;
+			}
 			ItemBijuCloak.clearCloakItems(this.jinchurikiPlayer);
 			T biju = this.spawnEntity(this.jinchurikiPlayer);
 			if (biju != null) {
-				biju.setLifeSpan(this.cloakXp[2] * 5 + 200);
+				biju.setLifeSpan(this.cloakXp[2] * 5 + 2400);
 			}
+			this.cloakCD = l+120;
 		}
 		return this.cloakLevel;
 	}

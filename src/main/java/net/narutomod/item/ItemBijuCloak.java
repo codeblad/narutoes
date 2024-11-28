@@ -311,9 +311,9 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 			if (entity.getHealth() < entity.getMaxHealth() && entity.getHealth() > 0.0f) {
 				entity.heal((float)level * 2);
 			}
-			if (level == 2) {
+			/*if (level == 2) {
 				entity.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, 2, false, false));
-			}
+			}*/
 		}
 		if (!entity.world.isRemote && entity instanceof EntityPlayer) {
 			NBTTagCompound compound = entity.getEntityData().hasKey("lungeAttackData") ? entity.getEntityData().getCompoundTag("lungeAttackData") : new NBTTagCompound();

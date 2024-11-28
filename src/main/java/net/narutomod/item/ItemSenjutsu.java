@@ -79,7 +79,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum SAGEMODE = new ItemJutsu.JutsuEnum(0, "tooltip.senjutsu.sagemode", 'S', 10d, new SageMode());
 	public static final ItemJutsu.JutsuEnum RASENGAN = new ItemJutsu.JutsuEnum(1, "tooltip.senjutsu.rasengan", 'S', ItemNinjutsu.RASENGAN.chakraUsage, new EntityRasengan.EC.SageModeVariant());
 	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(2, "tooltip.senjutsu.rasenshuriken", 'S', ItemFuton.RASENSHURIKEN.chakraUsage, new EntityRasenshuriken.EC.SageModeVairant());
-	public static final ItemJutsu.JutsuEnum WOODBUDDHA = new ItemJutsu.JutsuEnum(3, "buddha_1000", 'S', 5000d, new EntityBuddha1000.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum WOODBUDDHA = new ItemJutsu.JutsuEnum(3, "buddha_1000", 'S', 3000d, new EntityBuddha1000.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SNAKE8H = new ItemJutsu.JutsuEnum(4, "snake_8_heads", 'S', 3000d, new EntitySnake8Heads.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum GAMARINSHO = new ItemJutsu.JutsuEnum(5, "gamarinsho", 'S', 3000d, new EntityGamarinsho.EC.Jutsu());
 	private static final Random RAND = new Random();
@@ -224,7 +224,8 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int timeLeft) {
 			ItemJutsu.JutsuEnum jutsu = this.getCurrentJutsu(stack);
-			if (!player.world.isRemote && jutsu == SAGEMODE && !(player.getRidingEntity() instanceof EntitySitPlatform)) {
+			if (!player.world.isRemote && jutsu == SAGEMODE
+ && !(player.getRidingEntity() instanceof EntitySitPlatform)) {
 				player.resetActiveHand();
 				return;
 			}
@@ -236,7 +237,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 			ItemStack stack = entity.getHeldItem(hand);
 			ItemJutsu.JutsuEnum jutsu = this.getCurrentJutsu(stack);
 			if (jutsu == SAGEMODE && isSageModeActivated(stack)) {
-				//deactivateSageMode(stack, entity);
+				deactivateSageMode(stack, entity);
 				return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
 			}
 			if (jutsu != SAGEMODE && !isSageModeActivated(stack)) {
@@ -372,15 +373,15 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 			if (power >= 100.0f) {
 				Chakra.Pathway cp = Chakra.pathway(entity);
 				stack.getTagCompound().setDouble(SAGECHAKRADEPLETIONAMOUNT, cp.getAmount());
-				float f = stack.getItem() == block && ((RangedItem)stack.getItem()).getCurrentJutsu(stack) == SAGEMODE
-				 ? ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) : 1.0f;
-				cp.consume(-0.6f / f, true);
+				float f = stack.getItem() == block && ((RangedItem)stack.getItem()).getCurrentJutsu(stack) == SAGEMODE ? ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) : 1.0f;
+				cp.consume(-0.5f / f, true);
 				stack.getTagCompound().setBoolean(SAGEMODEACTIVATEDKEY, true);
 				if (entity instanceof EntityPlayerMP) {
 					OverlayChakraDisplay.ShowFlamesMessage.send((EntityPlayerMP)entity, true);
 				}
 				return true;
 			}
+			stack.getTagCompound().setBoolean(SAGEMODEACTIVATEDKEY, false);
 			return false;
 		}
 
@@ -396,7 +397,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 	
 		@Override
 		public float getPowerupDelay() {
-			return 20.0f;
+			return 5.0f;
 		}
 	
 		@Override

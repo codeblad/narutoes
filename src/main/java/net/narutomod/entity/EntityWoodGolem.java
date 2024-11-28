@@ -1,6 +1,9 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraftforge.event.entity.EntityMountEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -32,6 +35,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 
+import net.narutomod.PlayerTracker;
+import net.narutomod.item.ItemSenjutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemMokuton;
 import net.narutomod.item.ItemJutsu;
@@ -40,6 +45,9 @@ import net.narutomod.ElementsNarutomodMod;
 
 import com.google.common.collect.Lists;
 import java.util.List;
+
+import static net.narutomod.item.ItemMokuton.GOLEM;
+import static net.narutomod.item.ItemSenjutsu.WOODBUDDHA;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
@@ -61,6 +69,13 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 		protected final int growTime = 30;
 		private List<BlockPos> particleArea;
 		private double chakraBurn;
+		public boolean canTick = true;
+
+		@Override
+		public float getAIMoveSpeed() {
+			return 0.5f;
+		}
+
 
 		public EC(World world) {
 			super(world);
@@ -77,8 +92,10 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 			this.setOwnerCanSteer(true, 1.0F);
 			this.stepHeight = this.height / 3;
 			Chakra.Pathway cp = Chakra.pathway(summonerIn);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(Chakra.getLevel(summonerIn) * 50d);
-			this.setHealth(this.getMaxHealth());
+			float health = (20+ (80*(ItemJutsu.getDmgMult(summonerIn)/63))) * PlayerTracker.getDefense(summonerIn);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*5);
+			float ratio = summonerIn.getHealth()/summonerIn.getMaxHealth();
+			this.setHealth(this.getMaxHealth()*ratio);
 			this.chakraBurn = chakraUsagePerSec;
 		}
 
@@ -118,8 +135,32 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void setDead() {
+			super.setDead();
+			if (!this.world.isRemote) {
+				if (this.canTick && this.getSummoner() != null) {
+					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getSummoner(), ItemMokuton.block);
+					if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
+						ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
+						float ratio = this.getHealth()/this.getMaxHealth();
+						this.getSummoner().setHealth(this.getSummoner().getMaxHealth()*ratio);
+						//(30*20)+this.ticksExisted+this.ticksExisted/2
+						item.setJutsuCooldown(stack, GOLEM, 20*3);
+					}
+				}
+			}
+		}
+
+		@Override
 		public void onUpdate() {
 			super.onUpdate();
+			/*if (this.canTick) {
+				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getSummoner(), ItemMokuton.block);
+				if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
+					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
+					item.setJutsuCooldown(stack, GOLEM, 100+this.ticksExisted);
+				}
+			}*/
 			if (this.ticksExisted <= this.growTime) {
 				if (this.particleArea == null) {
 					this.particleArea = ProcedureUtils.getNonAirBlocks(this.world, 
@@ -155,8 +196,9 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, 
 					 (net.minecraft.util.SoundEvent)net.minecraft.util.SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:mokujin_no_jutsu")), SoundCategory.PLAYERS, 1, 1f);
-					entity.world.spawnEntity(new EC(entity, ItemMokuton.GOLEM.chakraUsage * 0.05d *
+					entity.world.spawnEntity(new EC(entity, GOLEM.chakraUsage * 0.01d *
 					 ((ItemMokuton.ItemCustom)stack.getItem()).getCurrentJutsuXpModifier(stack, entity)));
+					ItemJutsu.setCurrentJutsuCooldown(stack, 500);
 					return true;
 				}
 				return false;

@@ -56,6 +56,12 @@ public class ModConfig extends ElementsNarutomodMod.ModElement {
 	@Config.Comment("Ninja XP gain multiplier (higher value gains NinjaXp faster. default=0.5)")
 	public static double NINJAXP_MULTIPLIER = 0.5D;
 
+	@Config.Comment("Max NinjaXP attainable (default = 100000.0")
+	public static double MAX_NINJAXP = 100000.0D;
+
+	@Config.Comment("Jutsu XP gain multiplier (higher value gains NinjaXp faster. default=1)")
+	public static int JUTSUXP_MULTIPLIER = 1;
+
 	public ModConfig(ElementsNarutomodMod instance) {
 		super(instance, 837);
 	}

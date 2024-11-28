@@ -63,10 +63,12 @@ public class ProcedureBasicNinjaSkills extends ElementsNarutomodMod.ModElement {
 			} else {
 				if ((!((world.getBlockState(new BlockPos((int) Math.floor((entity.posX)), (int) (entity.posY), (int) Math.floor((entity.posZ)))))
 						.getBlock() == BlockMud.block.getDefaultState().getBlock()))) {
-					entity.motionY = 0.6d - (world.getBlockState(r.getBlockPos()).getBlock().slipperiness - 0.6) * 2;
+					// wall climbing
+					entity.motionY = 0.85d - (world.getBlockState(r.getBlockPos()).getBlock().slipperiness - 0.6) * 2;
 				}
 			}
 		}
+		// fall reduction
 		if (entity.fallDistance > 4f)
 			entity.fallDistance -= 0.75f;
 	}

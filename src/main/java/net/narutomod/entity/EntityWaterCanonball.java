@@ -56,7 +56,8 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 		private float fullScale = 1f;
 		private final int timeToFullscale = 20;
 		private int explosionSize;
-		private float damage;
+		private float damage = 4;
+		private float mult = 1;
 		
 		public EC(World a) {
 			super(a);
@@ -69,7 +70,8 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 			this.setEntityScale(0.1f);
 			this.fullScale = power * 3.2f;
 			this.explosionSize = (int)(power * 2f);
-			this.damage = power * 30.0f;
+			this.mult = 1+2*(power/5);
+			this.damage *= mult;
 			Vec3d vec = shooter.getPositionEyes(1f).add(shooter.getLookVec().scale(shooter.width * 0.5f)).subtract(0d, 0.2d, 0d);
 			this.setLocationAndAngles(vec.x, vec.y, vec.z, shooter.rotationYawHead, shooter.rotationPitch);
 		}
@@ -91,7 +93,7 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && (result.entityHit == null || !result.entityHit.equals(this.shootingEntity))) {
 				float size = this.fullScale / 3.2f;
 				ProcedureAoeCommand.set(this.world, result.hitVec.x, result.hitVec.y, result.hitVec.z, 0.0D, size)
-				 .exclude(this.shootingEntity).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.damage);
+				 .exclude(this.shootingEntity).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.damage*ItemJutsu.getDmgMult(this.shootingEntity));
 				this.world.newExplosion(this.shootingEntity, result.hitVec.x, result.hitVec.y, result.hitVec.z, this.explosionSize,
 				 false, ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 				Map<BlockPos, IBlockState> map = Maps.newHashMap();
@@ -161,7 +163,7 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 150.0f;
+				return 100.0f;
 			}
 	
 			@Override

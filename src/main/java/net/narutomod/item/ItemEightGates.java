@@ -159,7 +159,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 12, 8, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.HASTE, 12, 3, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 12, this.strength, false, false));
-					entity.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 12, this.resistance, false, false));
+					//entity.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 12, this.resistance, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 12, this.speed, false, false));
 					if (entity.getHealth() > 0.0f && (!(entity instanceof EntityPlayer) || !((EntityPlayer) entity).isCreative())) {
 						if (this.damage >= 0.0f) {
@@ -1387,7 +1387,8 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					//spine8.rotateAngleX = f6 * 0.05F * f1;
 				}
 			}
-		}
+		}
+
 	
 		@SideOnly(Side.CLIENT)
 		public class ModelHirudora extends ModelBase {

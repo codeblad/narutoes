@@ -47,30 +47,31 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
-		private int wait = 50;
-		private int maxLife = 110;
+		private int wait = 30;
+		private int maxLife = 100;
 		private EntityLivingBase shooter;
 		private double width, range;
 		private int flameColor = 0xffffcf00;
-		private float damage;
+		private float damage = (float) 1.0f;
 
 		public EC(World world) {
 			super(world);
 			this.setSize(0.01f, 0.01f);
 		}
 
-		public EC(EntityLivingBase shooterIn, double widthIn, double rangeIn) {
+		public EC(EntityLivingBase shooterIn, double widthIn, double rangeIn, double  powa) {
 			this(shooterIn.world);
 			this.shooter = shooterIn;
 			this.setIdlePosition();
-			this.width = widthIn;
-			this.range = rangeIn;
-			this.damage = (float)rangeIn;
+			this.width = MathHelper.clamp(widthIn,1,15);
+			this.range = MathHelper.clamp(rangeIn,5,50);
+			float mult = 1+5*(((float) powa)/25);
+			this.damage = this.damage*mult+2;
 		}
 
 		@Override
 		public ItemJutsu.JutsuEnum.Type getJutsuType() {
-			return ItemJutsu.JutsuEnum.Type.RAITON;
+			return ItemJutsu.JutsuEnum.Type.KATON;
 		}
 
 		@Override
@@ -89,7 +90,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void setDamage(float amount) {
-			this.damage = amount;
+			this.damage *= amount;
 		}
 
 		@Override
@@ -126,7 +127,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				Vec3d vec3d = Vec3d.fromPitchYaw(directionPitch + (float)((this.rand.nextDouble()-0.5d) * angle * 3.0d),
 				 directionYaw + (float)((this.rand.nextDouble()-0.5d) * angle * 3.0d)).scale(range * 0.1d);
 				this.world.spawnEntity(new FlameParticle(this.shooter, this.posX, this.posY, this.posZ,
-				 vec3d.x, vec3d.y, vec3d.z, this.flameColor, 2.5f, this.damage * (this.rand.nextFloat() * 0.4f + 0.8f)));
+				 vec3d.x, vec3d.y, vec3d.z, this.flameColor, 2.5f, this.damage*ItemJutsu.getDmgMult(this.shooter) * (this.rand.nextFloat() * 0.4f + 0.8f)));
 			}
 			Particles.Renderer particles = new Particles.Renderer(this.world);
 			for (int i = 0; i < (int)(range * radius * 0.8d); i++) {
@@ -153,7 +154,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 				  SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:katon_gokamekeku")),
 				  SoundCategory.NEUTRAL, 5, 1f);
-				entity.world.spawnEntity(new EC(entity, power * 0.8, power * 1.5));
+				entity.world.spawnEntity(new EC(entity, power * 0.8, power * 1.5, power));
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
 				return true;
 			}
@@ -172,7 +173,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu2 implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				this.createJutsu(entity, power, (int)(power * 10f));
+				this.createJutsu(entity, power, (int)(power * 4f));
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
 				return true;
 			}
@@ -182,7 +183,8 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			}
 
 			public EC createJutsu(EntityLivingBase entity, float power, int duration, int color) {
-				EC entity1 = new EC(entity, 1.0f, power);
+				EC entity1 = new EC(entity, 1.0f, power, power);
+				entity1.setDamage(0.333f);
 				entity1.wait = 0;
 				entity1.maxLife = duration;
 				entity1.setFlameColor(color);
@@ -192,12 +194,12 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 30.0f;
+				return 15.0f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 30.0f;
+				return 25.0f;
 			}
 		}
 	}
@@ -250,8 +252,10 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 		public void onImpact(RayTraceResult result) {
 			int i = this.rand.nextInt(8);
 			if (result.entityHit != null) {
-				result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shooter).setFireDamage(), this.damage);
-				result.entityHit.setFire(10);
+				if (result.entityHit != this.shooter) {
+					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shooter).setFireDamage(), this.damage);
+					result.entityHit.setFire(10);
+				}
 			} else if (i == 0) {
 				BlockPos pos = result.getBlockPos().offset(result.sideHit);
 				if (this.world.isAirBlock(pos)) {

@@ -1,6 +1,7 @@
 
 package net.narutomod.item;
 
+import net.minecraft.entity.Entity;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -52,14 +53,22 @@ public class ItemBoneDrill extends ElementsNarutomodMod.ModElement {
 			setMaxStackSize(1);
 		}
 
+		float damage = 10f;
+
 		@Override
 		public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
 			Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(equipmentSlot);
 			if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
-				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", 79f, 0));
+				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", this.damage, 0));
 				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", -3.5, 0));
 			}
 			return multimap;
+		}
+
+		@Override
+		public void onUpdate(ItemStack p_77663_1_, World p_77663_2_, Entity entity, int p_77663_4_, boolean p_77663_5_) {
+			this.damage = 15 + ItemJutsu.getDmgMult(entity)*2f;
+			super.onUpdate(p_77663_1_, p_77663_2_, entity, p_77663_4_, p_77663_5_);
 		}
 
 		@Override

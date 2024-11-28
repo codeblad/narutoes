@@ -91,6 +91,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 		private float damage;
 		private boolean guided;
 		private Entity target;
+		private float mult;
 		
 		public EntityBigFireball(World a) {
 			super(a);
@@ -102,8 +103,12 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.setOGSize(0.8F, 0.8F);
 			this.fullScale = fullScale;
 			this.explosionSize = Math.max((int)fullScale - 1, 0);
-			this.damage = fullScale * 10.0f;
-			this.guided = isGuided;
+			//this.damage = fullScale * 10.0f;
+			this.damage = 3.0f;
+			this.mult = 1.0f + 2f*((fullScale-1f)/10);
+			this.damage *= mult;
+			//this.guided = isGuided;
+			this.guided = false;
 			//this.setEntityScale(0.1f);
 			Vec3d vec3d = shooter.getLookVec();
 			this.setPosition(shooter.posX + vec3d.x, shooter.posY + shooter.getEyeHeight() - 0.2d * fullScale + vec3d.y, shooter.posZ + vec3d.z);
@@ -137,7 +142,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					return;
 				}
 				ProcedureAoeCommand.set(this, 0d, this.fullScale * 0.4f).exclude(this.shootingEntity)
-				 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), this.damage).setFire(15);
+				 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), this.damage*ItemJutsu.getDmgMult(this.shootingEntity)).setFire(15);
 				boolean flag = ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosionSize, flag, false);
 				this.setDead();
@@ -151,7 +156,8 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			  0xffff0000|((0x40+this.rand.nextInt(0x80))<<8), 30);
 		}
 
-		@Override
+
+		@Override
 		protected void checkOnGround() {
 		}
 
@@ -206,7 +212,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 
 			public void createJutsu(EntityLivingBase entity, double x, double y, double z, float power, boolean isGuided) {
 				EntityBigFireball entityarrow = new EntityBigFireball(entity, power, isGuided);
-				entityarrow.shoot(x, y, z, 0.99f, 0);
+				entityarrow.shootPrecise(x, y, z, 0.99f);
 				entity.world.spawnEntity(entityarrow);
 			}
 

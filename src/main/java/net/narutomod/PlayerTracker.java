@@ -1,5 +1,7 @@
 package net.narutomod;
 
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -30,6 +32,7 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
 import net.narutomod.entity.EntityNinjaMob;
+import net.narutomod.item.ItemBoneArmor;
 import net.narutomod.item.ItemIryoJutsu;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
@@ -60,7 +63,8 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static boolean isNinja(EntityPlayer player) {
-		return player.getEntityData().getDouble(BATTLEXP) > 0.0d;
+		return true;
+		//return player.getEntityData().getDouble(BATTLEXP) > 0.0d;
 	}
 
 	public static double getBattleXp(EntityPlayer player) {
@@ -76,7 +80,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	}
 
 	private static void addBattleXp(EntityPlayer entity, double xp, boolean sendMessage) {
-		entity.getEntityData().setDouble(BATTLEXP, Math.min(getBattleXp(entity) + xp, 100000.0d));
+		entity.getEntityData().setDouble(BATTLEXP, Math.min(getBattleXp(entity) + xp, ModConfig.MAX_NINJAXP));
 		if (entity instanceof EntityPlayerMP) {
 			sendBattleXPToTracking((EntityPlayerMP)entity);
 			if (sendMessage) {
@@ -85,6 +89,10 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				 String.format("%.1f", getBattleXp(entity))), true);
 			}
 		}
+	}
+
+	public static float getDefense(Entity entity) {
+		return 1+19*ItemJutsu.getDmgMult(entity)/63;
 	}
 
 	private static void logBattleExp(EntityPlayer entity, double xp) {
@@ -208,16 +216,18 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			}
 			return 0.0d;
 		}
+
 	}
 
 	public static class PlayerHook {
 		private static final Map<UUID, Map<String, Object>> PERSISTENT_DATA = Maps.newHashMap();
 		private static final UUID HP_UUID = UUID.fromString("84d6711b-c26d-4dfa-b0c5-1ff54395f4de");
-		
+
 		@SubscribeEvent
 		public void onTick(TickEvent.PlayerTickEvent event) {
-			if (event.phase == TickEvent.Phase.END && event.player instanceof EntityPlayerMP) {
-				double d = getBattleXp(event.player) * 0.005d;
+			if (event.phase == TickEvent.Phase.START && event.player instanceof EntityPlayerMP) {
+				//double d = getBattleXp(event.player) * 0.0008d;
+				double d = 80*(ItemJutsu.getDmgMult(event.player)/63);
 				if (d > 0d) {
 					IAttributeInstance maxHealthAttr = event.player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
 					AttributeModifier attr = maxHealthAttr.getModifier(HP_UUID);
@@ -225,8 +235,15 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 						if (attr != null) {
 							maxHealthAttr.removeModifier(HP_UUID);
 						}
+
+						maxHealthAttr.removeModifier(HP_UUID);
 						maxHealthAttr.applyModifier(new AttributeModifier(HP_UUID, "ninja.maxhealth", d, 0));
+
 						event.player.setHealth(event.player.getHealth() + 0.1f);
+						if (!event.player.getEntityData().getBoolean("maxhpSpawn")) {
+							event.player.setHealth(event.player.getMaxHealth());
+							event.player.getEntityData().setBoolean("maxhpSpawn",true);
+						}
 					}
 				}
 				if (event.player.getEntityData().getBoolean(FORCE_SEND)) {
@@ -255,11 +272,25 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			return i < 0 || i > 20;
 		}
 
+
 		@SubscribeEvent(priority = EventPriority.LOW)
 		public void onDamaged(LivingDamageEvent event) {
 			Entity targetEntity = event.getEntity();
 			Entity sourceEntity = event.getSource().getTrueSource();
 			float amount = event.getAmount();
+			//I PUT DEFENSE IN HERE LOOK FOR DEFENSE HERE DAMAGE REDUCER DEFENSE MODIFIER
+			if (targetEntity instanceof EntityPlayer) {
+				float defMult = 1;
+				ItemStack cheststack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+				if (cheststack.getItem() == ItemBoneArmor.body) {
+					if (ItemBoneArmor.isLarchActive(cheststack)) {
+						defMult += 0.35f;
+					}
+				}
+				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
+				float newAmount = amount/defense;
+				event.setAmount(newAmount);
+			}
 			if (!targetEntity.equals(sourceEntity) && sourceEntity instanceof EntityLivingBase && amount > 0f) {
 				if (this.isOffCooldown(targetEntity) && targetEntity instanceof EntityPlayer && amount < ((EntityPlayer)targetEntity).getHealth()) {
 					double bxp = getBattleXp((EntityPlayer)targetEntity);
@@ -313,6 +344,8 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			addPersistentData(oldPlayer, BATTLEXP, Double.valueOf(getBattleXp(oldPlayer)));
 			addPersistentData(oldPlayer, FORCE_SEND, Boolean.valueOf(true));
 			addPersistentData(oldPlayer, "MedicalNinjaChecked", Boolean.valueOf(oldPlayer.getEntityData().getBoolean("MedicalNinjaChecked")));
+			addPersistentData(oldPlayer, "KekkeiGenkai", Integer.valueOf(oldPlayer.getEntityData().getInteger("KekkeiGenkai")));
+			addPersistentData(oldPlayer, "kgReceived", Boolean.valueOf(oldPlayer.getEntityData().getBoolean("kgReceived")));
 			addPersistentData(oldPlayer, NarutomodModVariables.FirstGotNinjutsu, Boolean.valueOf(oldPlayer.getEntityData().getBoolean(NarutomodModVariables.FirstGotNinjutsu)));
 			if (event.isWasDeath()) {
 				addPersistentData(oldPlayer, "ForceExtinguish", Integer.valueOf(5));
@@ -351,7 +384,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 		public void onWorldLoad(WorldEvent.Load event) {
 			World world = event.getWorld();
 			if (!world.isRemote && !world.getGameRules().hasRule(KEEPXP_RULE)) {
-				world.getGameRules().addGameRule(KEEPXP_RULE, "false", net.minecraft.world.GameRules.ValueType.BOOLEAN_VALUE);
+				world.getGameRules().addGameRule(KEEPXP_RULE, "true", net.minecraft.world.GameRules.ValueType.BOOLEAN_VALUE);
 			}
 			if (!world.isRemote && !world.getGameRules().hasRule(FORCE_DOJUTSU_DROP_RULE)) {
 				world.getGameRules().addGameRule(FORCE_DOJUTSU_DROP_RULE, "false", net.minecraft.world.GameRules.ValueType.BOOLEAN_VALUE);

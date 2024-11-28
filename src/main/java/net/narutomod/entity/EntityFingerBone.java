@@ -117,7 +117,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				 1f, 0.4f + this.rand.nextFloat() * 0.6f);
 				if (result.entityHit != null) {
 					result.entityHit.hurtResistantTime = 10;
-					result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.shootingEntity), this.damage);
+					result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.shootingEntity), this.damage+ItemJutsu.getDmgMult(shootingEntity)*1.75f);
 				}
 				this.setDead();
 			}
@@ -225,6 +225,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				modelRenderer.rotateAngleY = y;
 				modelRenderer.rotateAngleZ = z;
 			}
-		}
+	
+	}
 	}
 }

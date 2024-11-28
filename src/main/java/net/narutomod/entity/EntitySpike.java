@@ -44,14 +44,14 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 		public Base(World worldIn) {
 			super(worldIn);
 			this.setOGSize(0.5f, 1.82f);
-			this.maxInGroundTime = 400;
+			this.maxInGroundTime = 100;
 			//this.setNoGravity(true);
 		}
 
 		public Base(EntityLivingBase userIn) {
 			super(userIn);
 			this.setOGSize(0.5f, 1.82f);
-			this.maxInGroundTime = 400;
+			this.maxInGroundTime = 100;
 			//this.setNoGravity(false);
 		}
 
@@ -250,6 +250,7 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 				modelRenderer.rotateAngleY = y;
 				modelRenderer.rotateAngleZ = z;
 			}
-		}
+	
+	}
 	}
 }

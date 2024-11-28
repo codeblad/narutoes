@@ -43,8 +43,8 @@ public class ProcedureTenseiganHelmetTickEvent extends ElementsNarutomodMod.ModE
 		if ((!(world.isRemote))) {
 			if (entity instanceof EntityLivingBase)
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionFeatherFalling.potion, (int) 60, (int) 5, (false), (false)));
-			if (entity instanceof EntityLivingBase)
-				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, (int) 2, (int) 2, (false), (false)));
+			/*if (entity instanceof EntityLivingBase)
+				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, (int) 2, (int) 2, (false), (false)));*/
 			if (entity instanceof EntityLivingBase)
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.SPEED, (int) 2, (int) 4, (false), (false)));
 			if (entity instanceof EntityLivingBase)

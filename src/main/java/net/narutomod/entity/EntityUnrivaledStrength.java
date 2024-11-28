@@ -64,19 +64,19 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 				this.duration = (int)(power * 60f);
 				power *= 1.5f;
 			} else {
-				this.duration = (int)(power * 20f);
+				this.duration = (int)(power * 30f);
 			}
 			this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 			this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kairikimuso")), 1f, 1f);
 			PotionEffect effect = userIn.getActivePotionEffect(MobEffects.STRENGTH);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, this.duration, 
-			 (int)power + (effect != null ? effect.getAmplifier() : -1), false, false));
+			 (int) ((1+1*(power/20))*ItemJutsu.getDmgMult(userIn)), false, false));
 			effect = userIn.getActivePotionEffect(MobEffects.SPEED);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.SPEED, this.duration, 
-			 (int)(power * 2f) + (effect != null ? effect.getAmplifier() : -1), false, false));
+			 (int)(power * 2f), false, false));
 			effect = userIn.getActivePotionEffect(MobEffects.JUMP_BOOST);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, this.duration, 
-			 (int)(power * 0.2f) + (effect != null ? effect.getAmplifier() : -1), false, false));
+			 (int)(power * 0.2f), false, false));
 		}
 
 		@Override
@@ -171,7 +171,7 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 20.0f;
 			}
 	
 			@Override

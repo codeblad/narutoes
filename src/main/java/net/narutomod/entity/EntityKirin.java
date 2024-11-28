@@ -212,8 +212,8 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 				float size = this.getEntityScale();
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, vec.x, vec.y, vec.z, size, flag, flag);
-				ProcedureAoeCommand.set(this.world, vec.x, vec.y, vec.z, 0.0D, 10.0D).exclude(this).exclude(this.shootingEntity)
-				 .setFire(15).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 100f * size);
+				ProcedureAoeCommand.set(this.world, vec.x, vec.y, vec.z, 0.0D, 24.0D).exclude(this).exclude(this.shootingEntity)
+				 .setFire(15).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (100f*ItemJutsu.getDmgMult(this.shootingEntity)+75));
 			}
 			//this.haltMotion();
 			this.setDead();
@@ -260,7 +260,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static void chargingEffects(EntityLivingBase player, float pct) {
-		if (pct >= 0.8f && pct < 0.81f) {
+		if (pct > 0.8f && pct < 0.805f) {
 			player.world.playSound(null, player.posX, player.posY, player.posZ,
 			 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kirin_dialog")),
 			 SoundCategory.PLAYERS, 5f, 1f);
