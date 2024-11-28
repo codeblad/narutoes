@@ -136,6 +136,7 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 			super(world, 60, 7000d);
 			this.setSize(0.525f, 1.75f);
 			this.hundredStage = EnumStage.CANNOT_USE;
+			this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 10, true, false, this.playerTargetSelectorAkatsuki));
 		}
 
 		@Override
@@ -266,6 +267,7 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 				@Override
 				public boolean shouldExecute() {
 					return super.shouldExecute() && !EntityCustom.this.isRidingHiruko() && !EntityCustom.this.actionsHalted();
+
 				}
 			});
 			this.tasks.addTask(3, new EntityAIWatchClosest2(this, EntityPlayer.class, 15.0F, 1.0F));
@@ -273,13 +275,6 @@ public class EntitySasori extends ElementsNarutomodMod.ModElement {
 			this.tasks.addTask(5, new EntityAILookIdle(this));
 			this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));
 			this.targetTasks.addTask(2, new EntityPuppet.AIRidingHurtByTarget(this));
-			this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 10, true, false,
-					new Predicate<EntityPlayer>() {
-						public boolean apply(@Nullable EntityPlayer p_apply_1_) {
-							return p_apply_1_ != null && (ModConfig.AGGRESSIVE_BOSSES || EntityBijuManager.isJinchuriki(p_apply_1_));
-						}
-					}));
-			//this.targetTasks.addTask(4, new EntityAINearestAttackableTarget(this, EntityMob.class, false, false));
 		}
 
 		@Override
