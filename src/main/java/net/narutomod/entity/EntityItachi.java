@@ -121,7 +121,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		private static final int GENJUTSU_COOLDOWN = 100; // 5 seconds
 		private boolean isReal;
 		private int lookedAtTime;
-		private final int genjutsuDuration = 200;
+		private final int genjutsuDuration = 120;
 		private int lastGenjutsuTime;
 		private final int invisCD = 200;
 		private int lastInvisTime = -invisCD;
@@ -341,7 +341,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 							.getObject(new ResourceLocation("narutomod:sharingansfx")), SoundCategory.NEUTRAL, 1f, 1f);
 					PotionEffect effect = target.getActivePotionEffect(PotionAmaterasuFlame.potion);
 					int amplifier = effect != null ? effect.getAmplifier() + 2 : 3;
-					target.addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 1200, amplifier, false, false));
+					target.addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 60, amplifier, false, false));
 				} else if (chance <= 2 && distanceFactor >= 0.5333f && this.consumeChakra(FIREBALL_CHAKRA)) {
 					double d0 = target.posX - this.posX;
 					double d1 = target.posY - (this.posY + this.getEyeHeight());
@@ -371,7 +371,8 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void removeTrackingPlayer(EntityPlayerMP player) {
-			super.removeTrackingPlayer(player);
+			super.removeTrackingPlayer(player);
+
 			if (this.bossInfo.getPlayers().contains(player)) {
 				this.bossInfo.removePlayer(player);
 			}
@@ -428,7 +429,8 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void register() {
-			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager -> {
+			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager ->
+ {
 				class ModelItachi extends EntityNinjaMob.ModelNinja {
 					ModelItachi() {
 						super(0.0F);

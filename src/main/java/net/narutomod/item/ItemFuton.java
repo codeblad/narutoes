@@ -95,11 +95,13 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 				boolean rasenshurikenEnabled = this.isJutsuEnabled(itemstack, RASENSHURIKEN);
 				boolean rasenganEnabled = stack1 != null && ((ItemNinjutsu.RangedItem)stack1.getItem())
 				 .canActivateJutsu(stack1, ItemNinjutsu.RASENGAN, (EntityPlayer)entity) == EnumActionResult.SUCCESS;
-				if (rasenshurikenEnabled && !rasenganEnabled) {
-					this.enableJutsu(itemstack, RASENSHURIKEN, false);
-				} else if (!rasenshurikenEnabled && rasenganEnabled) {
-					this.enableJutsu(itemstack, RASENSHURIKEN, true);
-					((EntityPlayer)entity).sendStatusMessage(new TextComponentTranslation("chattext.jutsu.enabled", RASENSHURIKEN.getName()), false);
+				if (this.isAffinity(itemstack)) {
+					if (rasenshurikenEnabled && !rasenganEnabled) {
+						this.enableJutsu(itemstack, RASENSHURIKEN, false);
+					} else if (!rasenshurikenEnabled && rasenganEnabled) {
+						this.enableJutsu(itemstack, RASENSHURIKEN, true);
+						((EntityPlayer)entity).sendStatusMessage(new TextComponentTranslation("chattext.jutsu.enabled", RASENSHURIKEN.getName()), false);
+					}
 				}
 			}
 		}

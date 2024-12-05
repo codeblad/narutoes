@@ -40,11 +40,14 @@ public abstract class ProcedureAirPunch {
         }
     };
 
+
+
+
 	public static int getPressDuration(Entity entity) {
 		return entity.getEntityData().getInteger("pressDuration");
 	}
 
-	private static void setPressDuration(Entity entity, int duration) {
+	public static void setPressDuration(Entity entity, int duration) {
 		entity.getEntityData().setInteger("pressDuration", duration);
 	}
 
@@ -52,7 +55,7 @@ public abstract class ProcedureAirPunch {
 		int pressDuration = getPressDuration(player);
 		if (is_pressed) {
 			pressDuration++;
-			player.sendStatusMessage(new TextComponentString("Power range: " + (int) this.getRange(pressDuration)), true);
+			player.sendStatusMessage(new TextComponentString("Power:" + pressDuration), true);
 			Particles.spawnParticle(player.world, Particles.Types.SMOKE, player.posX, player.posY, player.posZ, pressDuration, 0.25D, 0.0D, 0.25D,
 					0.0D, 0.15D, 0.0D, 0x2000DDFF, 25, (int) (3.0D / (Math.random() * 0.8D + 0.2D)));
 		} else if (pressDuration > 0) {

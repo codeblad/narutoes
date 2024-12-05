@@ -86,27 +86,6 @@ public class ItemChokuto extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		@Override
-		public boolean isShield(ItemStack stack, EntityLivingBase entity) {
-			return stack.getItem() == block;
-		}
-
-		@Override
-		public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-			playerIn.setActiveHand(handIn);
-			//return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
-			return super.onItemRightClick(worldIn, playerIn, handIn);
-		}
-	
-		@Override
-		public EnumAction getItemUseAction(ItemStack stack) {
-			return EnumAction.BLOCK;
-		}
-	
-		@Override
-		public int getMaxItemUseDuration(ItemStack stack) {
-			return 72000;
-		}
 
 		public Set<String> getToolClasses(ItemStack stack) {
 			HashMap<String, Integer> ret = new HashMap<String, Integer>();

@@ -95,9 +95,9 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(400D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20D);
 		}
 
 		@Override
@@ -106,12 +106,13 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot_small")),
 				 0.8f, this.rand.nextFloat() * 0.4f + 0.8f);
-				for (int i = 0; i < this.rand.nextInt(50) + 100; i++) {
-					EntityIceSpear.EC.spawnShatteredShard(this.world, this.posX + this.width * (this.rand.nextFloat()-0.5f), 
+				EntityLivingBase summoner = this.getSummoner();
+				for (int i = 0; i < 50; i++) {
+					EntityIceSpear.EC shard = EntityIceSpear.EC.spawnShatteredShard(this.world, this.posX + this.width * (this.rand.nextFloat()-0.5f),
 					 this.posY + this.height * this.rand.nextFloat(), this.posZ + this.width * (this.rand.nextFloat()-0.5f),
 					 (this.rand.nextDouble()-0.5d) * 0.05d, 0d, (this.rand.nextDouble()-0.5d) * 0.05d);
+					shard.damage = 3f+((3*ItemJutsu.getDmgMult(summoner)/50));
 				}
-				EntityLivingBase summoner = this.getSummoner();
 				if (summoner != null && summoner.isPotionActive(MobEffects.INVISIBILITY)) {
 					summoner.removePotionEffect(MobEffects.INVISIBILITY);
 				}
@@ -338,6 +339,8 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:makyohyosho")),
 				 net.minecraft.util.SoundCategory.NEUTRAL, 1f, 0.9f);
 				EC entity1 = new EC(entity, x, y, z);
+				entity1.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50D+(8*ItemJutsu.getDmgMult(entity)));
+				entity1.setHealth(entity1.getMaxHealth());
 				entity.world.spawnEntity(entity1);
 				return entity1;
 			}
@@ -447,7 +450,8 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer bone17;
 			private final ModelRenderer cube_r3;
 			private final ModelRenderer cube_r4;
-			private final ModelRenderer bottom;
+		
+	private final ModelRenderer bottom;
 			private final ModelRenderer bone;
 			private final ModelRenderer bone9;
 			private final ModelRenderer bone5;

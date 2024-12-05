@@ -99,25 +99,8 @@ public class ItemSoundGaunlet extends ElementsNarutomodMod.ModElement {
 			return false;
 		}
 
-		@Override
-		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {
-			entity.setActiveHand(hand);
-			return new ActionResult(EnumActionResult.SUCCESS, entity.getHeldItem(hand));
-		}
 
-		@Override
-		public boolean isShield(ItemStack stack, @Nullable EntityLivingBase entity) {
-			return stack.getItem() == block;
-		}
 
-		@Override
-		public EnumAction getItemUseAction(ItemStack itemstack) {
-			return EnumAction.BLOCK;
-		}
 
-		@Override
-		public int getMaxItemUseDuration(ItemStack itemstack) {
-			return 72000;
-		}
 	}
 }

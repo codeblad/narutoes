@@ -93,9 +93,10 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 			this.stepHeight = this.height / 3;
 			Chakra.Pathway cp = Chakra.pathway(summonerIn);
 			float health = (20+ (80*(ItemJutsu.getDmgMult(summonerIn)/63))) * PlayerTracker.getDefense(summonerIn);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*5);
-			float ratio = summonerIn.getHealth()/summonerIn.getMaxHealth();
-			this.setHealth(this.getMaxHealth()*ratio);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2.5+500);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(50.0D+ItemJutsu.getDmgMult(summonerIn)*3.4);
+			//float ratio = summonerIn.getHealth()/summonerIn.getMaxHealth();
+			this.setHealth(this.getMaxHealth());
 			this.chakraBurn = chakraUsagePerSec;
 		}
 
@@ -109,8 +110,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 			super.applyEntityAttributes();
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(200.0D);
-			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(18.0D);
+			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(20.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
 		}
 
@@ -142,10 +142,8 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getSummoner(), ItemMokuton.block);
 					if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 						ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
-						float ratio = this.getHealth()/this.getMaxHealth();
-						this.getSummoner().setHealth(this.getSummoner().getMaxHealth()*ratio);
 						//(30*20)+this.ticksExisted+this.ticksExisted/2
-						item.setJutsuCooldown(stack, GOLEM, 20*3);
+						item.setJutsuCooldown(stack, GOLEM, 20*25);
 					}
 				}
 			}
@@ -196,7 +194,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, 
 					 (net.minecraft.util.SoundEvent)net.minecraft.util.SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:mokujin_no_jutsu")), SoundCategory.PLAYERS, 1, 1f);
-					entity.world.spawnEntity(new EC(entity, GOLEM.chakraUsage * 0.01d *
+					entity.world.spawnEntity(new EC(entity, GOLEM.chakraUsage * 0.001d *
 					 ((ItemMokuton.ItemCustom)stack.getItem()).getCurrentJutsuXpModifier(stack, entity)));
 					ItemJutsu.setCurrentJutsuCooldown(stack, 500);
 					return true;
@@ -797,13 +795,13 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 				GlStateManager.translate(0.0F, 1.5F - f6 * ((EC)entity).getGrowth(ageInTicks), 0.0F);
 				GlStateManager.scale(MODELSCALE, MODELSCALE, MODELSCALE);
 				super.render(entity, f, f1, ageInTicks, f3, f4, f5);
-				//dragon.render(f5);
+				dragon.render(f5);
 				GlStateManager.disableLighting();
 				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
 				bipedHeadwear.render(f5);
-				//if (dragon.showModel) {
-				//	dragonEyes.render(f5);
-				//}
+				if (dragon.showModel) {
+					dragonEyes.render(f5);
+				}
 				GlStateManager.enableLighting();
 				//GlStateManager.popMatrix();
 			}

@@ -65,7 +65,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			this(summonerIn.world);
 			this.setSize(0.01f, 0.01f);
 			this.summoner = summonerIn;
-			this.duration = (int)(powerIn * 20);
+			this.duration = (int)(powerIn * 20 * 0.5);
 			this.rantonstack = stack;
 			this.setIdlePosition();
 		}
@@ -96,7 +96,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 					this.playSound(SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:electricity")), 1.0f, this.rand.nextFloat() * 0.6f + 0.6f);
 				}
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 25d);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 35d);
 				if (res != null) {
 					this.setLightningAt(res.hitVec);
 				}
@@ -114,14 +114,14 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 		private void setLightningAt(Vec3d targetVec) {
 			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 			 this.getPositionVector(), targetVec, 0xc00000ff, 10, 0.1f);
-			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), this.getDamage(), this.summoner);
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 20+1.7f*ItemJutsu.getDmgMult(this.summoner), this.summoner);
 			this.world.spawnEntity(entity2);
 		}
 
-		private float getDamage() {
+		/*private float getDamage() {
 			float f = Math.max(((ItemJutsu.Base)this.rantonstack.getItem()).getXpRatio(this.rantonstack, ItemRanton.LASERCIRCUS), 1f);
 			return this.rand.nextFloat() * f * 20f;
-		}
+		}*/
 
 		@Override
 		protected void readEntityFromNBT(NBTTagCompound compound) {
@@ -135,6 +135,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power, stack));
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*3);
 				return true;
 			}
 
@@ -145,7 +146,12 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 10.0f;
+			}
+
+			@Override
+			public float getMaxPower() {
+				return 10f;
 			}
 		}
 	}

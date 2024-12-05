@@ -1,5 +1,6 @@
 package net.narutomod.procedure;
 
+import net.narutomod.item.ItemJutsu;
 import net.narutomod.world.WorldKamuiDimension;
 import net.narutomod.item.ItemMangekyoSharinganObito;
 import net.narutomod.gui.overlay.OverlayByakuganView;
@@ -88,8 +89,11 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 				timer = (double) (-1);
 			}
 			if ((world.getTotalWorldTime() > entity.getEntityData().getLong("kamui_intangible_cd"))) {
+				if (entity.getEntityData().getBoolean("susanoo_activated")) {
+					return;
+				}
 				chakraUsage = (double) ItemMangekyoSharinganObito.getIntangibleChakraUsage((EntityLivingBase) entity);;
-				f2 = (boolean) (((is_pressed) && ((timer) <= 600)) && ((chakraAmount) > (chakraUsage)));
+				f2 = (boolean) (((is_pressed) && ((timer) <= 100)) && ((chakraAmount) > (chakraUsage)));
 				if ((f2)) {
 					ProcedureUtils.purgeHarmfulEffects((EntityLivingBase) entity);
 					ProcedureOnLivingUpdate.setUntargetable(entity, 3);
@@ -110,9 +114,7 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 				}
 				entity.getEntityData().setBoolean("kamui_intangible", (f2));
 				if ((!(f2))) {
-					if (((timer) > 400)) {
-						entity.getEntityData().setLong("kamui_intangible_cd", world.getTotalWorldTime() + (long) timer - 400);
-					}
+					entity.getEntityData().setLong("kamui_intangible_cd", world.getTotalWorldTime() + (long) timer);
 					timer = (double) (-1);
 				}
 			} else if ((entity instanceof EntityPlayer)) {
@@ -163,10 +165,14 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 					if ((f2)) {
 						i = t.entityHit.getEntityBoundingBox().getAverageEdgeLength();
 						i = (double) (((timer) - 5) / (((distance) * (i)) * (2.01 - (PlayerTracker.getNinjaLevel((EntityPlayer) entity) / 500.1))));
+						System.out.println(i);
 						if (((!(f3)) && ((i) <= 0.99999))) {
-							if (((i) > 0)) {
-								i = (double) ((i)
-										* ((t.entityHit instanceof EntityLivingBase) ? ((EntityLivingBase) t.entityHit).getMaxHealth() : -1));
+							if (((i) > 0) && entity.getEntityData().getFloat("kamuiDMGCD") < world.getTotalWorldTime()) {
+								entity.getEntityData().setFloat("kamuiDMGCD", world.getTotalWorldTime()+20*7);
+								i = 50f;
+								if (t.entityHit instanceof EntityLivingBase) {
+									i = ((EntityLivingBase) t.entityHit).getMaxHealth()*0.2f;
+								}
 								t.entityHit.attackEntityFrom(DamageSource.OUT_OF_WORLD.setDamageIsAbsolute(), Math.min((float) i, 1024f));
 							}
 						} else {

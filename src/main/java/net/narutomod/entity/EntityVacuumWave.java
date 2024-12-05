@@ -101,7 +101,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 						}
 					}
 					this.setDead();
-				} else if (this.ticksExisted > this.maxAge - 2) {
+				} else if (this.ticksExisted == this.maxAge) {
 					for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().expand(5d, -this.height, 5d))) {
 						if (entity != this.shootingEntity && !entity.equals(this)
 						 && entity.getDistance(this) <= 1.5d * this.width) {
@@ -109,7 +109,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 							vec = vec.subtract(this.rotationYaw, this.rotationPitch);
 				            if (Math.abs(vec.x) <= 90f && Math.abs(vec.y) <= 90f) {
 							 	entity.hurtResistantTime = 10;
-								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 4*(1+0.25f*(this.power/10))* ItemJutsu.getDmgMult(this.shootingEntity));
+								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 5+1*(1+0.25f*(this.power/10))* ItemJutsu.getDmgMult(this.shootingEntity));
 				            }
 						}
 					}

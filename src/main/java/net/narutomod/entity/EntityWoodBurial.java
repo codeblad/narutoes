@@ -48,18 +48,20 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 		private EC prevSegment;
 		private Entity target;
 		private Vec3d targetVec;
+		private Entity owner;
 
 		public EC(World world) {
 			super(world);
 		}
 
-		public EC(Entity targetIn) {
+		public EC(Entity targetIn, Entity ownerIn) {
 			this(targetIn.world);
 			this.setParent(this);
 			this.setLocationAndAngles(targetIn.posX, targetIn.posY-0.5d, targetIn.posZ, 0f, 0f);
 			this.setPositionAndRotationFromParent(1f);
 			this.prevSegment = this;
 			this.target = targetIn;
+			this.owner = ownerIn;
 			this.targetVec = targetIn.getPositionVector();
 		}
 
@@ -124,7 +126,7 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 				}
 				if (this.targetVec != null && this.targetTargetable()) {
 					if (this.ticksExisted > 20) {
-						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, null), 10.0f);
+						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, null), 10.0f+ItemJutsu.getDmgMult(this.owner)*0.5f);
 					}
 					this.target.setPositionAndUpdate(this.targetVec.x, this.targetVec.y, this.targetVec.z);
 				}
@@ -154,7 +156,7 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 					}
 				});
 				if (res != null && res.entityHit != null) {
-					entity.world.spawnEntity(new EC(res.entityHit));
+					entity.world.spawnEntity(new EC(res.entityHit,entity));
 					((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 200);
 					return true;
 				}

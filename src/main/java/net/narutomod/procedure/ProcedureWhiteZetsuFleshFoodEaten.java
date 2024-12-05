@@ -45,19 +45,18 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 		boolean flag = false;
 		if ((!(world.isRemote))) {
 			if (ItemSharingan.isWearingMangekyo((EntityLivingBase) entity)) {
-				if (entity instanceof EntityLivingBase)
-					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.INSTANT_HEALTH, (int) 10, (int) 4, (false), (false)));
+				//if (entity instanceof EntityLivingBase)
+					//((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.INSTANT_HEALTH, (int) 10, (int) 4, (false), (false)));
 			} else {
-				entity.attackEntityFrom(DamageSource.STARVE, (float) ((Math.random() * 220) + 20));
+				float dmg = (float) ((Math.random() * 220) + 20);
+				if (entity.getEntityData().getInteger("KekkeiGenkai") == 9){
+					dmg = 10;
+				}
+				entity.attackEntityFrom(DamageSource.STARVE, dmg);
 				if (entity instanceof EntityLivingBase)
 					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.HUNGER, (int) 300, (int) 1, (false), (false)));
 			}
-			if ((((((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
-					? ((EntityPlayerMP) entity).getAdvancements()
-							.getProgress(((WorldServer) (entity).world).getAdvancementManager()
-									.getAdvancement(new ResourceLocation("narutomod:eternalmangekyoachieved")))
-							.isDone()
-					: false)
+			if (((((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
 					&& (((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY)
 							.getItem() == new ItemStack(ItemMangekyoSharinganEternal.helmet, (int) (1)).getItem()))
 					&& (((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
@@ -94,21 +93,13 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 								.getObject(new ResourceLocation("ui.toast.challenge_complete")),
 						SoundCategory.NEUTRAL, (float) 1, (float) 1);
 			}
-			if ((((((entity instanceof EntityPlayer)
-					? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemSuiton.block, (int) (1)))
-					: false)
-					&& ((entity instanceof EntityPlayer)
-							? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemDoton.block, (int) (1)))
-							: false))
+			if ((((entity instanceof EntityPlayer)
+					&& entity.getEntityData().getInteger("KekkeiGenkai") == 9
 					&& (!((entity instanceof EntityPlayer)
 							? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemMokuton.block, (int) (1)))
 							: false)))
 					&& (entity.isEntityAlive()))) {
-				if ((world.getGameRules().getBoolean("keepInventory") || world.getGameRules().getBoolean("keepNinjaXp"))) {
-					flag = (boolean) (Math.random() < 0.25);
-				} else {
-					flag = (boolean) (Math.random() < 0.25);
-				}
+				flag = (boolean) (Math.random() < 0.2);
 				if ((flag)) {
 					if (entity instanceof EntityPlayer) {
 						ItemStack _setstack = new ItemStack(ItemMokuton.block, (int) (1));

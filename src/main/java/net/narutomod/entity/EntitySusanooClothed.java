@@ -83,7 +83,7 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 			this.setSize(MODELSCALE * 0.8F, MODELSCALE * (this.hasLegs() ? 2.0F : 1.25F));
 			this.getEntityData().setDouble("entityModelScale", (double)MODELSCALE);
 			this.lifeSpan = Integer.MAX_VALUE;
-			this.chakraUsage = this.hasLegs() ? 20d : 15d;
+			this.chakraUsage = this.hasLegs() ? 25d : 20d;
 		}
 
 		public EntityCustom(EntityLivingBase entity, boolean fullBody) {
@@ -95,6 +95,7 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 				this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("susanoo.reachExtension", 3.0D, 0));
 				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier("susanoo.speedboost", 0.5D, 0));
 			}
+			float ratio = 1;
 			if (!(entity instanceof EntityPlayer)) {
 				this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("susanoo.maxhealth", 400.0d, 0));
 				this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("susanoo.damage", 50.0d, 0));
@@ -106,15 +107,18 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 				 //.applyModifier(new AttributeModifier("susanoo.maxhealth", this.hasLegs() ? 10d : 3d, 2));
 				float health = (20+ (80*(ItemJutsu.getDmgMult(entity)/63))) * PlayerTracker.getDefense(entity);
 				//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*10);
+				ratio = this.getHealth()/this.getMaxHealth();
 				if (this.hasLegs()) {
-					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*4+300);
+					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1.85+300);
+					this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
+							.setBaseValue(40.0D+ItemJutsu.getDmgMult(entity)*2.35);
 				} else {
-					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*3+200);
+					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1+200);
+					this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
+							.setBaseValue(30.0D+ItemJutsu.getDmgMult(entity)*2);
 				}
-				this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
-				 .setBaseValue(Math.min(this.playerXp, this.hasLegs() ? EntitySusanooBase.BXP_REQUIRED_L4 : EntitySusanooBase.BXP_REQUIRED_L3) * 0.003d);
+				ratio = entity.getEntityData().getFloat("susanratio");
 			}
-			float ratio = entity.getHealth()/entity.getMaxHealth();
 			this.setHealth(this.getMaxHealth()*ratio);
 			this.chakraUsage = this.hasLegs() ? 20d : 15d;
 			this.stepHeight = this.height / 3.0F;
@@ -241,7 +245,7 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 				if (this.getOwnerPlayer() != null 
 				 && (this.getOwnerPlayer().getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() == ItemMangekyoSharingan.helmet ||
 				     this.getOwnerPlayer().getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() == ItemMangekyoSharinganEternal.helmet))
-					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 200, this.hasLegs() ? 2 : 1, false, false));
+					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 10, this.hasLegs() ? 2 : 1, false, false));
 			}
 			super.collideWithEntity(entity);
 		}

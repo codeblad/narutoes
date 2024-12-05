@@ -172,16 +172,9 @@ public class ItemAdamantineNyoi extends ElementsNarutomodMod.ModElement {
 			Entity entity = world.getEntityByID(stack.getTagCompound().getInteger("staffEntityId"));
 			return entity instanceof EntityExtend && !entity.isDead ? (EntityExtend)entity : null;
 		}
-
-		@Override
-		public EnumAction getItemUseAction(ItemStack itemstack) {
-			return this.getCurrentJutsu(itemstack) == WEAPON ? EnumAction.BLOCK : EnumAction.BOW;
-		}
 
-		@Override
-		public boolean isShield(ItemStack stack, @Nullable EntityLivingBase entity) {
-			return stack.getItem() == block && this.getCurrentJutsu(stack) == WEAPON;
-		}
+
+
 
 		@Override
 		public ItemOnBody.BodyPart showOnBody() {

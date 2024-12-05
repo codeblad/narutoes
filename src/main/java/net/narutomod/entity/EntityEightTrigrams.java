@@ -32,6 +32,8 @@ import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.Minecraft;
 
+import net.narutomod.item.ItemJutsu;
+import net.narutomod.potion.PotionHeaviness;
 import net.narutomod.procedure.ProcedureRenderView;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureSync;
@@ -83,8 +85,8 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 			this.setEntityInvulnerable(true);
 			this.canDie = false;
 			this.ownerPlayer = null;
-			this.effectRadius = 16d;
-			this.effectDuration = 240;
+			this.effectRadius = 18d;
+			this.effectDuration = 120;
 		}
 
 		public EntityCustom(EntityLivingBase userIn) {
@@ -136,15 +138,16 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				}
-				if (this.ticksExisted > 3 && this.ticksExisted < 20) {
-					ProcedureAoeCommand.set(this, 0.0D, this.effectRadius).exclude(this.ownerPlayer).effect(MobEffects.SLOWNESS, 15, 4, true)
-					 .effect(MobEffects.WEAKNESS, 15, 255, true).effect(MobEffects.MINING_FATIGUE, 15, 5, true);
+				if (this.ticksExisted > 0 && this.ticksExisted < 20) {
+					this.rotationYaw+= (float) 360 /20;
+					ProcedureAoeCommand.set(this, 0.0D, this.effectRadius).exclude(this.ownerPlayer).effect(MobEffects.SLOWNESS, 3, 5, true)
+					 .effect(MobEffects.WEAKNESS, 6, 255, true).effect(MobEffects.MINING_FATIGUE, 6, 5, true);
 				}
 				if (this.ownerPlayer instanceof EntityPlayer) {
-					((EntityPlayer)this.ownerPlayer).sendStatusMessage(new TextComponentString(I18n.translateToLocal("tooltip.byakugan.jutsu2")), true);
+					//((EntityPlayer)this.ownerPlayer).sendStatusMessage(new TextComponentString(I18n.translateToLocal("tooltip.byakugan.jutsu2")), true);
 					if (this.ticksExisted % 40 == 4) {
 						this.ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 
-						 50, (int)(PlayerTracker.getNinjaLevel((EntityPlayer)this.ownerPlayer) + this.ticksExisted) / 30));
+						 50, (int) (( 2 + ((ItemJutsu.getDmgMult(this.ownerPlayer)*0.8) * (1+2*((float) this.ticksExisted /120)))/3 ))));
 						this.ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.HASTE, 50, 3));
 					}
 				}

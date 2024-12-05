@@ -136,8 +136,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 			public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
 				Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
 				if (slot == EntityEquipmentSlot.HEAD && ItemRinnegan.isRinnesharinganActivated(stack)) {
-					multimap.put(SharedMonsterAttributes.MAX_HEALTH.getName(),
-					 new AttributeModifier(ItemRinnegan.RINNESHARINGAN_MODIFIER, "rinnesharingan.maxhealth", 380d, 0));
+
 				}
 				return multimap;
 			}

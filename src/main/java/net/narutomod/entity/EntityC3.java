@@ -42,14 +42,15 @@ public class EntityC3 extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
-		 .id(new ResourceLocation("narutomod", "c_3"), ENTITYID).name("c_3").tracker(64, 3, true).build());
+		 .id(new ResourceLocation("narutomod", "c_3"), ENTITYID)
+.name("c_3").tracker(64, 3, true).build());
 	}
 
 	public static class EC extends EntityLiving implements ItemJutsu.IJutsu {
 		private final int growTime = 30;
 		private final int fuseTime = 100;
 		private final int explosionRange = 32;
-		private final float explosionDamage = 200.0f;
+		private final float explosionDamage = 50.0f;
 		private EntitySpecialEffect.EntityCustom effectEntity;
 		private EntityLivingBase user;
 
@@ -132,7 +133,7 @@ public class EntityC3 extends ElementsNarutomodMod.ModElement {
 			}
 			if (!this.world.isRemote && !this.hasNoGravity() && this.onGround) {// && this.detonateTicks == 0) {
 				new EventSphericalExplosion(this.world, null, (int)this.posX, (int)this.posY + 5, (int)this.posZ, this.explosionRange, 0, 0.3f);
-				ProcedureAoeCommand.set(this, 0d, this.explosionRange).damageEntities(ItemJutsu.causeJutsuDamage(this, null), this.explosionDamage);
+				ProcedureAoeCommand.set(this, 0d, this.explosionRange).damageEntities(ItemJutsu.causeJutsuDamage(this, null), this.explosionDamage+15.1f*ItemJutsu.getDmgMult(this.user));
 				this.setDead();
 				if (this.effectEntity != null) {
 					this.effectEntity.setLifespan(50);

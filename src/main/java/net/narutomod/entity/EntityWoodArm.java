@@ -107,7 +107,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 				 	this.target.getEntityData().setBoolean("TempData_disableKnockback", true);
 
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this,
-					 parent instanceof EntityLivingBase ? (EntityLivingBase)parent : null), 4.0f* ItemJutsu.getDmgMult(parent));
+					 parent instanceof EntityLivingBase ? (EntityLivingBase)parent : null), 10+2.5f* ItemJutsu.getDmgMult(parent));
 				}
 				if (this.targetDistance != 0d && this.targetTargetable() && this.ticksExisted < this.lifespan * 4/5) {
 					Vec3d vec = new Vec3d(0d, 0d, this.targetDistance)
@@ -134,6 +134,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 120d, 4d, ItemMokuton.WoodSegment.class);
 				if (res != null && res.entityHit != null) {
 					entity.world.spawnEntity(new EC(entity, res.entityHit));
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
 					return true;
 				}
 				return false;

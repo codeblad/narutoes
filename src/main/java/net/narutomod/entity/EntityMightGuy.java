@@ -116,7 +116,8 @@ public class EntityMightGuy extends ElementsNarutomodMod.ModElement {
 		private ScoreObjective customerKillCount;
 		private int killCount;
 		private float gateOpened;
-		private int blockingTicks;
+
+		private int blockingTicks;
 
 		public EntityCustom(World world) {
 			super(world, 120, 5000d);
@@ -370,11 +371,11 @@ public class EntityMightGuy extends ElementsNarutomodMod.ModElement {
 							+ TextFormatting.WHITE + I18n.translateToLocal("chattext.mightguy.interact4"));
 					this.getVillage().modifyPlayerReputation(this.customer.getUniqueID(), -3);
 				} else {
-					ProcedureUtils.sendChat(this.customer, TextFormatting.GREEN + I18n.translateToLocal("entity.mightguy.name") + ": "
+					/*ProcedureUtils.sendChat(this.customer, TextFormatting.GREEN + I18n.translateToLocal("entity.mightguy.name") + ": "
 							+ TextFormatting.WHITE + I18n.translateToLocal("chattext.mightguy.interact3"));
 					this.getVillage().modifyPlayerReputation(this.customer.getUniqueID(), 3);
 					ItemHandlerHelper.giveItemToPlayer(this.customer, new ItemStack(ItemEightGates.block));
-					ProcedureUtils.grantAdvancement((EntityPlayerMP)this.customer, "narutomod:openedgates", true);
+					ProcedureUtils.grantAdvancement((EntityPlayerMP)this.customer, "narutomod:openedgates", true);*/
 				}
 				this.customer.sendStatusMessage(new TextComponentString(
 						"Villagers killed: " + villagersKilled + ", your kills: " + kills + ", Might Guy's kills: " + this.killCount), false);

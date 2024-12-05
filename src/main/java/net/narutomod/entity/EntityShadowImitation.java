@@ -201,17 +201,19 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 30d);
 				if (res != null && res.entityHit instanceof EntityLivingBase) {
-					int[] oldintarray = entity.getEntityData().getIntArray(ECENTITYID);
-					if (!this.intarrayContains(entity.world, oldintarray, res.entityHit.getEntityId())) {
-						int[] newintarray = new int[oldintarray.length + 1];
-						for (int i = 0; i < oldintarray.length; i++) {
-							newintarray[i] = oldintarray[i];
+					if (!res.entityHit.isAirBorne && !entity.isAirBorne) {
+						int[] oldintarray = entity.getEntityData().getIntArray(ECENTITYID);
+						if (!this.intarrayContains(entity.world, oldintarray, res.entityHit.getEntityId())) {
+							int[] newintarray = new int[oldintarray.length + 1];
+							for (int i = 0; i < oldintarray.length; i++) {
+								newintarray[i] = oldintarray[i];
+							}
+							EC entity1 = new EC(entity, (EntityLivingBase)res.entityHit, ItemInton.SHADOW_IMITATION.chakraUsage);
+							entity.world.spawnEntity(entity1);
+							newintarray[oldintarray.length] = entity1.getEntityId();
+							entity.getEntityData().setIntArray(ECENTITYID, newintarray);
+							return true;
 						}
-						EC entity1 = new EC(entity, (EntityLivingBase)res.entityHit, ItemInton.SHADOW_IMITATION.chakraUsage);
-						entity.world.spawnEntity(entity1);
-						newintarray[oldintarray.length] = entity1.getEntityId();
-						entity.getEntityData().setIntArray(ECENTITYID, newintarray);
-						return true;
 					}
 				}
 				return false;

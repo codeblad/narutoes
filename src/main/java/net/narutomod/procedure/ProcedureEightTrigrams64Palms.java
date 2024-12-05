@@ -62,7 +62,7 @@ public class ProcedureEightTrigrams64Palms extends ElementsNarutomodMod.ModEleme
 						ItemStack _stack = (helmetstack);
 						if (!_stack.hasTagCompound())
 							_stack.setTagCompound(new NBTTagCompound());
-						_stack.getTagCompound().setDouble("HakkeRokujuuyonshouCD", ((NarutomodModVariables.world_tick) + ((cooldown) * 1200)));
+						_stack.getTagCompound().setDouble("HakkeRokujuuyonshouCD", ((NarutomodModVariables.world_tick) +5*20 + ((cooldown) * 1200)));
 					}
 				} else if ((entity instanceof EntityPlayer)) {
 					Chakra.pathway((EntityPlayer) entity).warningDisplay();

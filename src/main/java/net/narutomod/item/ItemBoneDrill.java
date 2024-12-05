@@ -71,26 +71,7 @@ public class ItemBoneDrill extends ElementsNarutomodMod.ModElement {
 			super.onUpdate(p_77663_1_, p_77663_2_, entity, p_77663_4_, p_77663_5_);
 		}
 
-		@Override
-		public boolean isShield(ItemStack stack, EntityLivingBase entity) {
-			return stack.getItem() == block;
-		}
 
-		@Override
-		public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-			playerIn.setActiveHand(handIn);
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
-		}
-	
-		@Override
-		public EnumAction getItemUseAction(ItemStack stack) {
-			return EnumAction.BLOCK;
-		}
-	
-		@Override
-		public int getMaxItemUseDuration(ItemStack stack) {
-			return 72000;
-		}
 
 		@Override
 		public float getDestroySpeed(ItemStack par1ItemStack, IBlockState par2Block) {

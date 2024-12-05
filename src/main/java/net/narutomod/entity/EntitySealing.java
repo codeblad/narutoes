@@ -156,7 +156,7 @@ public class EntitySealing extends ElementsNarutomodMod.ModElement {
 					this.ticks2Death = 0;
 				} else if (this.isBeingRidden() && this.getSealersCount() > 0) {
 					if (!this.bijuEntity.isFuuinInProgress()) {
-						this.bijuEntity.fuuinIntoVessel(this.getControllingPassenger(), 36000);
+						this.bijuEntity.fuuinIntoVessel(this.getControllingPassenger(), 12000);
 					} else {
 						this.bijuEntity.incFuuinProgress(this.getSealersCount() - 1);
 						this.sendSealingProgress(this.bijuEntity.getFuuinProgress());
@@ -267,7 +267,7 @@ public class EntitySealing extends ElementsNarutomodMod.ModElement {
 				this.world.updateEntity(passenger);
 				if (!(passenger instanceof EntityLivingBase) || passenger.isSneaking()
 				 || (!this.world.isRemote && this.ticksExisted % 20 == 0 && this.ec.isSealingInProgress()
-				  && !Chakra.pathway((EntityLivingBase)passenger).consume(10d))) {
+				  && !Chakra.pathway((EntityLivingBase)passenger).consume(5d))) {
 					passenger.dismountRidingEntity();
 				}
 				if (!this.world.isRemote) {

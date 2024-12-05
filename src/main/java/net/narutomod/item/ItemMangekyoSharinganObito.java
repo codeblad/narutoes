@@ -32,7 +32,7 @@ import net.narutomod.ElementsNarutomodMod;
 public class ItemMangekyoSharinganObito extends ElementsNarutomodMod.ModElement {
 	@ObjectHolder("narutomod:mangekyosharinganobitohelmet")
 	public static final Item helmet = null;
-	private static final double INTANGIBLE_CHAKRA_USAGE = 1d; // per tick
+	private static final double INTANGIBLE_CHAKRA_USAGE = 5d; // per tick
 	private static final double TELEPORT_CHAKRA_USAGE = 20d; // per tick
 	
 	public ItemMangekyoSharinganObito(ElementsNarutomodMod instance) {
@@ -55,7 +55,7 @@ public class ItemMangekyoSharinganObito extends ElementsNarutomodMod.ModElement 
 
 	public void initElements() {
 		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("MANGEKYOSHARINGANOBITO", "narutomod:mangekyosharingan_obito_", 1024,
-				new int[]{2, 5, 6, 10}, 0, null, 1.0F);
+				new int[]{2, 5, 6, 15}, 0, null, 1.0F);
 		this.elements.items.add(() -> new ItemSharingan.Base(enuma) {
 			@Override
 			public void onArmorTick(World world, EntityPlayer entity, ItemStack itemstack) {

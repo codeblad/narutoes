@@ -1,6 +1,8 @@
 
 package net.narutomod.keybind;
 
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.narutomod.procedure.ProcedureSync;
 import org.lwjgl.input.Keyboard;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -62,6 +64,24 @@ public class KeyBindingSpecialJutsu2 extends ElementsNarutomodMod.ModElement {
 			}
 		}
 	}*/
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onClientPostTick(TickEvent.ClientTickEvent event) {
+		if (event.phase == TickEvent.Phase.END) {
+			Minecraft mc = Minecraft.getMinecraft();
+			if (mc.currentScreen == null) {
+				this.processKeyBind();
+			}
+			if (mc.player != null) {
+				boolean flag = mc.currentScreen != null;
+				if (flag != mc.player.getEntityData().getBoolean("hasAnyGuiOpen")) {
+					mc.player.getEntityData().setBoolean("hasAnyGuiOpen", flag);
+					ProcedureSync.EntityNBTTag.sendToServer(mc.player, "hasAnyGuiOpen", flag);
+				}
+			}
+		}
+	}
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)

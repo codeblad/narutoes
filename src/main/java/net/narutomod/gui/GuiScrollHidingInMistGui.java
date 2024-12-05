@@ -1,6 +1,7 @@
 
 package net.narutomod.gui;
 
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
@@ -31,6 +32,11 @@ public class GuiScrollHidingInMistGui extends ElementsNarutomodMod.ModElement {
 			// security measure to prevent arbitrary chunk generation
 			if (player.world.isRemote || !player.world.isBlockLoaded(new BlockPos(this.x, this.y, this.z)))
 				return;
+			ItemStack stack1 = ProcedureUtils.getMatchingItemStack(player, ItemSuiton.block);
+			if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+				player.sendStatusMessage(new TextComponentTranslation("This is not your affinity."), false);
+				return;
+			}
 			ItemStack stack = GuiNinjaScroll.enableJutsu(player, (ItemSuiton.RangedItem)ItemSuiton.block, ItemSuiton.HIDINGINMIST, true);
 			if (stack != null) {
 				super.handleButtonAction(player, buttonID);

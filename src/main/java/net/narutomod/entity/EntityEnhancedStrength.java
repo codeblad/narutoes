@@ -1,7 +1,8 @@
 
 package net.narutomod.entity;
 
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -115,14 +116,15 @@ public class EntityEnhancedStrength extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
-
+
+
 		@Override
 		public void onUpdate() {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				ItemStack stack = this.user.getHeldItemMainhand();
 				if (this.ticksExisted % 10 == 2 && (stack.isEmpty() || stack.getItem() == ItemIryoJutsu.block)) {
-					this.user.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 12, this.amplifier, true, false));
+					this.user.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 12, (int) (20+ItemJutsu.getDmgMult(this.user)*4.4f), true, false));
 				}
 			} else if (!this.world.isRemote) {
 				this.setDead();

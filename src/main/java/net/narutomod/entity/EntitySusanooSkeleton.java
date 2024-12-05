@@ -28,6 +28,8 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.init.MobEffects;
 
+import net.narutomod.PlayerTracker;
+import net.narutomod.item.ItemJutsu;
 import net.narutomod.potion.PotionAmaterasuFlame;
 import net.narutomod.item.ItemMangekyoSharingan;
 import net.narutomod.ElementsNarutomodMod;
@@ -60,14 +62,19 @@ public class EntitySusanooSkeleton extends ElementsNarutomodMod.ModElement {
 		public EntityCustom(EntityPlayer player, boolean full) {
 			super(player);
 			this.setSize(2.4F, 2.4F);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
-			 .setBaseValue(Math.min(this.playerXp, EntitySusanooBase.BXP_REQUIRED_L2) * 0.003d);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(20+ItemJutsu.getDmgMult(player)*1.5);
+			float ratio = 1;
 			if (!full) {
 				this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(0.0D);
-				this.chakraUsage = 10d;
+				this.chakraUsage = 15d;
 			} else {
 				this.setFullBody(true);
+				this.chakraUsage = 20d;
+				ratio = player.getEntityData().getFloat("susanratio");
+				float health = (20+ (80*(ItemJutsu.getDmgMult(player)/63))) * PlayerTracker.getDefense(player);
+				this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*0.35+150);
 			}
+			this.setHealth(this.getMaxHealth()*ratio);
 			this.stepHeight = this.height / 3.0F;
 		}
 
@@ -120,7 +127,7 @@ public class EntitySusanooSkeleton extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && this.getOwnerPlayer() != null
 			 && this.getOwnerPlayer().getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() == ItemMangekyoSharingan.helmet
 			 && entity instanceof EntityLivingBase && !entity.equals(this.getOwnerPlayer()))
-				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 200, 0, false, false));
+				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 10, 0, false, false));
 			super.collideWithEntity(entity);
 		}
 	}

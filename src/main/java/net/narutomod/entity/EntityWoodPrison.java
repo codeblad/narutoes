@@ -151,7 +151,7 @@ public class EntityWoodPrison extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult result = ProcedureUtils.raytraceBlocks(entity, Math.max(2d * power, 20d));
+				RayTraceResult result = ProcedureUtils.raytraceBlocks(entity, Math.max(2d * power, 50d));
 				if (result != null && result.typeOfHit != RayTraceResult.Type.MISS) {
 					entity.world.spawnEntity(new EC(entity.world, result.hitVec, power, entity));
 					return true;
@@ -161,7 +161,7 @@ public class EntityWoodPrison extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 20.0f;
 			}
 	
 			@Override

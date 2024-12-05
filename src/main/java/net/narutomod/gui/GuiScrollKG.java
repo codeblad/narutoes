@@ -56,6 +56,7 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 				ItemSharingan.helmet,
 				ItemIryoJutsu.block,
 				ItemMangekyoSharingan.helmet,
+				ItemMangekyoSharinganObito.helmet,
 				ItemMangekyoSharinganEternal.helmet,
 				ItemRinnegan.helmet,
 				ItemKekkeiMora.block,

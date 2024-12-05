@@ -151,7 +151,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		protected boolean canPassengerDismount = true;
 		protected boolean spawnedBySpawner;
 		protected final ProcedureUtils.CollisionHelper collisionData;
-		protected Entity mouthShootingJutsu;
+		public Entity mouthShootingJutsu;
 		private int meleeTime;
 
 		public Base(World world) {
@@ -813,7 +813,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				return;
 			}
 			if ((this.mouthShootingJutsu == null || this.mouthShootingJutsu.isDead) && (flag || (distanceFactor >= 1.0f && this.canShootBijudama()))) {
-				this.mouthShootingJutsu = EntityTailBeastBall.spawn(this, 14f, 1000f);
+				this.mouthShootingJutsu = EntityTailBeastBall.spawn(this, 15f, 1000f);
 				if (this.mouthShootingJutsu != null) {
 					this.setSwingingArms(true);
 					this.tailBeastBallTime = ATTACK_CD_MAX;
@@ -981,7 +981,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 						if (living.getAttackTarget() != null) {
 							this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:nagiharai")), 10f, 1f);
 							this.shoot(living.getAttackTarget().posX - this.posX, living.getAttackTarget().posY - this.posY - (this.height / 2.0F), 
-							  living.getAttackTarget().posZ - this.posZ, 1.05F, 0.0F);
+							  living.getAttackTarget().posZ - this.posZ, 1.2F, 0.0F);
 						} else {
 							this.setDead();
 						}
@@ -990,7 +990,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				} else if (!this.isLaunched()) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:nagiharai")), 10f, 1f);
 					Vec3d vec = this.shootingEntity.getLookVec();
-					this.shoot(vec.x, vec.y, vec.z, 1.05F, 0.0F);
+					this.shoot(vec.x, vec.y, vec.z, 1.2F, 0.0F);
 					this.closeMouth();
 
 				}
@@ -1016,7 +1016,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				float radius = MathHelper.sqrt(this.getEntityScale()) * 6f;
 				new EventSphericalExplosion(this.world, this.shootingEntity, (int) this.posX, (int) this.posY,
 				 (int) this.posZ, (int)radius, 0, 0.33f);
-				ProcedureAoeCommand.set(this, 0d, radius * 1.2).exclude(excludePlayer)
+				ProcedureAoeCommand.set(this, 0d, radius * 1.5).exclude(excludePlayer)
 				 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.maxDamage);
 				this.setDead();
 			}

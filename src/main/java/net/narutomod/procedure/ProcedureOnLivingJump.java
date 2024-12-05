@@ -12,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.entity.EntitySusanooBase;
+import net.narutomod.item.ItemEightGates;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
@@ -26,7 +27,7 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 		}
 		boolean leapt = false;
 		if (entity.isPotionActive(MobEffects.JUMP_BOOST) && speed >= 0.14d
-		 && entity.isSneaking() && entity.getFoodStats().getFoodLevel() > 8.0f) {
+		 && (entity.isSneaking()) && (entity.getFoodStats().getFoodLevel() > 4.0f || ItemEightGates.getGatesOpened(entity) > 0)) {
 			double motionY = 0.42d + (double) (entity.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1d;
 			if (speed > 0.4d && motionY > 0.8d) {
 				RayTraceResult t = ProcedureUtils.objectEntityLookingAt(entity, 50d, 1.0d);
@@ -51,7 +52,7 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 				entity.motionZ += Math.cos(yaw) * d0 * speed * 2.5d;
 				entity.motionY = Math.max(motionY * Math.sin(pitch) * 2.0d, 0.8d);
 			}
-			entity.addExhaustion(0.5f);
+			entity.addExhaustion(0.2f);
 		}
 	}
 

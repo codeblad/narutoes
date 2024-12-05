@@ -31,13 +31,11 @@ import net.minecraft.scoreboard.Team;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
+import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.entity.EntityNinjaMob;
-import net.narutomod.item.ItemBoneArmor;
-import net.narutomod.item.ItemIryoJutsu;
+import net.narutomod.item.*;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.item.ItemEightGates;
-import net.narutomod.item.ItemJutsu;
 
 import java.util.UUID;
 import java.util.List;
@@ -222,6 +220,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	public static class PlayerHook {
 		private static final Map<UUID, Map<String, Object>> PERSISTENT_DATA = Maps.newHashMap();
 		private static final UUID HP_UUID = UUID.fromString("84d6711b-c26d-4dfa-b0c5-1ff54395f4de");
+		private static final UUID ATTACK_UUID = UUID.fromString("cb34abd5-09bb-40bd-b55a-4ced5442ea8e");
 
 		@SubscribeEvent
 		public void onTick(TickEvent.PlayerTickEvent event) {
@@ -231,13 +230,21 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				if (d > 0d) {
 					IAttributeInstance maxHealthAttr = event.player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
 					AttributeModifier attr = maxHealthAttr.getModifier(HP_UUID);
+					IAttributeInstance attackAttr = event.player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
+					AttributeModifier attr2 = maxHealthAttr.getModifier(ATTACK_UUID);
 					if (attr == null || (int)attr.getAmount() / 2 != (int)d / 2) {
 						if (attr != null) {
 							maxHealthAttr.removeModifier(HP_UUID);
 						}
+						if (attr2 != null) {
+							attackAttr.removeModifier(ATTACK_UUID);
+						}
 
 						maxHealthAttr.removeModifier(HP_UUID);
 						maxHealthAttr.applyModifier(new AttributeModifier(HP_UUID, "ninja.maxhealth", d, 0));
+
+						attackAttr.removeModifier(ATTACK_UUID);
+						attackAttr.applyModifier(new AttributeModifier(ATTACK_UUID, "ninja.attackdamage", 50*(ItemJutsu.getDmgMult(event.player)/63), 0));
 
 						event.player.setHealth(event.player.getHealth() + 0.1f);
 						if (!event.player.getEntityData().getBoolean("maxhpSpawn")) {
@@ -262,6 +269,10 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			EntityLivingBase entity = event.getEntityLiving();
 			if (entity instanceof EntityPlayerMP) {
 				Deaths.log((EntityPlayer) entity);
+				EntityBijuManager bm = EntityBijuManager.getBijuManagerFrom((EntityPlayer) entity);
+				if (bm!=null) {
+					bm.auraCD = 0;
+				}
 				entity.clearActivePotions();
 			}
 		}
@@ -287,15 +298,41 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 						defMult += 0.35f;
 					}
 				}
+				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
+					defMult+= 0.25f;
+				}
+				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
+					defMult+= 0.25f;
+				}
+				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
+					defMult+= 0.55f;
+				}
+				if (ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity) > 0) {
+					int gates = ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity);
+					if (gates < 7) {
+						defMult+= 1.25*((float) gates /6);
+					} else if (gates == 7) {
+						defMult+= 2.5;
+					} else if (gates == 8) {
+						defMult+= 3.5;
+					}
+				}
+				if (targetEntity.getEntityData().hasKey("bigRatio")) {
+					float ratio = targetEntity.getEntityData().getFloat("bigRatio");
+					defMult += 0.8f*ratio;
+				}
 				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
 				float newAmount = amount/defense;
+				if (event.getSource() == ProcedureUtils.SPECIAL_DAMAGE) {
+					newAmount = amount;
+				}
 				event.setAmount(newAmount);
 			}
 			if (!targetEntity.equals(sourceEntity) && sourceEntity instanceof EntityLivingBase && amount > 0f) {
-				if (this.isOffCooldown(targetEntity) && targetEntity instanceof EntityPlayer && amount < ((EntityPlayer)targetEntity).getHealth()) {
+				/*if (this.isOffCooldown(targetEntity) && targetEntity instanceof EntityPlayer && amount < ((EntityPlayer)targetEntity).getHealth()) {
 					double bxp = getBattleXp((EntityPlayer)targetEntity);
 					logBattleExp((EntityPlayer)targetEntity, bxp < 1d ? 1d : (amount / MathHelper.sqrt(MathHelper.sqrt(bxp))));
-				}
+				}*/
 				if (sourceEntity instanceof EntityPlayer) {
 					double xp = 0.0d;
 					if ((targetEntity instanceof EntityPlayer || (targetEntity instanceof EntityLiving && !((EntityLiving)targetEntity).isAIDisabled()))

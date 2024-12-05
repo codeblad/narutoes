@@ -7,7 +7,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -170,7 +171,7 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 	public static class EntityIceSpike extends EntitySpike.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 10;
 		private final float maxScale = 3.0f;
-		private final float damage = 20.0f;
+		private float damage = 20.0f;
 		private EntityLivingBase user;
 
 		public EntityIceSpike(World worldIn) {
@@ -199,7 +200,7 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 					if (!entity.equals(this.user)) {
 						entity.hurtResistantTime = 10;
 						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),
-						 this.damage * (1f - (float)(this.ticksAlive - 1) / this.growTime));
+						 this.damage);
 					}
 				}
 			}
@@ -219,6 +220,7 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 					float f = MathHelper.sqrt(power * 9f / 5f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EntityIceSpike entity1 = new EntityIceSpike(entity);
+						entity1.damage = 6 * ((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
 						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
 						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));

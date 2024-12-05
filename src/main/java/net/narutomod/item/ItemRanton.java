@@ -1,6 +1,8 @@
 
 package net.narutomod.item;
 
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -128,10 +130,13 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 					this.playSound(SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:electricity")), 0.1f, this.rand.nextFloat() * 0.6f + 0.3f);
 				}
+				if (this.ticksExisted%20 == 2) {
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 8, false, false));
+				}
 				EntityLightningArc.spawnAsParticle(this.world, this.posX + (this.rand.nextDouble()-0.5d) * 2.0d,
 				  this.posY + this.rand.nextDouble() * 1.6d, this.posZ + (this.rand.nextDouble()-0.5d) * 2.0d, 1.2d, 0d, 0d, 0d);
 				Particles.spawnParticle(world, Particles.Types.SMOKE, this.posX, this.posY + 0.9d, this.posZ,
-				  100, 0.4d, 0.6d, 0.4d, 0d, 0d, 0d, 0xff303030, 30, 0, 0, this.summoner.getEntityId(), 0);
+				  20, 0.4d, 0.6d, 0.4d, 0d, 0d, 0d, 0xff303030, 30, 0, 0, this.summoner.getEntityId(), 0);
 				for (EntityLivingBase entity1 : 
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.summoner.getEntityBoundingBox().grow(4d))) {
 					if (!entity1.equals(this.summoner) && entity1.isEntityAlive()) {
@@ -151,7 +156,7 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 			 this.getPositionVector().addVector(0d, 1d, 0d), entity.getPositionVector().addVector(0d, entity.height/2, 0d),
 			 0xc00000ff, 1, 0f);
-			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), this.getDamage(), this.summoner, 0);
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 4+0.2f*ItemJutsu.getDmgMult(this.summoner)*this.damageMultiplier, this.summoner, 0);
 			this.world.spawnEntity(entity2);
 		}
 
@@ -180,7 +185,24 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 					entity1 = new EntityRaiunkuha(entity, stack);
 					entity.world.spawnEntity(entity1);
 					stack.getTagCompound().setInteger(RaiunkuhaID, entity1.getEntityId());
+					if (ItemRaiton.CHAKRAMODE.jutsu.isActivated(entity)) {
+						ItemRaiton.CHAKRAMODE.jutsu.deactivate(entity);
+					}
 					return true;
+				}
+			}
+
+			@Override
+			public boolean isActivated(EntityLivingBase entity) {
+				return this.getData(entity) != null;
+			}
+
+			@Override
+			public void deactivate(EntityLivingBase entity) {
+				JutsuData jd = this.getData(entity);
+				if (jd != null) {
+					jd.entity.setDead();
+					jd.stack.getTagCompound().removeTag(RaiunkuhaID);
 				}
 			}
 		}

@@ -80,7 +80,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("BIJU_CLOAK", "narutomod:sasuke_",
-		 1024, new int[]{1024, 1024, 1024, 1024}, 0, null, 5f);
+		 1024, new int[]{10, 10, 10, 10}, 0, null, 5f);
 
 		elements.items.add(() -> new ItemArmor(enuma, 0, EntityEquipmentSlot.HEAD) {
 			@Override
@@ -199,7 +199,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 			public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
 				Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
 				if (slot == EntityEquipmentSlot.CHEST && isWearingFullSet(stack)) {
-					multimap.put(SharedMonsterAttributes.MAX_HEALTH.getName(), CLOAK_MODIFIER);
+					//multimap.put(SharedMonsterAttributes.MAX_HEALTH.getName(), CLOAK_MODIFIER);
 				}
 				return multimap;
 			}
@@ -304,12 +304,12 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 		}
 		if (!entity.world.isRemote && entity.ticksExisted % 20 == 4) {
 			//entity.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 5, 0, false, false));
-			entity.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 22, level * 32, false, false));
-			entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, level * 24, false, false));
+			entity.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 22, (int) (15+ItemJutsu.getDmgMult(entity)*0.85*level), false, false));
+			entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, level * 8, false, false));
 			entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 5, false, false));
 			entity.addPotionEffect(new PotionEffect(PotionReach.potion, 22, level - 1, false, false));
 			if (entity.getHealth() < entity.getMaxHealth() && entity.getHealth() > 0.0f) {
-				entity.heal((float)level * 2);
+				entity.heal((float)level * 1);
 			}
 			/*if (level == 2) {
 				entity.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, 2, false, false));
@@ -417,7 +417,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 	private void spawnClone(EntityPlayer original, ItemStack stack) {
 		if (!original.world.isRemote && !hasClone(stack)) {
 			EntityJinchurikiClone.EntityCustom entity = new EntityJinchurikiClone.EntityCustom(original);
-			entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(CLOAK_MODIFIER);
+			//entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(CLOAK_MODIFIER);
 			entity.setHealth(original.getHealth());
 			original.world.spawnEntity(entity);
 			setClone(stack, entity);

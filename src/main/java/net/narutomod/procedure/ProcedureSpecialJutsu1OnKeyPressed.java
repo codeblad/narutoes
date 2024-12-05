@@ -1,5 +1,10 @@
 package net.narutomod.procedure;
 
+import net.minecraft.entity.EntityLivingBase;
+import net.narutomod.entity.EntityBijuManager;
+import net.narutomod.entity.EntityEightTails;
+import net.narutomod.entity.EntityNineTails;
+import net.narutomod.entity.EntityTailedBeast;
 import net.narutomod.world.WorldKamuiDimension;
 import net.narutomod.item.ItemTenseigan;
 import net.narutomod.item.ItemRinnegan;
@@ -105,23 +110,23 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 				}
 			}
 		} else if (((helmet).getItem() == new ItemStack(ItemByakugan.helmet, (int) (1)).getItem())) {
-			if ((entity.isSneaking())) {
-				{
-					Map<String, Object> $_dependencies = new HashMap<>();
-					$_dependencies.put("is_pressed", is_pressed);
-					$_dependencies.put("entity", entity);
-					ProcedureHakkeKusho.executeProcedure($_dependencies);
-				}
-			} else {
-				{
-					Map<String, Object> $_dependencies = new HashMap<>();
-					$_dependencies.put("is_pressed", is_pressed);
-					$_dependencies.put("entity", entity);
-					$_dependencies.put("x", x);
-					$_dependencies.put("y", y);
-					$_dependencies.put("z", z);
-					$_dependencies.put("world", world);
-					ProcedureByakuganActivate.executeProcedure($_dependencies);
+			{
+				Map<String, Object> $_dependencies = new HashMap<>();
+				$_dependencies.put("is_pressed", is_pressed);
+				$_dependencies.put("entity", entity);
+				$_dependencies.put("x", x);
+				$_dependencies.put("y", y);
+				$_dependencies.put("z", z);
+				$_dependencies.put("world", world);
+				ProcedureByakuganActivate.executeProcedure($_dependencies);
+			}
+		} else if (EntityBijuManager.cloakLevel((EntityPlayer) entity) == 3) {
+			if ((!(is_pressed))) {
+				EntityTailedBeast.Base biju = EntityBijuManager.getBijuOfPlayerInWorld((EntityPlayer) entity);
+				biju.setSwingingArms(true);
+				int tails = EntityBijuManager.getTails((EntityPlayer) entity);
+				if (tails == 9) {
+					biju.mouthShootingJutsu = EntityNineTails.EntityBeam.shoot((EntityLivingBase) entity, 0.6f, 0.8f);
 				}
 			}
 		}

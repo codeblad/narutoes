@@ -23,6 +23,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
 
+import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemGourd;
 import net.narutomod.item.ItemJiton;
@@ -30,13 +31,14 @@ import net.narutomod.item.ItemJutsu;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
 
-import java.util.Random;
-import java.util.List;
-import java.util.Map;
-import java.util.Iterator;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
 import com.google.common.collect.Maps;
 import com.google.common.collect.Lists;
 import javax.annotation.Nullable;
+
+import static net.narutomod.item.ItemJiton.getSandType;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
@@ -91,7 +93,7 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 
 		public EC(World worldIn) {
 			super(worldIn);
-			this.setOGSize(0.2f, 0.2f);
+			this.setOGSize(0.5f, 0.5f);
 		}
 
 		public EC(EntityLivingBase shooter, int sandColor) {
@@ -132,7 +134,7 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 				Vec3d vec = this.shootingEntity instanceof EntityLiving && ((EntityLiving)this.shootingEntity).getAttackTarget() != null
 				 ? ((EntityLiving)this.shootingEntity).getAttackTarget().getPositionEyes(1f).subtract(this.getPositionVector())
 				 : this.shootingEntity.getLookVec();
-				this.shoot(vec.x, vec.y, vec.z, 1.2f, 0.1f);
+				this.shoot(vec.x, vec.y, vec.z, 1.2f, 0.05f);
 			}
 			super.onUpdate();
 			if (this.ticksAlive > this.delay + 80) {
@@ -145,13 +147,18 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && (result.entityHit == null || !this.ignoreEntities.contains(result.entityHit))) {
 				this.playSound(net.minecraft.util.SoundEvent.REGISTRY
 				 .getObject(new ResourceLocation("narutomod:bullet_impact")), 1f, 0.4f + this.rand.nextFloat() * 0.6f);
-				this.world.createExplosion(this.shootingEntity, result.hitVec.x, result.hitVec.y, result.hitVec.z, 3f,
-				  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
-				if (result.entityHit instanceof EntityLivingBase) {
-					result.entityHit.hurtResistantTime = 10;
-					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setProjectile(), 15f);
-					//ProcedureUtils.pushEntity(this, result.entityHit, 10d, 3.0f);
+				ProcedureAoeCommand bruh = ProcedureAoeCommand.set(this,0,4);
+				for (Entity entity : bruh.getList()) {
+					entity.hurtResistantTime = 10;
+					entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 5+1.5f*ItemJutsu.getDmgMult(this.shootingEntity));
 				}
+				this.world.createExplosion(this.shootingEntity, result.hitVec.x, result.hitVec.y, result.hitVec.z, 2f,
+						net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
+				/*if (result.entityHit instanceof EntityLivingBase) {
+					result.entityHit.hurtResistantTime = 10;
+					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 5+2*ItemJutsu.getDmgMult(this.shootingEntity));
+					//ProcedureUtils.pushEntity(this, result.entityHit, 10d, 3.0f);
+				}*/
 				this.setDead();
 			}
 		}
@@ -174,9 +181,24 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
+		public static void delay(int ms)
+		{
+			try
+			{
+				Thread.sleep(ms);
+			}
+			catch(InterruptedException ex)
+			{
+				Thread.currentThread().interrupt();
+			}
+		}
+
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+				for (int i = 0; i < 1+power*4; i++) {
+					addPos(getSandType(stack), entity, power, ItemGourd.getMouthPos(entity));
+                }
 				List<ItemJiton.SwarmTarget> list = getStartPosList(entity);
 				if (list != null) {
 					Iterator<ItemJiton.SwarmTarget> iter = list.iterator();
@@ -212,7 +234,7 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 40.0f;
 			}
 	
 			@Override

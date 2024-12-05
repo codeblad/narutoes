@@ -32,7 +32,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
+
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.block.material.Material;
 
 import net.narutomod.procedure.ProcedureSharinganHelmetTickEvent;
@@ -212,7 +213,7 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 			Entity attacker = event.getSource().getTrueSource();
 			if (wearingAny(entity) && ItemJutsu.canTarget(entity) && !entity.isRiding() && !event.getSource().isUnblockable()
 			 && attacker instanceof EntityLivingBase && !attacker.world.isRemote) {
-			 	if (entity.getRNG().nextFloat() <= 0.6f) {
+			 	/*if (entity.getRNG().nextFloat() <= 0.6f) {
 			    	List<BlockPos> list = ProcedureUtils.getAllAirBlocks(entity.world, entity.getEntityBoundingBox().grow(2.5d));
 			    	for (int i = 0; i < list.size(); i++) {
 			    		BlockPos pos = list.get(entity.getRNG().nextInt(list.size()));
@@ -224,7 +225,7 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 				 			break;
 			    		}
 			    	}
-			 	}
+			 	}*/
 				if (entity instanceof EntityPlayer) {
 					this.lockOnTarget(entity, (EntityLivingBase)attacker, 300);
 				}

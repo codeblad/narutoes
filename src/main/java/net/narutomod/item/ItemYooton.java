@@ -149,7 +149,7 @@ public class ItemYooton extends ElementsNarutomodMod.ModElement {
 			scale *= 1.2F;
 			this.setEntityScale(scale);
 			this.explosionSize = Math.max((int)scale - 1, 0);
-			this.damage = scale * 20f;
+			this.damage = 5*(1+1*(scale/20));
 			Vec3d vec3d = shooter.getLookVec();
 			this.setPosition(shooter.posX + vec3d.x, shooter.posY + 1.2D + vec3d.y, shooter.posZ + vec3d.z);
 		}
@@ -171,7 +171,7 @@ public class ItemYooton extends ElementsNarutomodMod.ModElement {
 				if (result.entityHit != null) {
 					if (result.entityHit.equals(this.shootingEntity) || result.entityHit instanceof EntityMagmaBall)
 						return;
-					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), this.damage);
+					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), this.damage*ItemJutsu.getDmgMult(this.shootingEntity));
 					result.entityHit.setFire(10);
 				}
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
@@ -218,7 +218,7 @@ public class ItemYooton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 40.0f;
 			}
 
 			@Override

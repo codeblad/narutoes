@@ -35,11 +35,12 @@ public class ProcedureCameraShake extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	@SubscribeEvent
 	public void onShake(EntityViewRenderEvent.CameraSetup event) {
-		if (this.shakeDuration > Minecraft.getMinecraft().world.getTotalWorldTime()) {
+		/*if (this.shakeDuration > Minecraft.getMinecraft().world.getTotalWorldTime())
+ {
 			event.setYaw(((float) Math.random() - 0.5F) * instance.shakeScale + event.getYaw());
 			event.setPitch(((float) Math.random() - 0.5F) * instance.shakeScale + event.getPitch());
 			event.setRoll(((float) Math.random() - 0.5F) * instance.shakeScale + event.getRoll());
-		}
+		}*/
 	}
 
 	@Override
@@ -58,12 +59,12 @@ public class ProcedureCameraShake extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static void sendToClient(EntityPlayer player, int duration, float scale) {
-		if (player instanceof EntityPlayerMP) {
+		/*if (player instanceof EntityPlayerMP) {
 			NarutomodMod.PACKET_HANDLER.sendTo(new Message(duration, scale), (EntityPlayerMP)player);
 		} else if (player.world.isRemote) {
 			instance.shakeDuration = player.world.getTotalWorldTime() + duration;
 			instance.shakeScale = scale;
-		}
+		}*/
 	}
 
 	public static class Message implements IMessage {

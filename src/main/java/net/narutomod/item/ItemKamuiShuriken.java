@@ -54,7 +54,7 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:kamuishuriken")
 	public static final Item block = null;
 	public static final int ENTITYID = 114;
-	private static final double CHAKRA_USAGE = 700.0d;
+	private static final double CHAKRA_USAGE = 600.0d;
 	
 	public ItemKamuiShuriken(ElementsNarutomodMod instance) {
 		super(instance, 331);
@@ -95,8 +95,9 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 				if (entity.isRiding() && entity.getRidingEntity() instanceof EntitySusanooWinged.EntityCustom) {
 					entityarrow.setScale((float)entity.getRidingEntity().getEntityData().getDouble("entityModelScale"));
 				}
-				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 2, 0);
+				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 8, 0);
 				world.spawnEntity(entityarrow);
+				entity.getCooldownTracker().setCooldown(this,40);
 			}
 		}
 
@@ -174,11 +175,9 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				if (result.entityHit != null && this.thrower instanceof EntityPlayer) {
 					EntityPlayer thrower = (EntityPlayer) this.thrower;
-					double d = 0.00000625d * this.getScale() * PlayerTracker.getBattleXp(thrower)
-							/ result.entityHit.getEntityBoundingBox().getAverageEdgeLength();
 					if (result.entityHit instanceof EntityLivingBase) {
 						EntityLivingBase elb = (EntityLivingBase) result.entityHit;
-						elb.attackEntityFrom(DamageSource.OUT_OF_WORLD, elb.getMaxHealth() * (float)d);
+						elb.attackEntityFrom(ItemJutsu.causeJutsuDamage(this,this.thrower), 50+ItemJutsu.getDmgMult(this.thrower)*7);
 					} else {
 						result.entityHit.onKillCommand();
 					}
@@ -233,7 +232,8 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 				GlStateManager.scale(scale, scale, scale);
 				GlStateManager.enableRescaleNormal();
 				GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-				GlStateManager.rotate((float) (this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+				GlStateManager.rotate((float) (this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * this.renderManager.playerViewX, 1.0F, 0.0F,
+ 0.0F);
 				GlStateManager.rotate(180.0F, 0.0F, 1.0F, 0.0F);
 				GlStateManager.rotate(5f * ((float)entity.ticksExisted + partialTicks), 0.0F, 0.0F, 1.0F);
 				GlStateManager.rotate(-60f * ((float)entity.ticksExisted + partialTicks), 1.0F, 0.0F, 0.0F);

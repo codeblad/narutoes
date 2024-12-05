@@ -159,7 +159,7 @@ public class EntitySandGathering extends ElementsNarutomodMod.ModElement {
 						this.world.createExplosion(this.summoner, result.hitVec.x, result.hitVec.y, result.hitVec.z, SCALE * 0.8f,
 						 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.summoner));
 						ProcedureAoeCommand.set(this.world, result.hitVec.x, result.hitVec.y, result.hitVec.z, 0d, SCALE * 0.6f)
-						 .exclude(this.summoner).damageEntities(ItemJutsu.causeJutsuDamage(this, this.summoner), SCALE * 4f);
+						 .exclude(this.summoner).damageEntities(ItemJutsu.causeJutsuDamage(this, this.summoner), 10+3*ItemJutsu.getDmgMult(this.summoner));
 						this.accelX = 0.0d;
 						this.accelY = 0.0d;
 						this.accelZ = 0.0d;
@@ -187,7 +187,7 @@ public class EntitySandGathering extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void shoot(Vec3d vec) {
-			Vec3d vec1 = vec.normalize().scale(0.15d);
+			Vec3d vec1 = vec.normalize().scale(0.3d);
 			this.accelX = vec1.x;
 			this.accelY = vec1.y;
 			this.accelZ = vec1.z;
@@ -243,7 +243,7 @@ public class EntitySandGathering extends ElementsNarutomodMod.ModElement {
 							entity = owner;
 						}
 					}
-					RayTraceResult res = ProcedureUtils.raytraceBlocks(entity, 40d);
+					RayTraceResult res = ProcedureUtils.raytraceBlocks(entity, 150d);
 					if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK) {
 						((EC)entity1).shoot(res.hitVec.subtract(entity1.getPositionVector()));
 					}

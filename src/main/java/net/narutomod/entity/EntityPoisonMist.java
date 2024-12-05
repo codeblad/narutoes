@@ -10,7 +10,8 @@ import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.Entity;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -22,7 +23,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.SoundEvent;
 
-import net.narutomod.item.ItemJutsu;
+
+import net.narutomod.item.ItemJutsu;
+import net.narutomod.potion.PotionCorrosion;
 import net.narutomod.procedure.ProcedureAirPunch;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -116,8 +119,8 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
 				if (target instanceof EntityLivingBase) {
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.WITHER, 300, 2));
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 2));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, (int) (80+80*(power/20)), (int) (5+ItemJutsu.getDmgMult(player)*0.15)));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) (40+100*(power/20)), 2));
 				}
 			}
 
@@ -141,12 +144,12 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 15.0f;
+				return 10.0f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 35.0f;
+				return 20.0f;
 			}
 		}
 	}

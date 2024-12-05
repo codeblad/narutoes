@@ -505,7 +505,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			stack.getTagCompound().setBoolean(AFFINITY_KEY, b);
 		}
 
-		private boolean isAffinity(ItemStack stack) {
+		public boolean isAffinity(ItemStack stack) {
 			return stack.hasTagCompound() ? stack.getTagCompound().getBoolean(AFFINITY_KEY) : false;
 		}
 

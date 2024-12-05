@@ -62,6 +62,9 @@ public class ModConfig extends ElementsNarutomodMod.ModElement {
 	@Config.Comment("Jutsu XP gain multiplier (higher value gains NinjaXp faster. default=1)")
 	public static int JUTSUXP_MULTIPLIER = 1;
 
+	@Config.Comment("Chakra percent on spawn (spawn with chakra lol default=1)")
+	public static float CHAKRA_PERCENT = 1;
+
 	public ModConfig(ElementsNarutomodMod instance) {
 		super(instance, 837);
 	}

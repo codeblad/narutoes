@@ -83,7 +83,7 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 			super(world);
 			this.setSize(MODELSCALE * 0.8f, MODELSCALE * 2.0f);
 			this.getEntityData().setDouble("entityModelScale", (double)MODELSCALE);
-			this.chakraUsage = 5d;
+			this.chakraUsage = 25d;
 		}
 
 		public EntityCustom(EntityPlayer player) {
@@ -95,11 +95,12 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 			this.wingSwingProgressInt = 0;
 			this.isWingDetracting = false;
 			this.isWingExtending = false;
+			float ratio = player.getEntityData().getFloat("susanratio");
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("susanoo.reachExtension", 12.0D, 0));
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier("susanoo.speedboost", 0.65D, 0));
 			float health = (20+ (80*(ItemJutsu.getDmgMult(player)/63))) * PlayerTracker.getDefense(player);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*5.5+300);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(this.playerXp * 0.003d);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2.5+500);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(30.0D+ItemJutsu.getDmgMult(player)*3.2);
 			this.getEntityData().setDouble("entityModelScale", (double)MODELSCALE);
 			Item helmet = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem();
 			if (helmet == ItemMangekyoSharingan.helmet || helmet == ItemMangekyoSharinganEternal.helmet) {
@@ -111,7 +112,6 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 				//this.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, new ItemStack(ItemKamuiShuriken.block));
 				ItemHandlerHelper.giveItemToPlayer(player, kamuiShuriken);
 			}
-			float ratio = player.getHealth()/player.getMaxHealth();
 			this.setHealth(this.getMaxHealth()*ratio);
 		}
 
@@ -150,11 +150,11 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 	    			//this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, ItemStack.EMPTY);
 					this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(SWORD_REACH);
 					this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(SWORD_ATTACK);
-					this.chakraUsage += 10.0d;
+					this.chakraUsage += 5.0d;
 		    	} else {
 		    		this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).removeModifier(SWORD_REACH);
 		    		this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(SWORD_ATTACK);
-		    		this.chakraUsage -= 10.0d;
+		    		this.chakraUsage -= 5.0d;
 		    	}
 		    	this.getDataManager().set(SHOW_SWORD, Boolean.valueOf(show));
 	    	}
@@ -305,7 +305,7 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
  {
 				if (this.getOwnerPlayer() != null 
 				 && this.getOwnerPlayer().getHeldItemMainhand().getItem() == ItemKagutsuchiSwordRanged.block)
-					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 200, 2, false, false));
+					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 10, 2, false, false));
 			}
 			super.collideWithEntity(entity);
 		}

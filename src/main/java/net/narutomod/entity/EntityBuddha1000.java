@@ -105,10 +105,9 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 			this.stepHeight = this.height / 3;
 
 			float health = (20+ (80*(ItemJutsu.getDmgMult(summonerIn)/63))) * PlayerTracker.getDefense(summonerIn);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*8+4000);
-
-			float ratio = summonerIn.getHealth()/summonerIn.getMaxHealth();
-			this.setHealth(this.getMaxHealth()*ratio);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*4+2000);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(150.0D+ItemJutsu.getDmgMult(summonerIn)*8);
+			this.setHealth(this.getMaxHealth());
 			this.chakraBurn = chakraUsagePerSec;
 		}
 
@@ -157,8 +156,7 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 			super.applyEntityAttributes();
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(500.0D);
-			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(2.5D * MODELSCALE);
+			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(2.65D * MODELSCALE);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
 		}
 
@@ -301,19 +299,19 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 							 .rotateYaw(-this.renderYawOffset * (float)Math.PI / 180f)
 							 .scale((this.rand.nextDouble() * 3d + 1.5d) * this.width)
 							 .addVector(this.posX, this.posY + 0.625d * this.height, this.posZ);
-							EntityArm entity = new EntityArm(this, vec1.x, vec1.y, vec1.z, 100f);
-							entity.shoot(vec.x, vec.y, vec.z, 1.15f, 0f);
+							EntityArm entity = new EntityArm(this, vec1.x, vec1.y, vec1.z, 30.0f+ItemJutsu.getDmgMult(summoner)*0.8f);
+							entity.shoot(vec.x, vec.y, vec.z, 1.2f, 0f);
 							this.world.spawnEntity(entity);
 						}
 					} else {
-						RayTraceResult res = ProcedureUtils.objectEntityLookingAt(summoner, 64d);
+						RayTraceResult res = ProcedureUtils.objectEntityLookingAt(summoner, 128d);
 						Vec3d vec1 = this.getLookVec().scale(this.width)
 						 .addVector(this.posX, this.posY + 0.625d * this.height, this.posZ);
 						Vec3d vec = res.hitVec.subtract(vec1);
-						EntityArm entity = new EntityArm(this, vec1.x, vec1.y, vec1.z, 500f);
-						entity.shoot(vec.x, vec.y, vec.z, 1.5f, 0f);
+						EntityArm entity = new EntityArm(this, vec1.x, vec1.y, vec1.z, 130.0f+ItemJutsu.getDmgMult(summoner)*6f);
+						entity.shoot(vec.x, vec.y, vec.z, 1.65f, 0f);
 						this.world.spawnEntity(entity);
-						entity.setGrow(false);
+						//entity.setGrow(false);
 					}
 					this.attackCooldown = 20;
 				}
@@ -328,8 +326,6 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 				if (summoner != null) {
 					summoner.addPotionEffect(new PotionEffect(PotionFeatherFalling.potion, 60, 5));
 				}
-				float ratio = this.getHealth()/this.getMaxHealth();
-				this.getSummoner().setHealth(this.getSummoner().getMaxHealth()*ratio);
 
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:poof")), 2.0F, 1.0F);
 				Particles.spawnParticle(this.world, Particles.Types.SMOKE, this.posX, this.posY+this.height/2, this.posZ, 300,
@@ -361,7 +357,7 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, 
 					 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:shinsusenju")),
 					 SoundCategory.PLAYERS, 5f, 1f);
-					entity.world.spawnEntity(new EC(entity, WOODBUDDHA.chakraUsage * 0.01d *
+					entity.world.spawnEntity(new EC(entity, WOODBUDDHA.chakraUsage * 0.001d *
 					 ((ItemSenjutsu.RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity)));
 					ItemJutsu.setCurrentJutsuCooldown(stack, 3600);
 					return true;
@@ -380,7 +376,7 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 					if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 						ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
 						//int l = 30*20+entity.getTicksAlive()+entity.getTicksAlive()/2;
-						int l = 20*3;
+						int l = 20*120;
 						item.setJutsuCooldown(stack, WOODBUDDHA, l);
 					}
 				}
@@ -563,7 +559,7 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 					GlStateManager.disableLighting();
 					GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
 					OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-					GlStateManager.color(1.0f, 1.0f, 1.0f, 0.5f);
+					GlStateManager.color(1.0f, 1.0f, 1.0f, 0.0f);
 					new ModelWoodFist(8).render(entity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
 					GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
 					GlStateManager.enableLighting();

@@ -160,7 +160,7 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 				ProcedureUtils.pushEntity(this, entity, 60.0D, 1.0F);
 				EntityLivingBase summoner = this.getSummoner();
 				entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, summoner),
-				 summoner instanceof EntityPlayer ? (float)PlayerTracker.getNinjaLevel((EntityPlayer)summoner) / 4.0F + 10F : 10F);
+				 summoner instanceof EntityPlayer ? 10f+ItemJutsu.getDmgMult(summoner)*2 : 10F);
 			}
 		}
 
@@ -181,15 +181,15 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				EntityLivingBase summoner = this.getSummoner();
 				if (summoner instanceof EntityPlayer) {
-					double cooldown = ProcedureUtils.getCooldownModifier((EntityPlayer)summoner) * this.ticksExisted * 5;
+					double cooldown = ProcedureUtils.getCooldownModifier((EntityPlayer)summoner) * this.ticksExisted * 6;
 					ItemStack _stack = summoner.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 					if (_stack.getItem() == ItemByakugan.helmet) {
 						if (!_stack.hasTagCompound()) {
 							_stack.setTagCompound(new NBTTagCompound());
 						}
-						_stack.getTagCompound().setDouble("HakkeshoKaitenCD", NarutomodModVariables.world_tick + cooldown + 40d);
-						((EntityPlayer)summoner).getFoodStats()
-						 .setFoodLevel(((EntityPlayer)summoner).getFoodStats().getFoodLevel() - (this.ticksExisted / 60 + 1));
+						_stack.getTagCompound().setDouble("HakkeshoKaitenCD", NarutomodModVariables.world_tick + cooldown + 80d);
+						/*((EntityPlayer)summoner).getFoodStats()
+						 .setFoodLevel(((EntityPlayer)summoner).getFoodStats().getFoodLevel() - (this.ticksExisted / 60 + 1));*/
 					}
 				}
 			}

@@ -54,7 +54,7 @@ public class EntityQuicklime extends ElementsNarutomodMod.ModElement {
 
 		public EC(EntityLivingBase shooterIn, double x, double y, double z, double mX, double mY, double mZ, float damageIn) {
 			super(shooterIn.world, x, y, z, mX, mY, mZ, 0xF8B0B0B0, 6.0f, 0);
-			this.setMaxAge(200);
+			this.setMaxAge(120);
 			this.setShooter(shooterIn);
 			this.damage = damageIn;
 		}
@@ -97,7 +97,7 @@ public class EntityQuicklime extends ElementsNarutomodMod.ModElement {
 					this.hitEntity = (EntityLivingBase)res.entityHit;
 					this.hitTime = age;
 					this.hitEntity.getEntityData().setBoolean("TempData_disableKnockback", true);
-					this.hitEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, shooter), this.damage);
+					this.hitEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, shooter), 8f+ItemJutsu.getDmgMult(shooter)*0.75f);
 				}
 			} else {
 				this.motionX = this.hitEntity.posX - this.posX;

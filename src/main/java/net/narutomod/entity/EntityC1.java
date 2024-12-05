@@ -40,7 +40,8 @@ public class EntityC1 extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
-		 .id(new ResourceLocation("narutomod", "c_1"), ENTITYID).name("c_1").tracker(64, 3, true).build());
+		 .id(new ResourceLocation("narutomod", "c_1"), ENTITYID)
+.name("c_1").tracker(64, 3, true).build());
 	}
 
 	public static class EC extends ItemBakuton.ExplosiveClay {
@@ -67,7 +68,7 @@ public class EntityC1 extends ElementsNarutomodMod.ModElement {
 	    public boolean attackEntityAsMob(Entity entityIn) {
 	    	if (super.attackEntityAsMob(entityIn)) {
 		    	entityIn.hurtResistantTime = 10;
-		    	return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.getOwner()), 8f + this.rand.nextFloat() * 4f);
+		    	return entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.getOwner()), 8f + 1.35f*ItemJutsu.getDmgMult(this.getOwner()));
 	    	}
 	    	return false;
 	    }

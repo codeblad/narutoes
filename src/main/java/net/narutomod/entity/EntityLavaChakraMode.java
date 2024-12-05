@@ -1,6 +1,8 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -39,11 +41,13 @@ import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 274;
 	public static final int ENTITYID_RANGED = 275;
+	protected static final UUID LAVA_DAMAGE = UUID.fromString("a22e2e6f-e29f-4157-8492-522e15d67b80");
 
 	public EntityLavaChakraMode(ElementsNarutomodMod instance) {
 		super(instance, 594);
@@ -70,9 +74,9 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 			this.setUser(userIn);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
 			userIn.getEntityData().setInteger(LCMEntityIdKey, this.getEntityId());
-			if (userIn.isPotionActive(MobEffects.STRENGTH)) {
+			/*if (userIn.isPotionActive(MobEffects.STRENGTH)) {
 				this.strengthAmplifier += userIn.getActivePotionEffect(MobEffects.STRENGTH).getAmplifier() + 1;
-			}
+			}*/
 		}
 
 		@Override
@@ -115,7 +119,12 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 					if (!Chakra.pathway(user).consume(ItemYooton.CHAKRAMODE.chakraUsage)) {
 						this.setDead();
 					} else {
-						user.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 21, this.strengthAmplifier, false, false));
+						AttributeModifier amod = user.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getModifier(LAVA_DAMAGE);
+						if (amod != null) {
+							user.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(amod);
+						}
+						user.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier(LAVA_DAMAGE,"lavaCloak", 10+ItemJutsu.getDmgMult(user), 0));
+						//user.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 21, this.strengthAmplifier, false, false));
 						user.addPotionEffect(new PotionEffect(MobEffects.SPEED, 21, 16, false, false));
 					}
 				}
@@ -130,7 +139,7 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, 
 				 user.getEntityBoundingBox().grow(6d))) {
 				 	if (!entity.equals(user)) {
-						entity.attackEntityFrom(DamageSource.LAVA, 4.0F);
+						entity.attackEntityFrom(DamageSource.LAVA, 4.0F+ItemJutsu.getDmgMult(user)*0.16f);
 						entity.setFire(15);
 				 	}
 				}
@@ -158,6 +167,11 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 						entity.world.spawnEntity(new EC(entity));
 						return true;
 					} else {
+
+						AttributeModifier amod = entity.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getModifier(LAVA_DAMAGE);
+						if (amod != null) {
+							entity.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(amod);
+						}
 						entity1.setDead();
 					}
 				//}

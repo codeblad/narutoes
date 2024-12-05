@@ -79,8 +79,8 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 		private ItemJiton.SwarmTarget sandTarget;
 		private Vec3d capturedVec;
 		private int funeralTime;
-		private final float funeralDamage = 4f; // per tick for 20 ticks
-		private static final int MAXTIME = 600;
+		private final float funeralDamage = 1f; // per tick for 20 ticks
+		private static final int MAXTIME = 100;
 
 		public EC(World world) {
 			super(world);
@@ -191,7 +191,7 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 					if (this.isTargetCaptured()) {
 						if (this.funeralTime > 0) {
 							this.sandTarget.setTarget(targetBB, 0.95f, 0.03f, false);
-							this.attackTargetEntity(this.funeralDamage);
+							this.attackTargetEntity(this.funeralDamage+0.5f*ItemJutsu.getDmgMult(this.user));
 							--this.funeralTime;
 						} else {
 							this.sandTarget.setTarget(targetBB, this.getEntityBoundingBox().getAverageEdgeLength() < this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 2.0d ? 0.0f : 0.3f, 0.0f, false);

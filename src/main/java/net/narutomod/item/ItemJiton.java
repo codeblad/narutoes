@@ -60,11 +60,11 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 201;
 	public static final int ENTITYID_RANGED = 200;
-	public static final ItemJutsu.JutsuEnum SANDSHIELD = new ItemJutsu.JutsuEnum(0, "entityjitonshield", 'S', 150, 20d, new EntitySandShield.Jutsu());
-	public static final ItemJutsu.JutsuEnum SANDBULLET = new ItemJutsu.JutsuEnum(1, "sand_bullet", 'S', 100, 20d, new EntitySandBullet.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum SANDBIND = new ItemJutsu.JutsuEnum(2, "sand_bind", 'S', 200, 100d, new EntitySandBind.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum SANDFLY = new ItemJutsu.JutsuEnum(3, "sand_levitation", 'S', 200, 0.25d, new EntitySandLevitation.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum GATHERING = new ItemJutsu.JutsuEnum(4, "sand_gathering", 'S', 200, 100d, new EntitySandGathering.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SANDSHIELD = new ItemJutsu.JutsuEnum(0, "entityjitonshield", 'S', 150, 250d, new EntitySandShield.Jutsu());
+	public static final ItemJutsu.JutsuEnum SANDBULLET = new ItemJutsu.JutsuEnum(1, "sand_bullet", 'S', 100, 100d, new EntitySandBullet.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SANDBIND = new ItemJutsu.JutsuEnum(2, "sand_bind", 'S', 200, 500d, new EntitySandBind.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SANDFLY = new ItemJutsu.JutsuEnum(3, "sand_levitation", 'S', 200, 1d, new EntitySandLevitation.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum GATHERING = new ItemJutsu.JutsuEnum(4, "sand_gathering", 'S', 200, 500d, new EntitySandGathering.EC.Jutsu());
 
 	public ItemJiton(ElementsNarutomodMod instance) {
 		super(instance, 518);
@@ -140,14 +140,14 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, entity.getHeldItem(hand));
 		}
 
-		@Override
+		/*@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int timeLeft) {
 			super.onUsingTick(stack, player, timeLeft);
 			if (!player.world.isRemote && this.getCurrentJutsu(stack) == SANDBULLET
 			 && this.getPower(stack, player, timeLeft) < this.getMaxPower(stack, player)) {
 				EntitySandBullet.addPos(getSandType(stack), player, this.getPower(stack, player, timeLeft), ItemGourd.getMouthPos(player));
 			}
-		}
+		}*/
 
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
@@ -235,7 +235,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EntitySandShield extends EntityShieldBase {
-		private final double chakraUsage = 0.5d; // per 1 ticks
+		private final double chakraUsage = 2.5d; // per 1 ticks
 		private List<SwarmTarget> sandTargets = Lists.newArrayList();
 		private int color;
 
@@ -247,7 +247,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 		public EntitySandShield(EntityLivingBase user, Type sandType) {
 			super(user);
 			this.setSize(3.0F, 3.0F);
-			double d = user instanceof EntityPlayer ? (2.5d * PlayerTracker.getNinjaLevel((EntityPlayer)user)) : 100d;
+			double d = user instanceof EntityPlayer ? (50+2.75d * PlayerTracker.getNinjaLevel((EntityPlayer)user)) : 100d;
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(d);
 			this.setHealth(this.getMaxHealth());
 			this.color = sandType.getColor();

@@ -126,6 +126,18 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 			return d != d1;
 		}
 
+		public boolean consume2(double amountIn) {
+			double d = this.getAmount();
+			double max = this.getMax();
+			double d1 = d - amountIn;
+			if (d1 < 0) {
+				d1 = 0;
+			}
+			this.set(d1);
+			return d != d1;
+		}
+
+
 		public boolean consume(double amountIn) {
 			return this.consume(amountIn, false);
 		}
@@ -245,7 +257,8 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 			 	this.motionlessTime = 0;
 			}
 			if (this.motionlessTime > 20 && this.user.isSneaking() && !this.user.isAirBorne) {
-				this.consume((-ModConfig.CHAKRA_REGEN_RATE - 0.001f )*10);
+				this.consume(-50d);
+				this.consume((-ModConfig.CHAKRA_REGEN_RATE - 0.001f )*4);
 				//* this.user.getFoodStats().getSaturationLevel()
 			}
 			//double d = 500d + PlayerTracker.getBattleXp(this.user) * 0.1d;
@@ -257,7 +270,7 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 			}
 			if (!this.user.getEntityData().getBoolean("chakraSpawn")) {
 				this.user.getEntityData().setBoolean("chakraSpawn",true);
-				this.set(d);
+				this.set(d*ModConfig.CHAKRA_PERCENT);
 			}
 			this.prevX = this.user.posX;
 			this.prevZ = this.user.posZ;

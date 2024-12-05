@@ -218,26 +218,6 @@ public class ItemScytheMadara extends ElementsNarutomodMod.ModElement {
 			return true;
 		}
 
-		@Override
-		public boolean isShield(ItemStack stack, @Nullable EntityLivingBase entity) {
-			return stack.getItem() == block;
-		}
-
-		@Override
-		public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-			playerIn.setActiveHand(handIn);
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
-		}
-
-		@Override
-		public EnumAction getItemUseAction(ItemStack itemstack) {
-			return this.isThrown(itemstack) ? EnumAction.BOW : EnumAction.BLOCK;
-		}
-
-		@Override
-		public int getMaxItemUseDuration(ItemStack itemstack) {
-			return 72000;
-		}
 
 		@Override
 		public ItemOnBody.BodyPart showOnBody(ItemStack stack) {

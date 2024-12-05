@@ -4,7 +4,8 @@ package net.narutomod.entity;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 import net.minecraft.world.World;
@@ -30,6 +31,7 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 
+import net.narutomod.PlayerTracker;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.potion.PotionHeaviness;
 import net.narutomod.procedure.ProcedureUtils;
@@ -113,8 +115,9 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 
 		public EC(EntityLivingBase user) {
 			super(user);
+			float defense = PlayerTracker.getDefense(user);
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(user.getMaxHealth());
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(user.getMaxHealth()*defense);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(ProcedureUtils.getModifiedSpeed(user) * 4.0d);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(48d);
 			this.setHealth(this.getMaxHealth());
@@ -173,7 +176,7 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 				this.world.createExplosion(summoner, this.posX, this.posY, this.posZ, 8f,
 		    	 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, summoner));
 		    	ProcedureAoeCommand.set(this, 0d, 8d)
-		    	 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, summoner), 45f + this.rand.nextFloat() * 10f);
+		    	 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, summoner), 10f+1.65f*ItemJutsu.getDmgMult(summoner));
 	    		this.setDead();
 	    	}
 		}

@@ -173,7 +173,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 			}
 			this.updateLimbSwing();
 			if (!this.world.isRemote
-			 && (this.ticksInAir > 120 || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
+			 && (this.ticksInAir > 60 || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
 				this.setDead();
 			}
 		}

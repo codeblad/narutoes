@@ -132,21 +132,9 @@ public class ItemSamehada extends ElementsNarutomodMod.ModElement {
 			return true;
 		}
 
-		@Override
-		public boolean canDisableShield(ItemStack stack, ItemStack shield, EntityLivingBase entity, EntityLivingBase attacker) {
-			return true;
-		}
 
-		@Override
-		public boolean isShield(ItemStack stack, @Nullable EntityLivingBase entity) {
-			return true;
-		}
 
-		@Override
-		public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-			playerIn.setActiveHand(handIn);
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
-		}
+
 
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
@@ -156,15 +144,6 @@ public class ItemSamehada extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		@Override
-		public EnumAction getItemUseAction(ItemStack stack) {
-			return EnumAction.BLOCK;
-		}
-
-		@Override
-		public int getMaxItemUseDuration(ItemStack stack) {
-			return 72000;
-		}
 
 		@Override
 		public boolean isFull3D() {

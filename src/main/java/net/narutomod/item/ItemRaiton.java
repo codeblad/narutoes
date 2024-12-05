@@ -50,7 +50,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 129;
 	public static final int ENTITY2ID = 10129;
 	public static final ItemJutsu.JutsuEnum CHIDORI = new ItemJutsu.JutsuEnum(0, "chidori", 'A', EntityChidori.CHAKRA_USAGE, new EntityChidori.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum CHAKRAMODE = new ItemJutsu.JutsuEnum(1, "raitonchakramode", 'B', 10d, new EntityChakraMode.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHAKRAMODE = new ItemJutsu.JutsuEnum(1, "raitonchakramode", 'B', 50d, new EntityChakraMode.Jutsu());
 	public static final ItemJutsu.JutsuEnum CHASINGDOG = new ItemJutsu.JutsuEnum(2, "lightning_beast", 'C', 20d, new EntityLightningBeast.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum GIAN = new ItemJutsu.JutsuEnum(3, "false_darkness", 'B', 100d, new EntityFalseDarkness.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum KIRIN = new ItemJutsu.JutsuEnum(4, "kirin", 'S', 1500d, new EntityKirin.EC.Jutsu());
@@ -128,7 +128,6 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 		private final double CHAKRA_BURN = CHAKRAMODE.chakraUsage; // per second
 		private EntityLivingBase summoner;
 		private ItemStack usingItemstack;
-		private int strengthAmplifier = 9;
 		private float modifier;
 
 		public EntityChakraMode(World a) {
@@ -143,9 +142,6 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			if (stack.getItem() == block) {
 				this.usingItemstack = stack;
 				this.modifier = ((RangedItem)stack.getItem()).getModifier(stack, summonerIn);
-			}
-			if (summonerIn.isPotionActive(MobEffects.STRENGTH)) {
-				this.strengthAmplifier += summonerIn.getActivePotionEffect(MobEffects.STRENGTH).getAmplifier() + 1;
 			}
 		}
 
@@ -174,10 +170,9 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					if (!chakra.consume(this.CHAKRA_BURN)) {
 						this.setDead();
 					}
-					int i = Math.max((int)(MathHelper.sqrt(chakra.getAmount()) / (2.5d * 3d)), 9) - 9;
 					//this.summoner.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, 3, false, false));
-					this.summoner.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 32, false, false));
-					this.summoner.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 22, this.strengthAmplifier + i, false, false));
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 36, false, false));
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 22, 2+(int)(1.6*ItemJutsu.getDmgMult(this.summoner))/3, false, false));
 					this.summoner.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 5, false, false));
 				}
 				if (this.modifier > 0.0f) {
@@ -265,6 +260,9 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					}
 					if (ItemKaton.FLAMESLICE.jutsu.isActivated(entity)) {
 						ItemKaton.FLAMESLICE.jutsu.deactivate(entity);
+					}
+					if (ItemRanton.CLOUD.jutsu.isActivated(entity)) {
+						ItemRanton.CLOUD.jutsu.deactivate(entity);
 					}
 					entity1 = new EntityChakraMode(entity, stack);
 					stack.getTagCompound().setInteger(ID_KEY, entity1.getEntityId());

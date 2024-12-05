@@ -37,7 +37,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.HashMap;
 import java.util.UUID;
-import com.google.common.collect.Multimap;
+
+import com.google.common.collect.Multimap;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemByakugan extends ElementsNarutomodMod.ModElement {
@@ -47,9 +48,9 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 	private static final String TENSEIGANEVOLVEDTIME = NarutomodModVariables.tenseiganEvolvedTime;
 	private final UUID RINNESHARINGAN_MODIFIER = UUID.fromString("c69907b2-2687-47ab-aca0-49898cd38463");
 	private static final double BYAKUGAN_CHAKRA_USAGE = 10d; //per half sec
-	private static final double ROKUJUYONSHO_CHAKRA_USAGE = 100d;
-	private static final double KAITEN_CHAKRA_USAGE = 5d; // per tick
-	private static final double KUSHO_CHAKRA_USAGE = 0.5d; // x pressDuration
+	private static final double ROKUJUYONSHO_CHAKRA_USAGE = 300d;
+	private static final double KAITEN_CHAKRA_USAGE = 15d; // per tick
+	private static final double KUSHO_CHAKRA_USAGE = 3d; // x pressDuration
 	
 	public ItemByakugan(ElementsNarutomodMod instance) {
 		super(instance, 98);
@@ -83,7 +84,8 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 	public void initElements() {
 		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("BYAKUGAN", "narutomod:byakugan_", 25, new int[]{2, 5, 6, 15}, 0, null, 0.0F);
 		
-		this.elements.items.add(() -> new ItemDojutsu.Base(enuma) {
+		this.elements.items.add(() -> new ItemDojutsu.Base(enuma) {
+
 			@SideOnly(Side.CLIENT)
 			@Override
 			public ModelBiped getArmorModel(EntityLivingBase living, ItemStack stack, EntityEquipmentSlot slot, ModelBiped defaultModel) {
@@ -169,13 +171,16 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 			@Override
 			public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
 				super.addInformation(stack, worldIn, tooltip, flagIn);
-				if (isRinnesharinganActivated(stack)) {
+				if (isRinnesharinganActivated(stack))
+ {
 					tooltip.add(TextFormatting.RED + I18n.translateToLocal("advancements.rinnesharinganactivated.title") + TextFormatting.WHITE);
 				}
 				tooltip.add(TextFormatting.ITALIC + I18n.translateToLocal("key.mcreator.specialjutsu1") + ": " + TextFormatting.GRAY + I18n.translateToLocal("tooltip.byakugan.jutsu1") + " (NXP:500)");
-				if (isRinnesharinganActivated(stack)) {
+				if (isRinnesharinganActivated(stack))
+ {
 					tooltip.add(TextFormatting.ITALIC + I18n.translateToLocal("key.mcreator.specialjutsu2") + ": " + TextFormatting.GRAY + I18n.translateToLocal("tooltip.byakurinnesharingan.jutsu2"));
-				} else {
+				} else
+ {
 					tooltip.add(TextFormatting.ITALIC + I18n.translateToLocal("key.mcreator.specialjutsu2") + ": " + TextFormatting.GRAY + I18n.translateToLocal("tooltip.byakugan.jutsu2") + " (NXP:1000)");
 				}
 				tooltip.add(TextFormatting.ITALIC + I18n.translateToLocal("key.mcreator.specialjutsu3") + ": " + TextFormatting.GRAY + I18n.translateToLocal("entity.hakkeshokeiten.name") + " (NXP:1500)");

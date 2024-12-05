@@ -114,7 +114,6 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868"), "sagemode.damage", 60.0d, 0))
 			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(UUID.fromString("33b7fa14-828a-4964-b014-b61863526589"), "sagemode.damagespeed", 2.0d, 1))
 			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.5d, 1))
-			.put(SharedMonsterAttributes.MAX_HEALTH, new AttributeModifier(UUID.fromString("70e0acc2-cf75-4bbd-a21a-753088324a59"), "sagemode.health", 80.0d, 0))
 			.build();
 
 		@SideOnly(Side.CLIENT)
@@ -159,30 +158,31 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 				}
 				EntityLivingBase living = (EntityLivingBase)entity;
 				boolean flag = isSageModeActivated(itemstack);
-				boolean flag1 = living.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).hasModifier(buffMap.get(SharedMonsterAttributes.MAX_HEALTH));
-				if (flag && !flag1) {
+				//boolean flag1 = living.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).hasModifier(buffMap.get(SharedMonsterAttributes.MAX_HEALTH));
+				if (flag) {
 					for (Map.Entry<IAttribute, AttributeModifier> entry : buffMap.entrySet()) {
 						IAttributeInstance attr = living.getEntityAttribute(entry.getKey());
-						if (attr != null) {
+						if (attr != null && !attr.hasModifier(entry.getValue())) {
 							attr.applyModifier(entry.getValue());
 						}
 					}
-					if (entity instanceof EntityPlayer) {
+					/*if (entity instanceof EntityPlayer) {
 						int foodlevel = ((EntityPlayer)entity).getFoodStats().getFoodLevel();
 						if (itemstack.getTagCompound().getInteger("prevFoodStat") != foodlevel) {
 							itemstack.getTagCompound().setInteger("prevFoodStat", foodlevel);
 						}
-					}
-				} else if (!flag && flag1) {
+					}*/
+				} else if (!flag) {
 					for (Map.Entry<IAttribute, AttributeModifier> entry : buffMap.entrySet()) {
 						IAttributeInstance attr = living.getEntityAttribute(entry.getKey());
 						if (attr != null) {
 							attr.removeModifier(entry.getValue().getID());
 						}
 					}
-					if (entity instanceof EntityPlayer) {
-						((EntityPlayer)entity).getFoodStats().setFoodLevel(itemstack.getTagCompound().getInteger("prevFoodStat") - 5);
-					}
+					/*if (entity instanceof EntityPlayer) {
+						itemstack.getTagCompound().removeTag("prevFoodStat");
+						((EntityPlayer)entity).getFoodStats().setFoodLevel(itemstack.getTagCompound().getInteger("prevFoodStat"));
+					}*/
 				}
 				if (flag) {
 					Chakra.Pathway cp = Chakra.pathway(living);
@@ -258,9 +258,9 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
 			if (attacker.equals(target) && this.getSageType(itemstack) == Type.TOAD && isSageModeActivated(itemstack)) {
-				target = ProcedureUtils.objectEntityLookingAt(attacker, ProcedureUtils.getReachDistance(attacker), 3d).entityHit;
+				target = ProcedureUtils.objectEntityLookingAt(attacker, ProcedureUtils.getReachDistance(attacker), 5d).entityHit;
 				if (target == null) {
-					target = ProcedureUtils.objectEntityLookingAt(attacker, ProcedureUtils.getReachDistance(attacker), 4.5d).entityHit;
+					target = ProcedureUtils.objectEntityLookingAt(attacker, ProcedureUtils.getReachDistance(attacker), 8d).entityHit;
 					if (target != null) {
 						attacker.attackTargetEntityWithCurrentItem(target);
 					}

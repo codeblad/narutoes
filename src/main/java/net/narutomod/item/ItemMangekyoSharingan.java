@@ -32,7 +32,7 @@ import java.util.List;
 public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 	@ObjectHolder("narutomod:mangekyosharinganhelmet")
 	public static final Item helmet = null;
-	private static final double AMATERASU_CHAKRA_USAGE = 100d;
+	private static final double AMATERASU_CHAKRA_USAGE = 150d;
 	
 	public ItemMangekyoSharingan(ElementsNarutomodMod instance) {
 		super(instance, 69);
@@ -47,7 +47,7 @@ public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 
 	public void initElements() {
 		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("MANGEKYOSHARINGAN", "narutomod:mangekyosharingan_sasuke_", 1024,
-				new int[]{2, 5, 6, 10}, 0, null, 1.0F);
+				new int[]{2, 5, 6, 15}, 0, null, 1.0F);
 		this.elements.items.add(() -> new ItemSharingan.Base(enuma) {
 			@Override
 			public void onArmorTick(World world, EntityPlayer entity, ItemStack itemstack) {

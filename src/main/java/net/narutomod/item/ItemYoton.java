@@ -100,12 +100,14 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 			this.scale = scaleIn;
 			this.stepHeight = scaleIn * this.height / 3.0F;
 			this.setNoAI(true);
+			float ratio = 1+1*(scaleIn/10);
 			double d = MathHelper.sqrt((4d * scaleIn * scaleIn) + (this.height * this.height));
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("biggerme.reach", d, 0));
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("biggerme.damage", scaleIn * scaleIn, 0));
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("biggerme.damage", (5+ItemJutsu.getDmgMult(user)*2)*ratio, 0));
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(user.getHealth() * scaleIn);
 			this.setHealth(this.getMaxHealth());
 			this.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 999999, (int)scaleIn, false, false));
+			user.getEntityData().setFloat("bigRatio",ratio);
 			user.startRiding(this);
 		}
 
@@ -202,6 +204,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 				      this.rand.nextGaussian() * 0.02D);
 				}
 				this.setDead();
+				this.getSummoner().getEntityData().removeTag("bigRatio");
 			}
 			super.onUpdate();
 		}
@@ -220,7 +223,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 150.0f;
+				return 80.0f;
 			}
 	
 			@Override

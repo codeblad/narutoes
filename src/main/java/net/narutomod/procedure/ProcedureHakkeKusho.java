@@ -1,11 +1,9 @@
 package net.narutomod.procedure;
 
+import akka.japi.Procedure;
+import net.minecraft.util.*;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
@@ -13,6 +11,8 @@ import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.block.Block;
 
+import net.minecraft.util.text.TextComponentString;
+import net.narutomod.NarutomodModVariables;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemByakugan;
 import net.narutomod.Chakra;
@@ -29,6 +29,12 @@ public class ProcedureHakkeKusho extends ElementsNarutomodMod.ModElement {
 	}
 	
 	public static class AirPunch extends ProcedureAirPunch {
+
+		public AirPunch() {
+			this.blockDropChance = 0F;
+			this.blockHardnessLimit = 2f;
+		}
+
 		@Override
 		protected double getRange(int duration) {
 			return duration / 3.0D + 5.0D;
@@ -43,11 +49,12 @@ public class ProcedureHakkeKusho extends ElementsNarutomodMod.ModElement {
 		protected void attackEntityFrom(Entity player, Entity target) {
 			super.attackEntityFrom(player, target);
 			if (target instanceof EntityLivingBase && player instanceof EntityPlayer) {
-				int strength = ProcedureAirPunch.getPressDuration(player);
-				double amount = (strength * ((EntityPlayer)player).experienceLevel / 100.0D + 10.0D) / Math.sqrt(target.getDistance(player));
-				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(player, null), (float) amount);
+				float ratio = (float) ProcedureAirPunch.getPressDuration(player)/50;
+				float strength = 1+(2*ratio);
+				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(player, null), 5+(1.8f*ItemJutsu.getDmgMult(player)) * strength);
 			}
 		}
+
 
 		@Override
 		protected EntityItem processAffectedBlock(Entity player, BlockPos pos, EnumFacing facing) {
@@ -80,22 +87,31 @@ public class ProcedureHakkeKusho extends ElementsNarutomodMod.ModElement {
 			return;
 		}
 		EntityPlayer player = (EntityPlayer) entity;
+		if (entity.getEntityData().getFloat("airPalmcd") > NarutomodModVariables.world_tick) {
+			player.sendStatusMessage(new TextComponentString("cooldown: " + (entity.getEntityData().getFloat("airPalmcd")-NarutomodModVariables.world_tick)/20), true);
+			return;
+		}
 		if (!player.isCreative()
 		 && (PlayerTracker.getBattleXp(player) < XP_REQUIRED || !ProcedureUtils.isOriginalOwner(player, player.inventory.armorInventory.get(3))))
 			return;
 		boolean is_pressed = ((Boolean) dependencies.get("is_pressed")).booleanValue();
 		int pressDuration = ProcedureAirPunch.getPressDuration(player);
 		Chakra.Pathway cp = Chakra.pathway(player);
+
+		if (cp.getAmount() >= ItemByakugan.getKushoChakraUsage(player) * (pressDuration + 1)) {
+			if (pressDuration > 49) {
+				ProcedureAirPunch.setPressDuration(player, 49);
+			}
+			KUSHO.execute(is_pressed, player);
+		}
 		if (!is_pressed && pressDuration > 0) {
+			player.getEntityData().setFloat("airPalmcd", (float) (NarutomodModVariables.world_tick +5*20));
 			ProcedureSync.SwingMainArm.send(player);
 			// player.swingArm(EnumHand.MAIN_HAND);
 			entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 					(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:HakkeKusho")),
 					SoundCategory.PLAYERS, 1.0F, 1.0F);
-			cp.consume(ItemByakugan.getKushoChakraUsage(player) * pressDuration);
-		}
-		if (cp.getAmount() >= ItemByakugan.getKushoChakraUsage(player) * (pressDuration + 1)) {
-			KUSHO.execute(is_pressed, player);
+			cp.consume(100+ItemByakugan.getKushoChakraUsage(player) * pressDuration);
 		}
 	}
 }

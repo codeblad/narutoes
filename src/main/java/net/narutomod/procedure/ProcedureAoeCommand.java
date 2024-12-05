@@ -83,7 +83,8 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 	}
 
 	public ProcedureAoeCommand exclude(Entity entity) {
-		if (entity != null) {
+		if (entity != null)
+ {
 			//excludedEntities.add(entity);
 			entitiesList.remove(entity);
 		}
@@ -202,7 +203,8 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 		//List<Entity> list = this.world.getEntitiesWithinAABB(Entity.class, aabb.grow(maxRange), MIN_DISTANCE);
 		if (!entitiesList.isEmpty())
 			for (Entity entity : entitiesList) {
-				if (!(entity instanceof EntityPlayer))
+				if (!(entity instanceof EntityPlayer)
+)
 					this.world.removeEntity(entity);
 			}
 		return this;
@@ -338,6 +340,10 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 		}
 		pos.release();
 		return this;
+	}
+
+	public List<Entity> getList() {
+		return entitiesList;
 	}
 
 	public ProcedureAoeCommand setFire(int seconds) {

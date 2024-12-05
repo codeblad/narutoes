@@ -53,10 +53,11 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 20;
-		private int duration;
+		int duration;
 		private BlockPos drip;
 		private int deathTicks;
 		private int deathTime;
+		float supapower = 1;
 
 		public EC(World world) {
 			super(world);
@@ -71,7 +72,20 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 			this.setEntityScale(0.5f);
 			this.setRotation(this.rand.nextFloat() * 360f, 0f);
 			this.setIdlePosition();
-			this.duration = (int)(powerIn * 20);
+			this.supapower = powerIn;
+			this.duration = (int)(powerIn * 5);
+		}
+
+		public EC(EntityLivingBase shooter, float powerIn, float powerBall) {
+			super(shooter);
+			this.setOGSize(0.25F, 0.25F);
+			this.setNoGravity(powerIn > 0f);
+			this.setEntityScale(0.5f);
+			this.setRotation(this.rand.nextFloat() * 360f, 0f);
+			this.setIdlePosition();
+			this.supapower = powerBall;
+			this.duration = (int)(powerIn * 0);
+			//System.out.println(this.supapower);
 		}
 
 		@Override
@@ -142,11 +156,11 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 			super.onUpdate();
 			if (this.duration > 0) {
 				this.setIdlePosition();
-				if (this.duration > 1) {
+				if (this.duration > 3) {
 					Vec3d vec = this.shootingEntity.getLookVec();
-					for (int i = 0; i < 10; i++) {
-						EC entity = new EC(this.shootingEntity, 0f);
-						entity.shoot(vec.x, vec.y, vec.z, 0.85f, 0.1f);
+					for (int i = 0; i < 1; i++) {
+						EC entity = new EC(this.shootingEntity, 0,this.supapower);
+						entity.shoot(vec.x, vec.y, vec.z, 0.875f, 0.05f);
 						this.world.spawnEntity(entity);
 					}
 					--this.duration;
@@ -174,17 +188,19 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 				if (result.entityHit != null) {
 					result.entityHit.getEntityData().setBoolean("TempData_disableKnockback", true);
 					result.entityHit.hurtResistantTime = 10;
-					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), 4f);
+					float damage = 0.45f*ItemJutsu.getDmgMult(this.shootingEntity);
+					damage *= 1+(1*(this.supapower/10));
+					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), damage);
 					result.entityHit.setFire(15);
 				}
 				Particles.spawnParticle(this.world, Particles.Types.SMOKE, result.hitVec.x, result.hitVec.y, result.hitVec.z,
-				 100, this.width, 0.0d, this.width, 0d, 0d, 0d, 0xB0202020, 20 + this.rand.nextInt(30));
+				 20, this.width, 0.0d, this.width, 0d, 0d, 0d, 0xB0202020, 20 + this.rand.nextInt(30));
 				this.playSound(SoundEvents.BLOCK_LAVA_AMBIENT, 1f, this.rand.nextFloat() * 0.4f + 0.8f);
 				if (this.world.getGameRules().getBoolean("mobGriefing")) {
 					BlockPos pos = result.typeOfHit == RayTraceResult.Type.BLOCK 
 					 ? result.getBlockPos().offset(result.sideHit) : new BlockPos(result.hitVec);
 					if (this.world.isAirBlock(pos)) {
-						this.world.setBlockState(pos, Blocks.LAVA.getDefaultState(), 3);
+						this.world.setBlockState(pos, Blocks.LAVA.getDefaultState(), 2);
 						this.drip = pos;
 					}
 				}
@@ -225,7 +241,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 200.0f;
+				return 100.0f;
 			}
 
 			@Override

@@ -30,22 +30,18 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
-import net.narutomod.item.ItemTotsukaSword;
-import net.narutomod.item.ItemChokuto;
-import net.narutomod.item.ItemShuriken;
-import net.narutomod.item.ItemSharingan;
-import net.narutomod.item.ItemJutsu;
+import net.narutomod.*;
+import net.narutomod.item.*;
+import net.narutomod.potion.PotionFeatherFalling;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureSusanoo;
-import net.narutomod.PlayerTracker;
-import net.narutomod.Particles;
-import net.narutomod.Chakra;
-import net.narutomod.ElementsNarutomodMod;
 import org.lwjgl.input.Keyboard;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
@@ -57,10 +53,12 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	public static final double BXP_REQUIRED_L2 = 10000.0d;
 	public static final double BXP_REQUIRED_L3 = 20000.0d;
 	public static final double BXP_REQUIRED_L4 = 40000.0d;
-	protected double chakraUsage = 10d; // per second
+	protected double chakraUsage = 15d; // per second
 	protected double chakraUsageModifier = 2d;
 	protected double playerXp;
+	public boolean deadDrain = true;
 	public float jumpPower = 0;
+	private static final String SUMMONED_SUSANOO = "summonedSusanooID";
 
 	public EntitySusanooBase(World world) {
 		super(world);
@@ -80,7 +78,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		if (player instanceof EntityPlayer) {
 			this.playerXp = PlayerTracker.getBattleXp((EntityPlayer)player);
 			float health = (20+ (80*(ItemJutsu.getDmgMult(player)/63))) * PlayerTracker.getDefense(player);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2+100);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*0.2+100);
 			//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(MathHelper.sqrt(this.playerXp));
 			 //.applyModifier(new AttributeModifier("susanoo.health", 2d * ((EntityPlayer)player).experienceLevel, 0));
 			//this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
@@ -97,8 +95,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 			}
 		}
 		//this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(ProcedureUtils.getModifiedSpeed(player) * 0.3d);
-		float ratio = player.getHealth()/player.getMaxHealth();
-		this.setHealth(this.getMaxHealth()*ratio);
+		this.setHealth(this.getMaxHealth());
 		this.setAlwaysRenderNameTag(false);
 		player.startRiding(this);
 	}
@@ -378,6 +375,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	protected void consumeChakra() {
 		if (this.ticksExisted % 20 == 0) {
 			if (!Chakra.pathway(this.getOwnerPlayer()).consume(this.chakraUsage * this.chakraUsageModifier)) {
+				ProcedureSusanoo.handleSusanCD((EntityPlayer) this.getOwnerPlayer(), this);
 				this.setDead();
 			}
 		}
@@ -387,8 +385,28 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	public void setDead() {
 		super.setDead();
 		if (!this.world.isRemote && this.getOwnerPlayer() != null) {
-			float ratio = this.getHealth()/this.getMaxHealth();
-			this.getOwnerPlayer().setHealth(this.getOwnerPlayer().getMaxHealth()*ratio);
+			float ratio = 1-(this.getHealth()/this.getMaxHealth());
+			double baseValue = 500;
+			EntityPlayer player = (EntityPlayer) this.getOwnerPlayer();
+			if (this instanceof EntitySusanooSkeleton.EntityCustom) {
+				boolean fullBody = ((EntitySusanooSkeleton.EntityCustom)this).isFullBody();
+				if (fullBody) {
+					baseValue = 750;
+				}
+			} else if (this instanceof EntitySusanooClothed.EntityCustom) {
+				boolean hasLegs = ((EntitySusanooClothed.EntityCustom)this).hasLegs();
+				if (!hasLegs) {
+					baseValue = 1500;
+				} else {
+					baseValue = 2500;
+				}
+			} else if (this instanceof  EntitySusanooWinged.EntityCustom) {
+				baseValue = 5000;
+			}
+			if (this.deadDrain) {
+				Chakra.pathway(this.getOwnerPlayer()).consume2(baseValue*ratio);
+			}
+			//this.getOwnerPlayer().setHealth(this.getOwnerPlayer().getMaxHealth());
 		}
 	}
 
@@ -412,6 +430,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 					this.consumeChakra();
 				}
 			}
+			ownerPlayer.getEntityData().setFloat("susanratio", this.getHealth()/this.getMaxHealth());
 			if (!this.world.isRemote && this.ticksExisted % 20 == 1) {
 				ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 22, 6, false, false));
 			}

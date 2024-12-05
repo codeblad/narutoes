@@ -42,7 +42,7 @@ public class EntityDeepForest extends ElementsNarutomodMod.ModElement {
 
 
 	public static class EC extends ItemMokuton.BigWoodSegment implements ItemJutsu.IJutsu {
-		private int lifespan = 600;
+		private int lifespan = 1200;
 		private EC prevSegment;
 		private EC firstSegment;
 		private boolean canSplit = false;
@@ -122,7 +122,7 @@ public class EntityDeepForest extends ElementsNarutomodMod.ModElement {
 						this.world.spawnEntity(segment);
 					}
 				}
-				if (!this.world.isRemote && this.getIndex() == 1 && this.ticksExisted > 1 && this.ticksExisted <= 25) {
+				if (!this.world.isRemote && this.getIndex() == 1 && this.ticksExisted > 1 && this.ticksExisted <= 22) {
 					float yaw = (this.rand.nextFloat()-0.5f) * 50f;
 					int i = this.prevSegment.getIndex();
 					/*if (this.hasLivingTarget() && i > 1) {
@@ -191,7 +191,7 @@ public class EntityDeepForest extends ElementsNarutomodMod.ModElement {
 								net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:deep_forest"))),
 						SoundCategory.NEUTRAL, 3, 1f);
 				entity.world.spawnEntity(new EC(entity));
-				((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 200);
+				((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 20*10);
 				return true;
 			}
 		}

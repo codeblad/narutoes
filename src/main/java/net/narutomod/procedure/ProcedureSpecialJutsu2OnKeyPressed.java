@@ -179,11 +179,29 @@ public class ProcedureSpecialJutsu2OnKeyPressed extends ElementsNarutomodMod.Mod
 						ProcedureYomotsuHirasaka.executeProcedure($_dependencies);
 					}
 				} else {
+					if ((entity.isSneaking())) {
+						{
+							Map<String, Object> $_dependencies = new HashMap<>();
+							$_dependencies.put("entity", entity);
+							$_dependencies.put("world", world);
+							ProcedureEightTrigrams64Palms.executeProcedure($_dependencies);
+						}
+					} else {
+						{
+							Map<String, Object> $_dependencies = new HashMap<>();
+							$_dependencies.put("is_pressed", false);
+							$_dependencies.put("entity", entity);
+							ProcedureHakkeKusho.executeProcedure($_dependencies);
+						}
+					}
+				}
+			} else {
+				if (!(entity.isSneaking())) {
 					{
 						Map<String, Object> $_dependencies = new HashMap<>();
+						$_dependencies.put("is_pressed", true);
 						$_dependencies.put("entity", entity);
-						$_dependencies.put("world", world);
-						ProcedureEightTrigrams64Palms.executeProcedure($_dependencies);
+						ProcedureHakkeKusho.executeProcedure($_dependencies);
 					}
 				}
 			}

@@ -165,27 +165,7 @@ public class ItemCleaver extends ElementsNarutomodMod.ModElement {
 			}
 			return null;
 		}
-	
-		@Override
-		public boolean isShield(ItemStack stack, EntityLivingBase entity) {
-			return stack.getItem() == block;
-		}
-	
-		@Override
-		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {
-			entity.setActiveHand(hand);
-			return new ActionResult(EnumActionResult.SUCCESS, entity.getHeldItem(hand));
-		}
-	
-		@Override
-		public EnumAction getItemUseAction(ItemStack itemstack) {
-			return EnumAction.BLOCK;
-		}
 
-		@Override
-		public int getMaxItemUseDuration(ItemStack itemstack) {
-			return 72000;
-		}
 	}
 
 	@SideOnly(Side.CLIENT)
