@@ -217,7 +217,6 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 		public EntityBrackenDance(World worldIn) {
 			super(worldIn);
 			this.setColor(0xFFFFFFFF);
-			this.maxScale = this.rand.nextFloat() * 2.0f + 1.5f;
 		}
 
 		public EntityBrackenDance(EntityLivingBase userIn, float damageIn) {
