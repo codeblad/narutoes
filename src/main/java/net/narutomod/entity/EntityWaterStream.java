@@ -67,7 +67,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 				Vec3d vec3d = this.shootingEntity.getLookVec();
 				Vec3d vec3d1 = vec3d.add(this.shootingEntity.getPositionEyes(1f).subtract(0d, 0.2d, 0d));
 				this.setPositionAndRotation(vec3d1.x, vec3d1.y, vec3d1.z, this.shootingEntity.rotationYaw, this.shootingEntity.rotationPitch);
-				vec3d1 = vec3d.scale(this.power);
+				vec3d1 = vec3d.scale(5+this.power*1.5);
 				this.shoot(vec3d1.x, vec3d1.y, vec3d1.z);
 			}
 		}
@@ -121,8 +121,9 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
 				target.extinguish();
+				float damage = 5 + ((1+2*(EC.this.power/30)) * EC.this.damageModifier)*ItemJutsu.getDmgMult(player)*1.25f;
 				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player),
-						(1.25f* (1+2*(EC.this.power/30)) * EC.this.damageModifier)*ItemJutsu.getDmgMult(player));
+						damage);
 			}
 
 			@Override
@@ -147,6 +148,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 5.0f) {
 					this.createJutsu(entity, power, 100);
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 100);
 					return true;
 				}
 				return false;

@@ -1,10 +1,7 @@
 
 package net.narutomod.entity;
 
-import net.narutomod.item.ItemJutsu;
-import net.narutomod.item.ItemKaton;
-import net.narutomod.item.ItemFuton;
-import net.narutomod.item.ItemRaiton;
+import net.narutomod.item.*;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
 import net.narutomod.PlayerTracker;
@@ -86,7 +83,7 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 					if (user instanceof EntityPlayer && user.swingProgressInt == 1) {
 						this.world.spawnEntity(new EntitySweepParticle(user, 8.0f));
 						double d = ProcedureUtils.getReachDistance(user)+4;
-						float damage = (float)ProcedureUtils.getModifiedAttackDamage(user) * this.getCooledAttackStrength(user, 0.5f)+ (1.75f*ItemJutsu.getDmgMult(user)*this.getCooledAttackStrength(user, 0.5f));
+						float damage = (float)ProcedureUtils.getModifiedAttackDamage(user) * this.getCooledAttackStrength(user, 0.5f) + (ItemJutsu.getDmgMult(user)*this.getCooledAttackStrength(user, 0.5f));
 						this.ticksSinceLastSwing = 0;
 						Entity directTarget = ProcedureUtils.objectEntityLookingAt(user, 4d, this).entityHit;
 						for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, user.getEntityBoundingBox().grow(d, 0.25D, d))) {
@@ -133,6 +130,9 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 				} else {
 					if (ItemRaiton.CHAKRAMODE.jutsu.isActivated(entity)) {
 						ItemRaiton.CHAKRAMODE.jutsu.deactivate(entity);
+					}
+					if (ItemIryoJutsu.POWERMODE.jutsu.isActivated(entity)) {
+						ItemIryoJutsu.POWERMODE.jutsu.deactivate(entity);
 					}
 					if (ItemRaiton.CHIDORI.jutsu.isActivated(entity)) {
 						ItemRaiton.CHIDORI.jutsu.deactivate(entity);

@@ -75,7 +75,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 			this(userIn.world);
 			this.user = userIn;
 			this.setScale(size);
-			this.setLocationAndAngles(userIn.posX, userIn.posY, userIn.posZ, 0.0f, 0.0f);
+			this.setLocationAndAngles(userIn.posX, userIn.posY-1, userIn.posZ, 0.0f, 0.0f);
 		}
 
 		@Override
@@ -118,8 +118,8 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void applyEntityCollision(Entity entityIn) {
-			float newDMG = this.contactDamage + this.rand.nextFloat() * 2.0f;
-			entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user), newDMG*ItemJutsu.getDmgMult(this.user));
+			float newDMG = 5;
+			entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user), 10+ItemJutsu.getDmgMult(this.user)*2);
 			entityIn.setFire(15);
 		}
 
@@ -189,6 +189,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power));
+				ItemJutsu.setCurrentJutsuCooldown(stack, entity, 100);
 				return true;
 			}
 

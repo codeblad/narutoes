@@ -40,6 +40,7 @@ import net.minecraft.init.SoundEvents;
 
 import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntityScalableProjectile;
+import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -124,7 +125,7 @@ public class ItemAsuraCanon extends ElementsNarutomodMod.ModElement {
 			Vec3d vec0 = throwerIn.getLookVec();
 			Vec3d vec = vec0.add(throwerIn.getPositionEyes(1f));
 			this.setLocationAndAngles(vec.x, vec.y, vec.z, throwerIn.rotationYawHead, throwerIn.rotationPitch);
-			this.shoot(vec0.x, vec0.y, vec0.z, 0.8f, 0.1f, true);
+			this.shoot(vec0.x, vec0.y, vec0.z, 0.975f, 0.1f, true);
 		}
 
 		@Override
@@ -133,7 +134,7 @@ public class ItemAsuraCanon extends ElementsNarutomodMod.ModElement {
 			this.updateInFlightRotations();
 			if (this.target != null) {
 				Vec3d vec = this.target.getPositionEyes(1f).subtract(this.getPositionVector());
-				this.shootPrecise(vec.x, vec.y, vec.z, this.isInWater() ? 0.85f : 0.95f);
+				this.shootPrecise(vec.x, vec.y, vec.z, this.isInWater() ? 0.9f : 0.975f);
 			} else if (this.shootingEntity instanceof EntityLiving) {
 				this.target = ((EntityLiving)this.shootingEntity).getAttackTarget();
 			} else if (this.shootingEntity != null) {
@@ -144,7 +145,7 @@ public class ItemAsuraCanon extends ElementsNarutomodMod.ModElement {
 					}
 				}).entityHit;
 			}
-			if (!this.world.isRemote && this.ticksInAir > 160) {
+			if (!this.world.isRemote && this.ticksInAir > 50) {
 				this.setDead();
 			}
 		}
@@ -152,6 +153,8 @@ public class ItemAsuraCanon extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void onImpact(RayTraceResult result) {
 			if (!this.world.isRemote && (result.entityHit == null || !result.entityHit.equals(this.shootingEntity))) {
+				ProcedureAoeCommand.set(this.world, this.posX,  this.posY, this.posZ, 0d, this.explosivePower).exclude(this.shootingEntity)
+						.damageEntities(ItemJutsu.causeJutsuDamage(this,this.shootingEntity),35+ItemJutsu.getDmgMult(this.shootingEntity)*1.45f);
 				this.world.createExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosivePower,
 				 ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 				this.setDead();

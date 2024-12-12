@@ -293,19 +293,35 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			if (targetEntity instanceof EntityPlayer) {
 				float defMult = 1;
 				ItemStack cheststack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
+					defMult += 0.65f;
+				}
 				if (cheststack.getItem() == ItemBoneArmor.body) {
 					if (ItemBoneArmor.isLarchActive(cheststack)) {
-						defMult += 0.35f;
+						defMult += 0.55f;
 					}
 				}
+				if (cheststack.getItem() == ItemTenseigan.body) {
+					defMult += .8f;
+				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.25f;
+					defMult+= 0.4f;
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
 					defMult+= 0.25f;
 				}
+				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
+					defMult+=.35f;
+				}
+				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
+					defMult+=.8f;
+				}
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
-					defMult+= 0.55f;
+					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
+						defMult+= 0.1f;
+					} else {
+						defMult+= 0.7f;
+					}
 				}
 				if (ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity) > 0) {
 					int gates = ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity);
@@ -319,7 +335,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (targetEntity.getEntityData().hasKey("bigRatio")) {
 					float ratio = targetEntity.getEntityData().getFloat("bigRatio");
-					defMult += 0.8f*ratio;
+					defMult += 0.85f*ratio;
 				}
 				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
 				float newAmount = amount/defense;

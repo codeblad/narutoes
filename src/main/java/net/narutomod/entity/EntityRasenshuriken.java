@@ -68,7 +68,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 		private float fullScale;
 		private Vec3d impactVec;
 		private RayTraceResult targetTrace;
-		protected float impactDamageMultiplier = 2.0f;
+		protected float impactDamageMultiplier = 1.0f;
 		private DamageSource damageSource;
 
 		public EC(World a) {
@@ -188,7 +188,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 		protected void doImpactDamage() {
 			ProcedureAoeCommand.set(this.world, this.impactVec.x, this.impactVec.y, this.impactVec.z, 0d, this.width/2)
 			  .exclude(this.shootingEntity).exclude(EntityTruthSeekerBall.EntityCustom.class).resetHurtResistanceTime()
-			  .damageEntities(this.damageSource, 0.25f*1+0.25f*(this.fullScale/2) * this.impactDamageMultiplier * ItemJutsu.getDmgMult(this.shootingEntity))
+			  .damageEntities(this.damageSource, (10+ (1+3f*(this.fullScale/5)) * ItemJutsu.getDmgMult(this.shootingEntity)*0.095f) * this.impactDamageMultiplier )
 			  .motion(0d, 0d, 0d);
 		}
 
@@ -201,7 +201,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				if (impactTicks % 4 == 0) {
 					this.world.playSound(null, this.posX, this.posY, this.posZ, SoundEvent.REGISTRY
-					  .getObject(new ResourceLocation("narutomod:rasenshuriken_explode")), SoundCategory.NEUTRAL, 5, 1f);
+					  .getObject(new ResourceLocation("narutomod:rasenshuriken_explode")), SoundCategory.NEUTRAL, 2, 1f);
 				}
 				float scale = this.getEntityScale() * (impactTicks <= 20 ? 1.15f : 1.001f);
 				double d = (this.height * scale / this.getEntityScale() - this.height) / 2;
@@ -218,7 +218,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 					  0x10FFFFFF, (int)(scale * 16f), 20);
 				}
 				particles.send();
-				if (impactTicks >= 200) {
+				if (impactTicks >= 50) {
 					this.setDead();
 				}
 			}
@@ -311,7 +311,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 300.0f;
+				return 200.0f;
 			}
 	
 			@Override
@@ -321,7 +321,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 		}
 
 		public static class TSBVariant implements ItemJutsu.IJutsuCallback {
-			private static final float multiplier = 8.0f;
+			private static final float multiplier = 2.0f;
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				EC entity1 = EC.create(entity, 4.0f, true);

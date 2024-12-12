@@ -60,12 +60,12 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 134;
 	public static final int ENTITY2ID = 10134;
 	private static final List<Material> earthenMaterials = Arrays.asList(Material.GROUND, Material.ROCK, Material.SAND, Material.CLAY);
-	public static final ItemJutsu.JutsuEnum HIDINGINROCK = new ItemJutsu.JutsuEnum(0, "entityhidinginrock", 'C', 10d, new EntityHidingInRock.Jutsu());
+	public static final ItemJutsu.JutsuEnum HIDINGINROCK = new ItemJutsu.JutsuEnum(0, "entityhidinginrock", 'C', 50d, new EntityHidingInRock.Jutsu());
 	public static final ItemJutsu.JutsuEnum EARTHWALL = new ItemJutsu.JutsuEnum(1, "entityearthwall", 'B', 20d, new EntityEarthWall.Jutsu());
 	public static final ItemJutsu.JutsuEnum SANDWICH = new ItemJutsu.JutsuEnum(2, "earth_sandwich", 'B', 100d, new EntityEarthSandwich.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum SWAMPPIT = new ItemJutsu.JutsuEnum(3, "swamp_pit", 'A', 100d, new EntitySwampPit.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum SPEARS = new ItemJutsu.JutsuEnum(4, "earth_spears", 'C', 20d, new EntityEarthSpears.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum GOLEM = new ItemJutsu.JutsuEnum(5, "earth_golem", 'B', 100d, new EntityEarthGolem.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SWAMPPIT = new ItemJutsu.JutsuEnum(3, "swamp_pit", 'A', 150d, new EntitySwampPit.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SPEARS = new ItemJutsu.JutsuEnum(4, "earth_spears", 'C', 50d, new EntityEarthSpears.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum GOLEM = new ItemJutsu.JutsuEnum(5, "earth_golem", 'B', 300d, new EntityEarthGolem.EC.Jutsu());
 
 	public ItemDoton(ElementsNarutomodMod instance) {
 		super(instance, 378);
@@ -415,10 +415,11 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 5f) {
-					RayTraceResult rt = ProcedureUtils.raytraceBlocks(entity, 30d);
+					RayTraceResult rt = ProcedureUtils.raytraceBlocks(entity, 45d);
 					if (rt != null && rt.typeOfHit == RayTraceResult.Type.BLOCK) {
 						entity.world.spawnEntity(new EntityEarthWall(
 						  entity.world, rt.hitVec.x, rt.hitVec.y, rt.hitVec.z, entity.rotationYaw, (double)power));
+						ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
 						return true;
 					}
 				}

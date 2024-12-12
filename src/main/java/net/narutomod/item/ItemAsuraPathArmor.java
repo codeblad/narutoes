@@ -40,7 +40,7 @@ public class ItemAsuraPathArmor extends ElementsNarutomodMod.ModElement {
 	}
 
 	public void initElements() {
-		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("ASURAPATHARMOR", "narutomod:sasuke_", 1024, new int[]{2, 5, 1024, 2}, 0, null,
+		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("ASURAPATHARMOR", "narutomod:sasuke_", 1024, new int[]{2, 5, 60, 2}, 0, null,
 				5.0F);
 		this.elements.items.add(() -> new ItemArmor(enuma, 0, EntityEquipmentSlot.CHEST) {
 			@SideOnly(Side.CLIENT)
@@ -76,14 +76,14 @@ public class ItemAsuraPathArmor extends ElementsNarutomodMod.ModElement {
 				ProcedureAsuraPathArmorBodyTickEvent.executeProcedure((HashMap) $_dependencies);
 			}
 
-			@Override
+			/*@Override
 			public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
 				Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(equipmentSlot);
 				if (equipmentSlot == EntityEquipmentSlot.CHEST) {
 					multimap.put(SharedMonsterAttributes.MAX_HEALTH.getName(), HEALTH_MODIFIER);
 				}
 				return multimap;
-			}
+			}*/
 
 			@Override
 			public boolean onDroppedByPlayer(ItemStack item, EntityPlayer player) {

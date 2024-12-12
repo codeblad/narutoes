@@ -258,7 +258,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 					float f = MathHelper.sqrt(power * 9f / 5f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EntityBrackenDance entity1 = new EntityBrackenDance(entity, power);
-						entity1.damage = 6* ((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
+						entity1.damage = 12+6* ((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
 						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
 						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
@@ -268,6 +268,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 						 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")),
 						 SoundCategory.NEUTRAL, 5f, entity.getRNG().nextFloat() * 0.4f + 0.4f);
 					}
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
 					return true;
 				}
 				return false;

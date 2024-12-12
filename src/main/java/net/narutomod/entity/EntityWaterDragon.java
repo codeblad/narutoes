@@ -87,7 +87,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 			this.setOGSize(1.0F, 1.0F);
 			this.setEntityScale(power);
 			this.power = power;
-			this.mult = 1.5f+1.5f*(power/5);
+			this.mult = 1f+1f*(power/5);
 			this.setLocationAndAngles(shooter.posX, shooter.posY, shooter.posZ, shooter.rotationYaw, shooter.rotationPitch);
 			this.yOrigin = shooter.posY;
 		}
@@ -200,7 +200,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 6.0F * size, false,
 				  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 				ProcedureAoeCommand.set(this, 1.0D, 5.0D).exclude(this.shootingEntity)
-				  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (12f*this.mult)*ItemJutsu.getDmgMult(this.shootingEntity));
+				  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 20+(7f*this.mult)*ItemJutsu.getDmgMult(this.shootingEntity));
 				Map<BlockPos, IBlockState> map = Maps.newHashMap();
 				for (BlockPos pos : ProcedureUtils.getAllAirBlocks(this.world, this.getEntityBoundingBox().contract(0d, this.height-1, 0d))) {
 					map.put(pos, Blocks.FLOWING_WATER.getDefaultState().withProperty(BlockLiquid.LEVEL, Integer.valueOf(1)));
@@ -225,6 +225,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 				if (power >= 1.0f //&& entity.onGround
 				 && (entity.isOverWater() || Chakra.pathway(entity).consume(ItemSuiton.WATERDRAGON.chakraUsage * 2))) {
 				 	this.createJutsu(entity, power);
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*5);
 					return true;
 				}
 				return false;

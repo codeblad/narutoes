@@ -51,7 +51,8 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-		 .id(new ResourceLocation("narutomod", "kikaichu"), ENTITYID).name("kikaichu").tracker(64, 3, true).build());
+		 .id(new ResourceLocation("narutomod", "kikaichu"), ENTITYID)
+.name("kikaichu").tracker(64, 3, true).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
 		 .id(new ResourceLocation("narutomod", "bugball"), ENTITYID_RANGED).name("bugball").tracker(64, 3, true).build());
 	}
@@ -291,8 +292,8 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 						if (!entity.isPotionActive(PotionHeaviness.potion) || entity.getActivePotionEffect(PotionHeaviness.potion).getAmplifier() < 1) {
 							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 22, 1, false, false));
 						}
-						if (this.chakra < 100d && Chakra.pathway(entity).consume(0.25d)) {
-							this.chakra += 0.25d;
+						if (this.chakra < 100d && Chakra.pathway(entity).consume(0.001d)) {
+							this.chakra += 0.001d;
 						}
 					} else if (this.chakra > 0.0d) {
 						Chakra.pathway(this.host).consume(-this.chakra);

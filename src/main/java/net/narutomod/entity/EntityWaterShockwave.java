@@ -110,7 +110,7 @@ public class EntityWaterShockwave extends ElementsNarutomodMod.ModElement {
 			}
 			if (this.user != null && this.user.isEntityAlive()) {
 				if (this.buildUpPhase) {
-					this.user.setPositionAndUpdate(this.posX, this.posY, this.posZ);
+					//this.user.setPositionAndUpdate(this.posX, this.posY, this.posZ);
 					List<BlockPos> list = this.getAirBlocksInRadius();
 					if (!list.isEmpty()) {
 						for (int i = 0; i < this.radius * this.radius && i < list.size(); i++) {

@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.util.math.*;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
@@ -30,10 +31,6 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.item.Item;
@@ -167,7 +164,9 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && this.getBijuManager().hasSpawnPos()) {
 				this.setHomePosAndDistance(this.getBijuManager().getSpawnPos(), 128);
 			}
+			setEntityBoundingBox(getEntityBoundingBox().expand(5,0,5));
 		}
+
 
 		public Base(EntityPlayer player) {
 			this(player.world);
@@ -269,7 +268,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(this.getTargetRange());
 			this.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(200.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(100.0D);
 		}
 
 		@Override
@@ -298,7 +297,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				@Override
 				public void resetTask() {
 					super.resetTask();
-					Base.this.meleeTime = 100;
+					Base.this.meleeTime = 200;
 				}
 			});
 			this.tasks.addTask(1, new AILeapAtTarget(this, 36.0d, 2.0f) {
@@ -396,7 +395,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			if (this.meleeTime > 0) {
 				--this.meleeTime;
 			} else if (target != null && this.getDistance(target) <= ProcedureUtils.getReachDistance(this) * 0.6d) {
-				this.meleeTime = 80;
+				this.meleeTime = 120;
 			}
 		}
 
@@ -447,13 +446,14 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public int getTalkInterval() {
-			return 320 - this.angerLevel * 120;
+			return 500 - this.angerLevel * 120;
 		}
 
 		@Override
 		public boolean canBePushed() {
 			return false;
 		}
+
 
 		@Override
 		protected void collideWithEntity(Entity entityIn) {
@@ -1101,7 +1101,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 						 new TextComponentString(String.format("%.1f", cd.power)), true);
 					}
 				} else {
-					if (spawn(entity, cd.power, cd.power * 70f) != null) {
+					if (spawn(entity, cd.power, 150+ItemJutsu.getDmgMult(entity)*(1+12*cd.power/14)) != null) {
 						cd.cooldown = entity.ticksExisted + (int)(cd.power * 7.143f);
 					}
 					cd.power = 0f;
@@ -1161,8 +1161,8 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 	            	d3 = d;
 	            }
 	            this.leaper.rotationYaw = (float)(MathHelper.atan2(d1, d0) * (180D / Math.PI)) - 90.0F;
-	            this.leaper.motionX = d0 * 0.145d;
-	            this.leaper.motionZ = d1 * 0.145d;
+	            this.leaper.motionX = d0 * 0.1d;
+	            this.leaper.motionZ = d1 * 0.1d;
 	            this.leaper.motionY = 0.32d + (Math.max(d2, 0.0d) + d3 * 0.6d) * 0.1d;
             }
 	    }
@@ -1368,7 +1368,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 	            this.entity.renderYawOffset = this.entity.rotationYaw;
 				f = (float)(-(MathHelper.atan2(d2, MathHelper.sqrt(d0 * d0 + d1 * d1)) * (180D / Math.PI)));
 				this.entity.rotationPitch = this.limitAngle(this.entity.rotationPitch, f, 60.0F);
-	            this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue()));
+	            this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue())*0.3f);
 			} else {
 				super.onUpdateMoveHelper();
 			}

@@ -76,8 +76,10 @@ public class EntityGedoStatue extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-		 .id(new ResourceLocation("narutomod", "gedo_statue"), ENTITYID).name("gedo_statue")
+		elements.entities
+.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
+		 .id(new ResourceLocation("narutomod", "gedo_statue"), ENTITYID)
+.name("gedo_statue")
 		 .tracker(128, 3, true).egg(-8621734, -10069692).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityPurpleDragon.class)
 		 .id(new ResourceLocation("narutomod", "purple_dragon"), ENTITYID_RANGED).name("purple_dragon")
@@ -267,8 +269,8 @@ public class EntityGedoStatue extends ElementsNarutomodMod.ModElement {
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.8D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10000D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(100D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(6000D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(200D);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(24.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0D);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(24.0D);
@@ -683,12 +685,12 @@ public class EntityGedoStatue extends ElementsNarutomodMod.ModElement {
 			 		if (result.entityHit instanceof EntityTailedBeast.Base
 			 		 && ((EntityLivingBase)result.entityHit).getHealth() > 50.0f) {
 						result.entityHit.attackEntityFrom(ItemJutsu.causeSenjutsuDamage(this, this.shootingEntity)
-						 .setDamageBypassesArmor(), this.damage * 0.25f + (this.rand.nextFloat()-0.5f) * 10f);
+						 .setDamageBypassesArmor(), this.damage + ItemJutsu.getDmgMult(this.shootingEntity)*2.5f);
 			 		}
 			 	} else if (!result.entityHit.equals(((EntityCustom)this.shootingEntity).getSummoner())) {
 					Chakra.pathway((EntityLivingBase)result.entityHit).consume(1.0f);
 					result.entityHit.attackEntityFrom(ItemJutsu.causeSenjutsuDamage(this, this.shootingEntity)
-					 .setDamageBypassesArmor(), this.damage + (this.rand.nextFloat()-0.5f) * 40f);
+					 .setDamageBypassesArmor(), this.damage*0.5f + ItemJutsu.getDmgMult(this.shootingEntity)*2);
 					if (this.targetList.contains(result.entityHit)) {
 						this.targetList.remove(result.entityHit);
 						this.targetList.sort(new ProcedureUtils.EntitySorter(this));

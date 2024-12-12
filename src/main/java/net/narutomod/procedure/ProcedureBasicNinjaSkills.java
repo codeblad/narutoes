@@ -56,7 +56,7 @@ public class ProcedureBasicNinjaSkills extends ElementsNarutomodMod.ModElement {
 		RayTraceResult r = ProcedureUtils.raytraceBlocks(entity, 1d);
 		f1 = (!entity.onGround && entity.rotationPitch < 0 && r != null && r.typeOfHit == RayTraceResult.Type.BLOCK
 				&& world.getBlockState(r.getBlockPos()).isFullCube());
-		if ((f1)) {
+		if ((f1) && !entity.isSneaking()) {
 			f1 = entity.isInWater() || entity.isInLava();
 			if ((f1)) {
 				entity.motionY = 0.3;

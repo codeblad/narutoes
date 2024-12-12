@@ -160,10 +160,10 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 			@Override
 			public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
 				Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
-				if (slot == EntityEquipmentSlot.HEAD && isRinnesharinganActivated(stack)) {
+				/*if (slot == EntityEquipmentSlot.HEAD && isRinnesharinganActivated(stack)) {
 					multimap.put(SharedMonsterAttributes.MAX_HEALTH.getName(),
 					 new AttributeModifier(RINNESHARINGAN_MODIFIER, "byakurinnesharingan.maxhealth", 380d, 0));
-				}
+				}*/
 				return multimap;
 			}
 

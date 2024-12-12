@@ -176,7 +176,7 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 				this.world.createExplosion(summoner, this.posX, this.posY, this.posZ, 8f,
 		    	 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, summoner));
 		    	ProcedureAoeCommand.set(this, 0d, 8d)
-		    	 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, summoner), 10f+1.65f*ItemJutsu.getDmgMult(summoner));
+		    	 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, summoner), 5f+1.45f*ItemJutsu.getDmgMult(summoner));
 	    		this.setDead();
 	    	}
 		}
@@ -234,6 +234,7 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (!entity.isSneaking()) {
 					this.createJutsu(entity);
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*2);
 					return true;
 				} else {
 					for (EC clone : entity.world.getEntities(EC.class, EntitySelectors.IS_ALIVE)) {

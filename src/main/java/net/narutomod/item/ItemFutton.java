@@ -56,8 +56,8 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:futton")
 	public static final Item block = null;
 	public static final int ENTITYID = 281;
-	public static final ItemJutsu.JutsuEnum MIST = new ItemJutsu.JutsuEnum(0, "futton_mist", 'S', 50d, new EntityBoilingMist.Jutsu());
-	public static final ItemJutsu.JutsuEnum STRENGTH = new ItemJutsu.JutsuEnum(1, "unrivaled_strength", 'S', 65d, new EntityUnrivaledStrength.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum MIST = new ItemJutsu.JutsuEnum(0, "futton_mist", 'S', 80d, new EntityBoilingMist.Jutsu());
+	public static final ItemJutsu.JutsuEnum STRENGTH = new ItemJutsu.JutsuEnum(1, "unrivaled_strength", 'S', 70d, new EntityUnrivaledStrength.EC.Jutsu());
 
 	public ItemFutton(ElementsNarutomodMod instance) {
 		super(instance, 600);
@@ -123,7 +123,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			this.user = userIn;
 			this.power = powerIn;
 			this.farRadius = width;
-			this.damagePerSec = (int) (1.25*ItemJutsu.getDmgMult(userIn));
+			this.damagePerSec = (int) (0.85*ItemJutsu.getDmgMult(userIn));
 			this.duration = (int)(powerIn * powerIn * 0.5f);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
 		}
@@ -224,6 +224,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				this.createJutsu(entity, power, power * 0.25f);
+				ItemJutsu.setCurrentJutsuCooldown(stack, entity, (long) (20+(power * power * 0.5)));
 				return true;
 			}
 

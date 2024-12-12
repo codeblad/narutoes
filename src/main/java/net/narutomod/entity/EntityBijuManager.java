@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 
 import net.minecraft.init.Biomes;
@@ -547,7 +548,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 				if (ItemSenjutsu.isSageModeActivated(this.jinchurikiPlayer) && this.cloakXp[1] < 800 || this.tails < 9) {
 					ItemSenjutsu.deactivateSageMode(this.jinchurikiPlayer);
 				}
-				double d = 5000d + this.getCloakXp();
+				double d = 5000d + Math.min(this.getCloakXp(),5000);
 				if (d > cp.getMax() * 4d && !this.jinchurikiPlayer.isCreative()) {
 					this.jinchurikiPlayer.sendStatusMessage(new TextComponentTranslation("chattext.bijumanager.tooweak",
 					 this.getEntityLocalizedName()), false);
@@ -600,7 +601,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 			if (this.jinchurikiPlayer != null
 			 && ((this.cloakLevel == 1 && this.cloakXp[0] >= 3600) || (this.cloakLevel == 2 && this.cloakXp[1] >= 4800))) {
 				Chakra.Pathway chakra = Chakra.pathway(this.jinchurikiPlayer);
-				double d = 5000d + this.getCloakXp();
+				double d = 5000d + Math.min(this.getCloakXp(),5000);
 				if (chakra.getAmount() + d > chakra.getMax() * 4 && !this.jinchurikiPlayer.isCreative()) {
 					this.jinchurikiPlayer.sendStatusMessage(new TextComponentTranslation("chattext.bijumanager.tooweak",
 					 this.getEntityLocalizedName()), false);
@@ -620,7 +621,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 							new TextComponentTranslation("chattext.cooldown.formatted", (this.cloakCD - l) / 20L), true);
 				}
 				this.cloakLevel = 2;
-				double d = 5000d + this.getCloakXp();
+				double d = 5000d + Math.min(this.getCloakXp(),5000);
 				Chakra.Pathway chakra = Chakra.pathway(this.jinchurikiPlayer);
 				chakra.consume(d, true);
 				return this.cloakLevel;
@@ -628,7 +629,8 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 			ItemBijuCloak.clearCloakItems(this.jinchurikiPlayer);
 			T biju = this.spawnEntity(this.jinchurikiPlayer);
 			if (biju != null) {
-				biju.setLifeSpan(this.cloakXp[2] * 5 + 1200);
+				biju.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(200.0D);
+				biju.setLifeSpan(Math.min(this.cloakXp[2],1800) + 600);
 			}
 			this.cloakCD = l+120*20;
 		}

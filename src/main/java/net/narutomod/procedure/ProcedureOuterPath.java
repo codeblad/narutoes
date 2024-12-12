@@ -102,7 +102,7 @@ public class ProcedureOuterPath extends ElementsNarutomodMod.ModElement {
 						entityToSpawn.setLocationAndAngles(x, ProcedureUtils.getTopSolidBlockY(world, new BlockPos(x, y, z)), z, entity.rotationYaw,
 								0f);
 						if (world.spawnEntity(entityToSpawn)) {
-							entity.getEntityData().setDouble((NarutomodModVariables.InvulnerableTime), 100);
+							entity.getEntityData().setDouble((NarutomodModVariables.InvulnerableTime), 20);
 							world.playSound((EntityPlayer) null, x, y, z,
 									(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY
 											.getObject(new ResourceLocation("narutomod:kuchiyosenojutsu")),

@@ -156,7 +156,7 @@ public class EntitySealing extends ElementsNarutomodMod.ModElement {
 					this.ticks2Death = 0;
 				} else if (this.isBeingRidden() && this.getSealersCount() > 0) {
 					if (!this.bijuEntity.isFuuinInProgress()) {
-						this.bijuEntity.fuuinIntoVessel(this.getControllingPassenger(), 12000);
+						this.bijuEntity.fuuinIntoVessel(this.getControllingPassenger(), 24000);
 					} else {
 						this.bijuEntity.incFuuinProgress(this.getSealersCount() - 1);
 						this.sendSealingProgress(this.bijuEntity.getFuuinProgress());

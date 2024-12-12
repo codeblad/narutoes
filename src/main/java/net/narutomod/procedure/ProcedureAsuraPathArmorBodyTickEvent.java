@@ -1,5 +1,6 @@
 package net.narutomod.procedure;
 
+import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemTenseigan;
 import net.narutomod.item.ItemRinnegan;
 import net.narutomod.ElementsNarutomodMod;
@@ -54,15 +55,17 @@ public class ProcedureAsuraPathArmorBodyTickEvent extends ElementsNarutomodMod.M
 		}
 		if (((!(world.isRemote)) && (((ticks_used) % 40) == 1))) {
 			if (entity instanceof EntityLivingBase)
-				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.STRENGTH, (int) 41, (int) 24, (false), (false)));
+				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.STRENGTH, (int) 41, (int) (6+42*(ItemJutsu.getDmgMult(entity)/63)), (false), (false)));
 			if (entity instanceof EntityLivingBase)
-				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.SPEED, (int) 41, (int) 16, (false), (false)));
+				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.SPEED, (int) 41, (int) 10, (false), (false)));
 			if (entity instanceof EntityLivingBase)
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.HASTE, (int) 41, (int) 5, (false), (false)));
 			if (entity instanceof EntityLivingBase)
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, (int) 41, (int) 5, (false), (false)));
 			if (entity instanceof EntityLivingBase)
-				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.SATURATION, (int) 41, (int) 0, (false), (false)));
+				((EntityLivingBase) entity).heal(0.5f);
+			if (entity instanceof EntityPlayer)
+				((EntityPlayer) entity).getFoodStats().addStats(1,0);
 		}
 	}
 }

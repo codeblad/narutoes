@@ -55,7 +55,7 @@ public class ItemTenseiganChakraMode extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:tenseigan_chakra_mode")
 	public static final Item block = null;
 	public static final int ENTITYID = 339;
-	public static final ItemJutsu.JutsuEnum CHAKRAORBS = new ItemJutsu.JutsuEnum(0, "tenseigangun", 'S', 10d, new EntityOrbs.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHAKRAORBS = new ItemJutsu.JutsuEnum(0, "tenseigangun", 'S', 50d, new EntityOrbs.Jutsu());
 	public static final ItemJutsu.JutsuEnum SILVERBLAST = new ItemJutsu.JutsuEnum(1, "tensei_baku_silver", 'S', 50d, new EntityTenseiBakuSilver.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum GOLDBLAST = new ItemJutsu.JutsuEnum(2, "tensei_baku_gold", 'S', 50d, new EntityTenseiBakuGold.EC.Jutsu());
 
@@ -165,7 +165,7 @@ public class ItemTenseiganChakraMode extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityOrbs extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private final int explosionSize = 5;
-		private final float damage = 30.0F;
+		private final float damage = 50.0F;
 
 		public EntityOrbs(World a) {
 			super(a);
@@ -203,7 +203,7 @@ public class ItemTenseiganChakraMode extends ElementsNarutomodMod.ModElement {
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosionSize, false, flag);
 				ProcedureAoeCommand.set(this, 0.0D, 3.0D).exclude(this.shootingEntity)
-						.damageEntities(DamageSource.causeIndirectMagicDamage(this, this.shootingEntity), this.damage);
+						.damageEntities(DamageSource.causeIndirectMagicDamage(this, this.shootingEntity), this.damage+ItemJutsu.getDmgMult(this.shootingEntity)*2);
 				this.setDead();
 			}
 		}

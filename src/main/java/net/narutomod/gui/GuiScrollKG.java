@@ -59,6 +59,7 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 				ItemMangekyoSharinganObito.helmet,
 				ItemMangekyoSharinganEternal.helmet,
 				ItemRinnegan.helmet,
+				ItemTenseigan.helmet,
 				ItemKekkeiMora.block,
 				ItemGourd.body,
 		};
@@ -152,7 +153,7 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 				giveJutsu(ItemDoton.block, player);
 				giveJutsu(ItemKaton.block, player);
 			} else if (buttonID == 6) {
-				//scorch
+				//MAGNET
 				giveJutsu(ItemDoton.block, player);
 				giveJutsu(ItemFuton.block, player);
 			} else if (buttonID == 7) {

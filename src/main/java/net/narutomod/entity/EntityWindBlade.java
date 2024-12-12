@@ -106,7 +106,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 				if (result.entityHit != null) {
 					if (!result.entityHit.equals(this.shootingEntity) && !(result.entityHit instanceof EC)) {
 						result.entityHit.hurtResistantTime = 10;
-						result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 2*(1+2*(this.power/5))*ItemJutsu.getDmgMult(this.shootingEntity));
+						result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 5+2*(1+1*(this.power/5))*ItemJutsu.getDmgMult(this.shootingEntity));
 						this.setDead();
 					}
 				} else {
@@ -133,6 +133,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0F) {
 					this.createJutsu(entity, power);
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20);
 					return true;
 				}
 				return false;

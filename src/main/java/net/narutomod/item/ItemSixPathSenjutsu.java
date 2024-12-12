@@ -38,11 +38,11 @@ public class ItemSixPathSenjutsu extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:six_path_senjutsu")
 	public static final Item block = null;
 	public static final int ENTITYID = 347;
-	public static final ItemJutsu.JutsuEnum SHOOT = new ItemJutsu.JutsuEnum(0, "tooltip.6psenjutsu.shoot", 'S', 50d, new ShootTruthSeekerBall());
-	public static final ItemJutsu.JutsuEnum SHIELD = new ItemJutsu.JutsuEnum(1, "tooltip.6psenjutsu.shield", 'S', 50d, new TruthSeekerShield());
+	public static final ItemJutsu.JutsuEnum SHOOT = new ItemJutsu.JutsuEnum(0, "tooltip.6psenjutsu.shoot", 'S', 150d, new ShootTruthSeekerBall());
+	public static final ItemJutsu.JutsuEnum SHIELD = new ItemJutsu.JutsuEnum(1, "tooltip.6psenjutsu.shield", 'S', 250d, new TruthSeekerShield());
 	public static final ItemJutsu.JutsuEnum THUNDER = new ItemJutsu.JutsuEnum(2, "inton_raiha", 'S', 100d, new EntityIntonRaiha.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum LASER = new ItemJutsu.JutsuEnum(3, "ranton_koga", 'S', 100d, new EntityRantonKoga.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(4, "tooltip.6psenjutsu.rasenshuriken", 'S', 1000d, new EntityRasenshuriken.EC.TSBVariant());
+	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(4, "tooltip.6psenjutsu.rasenshuriken", 'S', 2200d, new EntityRasenshuriken.EC.TSBVariant());
 
 	public ItemSixPathSenjutsu(ElementsNarutomodMod instance) {
 		super(instance, 703);
@@ -185,7 +185,8 @@ public class ItemSixPathSenjutsu extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
-	}
+
+	}
 
 	public static class ShootTruthSeekerBall implements ItemJutsu.IJutsuCallback {
 		@Override

@@ -68,7 +68,7 @@ public class ProcedureRinneganHelmetTickEvent extends ElementsNarutomodMod.ModEl
 			if (((isRinnesharingan) && (!(((entity instanceof EntityLivingBase) ? ((EntityLivingBase) entity).getHeldItemMainhand() : ItemStack.EMPTY)
 					.getItem() == new ItemStack(ItemTenseiganChakraMode.block, (int) (1)).getItem())))) {
 				ProcedureUtils.purgeHarmfulEffects((EntityLivingBase) entity);
-				ProcedureWhenPlayerAttcked.setExtraDamageReduction(entity, 0.9f);
+				//ProcedureWhenPlayerAttcked.setExtraDamageReduction(entity, 0.9f);
 				if (((entity.ticksExisted % 20) == 2)) {
 					if (entity instanceof EntityLivingBase)
 						((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionFlight.potion, (int) 22, (int) 1, (false), (false)));
@@ -80,7 +80,7 @@ public class ProcedureRinneganHelmetTickEvent extends ElementsNarutomodMod.ModEl
 				if (((((entity instanceof EntityLivingBase) ? ((EntityLivingBase) entity).getHealth() : -1) < ((entity instanceof EntityLivingBase)
 						? ((EntityLivingBase) entity).getMaxHealth()
 						: -1)) && (((entity instanceof EntityLivingBase) ? ((EntityLivingBase) entity).getHealth() : -1) > 0))) {
-					((EntityLivingBase) entity).heal(1.0f);
+					((EntityLivingBase) entity).heal(0.005f);
 				}
 				if ((!(((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(2) : ItemStack.EMPTY)
 						.getItem() == new ItemStack(ItemRinnegan.body, (int) (1)).getItem()))) {

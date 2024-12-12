@@ -47,8 +47,10 @@ public class EntityGiantDog2h extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-		 .id(new ResourceLocation("narutomod", "giant_dog_2h"), ENTITYID).name("giant_dog_2h")
+		elements.entities
+.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
+		 .id(new ResourceLocation("narutomod", "giant_dog_2h"), ENTITYID)
+.name("giant_dog_2h")
 		 .tracker(64, 3, true).egg(-11388356, -9088173).build());
 	}
 
@@ -95,7 +97,8 @@ public class EntityGiantDog2h extends ElementsNarutomodMod.ModElement {
 			this.tasks.addTask(2, new EntityAIAttackMelee(this, 1.4f, true));
 			this.tasks.addTask(3, new EntityAILookIdle(this));
 		}
-
+
+
 		@Override
 		public SoundEvent getAmbientSound() {
 			return SoundEvent.REGISTRY.getObject(new ResourceLocation("entity.wolf.growl"));
@@ -123,7 +126,7 @@ public class EntityGiantDog2h extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D);
 			//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1000D);
 			//this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(30D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(50D);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0);
 		}
 

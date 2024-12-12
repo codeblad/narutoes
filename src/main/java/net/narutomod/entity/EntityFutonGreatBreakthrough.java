@@ -93,8 +93,8 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 				boolean canfly = this.user instanceof EntityPlayer && !this.user.onGround;
 				this.shoot(this.power, this.power * 0.25d, canfly);
 				if (canfly && Chakra.pathway(this.user).consume(ItemFuton.BIGBLOW.chakraUsage * this.power * 0.0025d)) {
-					++this.duration;
-					ProcedureUtils.addVelocity(this.user, Vec3d.fromPitchYaw(this.user.rotationPitch, this.user.rotationYawHead).scale(-this.power * 0.003f));
+					//++this.duration;
+					ProcedureUtils.addVelocity(this.user, Vec3d.fromPitchYaw(this.user.rotationPitch, this.user.rotationYawHead).scale(-0.08-(0.04*this.power/64)));
 				}
 			}
 			if (!this.world.isRemote && this.ticksExisted > this.duration) {
@@ -155,6 +155,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= this.getBasePower()) {
 					entity.world.spawnEntity(new EC(entity, power));
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 120);
 					return true;
 				}
 				return false;
@@ -243,7 +244,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 						Vec3d vec1 = res.hitVec.subtract(shooter.getPositionEyes(1f));
 						vec1 = this.multiply(vec, vec1.normalize().scale(this.getRange() - (float)vec1.lengthVector()));
 						Particles.spawnParticle(this.world, Particles.Types.BLOCK_DUST, res.hitVec.x, res.hitVec.y, res.hitVec.z,
-						 6, 0.4d, 0.3d, 0.4d, vec1.x, vec1.y, vec1.z, Block.getIdFromBlock(blockstate.getBlock()), 50+this.rand.nextInt(50), 70, 10);
+						 1, 0.4d, 0.3d, 0.4d, vec1.x, vec1.y, vec1.z, Block.getIdFromBlock(blockstate.getBlock()), 50+this.rand.nextInt(50), 70, 10);
 					}
 				}
 			}

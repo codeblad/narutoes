@@ -30,7 +30,7 @@ public class ProcedureKingOfHellEntityOnEntityTickUpdate extends ElementsNarutom
 		Entity entity = (Entity) dependencies.get("entity");
 		World world = (World) dependencies.get("world");
 		boolean f1 = false;
-		Particles.spawnParticle(world, Particles.Types.FLAME, entity.posX, entity.posY, entity.posZ, 100, entity.width / 4, 0.2, entity.width / 4, 0,
+		Particles.spawnParticle(world, Particles.Types.FLAME, entity.posX, entity.posY, entity.posZ, 50, entity.width / 4, 0.2, entity.width / 4, 0,
 				0, 0, 0x80404080, 30);
 		if (((EntityKingOfHell.EntityCustom) entity).getAge() == 1) {
 			world.playSound((EntityPlayer) null, (entity.posX), (entity.posY), (entity.posZ),

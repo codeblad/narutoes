@@ -49,10 +49,10 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 123;
 	//public static final int ENTITY2ID = 10123;
-	public static final ItemJutsu.JutsuEnum GREATFIREBALL = new ItemJutsu.JutsuEnum(0, "katonfireball", 'C', 30d, new EntityBigFireball.Jutsu());
+	public static final ItemJutsu.JutsuEnum GREATFIREBALL = new ItemJutsu.JutsuEnum(0, "katonfireball", 'C', 50d, new EntityBigFireball.Jutsu());
 	public static final ItemJutsu.JutsuEnum GFANNIHILATION = new ItemJutsu.JutsuEnum(1, "tooltip.katon.annihilation", 'B', 50d, new EntityFirestream.EC.Jutsu1());
 	public static final ItemJutsu.JutsuEnum HIDINGINASH = new ItemJutsu.JutsuEnum(2, "hiding_in_ash", 'B', 50d, new EntityHidingInAsh.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum GREATFLAME = new ItemJutsu.JutsuEnum(3, "katonfirestream", 'C', 20d, new EntityFirestream.EC.Jutsu2());
+	public static final ItemJutsu.JutsuEnum GREATFLAME = new ItemJutsu.JutsuEnum(3, "katonfirestream", 'C', 15d, new EntityFirestream.EC.Jutsu2());
 	public static final ItemJutsu.JutsuEnum FLAMESLICE = new ItemJutsu.JutsuEnum(4, "flame_slice", 'D', 20d, new EntityFlameSlice.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum BARRIER = new ItemJutsu.JutsuEnum(5, "flame_formation", 'B', 100d, new EntityFlameFormation.EC.Jutsu());
 
@@ -104,9 +104,8 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.fullScale = fullScale;
 			this.explosionSize = Math.max((int)fullScale - 1, 0);
 			//this.damage = fullScale * 10.0f;
-			this.damage = 3.0f;
-			this.mult = 1.0f + 2f*((fullScale-1f)/10);
-			this.damage *= mult;
+			this.mult = 1.0f + 2f*(fullScale/10);
+			this.damage = 10 + ItemJutsu.getDmgMult(shooter)*mult;
 			//this.guided = isGuided;
 			this.guided = false;
 			//this.setEntityScale(0.1f);
@@ -135,14 +134,14 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			}
 			if (!this.world.isRemote) {
 				if (this.shootingEntity != null) {
-					this.shootingEntity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 40d);
+					this.shootingEntity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 10d);
 				}
 				if (result.entityHit != null && (result.entityHit.equals(this.shootingEntity)
 				 || (result.entityHit instanceof EntityBigFireball && ((EntityBigFireball)result.entityHit).shootingEntity == this.shootingEntity))) {
 					return;
 				}
 				ProcedureAoeCommand.set(this, 0d, this.fullScale * 0.4f).exclude(this.shootingEntity)
-				 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), this.damage*ItemJutsu.getDmgMult(this.shootingEntity)).setFire(15);
+				 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), this.damage).setFire(15);
 				boolean flag = ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosionSize, flag, false);
 				this.setDead();
@@ -200,7 +199,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					this.createJutsu(entity, entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power,
 					 stack.getItem() instanceof RangedItem && ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) <= 0.5f);
 					//if (entity instanceof EntityPlayer)
-					//	ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 80));
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20);
 					return true;
 				}
 				return false;

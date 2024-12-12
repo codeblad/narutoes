@@ -60,8 +60,11 @@ public class ProcedureBanShoTenin extends ElementsNarutomodMod.ModElement {
 				map.put(entity, procedure);
 			}
 			Chakra.Pathway cp = Chakra.pathway((EntityPlayer)entity);
+			int grabTicks = entity.getEntityData().getInteger("grabTicks");
 			if (is_pressed) {
-				if (cp.getAmount() < CHAKRA_USAGE) {
+				if (cp.getAmount() < CHAKRA_USAGE || grabTicks >= 20*5) {
+					entity.getEntityData().setInteger("grabTicks",0);
+					cooldown = (int)entity.world.getTotalWorldTime() + 100;
 					is_pressed = false;
 					cp.warningDisplay();
 				} else if (procedure.getGrabbedEntity() == null) {
@@ -86,9 +89,11 @@ public class ProcedureBanShoTenin extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				if (procedure.getGrabbedEntity() != null) {
+					entity.getEntityData().setInteger("grabTicks",grabTicks+1);
 					cp.consume(CHAKRA_USAGE);
 				}
 			} else if (procedure.getGrabbedEntity() != null) {
+				entity.getEntityData().setInteger("grabTicks",0);
 				cooldown = (int)entity.world.getTotalWorldTime() + 100;
 			}
 			procedure.execute(is_pressed, entity, grabbedEntity);

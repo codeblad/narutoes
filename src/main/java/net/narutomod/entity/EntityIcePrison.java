@@ -160,6 +160,7 @@ public class EntityIcePrison extends ElementsNarutomodMod.ModElement {
 					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot")),
 					 net.minecraft.util.SoundCategory.NEUTRAL, 1f, entity.getRNG().nextFloat() * 0.4f + 0.8f);
 					entity.world.spawnEntity(new EC(entity, (EntityLivingBase)result.entityHit));
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*3);
 					return true;
 				}
 				return false;

@@ -32,7 +32,7 @@ public class ProcedureHakkeKusho extends ElementsNarutomodMod.ModElement {
 
 		public AirPunch() {
 			this.blockDropChance = 0F;
-			this.blockHardnessLimit = 2f;
+			this.blockHardnessLimit = 0f;
 		}
 
 		@Override
@@ -58,12 +58,12 @@ public class ProcedureHakkeKusho extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		protected EntityItem processAffectedBlock(Entity player, BlockPos pos, EnumFacing facing) {
-			if (player.world.getGameRules().getBoolean("mobGriefing") && player.world.getBlockState(pos).isFullBlock()
+			/*if (player.world.getGameRules().getBoolean("mobGriefing") && player.world.getBlockState(pos).isFullBlock()
 			 && player.world.getBlockState(pos.up()).getCollisionBoundingBox(player.world, pos.up()) == Block.NULL_AABB) {
 				EntityFallingBlock entity = new EntityFallingBlock(player.world, 0.5d+pos.getX(), pos.getY(), 0.5d+pos.getZ(), player.world.getBlockState(pos));
 				entity.motionY = 0.45d;
 				player.world.spawnEntity(entity);
-			}
+			}*/
 			return super.processAffectedBlock(player, pos, facing);
 		}
 

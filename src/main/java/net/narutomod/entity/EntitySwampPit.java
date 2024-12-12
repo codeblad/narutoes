@@ -102,7 +102,7 @@ public class EntitySwampPit extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				}
-				new net.narutomod.event.EventSetBlocks(this.world, map, 0, 200, false, false);
+				new net.narutomod.event.EventSetBlocks(this.world, map, 0, 100, false, false);
 			}
 			if (!this.world.isRemote && this.ticksExisted >= this.radius - this.offsetY) {
 				this.setDead();
@@ -125,6 +125,7 @@ public class EntitySwampPit extends ElementsNarutomodMod.ModElement {
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:yominuma")), SoundCategory.PLAYERS, 1, 1f);
 					entity.world.spawnEntity(new EC(entity, rtr.getBlockPos(), (int)power));
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*5);
 					return true;
 				}
 				return false;

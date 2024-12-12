@@ -106,8 +106,8 @@ public class ItemMokuton extends ElementsNarutomodMod.ModElement {
 			//if (entity instanceof EntityLivingBase && !world.isRemote && entity.ticksExisted % 20 == 6) {
 			//	((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.SATURATION, 22, 0, false, false));
 			//}
-			if (entity instanceof EntityPlayer && !world.isRemote && entity.ticksExisted % 20 == 6) {
-				((EntityPlayer)entity).getFoodStats().addStats(20, 0.02f);
+			if (entity instanceof EntityPlayer && !world.isRemote && entity.ticksExisted % 20 == 0) {
+				((EntityPlayer)entity).getFoodStats().addStats(20, 0.1f);
 			}
 		}
 	}

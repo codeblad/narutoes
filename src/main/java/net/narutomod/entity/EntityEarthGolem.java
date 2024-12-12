@@ -83,12 +83,12 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void postScaleFixup() {
 			float f = this.getScale();
-			float newPower = (1+4*(this.power/5)) * ItemJutsu.getDmgMult(this.getSummoner());
+			float newPower = (1+7*(this.power/5)) * ItemJutsu.getDmgMult(this.getSummoner());
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(60.0D + 8*newPower);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D + 0.75*newPower);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(60.0D + 4*newPower);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D + 0.5*newPower);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(10.0D + 6.0D * f);
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D + (f - 1F) * 0.1D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D + (f - 1F) * 0.1D);
 			super.postScaleFixup();
 			this.experienceValue = (int)(f * 10);
 		}
@@ -218,6 +218,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
 					entity.world.spawnEntity(new EC(entity, power));
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
 					return true;
 				}
 				return false;

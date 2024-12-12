@@ -188,6 +188,15 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 					if (ItemRaiton.CHAKRAMODE.jutsu.isActivated(entity)) {
 						ItemRaiton.CHAKRAMODE.jutsu.deactivate(entity);
 					}
+					if (ItemFuton.CHAKRAFLOW.jutsu.isActivated(entity)) {
+						ItemFuton.CHAKRAFLOW.jutsu.deactivate(entity);
+					}
+					if (ItemKaton.FLAMESLICE.jutsu.isActivated(entity)) {
+						ItemKaton.FLAMESLICE.jutsu.deactivate(entity);
+					}
+					if (ItemIryoJutsu.POWERMODE.jutsu.isActivated(entity)) {
+						ItemIryoJutsu.POWERMODE.jutsu.deactivate(entity);
+					}
 					return true;
 				}
 			}

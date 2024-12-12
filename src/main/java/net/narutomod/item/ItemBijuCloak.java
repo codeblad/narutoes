@@ -304,12 +304,19 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 		}
 		if (!entity.world.isRemote && entity.ticksExisted % 20 == 4) {
 			//entity.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 5, 0, false, false));
-			entity.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 22, (int) (15+ItemJutsu.getDmgMult(entity)*0.85*level), false, false));
+			int d = (int) (10+ItemJutsu.getDmgMult(entity)*0.85);
+			if (level == 2) {
+				d = (int) (15+ItemJutsu.getDmgMult(entity)*2.15);
+			}
+			entity.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 22, d, false, false));
 			entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, level * 8, false, false));
 			entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 5, false, false));
 			entity.addPotionEffect(new PotionEffect(PotionReach.potion, 22, level - 1, false, false));
 			if (entity.getHealth() < entity.getMaxHealth() && entity.getHealth() > 0.0f) {
-				entity.heal((float)level * 1);
+				entity.heal((float)level * 0.25f);
+			}
+			if (entity instanceof  EntityPlayer) {
+				((EntityPlayer) entity).getFoodStats().addStats(1,0);
 			}
 			/*if (level == 2) {
 				entity.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, 2, false, false));

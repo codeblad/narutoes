@@ -173,7 +173,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
-			return EntityLightningArc.onStruck(entityIn, ItemJutsu.causeJutsuDamage(this, null), (5+2*this.power/5)*ItemJutsu.getDmgMult(this.getOwner()));
+			return EntityLightningArc.onStruck(entityIn, ItemJutsu.causeJutsuDamage(this, null), 10+(1+1*this.power/5)*1.65f*ItemJutsu.getDmgMult(this.getOwner()));
 		}
 
 		private BlockPos findDestination() {
@@ -288,6 +288,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity instanceof EntityPlayer && power >= 1.0f) {
 					entity.world.spawnEntity(new EC((EntityPlayer)entity, power));
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*5);
 					return true;
 				}
 				return false;

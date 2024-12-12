@@ -352,7 +352,7 @@ public class EntityTruthSeekerBall extends ElementsNarutomodMod.ModElement {
 
 		protected void eventOnTick(World world, int x, int y, int z, int radius, Entity entity, int tick) {
 			//float damage = (radius >= 30) ? Float.MAX_VALUE : (radius * 5);
-			float damage = radius * 10;
+			float damage = radius * 3;
 			ProcedureAoeCommand.set(world, x, y, z, 0.0D, radius).exclude(entity).exclude(EntityCustom.class)
 			 .resetHurtResistanceTime().damageEntities(
 			 ItemJutsu.causeSenjutsuDamage(this, this.shootingEntity).setDamageBypassesArmor(), damage);
@@ -374,7 +374,8 @@ public class EntityTruthSeekerBall extends ElementsNarutomodMod.ModElement {
 						eventOnTick(getWorld(), getX0(), getY0(), getZ0(), getRadius(), getEntity(), currentTick);
 					}
 				};
-				if (this.getEntityScale() >= 25.0F && result.entityHit instanceof EntityLivingBase) {
+				if (this.getEntityScale() >= 25.0F && result.entityHit instanceof EntityLivingBase)
+ {
 					((EntityLivingBase)result.entityHit).setHealth(0.0F);
 				}
 				if (this.maxScale > this.shieldSize) {

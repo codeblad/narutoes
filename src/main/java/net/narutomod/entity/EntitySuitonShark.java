@@ -69,7 +69,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 		private Entity target;
 		private float health;
 		public float power;
-		public float dmg = 8f;
+		public float dmg = 10f;
 		
 		public EC(World a) {
 			super(a);
@@ -85,8 +85,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 			this.setEntityScale(0.2f);
 			this.fullScale = power;
 			this.health = power * 20f;
-			this.power = power;
-			this.dmg = dmg*(1+2*(power/5));
+			this.power = (1+1*(power/5));
 			this.setWaterSlowdown(1.0f);
 			this.isImmuneToFire = true;
 		}
@@ -212,8 +211,9 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 				if (result.typeOfHit == RayTraceResult.Type.BLOCK
 				 || (result.entityHit != null && result.entityHit.equals(this.target))) {
 					float size = this.getEntityScale();
+					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*2.2f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
 					ProcedureAoeCommand.set(this, 0.0D, size).exclude(this.shootingEntity)
-					  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (dmg * (this.isInWater() ? 2f : 1f))*ItemJutsu.getDmgMult(this.shootingEntity));
+					  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);
 					this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, size * 2.0F, false,
 					  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 					/*Map<BlockPos, IBlockState> map = Maps.newHashMap();
@@ -259,7 +259,10 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				return power >= 1.0f ? this.createJutsu(entity, power) : false;
+				if (power >= 1.0f) {
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
+				}
+				return power >= 1.0f ? this.createJutsu(entity, power)  : false;
 			}
 
 			public boolean createJutsu(EntityLivingBase entity, float power) {

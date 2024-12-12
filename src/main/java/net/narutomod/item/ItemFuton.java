@@ -47,12 +47,12 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 132;
 	public static final int ENTITY2ID = 10132;
-	public static final ItemJutsu.JutsuEnum CHAKRAFLOW = new ItemJutsu.JutsuEnum(0, "futonchakraflow", 'D', 20d, new ChakraFlow.Jutsu());
-	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(1, "rasenshuriken", 'S', 1000d, new EntityRasenshuriken.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHAKRAFLOW = new ItemJutsu.JutsuEnum(0, "futonchakraflow", 'D', 120d, new ChakraFlow.Jutsu());
+	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(1, "rasenshuriken", 'S', 1250d, new EntityRasenshuriken.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum VACUUMS = new ItemJutsu.JutsuEnum(2, "futon_vacuum", 'B', 20d, new EntityFutonVacuum.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum BIGBLOW = new ItemJutsu.JutsuEnum(3, "futon_great_breakthrough", 'C', 20d, new EntityFutonGreatBreakthrough.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum WINDBLADE = new ItemJutsu.JutsuEnum(4, "wind_blade", 'A', 40d, new EntityWindBlade.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum VACWAVE = new ItemJutsu.JutsuEnum(5, "vacuum_wave", 'B', 30d, new EntityVacuumWave.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum BIGBLOW = new ItemJutsu.JutsuEnum(3, "futon_great_breakthrough", 'C', 15d, new EntityFutonGreatBreakthrough.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum WINDBLADE = new ItemJutsu.JutsuEnum(4, "wind_blade", 'A', 65d, new EntityWindBlade.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum VACWAVE = new ItemJutsu.JutsuEnum(5, "vacuum_wave", 'B', 55d, new EntityVacuumWave.EC.Jutsu());
 
 	public ItemFuton(ElementsNarutomodMod instance) {
 		super(instance, 376);
@@ -175,11 +175,17 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 					if (ItemRaiton.CHAKRAMODE.jutsu.isActivated(entity)) {
 						ItemRaiton.CHAKRAMODE.jutsu.deactivate(entity);
 					}
+					if (ItemRanton.CLOUD.jutsu.isActivated(entity)) {
+						ItemRanton.CLOUD.jutsu.deactivate(entity);
+					}
 					if (ItemRaiton.CHIDORI.jutsu.isActivated(entity)) {
 						ItemRaiton.CHIDORI.jutsu.deactivate(entity);
 					}
 					if (ItemKaton.FLAMESLICE.jutsu.isActivated(entity)) {
 						ItemKaton.FLAMESLICE.jutsu.deactivate(entity);
+					}
+					if (ItemIryoJutsu.POWERMODE.jutsu.isActivated(entity)) {
+						ItemIryoJutsu.POWERMODE.jutsu.deactivate(entity);
 					}
 					entity1 = new ChakraFlow(entity, stack);
 					entity.world.spawnEntity(entity1);

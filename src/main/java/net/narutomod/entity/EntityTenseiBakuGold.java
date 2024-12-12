@@ -119,7 +119,8 @@ public class EntityTenseiBakuGold extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
 				target.hurtResistantTime = 10;
-				target.attackEntityFrom(DamageSource.causeIndirectMagicDamage(EC.this, player), EC.this.power * 0.6f);
+				float dmg = 5+ItemJutsu.getDmgMult(player)*0.125f*(1+2*(EC.this.power/200));
+				target.attackEntityFrom(DamageSource.causeIndirectMagicDamage(EC.this, player), dmg);
 			}
 
 			@Nullable
@@ -169,7 +170,8 @@ public class EntityTenseiBakuGold extends ElementsNarutomodMod.ModElement {
 				return 200.0f;
 			}
 		}
-	}
+
+	}
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {

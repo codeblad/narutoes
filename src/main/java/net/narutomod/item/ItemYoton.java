@@ -50,8 +50,8 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum MULTISIZE = new ItemJutsu.JutsuEnum(0, "biggerme", 'B', 50d, new EntityBiggerMe.Jutsu());
 	public static final ItemJutsu.JutsuEnum FUUIN = new ItemJutsu.JutsuEnum(1, "sealing", 'S', 100d, new EntitySealing.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SEALINGCHAIN = new ItemJutsu.JutsuEnum(2, "sealing_chains", 'A', 50d, new EntitySealingChains.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum SEALING9D = new ItemJutsu.JutsuEnum(3, "tooltip.phantom9sealing.name", 'S', 100d, new EntityGedoStatue.Sealing9Jutsu());
-	public static final ItemJutsu.JutsuEnum SEALING10 = new ItemJutsu.JutsuEnum(4, "tooltip.10coffinseal.name", 'S', 100d, new EntityTenTails.CoffinSealJutsu());
+	public static final ItemJutsu.JutsuEnum SEALING9D = new ItemJutsu.JutsuEnum(3, "tooltip.phantom9sealing.name", 'S', 1500d, new EntityGedoStatue.Sealing9Jutsu());
+	public static final ItemJutsu.JutsuEnum SEALING10 = new ItemJutsu.JutsuEnum(4, "tooltip.10coffinseal.name", 'S', 2000d, new EntityTenTails.CoffinSealJutsu());
 
 	public ItemYoton(ElementsNarutomodMod instance) {
 		super(instance, 406);
@@ -103,7 +103,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 			float ratio = 1+1*(scaleIn/10);
 			double d = MathHelper.sqrt((4d * scaleIn * scaleIn) + (this.height * this.height));
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("biggerme.reach", d, 0));
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("biggerme.damage", (5+ItemJutsu.getDmgMult(user)*2)*ratio, 0));
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("biggerme.damage", (5+ItemJutsu.getDmgMult(user)*1.4)*ratio, 0));
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(user.getHealth() * scaleIn);
 			this.setHealth(this.getMaxHealth());
 			this.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 999999, (int)scaleIn, false, false));

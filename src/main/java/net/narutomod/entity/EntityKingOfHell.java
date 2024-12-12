@@ -154,7 +154,8 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 			 && (entity.equals(this.summoningPlayer) || this.summoningPlayer.isOnSameTeam(entity))) {
 				this.healingPlayer = entity;
 				this.toggleArmSwing();
-				this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:KoH_spawn")), 1.0F, 1.0F);
+				this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:KoH_spawn")),
+ 1.0F, 1.0F);
 				return true;
 			}
 			return super.processInteract(entity, hand);
@@ -183,7 +184,8 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 			int i = getArmSwingAnimationEnd();
 			if (this.isSwingInProgress) {
 				this.swingProgressInt++;
-				if (this.swingProgressInt == i / 2) {
+				if (this.swingProgressInt == i / 2)
+ {
 					this.isSwingInProgress = false;
 				}
 				if (this.swingProgressInt >= i) {
@@ -203,13 +205,13 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 
 		private void rejuvenatePlayer() {
 			if (this.healingPlayer != null) {
+				this.healingPlayer.heal(0.2F);
+				this.healingPlayer.setSneaking(false);
 				if (this.healingPlayer.startRiding(this)) {
 					this.world.setEntityState(this.healingPlayer, (byte) 35);
 					this.healingPlayer.clearActivePotions();
 					this.healingPlayer.addPotionEffect(new PotionEffect(MobEffects.ABSORPTION, 160, 4));
 				}
-				this.healingPlayer.heal(0.2F);
-				this.healingPlayer.setSneaking(false);
 				if (this.healingPlayer.getHealth() >= this.healingPlayer.getMaxHealth()) {
 					this.healingPlayer.dismountRidingEntity();
 					this.healingPlayer = null;
@@ -230,16 +232,20 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 			this.updateArmSwingProgress();
 			if (!this.world.isRemote) {
 				if (this.isArmsOpen()) {
-					if (this.healingPlayer != null) {
+					if (this.healingPlayer != null)
+ {
 						this.rejuvenatePlayer();
-					} else {
+					} else
+ {
 						this.toggleArmSwing();
 					}
 				}
 				if (this.summoningPlayer != null) {
-					if (this.summoningPlayer.getHealth() <= 0.0F) {
+					if (this.summoningPlayer.getHealth() <= 0.0F)
+ {
 						this.setHealth(0.0F);
-					} else if (this.summoningPlayer.getHealth() < 4.0F) {
+					} else if (this.summoningPlayer.getHealth() < 4.0F)
+ {
 						this.rejuvenateSummoningPlayer();
 					}
 				}

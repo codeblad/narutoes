@@ -63,8 +63,8 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 230;
 	public static final ItemJutsu.JutsuEnum JIRAIKEN = new ItemJutsu.JutsuEnum(0, "tooltip.bakuton.jiraiken", 'S', 150, 30d, new Jiraiken());
-	public static final ItemJutsu.JutsuEnum CLAY = new ItemJutsu.JutsuEnum(1, "c_1", 'S', 200, 75d, new ExplosiveClay.Jutsu());
-	public static final ItemJutsu.JutsuEnum CLONE = new ItemJutsu.JutsuEnum(2, "explosive_clone", 'S', 200, 150d, new EntityExplosiveClone.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum CLAY = new ItemJutsu.JutsuEnum(1, "c_1", 'S', 200, 100d, new ExplosiveClay.Jutsu());
+	public static final ItemJutsu.JutsuEnum CLONE = new ItemJutsu.JutsuEnum(2, "explosive_clone", 'S', 200, 250d, new EntityExplosiveClone.EC.Jutsu());
 
 	public ItemBakuton(ElementsNarutomodMod instance) {
 		super(instance, 543);
@@ -127,8 +127,8 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (entity.ticksExisted % 10 == 2 && entity instanceof EntityLivingBase && JIRAIKEN.jutsu.isActivated(itemstack)) {
 				((EntityLivingBase)entity).addPotionEffect(new PotionEffect(
-				 PotionChakraEnhancedStrength.potion, 12, (int)(5+(1+1*((Jiraiken)JIRAIKEN.jutsu).getPower(itemstack)/20)*(ItemJutsu.getDmgMult(entity)*1.5)), false, false));
-			}
+				 PotionChakraEnhancedStrength.potion, 12, (int)(5+(1+1*((Jiraiken)JIRAIKEN.jutsu).getPower(itemstack)/20)*(ItemJutsu.getDmgMult(entity)*1.25)), false, false));
+			} 
 		}
 
 		@Override
@@ -367,15 +367,19 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 					return false;
 				} else if (powerIn < 2f) {
 					ec = new EntityC1.EC(entity);
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20);
 				} else if (powerIn < 3f) {
 					ec = new EntityC2.EC(entity);
 					ProcedureUtils.poofWithSmoke(entity.world, vec.x, vec.y, vec.z, ec.width, ec.height);
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20);
 				} else if (powerIn < 4f) {
 					ec = new EntityC3.EC(entity);
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*5);
 				} else if (powerIn <= this.getMaxPower()) {
 					ec = new EntityC4.EC(entity);
 					float f = ((RangedItem)stack.getItem()).getXpRatio(stack, CLAY);
 					((EntityC4.EC)ec).setExplosionDamage(100, (int)(2.0f + ItemJutsu.getDmgMult(entity)*0.2));
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*8);
 				} else {
 					return false;
 				}

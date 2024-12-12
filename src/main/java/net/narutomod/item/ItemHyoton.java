@@ -59,10 +59,10 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:hyoton")
 	public static final Item block = null;
 	public static final int ENTITYID = 219;
-	public static final ItemJutsu.JutsuEnum KILLSPIKES = new ItemJutsu.JutsuEnum(0, "ice_spike", 'S', 150, 20d, new EntityIceSpike.Jutsu());
-	public static final ItemJutsu.JutsuEnum ICESPEARS = new ItemJutsu.JutsuEnum(1, "ice_spear", 'S', 150, 20d, new EntityIceSpear.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum ICEDOME = new ItemJutsu.JutsuEnum(2, "ice_dome", 'S', 200, 100d, new EntityIceDome.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum ICEPRISON = new ItemJutsu.JutsuEnum(3, "ice_prison", 'S', 150, 50d, new EntityIcePrison.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum KILLSPIKES = new ItemJutsu.JutsuEnum(0, "ice_spike", 'S', 150, 40d, new EntityIceSpike.Jutsu());
+	public static final ItemJutsu.JutsuEnum ICESPEARS = new ItemJutsu.JutsuEnum(1, "ice_spear", 'S', 150, 30d, new EntityIceSpear.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum ICEDOME = new ItemJutsu.JutsuEnum(2, "ice_dome", 'S', 200, 400d, new EntityIceDome.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum ICEPRISON = new ItemJutsu.JutsuEnum(3, "ice_prison", 'S', 150, 150d, new EntityIcePrison.EC.Jutsu());
 
 	public ItemHyoton(ElementsNarutomodMod instance) {
 		super(instance, 531);
@@ -220,13 +220,14 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 					float f = MathHelper.sqrt(power * 9f / 5f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EntityIceSpike entity1 = new EntityIceSpike(entity);
-						entity1.damage = 6 * ((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
+						entity1.damage = 8+6 * ((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
 						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
 						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
 						entity1.setLocationAndAngles(vec.x, vec.y + 0.5d, vec.z, entity.getRNG().nextFloat() * 360f, (entity.getRNG().nextFloat() - 0.5f) * 60f);
 						world.spawnEntity(entity1);
 					}
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
 					return true;
 				}
 				return false;

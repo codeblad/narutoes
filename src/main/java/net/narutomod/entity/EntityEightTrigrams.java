@@ -147,7 +147,7 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 					//((EntityPlayer)this.ownerPlayer).sendStatusMessage(new TextComponentString(I18n.translateToLocal("tooltip.byakugan.jutsu2")), true);
 					if (this.ticksExisted % 40 == 4) {
 						this.ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 
-						 50, (int) (( 2 + ((ItemJutsu.getDmgMult(this.ownerPlayer)*0.8) * (1+2*((float) this.ticksExisted /120)))/3 ))));
+						 50, (int) (( 2 + ((ItemJutsu.getDmgMult(this.ownerPlayer)*0.65) * (1+2*((float) this.ticksExisted /120)))/3 ))));
 						this.ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.HASTE, 50, 3));
 					}
 				}
@@ -190,7 +190,7 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 			public void onAttacked(LivingHurtEvent event) {
 				Entity source = event.getSource().getImmediateSource();
 				if (source != null && EntityCustom.isActivated(source)) {
-					Chakra.pathway(event.getEntityLiving()).consume(0.125f);
+					Chakra.pathway(event.getEntityLiving()).consume(0.01f);
 					event.getEntityLiving().getEntityData().setBoolean("TempData_disableKnockback", true);
 				}
 			}

@@ -42,11 +42,9 @@ import net.minecraft.init.SoundEvents;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.Particles;
+import net.narutomod.item.*;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureSync;
-import net.narutomod.item.ItemSenjutsu;
-import net.narutomod.item.ItemNinjutsu;
-import net.narutomod.item.ItemJutsu;
 
 import java.util.List;
 import java.util.Random;
@@ -156,6 +154,9 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				this.breakBlocks(this.world.getCollisionBoxes(null, this.getEntityBoundingBox()));
 			}
+			if (this.ticksAlive > 200) {
+				this.setDead();
+			}
 			if (!this.world.isRemote && (this.shootingEntity == null || (!this.shootingEntity.getHeldItemMainhand().isEmpty() && 
 			  !(this.shootingEntity.getHeldItemMainhand().getItem() instanceof ItemJutsu.Base)))) {
 				this.setDead();
@@ -230,7 +231,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 		public void applyEntityCollision(Entity entityIn) {
 			if (this.ticksAlive > this.growTime && this.shootingEntity != null
 			 && !entityIn.equals(this.shootingEntity) && !this.bunshinHasSameSummoner(entityIn)) {
-				if (entityIn.attackEntityFrom(this.damageSource, 10f + this.fullScale * this.fullScale * 20f)) {
+				if (entityIn.attackEntityFrom(this.damageSource, 10f + (1+1.85f*(this.fullScale/6))*ItemJutsu.getDmgMult(this.shootingEntity)*1.9f)) {
 					this.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 1.0F, this.rand.nextFloat() * 0.5F + 0.5F);
 					Vec3d vec = ProcedureUtils.pushEntity(this.shootingEntity, entityIn, 20d, 2f);
 					Vec3d vec1 = this.shootingEntity.getLookVec().add(this.shootingEntity.getPositionEyes(1.0f));
@@ -267,6 +268,15 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 					}
 					stack.getTagCompound().setInteger(ID_KEY, entity2.getEntityId());
 					stack.getTagCompound().setFloat(SIZE_KEY, power);
+					if (ItemFuton.CHAKRAFLOW.jutsu.isActivated(entity)) {
+						ItemFuton.CHAKRAFLOW.jutsu.deactivate(entity);
+					}
+					if (ItemRaiton.CHIDORI.jutsu.isActivated(entity)) {
+						ItemRaiton.CHIDORI.jutsu.deactivate(entity);
+					}
+					if (ItemKaton.FLAMESLICE.jutsu.isActivated(entity)) {
+						ItemKaton.FLAMESLICE.jutsu.deactivate(entity);
+					}
 					return true;
 				}
 				return false;
@@ -297,7 +307,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 200.0f;
+				return 100.0f;
 			}
 	
 			@Override
@@ -314,7 +324,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 200.0f;
+				return 100.0f;
 			}
 	
 			@Override

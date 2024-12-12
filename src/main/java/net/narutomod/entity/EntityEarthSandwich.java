@@ -155,7 +155,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 						 	Vec3d vec = entry.getValue();
 							entity.setPositionAndUpdate(vec.x, vec.y, vec.z);
 							if (age > this.growTime - 5) {
-								entity.attackEntityFrom(DamageSource.IN_WALL, 2f*ItemJutsu.getDmgMult(this.user));
+								entity.attackEntityFrom(DamageSource.IN_WALL, 5+0.85f*ItemJutsu.getDmgMult(this.user));
 							}
 						} else if (!entity.isEntityAlive() || !entity.getEntityBoundingBox().intersects(this.getEntityBoundingBox())) {
 							iter.remove();
@@ -167,7 +167,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 					 this.posX, this.posY, this.posZ, (int)(f * f * 6f), this.width * 0.2, 0.5d, this.width * 0.2,
 					 0.15d, Block.getIdFromBlock(Blocks.DIRT));
 				}
-				if (age > 100) {
+				if (age > 60) {
 					this.setDead();
 				}
 			}
@@ -190,7 +190,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 2f) {
-					RayTraceResult rt = ProcedureUtils.raytraceBlocks(entity, 32d);
+					RayTraceResult rt = ProcedureUtils.raytraceBlocks(entity, 45d);
 					if (rt != null && rt.typeOfHit == RayTraceResult.Type.BLOCK) {
 						if (power >= 8f) {
 							entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
@@ -200,6 +200,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 							 .getObject(new ResourceLocation("narutomod:jutsu")), SoundCategory.NEUTRAL, 1, 1f);
 						}
 						entity.world.spawnEntity(new EC(entity, rt.hitVec, power));
+						ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*3);
 						return true;
 					}
 				}

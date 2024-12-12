@@ -138,8 +138,9 @@ public class EntityIceSpear extends ElementsNarutomodMod.ModElement {
 					Vec3d vec3 = vec2.add(vec);
 					int num = (int)(power * 2f);
 					EC entity1 = this.createJutsu(entity.world, entity, vec2.x, vec2.y, vec2.z, vec3.x, vec3.y, vec3.z, 1.2f, 0.05f);
-					entity1.damage = 3f+((3*ItemJutsu.getDmgMult(entity)*(1+2*(power/50)))/num);
+					entity1.damage = 5f+((3*ItemJutsu.getDmgMult(entity)*(1+2*(power/50)))/num);
 				}
+				ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
 				return true;
 			}
 

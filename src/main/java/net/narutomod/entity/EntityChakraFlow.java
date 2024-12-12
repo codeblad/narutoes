@@ -109,7 +109,7 @@ public class EntityChakraFlow extends ElementsNarutomodMod.ModElement {
 						if (attributemodifier != null) {
 							aInstance.removeModifier(attributemodifier);
 						}
-						aInstance.applyModifier(new AttributeModifier(DAMAGE_MODIFIER, "chakraflow.damage", this.damageModifier+ 0.5*ItemJutsu.getDmgMult(user), 0));
+						aInstance.applyModifier(new AttributeModifier(DAMAGE_MODIFIER, "chakraflow.damage", this.damageModifier+ 2*ItemJutsu.getDmgMult(user), 0));
 					}
 				}
 			}

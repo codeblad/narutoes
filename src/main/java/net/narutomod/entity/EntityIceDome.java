@@ -36,6 +36,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
+import net.narutomod.item.ItemMokuton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.item.ItemJutsu;
@@ -47,6 +48,9 @@ import net.narutomod.ElementsNarutomodMod;
 import java.util.List;
 import java.util.Iterator;
 import com.google.common.collect.Lists;
+
+import static net.narutomod.item.ItemHyoton.ICEDOME;
+import static net.narutomod.item.ItemMokuton.GOLEM;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityIceDome extends ElementsNarutomodMod.ModElement {
@@ -116,6 +120,12 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 				if (summoner != null && summoner.isPotionActive(MobEffects.INVISIBILITY)) {
 					summoner.removePotionEffect(MobEffects.INVISIBILITY);
 				}
+				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getSummoner(), ItemHyoton.block);
+				if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
+					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
+					//(30*20)+this.ticksExisted+this.ticksExisted/2
+					item.setJutsuCooldown(stack, ICEDOME, 20*10);
+				}
 			}
 		}
 
@@ -176,7 +186,7 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			if (!this.world.isRemote && this.ticksExisted % 20 == 0 && summoner != null
-			 && !Chakra.pathway(summoner).consume(ItemHyoton.ICEDOME.chakraUsage * 0.05d)) {
+			 && !Chakra.pathway(summoner).consume(ICEDOME.chakraUsage * 0.05d)) {
 				this.setDead();
 			}
 			this.clearActivePotions();
@@ -326,9 +336,11 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (!entity.isRiding()) {
 					this.createJutsu(entity, entity.posX, entity.posY - 0.1d, entity.posZ);
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
 					return true;
 				} else if (entity.getRidingEntity() instanceof EC) {
 					((EC)entity.getRidingEntity()).shootSpears();
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*5);
 					return true;
 				}
 				return false;

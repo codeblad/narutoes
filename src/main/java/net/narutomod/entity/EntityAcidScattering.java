@@ -67,8 +67,8 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 			this.shooter = shooterIn;
 			this.setIdlePosition();
 			this.width = widthIn;
-			this.range = rangeIn;
-			this.dmg *= 1+1*(rangeIn/30);
+			this.range = 10+rangeIn;
+			this.dmg = 0.8f*(1+1*(rangeIn/30));
 			this.potionAmplifier = (int)(rangeIn * 0.5f);
 		}
 
@@ -159,6 +159,7 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= this.getBasePower()) {
 					this.createJutsu(entity, power);
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*8);
 					return true;
 				}
 				return false;
@@ -232,8 +233,8 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 					this.hitTime = age;
 					if (!this.world.isRemote && this.ecEntity != null) {
 						this.hitEntity.getEntityData().setBoolean("TempData_disableKnockback", true);
-						this.hitEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, shooter), ecEntity.dmg*ItemJutsu.getDmgMult(shooter));
-						this.hitEntity.addPotionEffect(new PotionEffect(PotionCorrosion.potion, 100, this.ecEntity.potionAmplifier, false, false));
+						this.hitEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, shooter), 8+ecEntity.dmg*ItemJutsu.getDmgMult(shooter));
+						this.hitEntity.addPotionEffect(new PotionEffect(PotionCorrosion.potion, 100, (int) (5+ItemJutsu.getDmgMult(shooter)*0.5), false, false));
 					}
 				}
 			} else {

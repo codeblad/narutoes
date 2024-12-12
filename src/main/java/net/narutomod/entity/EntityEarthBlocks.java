@@ -52,7 +52,8 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.Nullable;
 import com.google.common.collect.Maps;
-import com.google.common.base.Predicate;
+
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
 @ElementsNarutomodMod.ModElement.Tag
@@ -210,7 +211,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			return (float)(this.getVelocity() * (double)this.mass());
 		}
 
-	    private float getCollisionDamage() {
+	    public float getCollisionDamage() {
 	    	return this.collisionForce() * 0.5f;
 	    }
 

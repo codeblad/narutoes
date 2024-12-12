@@ -451,7 +451,7 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 				}
 				if (ItemSharingan.isBlinded((EntityPlayer) entity)) {
 					if (entity instanceof EntityLivingBase)
-						((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 22, (int) 0, (false), (false)));
+						((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 40, (int) 0, (false), (false)));
 				}
 			} else if ((((!ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemYooton.block)
 					&& !ProcedureUtils.hasItemInInventory((EntityPlayer) entity, ItemRanton.block))

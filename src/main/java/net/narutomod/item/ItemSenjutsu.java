@@ -80,8 +80,8 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum RASENGAN = new ItemJutsu.JutsuEnum(1, "tooltip.senjutsu.rasengan", 'S', ItemNinjutsu.RASENGAN.chakraUsage, new EntityRasengan.EC.SageModeVariant());
 	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(2, "tooltip.senjutsu.rasenshuriken", 'S', ItemFuton.RASENSHURIKEN.chakraUsage, new EntityRasenshuriken.EC.SageModeVairant());
 	public static final ItemJutsu.JutsuEnum WOODBUDDHA = new ItemJutsu.JutsuEnum(3, "buddha_1000", 'S', 3000d, new EntityBuddha1000.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum SNAKE8H = new ItemJutsu.JutsuEnum(4, "snake_8_heads", 'S', 3000d, new EntitySnake8Heads.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum GAMARINSHO = new ItemJutsu.JutsuEnum(5, "gamarinsho", 'S', 3000d, new EntityGamarinsho.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SNAKE8H = new ItemJutsu.JutsuEnum(4, "snake_8_heads", 'S', 2500d, new EntitySnake8Heads.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum GAMARINSHO = new ItemJutsu.JutsuEnum(5, "gamarinsho", 'S', 2500d, new EntityGamarinsho.EC.Jutsu());
 	private static final Random RAND = new Random();
 
 	public ItemSenjutsu(ElementsNarutomodMod instance) {
@@ -111,9 +111,8 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		private static final String TYPEKEY = "SageType";
 		private static final Map<IAttribute, AttributeModifier> buffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
 			.put(EntityPlayer.REACH_DISTANCE, new AttributeModifier(UUID.fromString("c3ee1250-8b80-4668-b58a-33af5ea73ee6"), "sagemode.reach", 2.0d, 0))
-			.put(SharedMonsterAttributes.ATTACK_DAMAGE, new AttributeModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868"), "sagemode.damage", 60.0d, 0))
 			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(UUID.fromString("33b7fa14-828a-4964-b014-b61863526589"), "sagemode.damagespeed", 2.0d, 1))
-			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.5d, 1))
+			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.45d, 1))
 			.build();
 
 		@SideOnly(Side.CLIENT)
@@ -166,6 +165,18 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 							attr.applyModifier(entry.getValue());
 						}
 					}
+					double d = 15.0d+ItemJutsu.getDmgMult(living)*2.5f;
+					if (living instanceof  EntityPlayer) {
+						if (EntityBijuManager.cloakLevel((EntityPlayer) living) > 0) {
+							d = 7.0d+ItemJutsu.getDmgMult(living)*0.6;
+						}
+					}
+					if (living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868")) == null) {
+						living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868"), "sagemode.damage", d, 0));
+					}
+					/*if (living.getHealth() < living.getMaxHealth()) {
+						living.heal(0.1f);
+					}*/
 					/*if (entity instanceof EntityPlayer) {
 						int foodlevel = ((EntityPlayer)entity).getFoodStats().getFoodLevel();
 						if (itemstack.getTagCompound().getInteger("prevFoodStat") != foodlevel) {
@@ -179,6 +190,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 							attr.removeModifier(entry.getValue().getID());
 						}
 					}
+					living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868"));
 					/*if (entity instanceof EntityPlayer) {
 						itemstack.getTagCompound().removeTag("prevFoodStat");
 						((EntityPlayer)entity).getFoodStats().setFoodLevel(itemstack.getTagCompound().getInteger("prevFoodStat"));
@@ -189,7 +201,9 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 					if (cp.getAmount() < itemstack.getTagCompound().getDouble(SAGECHAKRADEPLETIONAMOUNT)) {
 						deactivateSageMode(itemstack, living);
 					} else if (living.ticksExisted % 20 == 10) {
-						living.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 22, 0, false, false));
+						if (entity instanceof EntityPlayer)
+							((EntityPlayer) entity).getFoodStats().addStats(2,0);
+						//living.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 22, 0, false, false));
 						cp.consume(50d);
 					}
 				}
@@ -245,7 +259,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 			}
 			ActionResult<ItemStack> res = super.onItemRightClick(world, entity, hand);
 			if (jutsu == SAGEMODE && res.getType() == EnumActionResult.SUCCESS && !world.isRemote) {
-				if (EntityBijuManager.cloakLevel(entity) > 0 && EntityBijuManager.getCloakXp(entity, 1) < 800) {
+				if (EntityBijuManager.cloakLevel(entity) > 0 && EntityBijuManager.getCloakXp(entity, 1) < 800 && EntityBijuManager.getTails(entity) != 9) {
 					entity.sendStatusMessage(new TextComponentTranslation("chattext.senjutsu.denied", 
 				 	 EntityBijuManager.getNameOfJinchurikisBiju(entity)), true);
 					return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
@@ -397,7 +411,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 	
 		@Override
 		public float getPowerupDelay() {
-			return 5.0f;
+			return 8.0f;
 		}
 	
 		@Override

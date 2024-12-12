@@ -79,6 +79,7 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 		private double stationaryY;
 		private double stationaryZ;
 
+
 		public EntityCustom(World world) {
 			super(world);
 			this.setOGSize(0.25F, 0.25F);
@@ -275,7 +276,7 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				} else {
-					entity.attackEntityFrom(DamageSource.FLY_INTO_WALL, 10f);
+					entity.attackEntityFrom(DamageSource.FLY_INTO_WALL, 1f);
 					if (entity instanceof EntityLivingBase) {
 						((EntityLivingBase)entity).addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 2, 3, false, false));
 					}
@@ -304,6 +305,11 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 		private EntityLivingBase summoner;
 		private boolean explosionSet;
 
+		@Override
+		public float getCollisionDamage() {
+			return 1000;
+		}
+
 		public Satellite(World world) {
 			super(world);
 		}
@@ -321,12 +327,12 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				if (!this.explosionSet && this.getTicksAlive() - this.fallTicks <= 1200) {
 					if (this.summoner != null) {
-						this.summoner.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 300d);
+						this.summoner.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 20d);
 					}
-					new EventSphericalExplosion(this.world, this.summoner, (int)this.posX, (int)this.posY, (int)this.posZ, 60, 0, 0.3f) {
+					new EventSphericalExplosion(this.world, this.summoner, (int)this.posX, (int)this.posY, (int)this.posZ, 60, 0, 0f) {
 						protected void doOnTick(int currentTick) {
 							ProcedureAoeCommand.set(getWorld(), getX0(), getY0(), getZ0(), 0d, getRadius())
-							 .exclude(getEntity()).damageEntities(DamageSource.FALLING_BLOCK, (float)getRadius());
+							 .exclude(getEntity()).damageEntities(DamageSource.FALLING_BLOCK, 500);
 						}
 					};
 					this.explosionSet = true;
@@ -385,7 +391,8 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			protected ResourceLocation getEntityTexture(EntityCustom entity) {
-				return entity.getEntityScale() > entity.maxScale * 0.4f ? this.blank_tex : this.texture;
+				return entity.getEntityScale() > entity.maxScale * 0.4f 
+? this.blank_tex : this.texture;
 			} // meteor2
 		}
 	

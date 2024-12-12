@@ -19,7 +19,8 @@ import net.narutomod.item.ItemJutsu;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
-
+
+
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityIntonRaiha extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 348;
@@ -82,7 +83,7 @@ public class EntityIntonRaiha extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				this.setPosition(this.shooter.posX, this.shooter.posY, this.shooter.posZ);
-				float duration = (float)this.waitTime + this.power * 10.0f;
+				float duration = (float)this.waitTime + this.power * 4.0f;
 				if (this.ticksExisted > this.waitTime) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")),
 					  0.6f, this.rand.nextFloat() + 0.5f);
@@ -93,7 +94,8 @@ public class EntityIntonRaiha extends ElementsNarutomodMod.ModElement {
 					 .rotatePitch((this.rand.nextFloat()-0.5f) * 1.0472f).add(this.shooter.getPositionEyes(1.0f));
 					float f = 5.0f + this.power * 5.0f + 1.0f / ((float)this.ticksExisted - duration - 0.4f);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, vec1, vec2, 0x80FF00FF, (int)f, 0.4f, 0.04f);
-					entity.setDamage(ItemJutsu.causeSenjutsuDamage(this, this.shooter), this.power, true, this.shooter);
+					float damage = 2+ItemJutsu.getDmgMult(this.shooter)*0.0185f*(1+2*(this.power/6));
+					entity.setDamage(ItemJutsu.causeSenjutsuDamage(this, this.shooter), damage, true, this.shooter);
 					this.world.spawnEntity(entity);
 				}
 				if (this.ticksExisted > (int)duration) {
