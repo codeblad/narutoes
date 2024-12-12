@@ -7,6 +7,7 @@ import net.narutomod.gui.GuiScrollGenjutsuGui;
 import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.PlayerTracker;
 import net.narutomod.NarutomodModVariables;
+import net.narutomod.ModConfig;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -478,7 +479,7 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 							((EntityLivingBase) entity)
 									.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 22, (int) 0, (false), (false)));
 					}
-				} /*else if ((((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 300)
+				} /*else if (((ModConfig.AUTO_KEKKEIGENKAI_ASSIGNMENT && ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 300))
 						&& (((((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
 								? ((EntityPlayerMP) entity).getAdvancements()
 										.getProgress(((WorldServer) (entity).world).getAdvancementManager()

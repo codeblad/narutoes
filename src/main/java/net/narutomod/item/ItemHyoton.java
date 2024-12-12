@@ -193,12 +193,13 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (this.ticksAlive <= this.growTime) {
+			if (!this.world.isRemote && this.ticksAlive <= this.growTime) {
 				this.setEntityScale(MathHelper.clamp(this.maxScale * (float)this.ticksAlive / this.growTime, 0.0f, this.maxScale));
 				for (EntityLivingBase entity : 
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
 					if (!entity.equals(this.user)) {
 						entity.hurtResistantTime = 10;
+						entity.getEntityData().setBoolean("TempData_disableKnockback", true);
 						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),
 						 this.damage);
 					}

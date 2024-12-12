@@ -217,10 +217,11 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 		public EntityBrackenDance(World worldIn) {
 			super(worldIn);
 			this.setColor(0xFFFFFFFF);
+			this.maxScale = this.rand.nextFloat() * 2.0f + 1.5f;
 		}
 
 		public EntityBrackenDance(EntityLivingBase userIn, float damageIn) {
-			super(userIn, 0xFFFFFFFF);
+			this(userIn.world);
 			//this.damage = damageIn;
 		}
 
@@ -232,12 +233,11 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (this.ticksAlive <= this.growTime) {
+			if (!this.world.isRemote && this.ticksAlive <= this.growTime) {
 				this.setEntityScale(MathHelper.clamp(this.maxScale * (float)this.ticksAlive / this.growTime, 0.0f, this.maxScale));
 				for (EntityLivingBase entity : 
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
 					if (!entity.equals(this.shootingEntity)) {
-						entity.hurtResistantTime = 10;
 						if (ticksAlive < 5) {
 							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
 									this.damage);
