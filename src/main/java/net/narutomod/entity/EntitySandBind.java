@@ -252,6 +252,7 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 						}
 						EC entity1 = new EC(entity, (EntityLivingBase)result.entityHit, ItemJiton.getSandType(stack));
 						entity.world.spawnEntity(entity1);
+						ItemJutsu.setCurrentJutsuCooldown(stack,20*12);
 						return true;
 					}
 				}

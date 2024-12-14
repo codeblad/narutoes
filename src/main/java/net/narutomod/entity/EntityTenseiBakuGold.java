@@ -152,6 +152,7 @@ public class EntityTenseiBakuGold extends ElementsNarutomodMod.ModElement {
 				entity.world.playSound(null, entity.posX, entity.posY + 2.0d, entity.posZ,
 				 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:laser")),
 				 net.minecraft.util.SoundCategory.PLAYERS, 4.0f, 1.0f);
+				ItemJutsu.setCurrentJutsuCooldown(stack,140);
 				return true;
 			}
 

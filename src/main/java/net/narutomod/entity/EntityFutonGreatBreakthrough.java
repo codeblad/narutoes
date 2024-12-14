@@ -155,7 +155,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= this.getBasePower()) {
 					entity.world.spawnEntity(new EC(entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 120);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 120);
 					return true;
 				}
 				return false;

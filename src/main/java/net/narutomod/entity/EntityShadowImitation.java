@@ -201,7 +201,7 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 30d);
 				if (res != null && res.entityHit instanceof EntityLivingBase) {
-					if (!res.entityHit.isAirBorne && !entity.isAirBorne) {
+					if (res.entityHit.onGround && entity.onGround) {
 						int[] oldintarray = entity.getEntityData().getIntArray(ECENTITYID);
 						if (!this.intarrayContains(entity.world, oldintarray, res.entityHit.getEntityId())) {
 							int[] newintarray = new int[oldintarray.length + 1];

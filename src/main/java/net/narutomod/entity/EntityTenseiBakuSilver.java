@@ -55,7 +55,8 @@ public class EntityTenseiBakuSilver extends ElementsNarutomodMod.ModElement {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
 		 .id(new ResourceLocation("narutomod", "tensei_baku_silver"), ENTITYID).name("tensei_baku_silver").tracker(64, 3, true).build());
 	}
-
+
+
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private static final DataParameter<Integer> USERID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private final AirPunch airPunch = new AirPunch();
@@ -214,6 +215,7 @@ public class EntityTenseiBakuSilver extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power));
+				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (power*4+20));
 				return true;
 			}
 

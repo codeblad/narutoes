@@ -110,9 +110,9 @@ public class EntityEnma extends ElementsNarutomodMod.ModElement {
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(20D);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1000D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(40D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(80D);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0D);
 		}
 

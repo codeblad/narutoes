@@ -73,8 +73,8 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 				duration = effect.getDuration() + 60;
 			}
 			entity.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, duration, amplifier));
-			entity.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 200, 4));
-			entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 200, 4));
+			entity.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 100, 4));
+			entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 4));
 			EntityLivingBase summoner = this.getSummoner();
 			summoner.heal(amount / 2.0F);
 			if (summoner instanceof EntityPlayer) {
@@ -98,7 +98,7 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 					}
 					EntityLivingBase summoner = this.getSummoner();
 					if (summoner != null && amount > 0f) {
-						Chakra.pathway(summoner).consume((double)-amount, true);
+						Chakra.pathway(summoner).consume((double)-amount*0.15, false);
 					}
 				}
 				return false;
@@ -114,7 +114,8 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("shield.health", 1024.0D, 0));
-		}*/
+		}
+*/
 
 		@Override
 		public void onDeathUpdate() {

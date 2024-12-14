@@ -63,7 +63,7 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 230;
 	public static final ItemJutsu.JutsuEnum JIRAIKEN = new ItemJutsu.JutsuEnum(0, "tooltip.bakuton.jiraiken", 'S', 150, 30d, new Jiraiken());
-	public static final ItemJutsu.JutsuEnum CLAY = new ItemJutsu.JutsuEnum(1, "c_1", 'S', 200, 100d, new ExplosiveClay.Jutsu());
+	public static final ItemJutsu.JutsuEnum CLAY = new ItemJutsu.JutsuEnum(1, "c_1", 'S', 200, 180d, new ExplosiveClay.Jutsu());
 	public static final ItemJutsu.JutsuEnum CLONE = new ItemJutsu.JutsuEnum(2, "explosive_clone", 'S', 200, 250d, new EntityExplosiveClone.EC.Jutsu());
 
 	public ItemBakuton(ElementsNarutomodMod instance) {
@@ -367,19 +367,19 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 					return false;
 				} else if (powerIn < 2f) {
 					ec = new EntityC1.EC(entity);
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20);
 				} else if (powerIn < 3f) {
 					ec = new EntityC2.EC(entity);
 					ProcedureUtils.poofWithSmoke(entity.world, vec.x, vec.y, vec.z, ec.width, ec.height);
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20);
+					ItemJutsu.setCurrentJutsuCooldown(stack,40);
 				} else if (powerIn < 4f) {
 					ec = new EntityC3.EC(entity);
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*5);
+					ItemJutsu.setCurrentJutsuCooldown(stack,140);
 				} else if (powerIn <= this.getMaxPower()) {
 					ec = new EntityC4.EC(entity);
 					float f = ((RangedItem)stack.getItem()).getXpRatio(stack, CLAY);
-					((EntityC4.EC)ec).setExplosionDamage(100, (int)(2.0f + ItemJutsu.getDmgMult(entity)*0.2));
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*8);
+					((EntityC4.EC)ec).setExplosionDamage(100, (int)(0.5f + ItemJutsu.getDmgMult(entity)*0.15));
+					ItemJutsu.setCurrentJutsuCooldown(stack,280);
 				} else {
 					return false;
 				}
@@ -396,7 +396,7 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 150.0f;
+				return 240.0f;
 			}
 
 			@Override

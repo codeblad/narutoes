@@ -84,6 +84,10 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 						this.world.spawnEntity(new EntitySweepParticle(user, 8.0f));
 						double d = ProcedureUtils.getReachDistance(user)+4;
 						float damage = (float)ProcedureUtils.getModifiedAttackDamage(user) * this.getCooledAttackStrength(user, 0.5f) + (ItemJutsu.getDmgMult(user)*this.getCooledAttackStrength(user, 0.5f));
+						ItemStack stack = ProcedureUtils.getMatchingItemStack(user,ItemKaton.block);
+						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+							damage*=1.25f;
+						}
 						this.ticksSinceLastSwing = 0;
 						Entity directTarget = ProcedureUtils.objectEntityLookingAt(user, 4d, this).entityHit;
 						for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, user.getEntityBoundingBox().grow(d, 0.25D, d))) {

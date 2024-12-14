@@ -116,8 +116,8 @@ public class EntityPuppet3rdKazekage extends ElementsNarutomodMod.ModElement {
 		public boolean attackEntityAsMob(Entity entityIn) {
 			if (super.attackEntityAsMob(entityIn)) {
 				if (entityIn instanceof EntityLivingBase) {
-					((EntityLivingBase)entityIn).addPotionEffect(new PotionEffect(MobEffects.POISON, 6000, 5));
-					((EntityLivingBase)entityIn).addPotionEffect(new PotionEffect(PotionHeaviness.potion, 6000, 2));
+					((EntityLivingBase)entityIn).addPotionEffect(new PotionEffect(MobEffects.POISON, 600, 5));
+					((EntityLivingBase)entityIn).addPotionEffect(new PotionEffect(PotionHeaviness.potion, 60, 2));
 				}
 				return true;
 			}

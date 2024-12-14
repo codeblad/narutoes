@@ -84,9 +84,9 @@ public class ItemIshiken extends ElementsNarutomodMod.ModElement {
 			if (attacker.getHeldItemMainhand().getItem() == block) {
 				EntityGamarinsho.EC ec = EntityGamarinsho.EC.Jutsu.getEntity(attacker);
 				if (ec != null && ec.getTrappedEntities().contains(event.getEntityLiving())) {
-					event.setCanceled(true);
 					event.getEntityLiving().getEntityData().setBoolean("IgnoreThisHook", true);
-					event.getEntityLiving().attackEntityFrom(event.getSource().setDamageBypassesArmor(), Float.MAX_VALUE);
+					event.getEntityLiving().attackEntityFrom(event.getSource().setDamageBypassesArmor(), event.getAmount()*2);
+					event.setCanceled(true);
 				}
 			}
 		}

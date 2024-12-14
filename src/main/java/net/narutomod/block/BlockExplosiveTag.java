@@ -1,6 +1,16 @@
 
 package net.narutomod.block;
 
+import net.minecraft.init.Biomes;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeForest;
+import net.minecraft.world.biome.BiomeHell;
+import net.minecraft.world.biome.BiomeHills;
+import net.narutomod.entity.EntityGiantDog2h;
+import net.narutomod.entity.EntitySlugSage;
+import net.narutomod.entity.EntitySnakeSage;
+import net.narutomod.entity.EntityToadSage;
 import net.narutomod.procedure.ProcedureExplosiveTagUpdateTick;
 import net.narutomod.procedure.ProcedureExplosiveTagBlockDestroyedByExplosion;
 import net.narutomod.creativetab.TabModTab;
@@ -234,6 +244,31 @@ public class BlockExplosiveTag extends ElementsNarutomodMod.ModElement {
 				$_dependencies.put("y", y);
 				$_dependencies.put("z", z);
 				$_dependencies.put("world", world);
+				if (!entity.world.isRemote) {
+					IBlockState b1 = entity.world.getBlockState(pos.add(0,-1,0));
+					boolean structure = true;
+					if (b1.getBlock() != Blocks.GOLD_BLOCK) {
+						structure = false;
+					}
+					if (structure) {
+						Biome biome = entity.world.getBiome(pos);
+						if (biome == Biomes.BIRCH_FOREST){
+							EntitySlugSage.EntityCustom spawn = new EntitySlugSage.EntityCustom(entity.world);
+							spawn.setLocationAndAngles(x,y,z,0,0);
+							entity.world.spawnEntity(spawn);
+						}
+						if (biome == Biomes.ROOFED_FOREST){
+							EntitySnakeSage.EntityCustom spawn = new EntitySnakeSage.EntityCustom(entity.world);
+							spawn.setLocationAndAngles(x,y,z,0,0);
+							entity.world.spawnEntity(spawn);
+						}
+						if (biome == Biomes.EXTREME_HILLS){
+							EntityToadSage.EntityCustom spawn = new EntityToadSage.EntityCustom(entity.world);
+							spawn.setLocationAndAngles(x,y,z,0,0);
+							entity.world.spawnEntity(spawn);
+						}
+					}
+				}
 				ProcedureExplosiveTagBlockDestroyedByExplosion.executeProcedure($_dependencies);
 			}
 			return true;

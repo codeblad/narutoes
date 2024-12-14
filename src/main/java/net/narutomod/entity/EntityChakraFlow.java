@@ -35,6 +35,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.init.MobEffects;
 
+import net.narutomod.item.ItemFuton;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.NarutomodMod;
@@ -109,7 +110,12 @@ public class EntityChakraFlow extends ElementsNarutomodMod.ModElement {
 						if (attributemodifier != null) {
 							aInstance.removeModifier(attributemodifier);
 						}
-						aInstance.applyModifier(new AttributeModifier(DAMAGE_MODIFIER, "chakraflow.damage", this.damageModifier+ 2*ItemJutsu.getDmgMult(user), 0));
+						float damage = (float) (this.damageModifier+ 2*ItemJutsu.getDmgMult(user));
+						ItemStack stack = ProcedureUtils.getMatchingItemStack(user, ItemFuton.block);
+						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+							damage*=1.25f;
+						}
+						aInstance.applyModifier(new AttributeModifier(DAMAGE_MODIFIER, "chakraflow.damage", damage, 0));
 					}
 				}
 			}

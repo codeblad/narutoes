@@ -95,6 +95,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 			float health = (20+ (80*(ItemJutsu.getDmgMult(summonerIn)/63))) * PlayerTracker.getDefense(summonerIn);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2.5+500);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(50.0D+ItemJutsu.getDmgMult(summonerIn)*3.4);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50D);
 			//float ratio = summonerIn.getHealth()/summonerIn.getMaxHealth();
 			this.setHealth(this.getMaxHealth());
 			this.chakraBurn = chakraUsagePerSec;
@@ -143,7 +144,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 					if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 						ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
 						//(30*20)+this.ticksExisted+this.ticksExisted/2
-						item.setJutsuCooldown(stack, GOLEM, 20*25);
+						item.setJutsuCooldown(stack, GOLEM, 20*35);
 					}
 				}
 			}
@@ -795,13 +796,13 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 				GlStateManager.translate(0.0F, 1.5F - f6 * ((EC)entity).getGrowth(ageInTicks), 0.0F);
 				GlStateManager.scale(MODELSCALE, MODELSCALE, MODELSCALE);
 				super.render(entity, f, f1, ageInTicks, f3, f4, f5);
-				dragon.render(f5);
+				//dragon.render(f5);
 				GlStateManager.disableLighting();
 				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
 				bipedHeadwear.render(f5);
-				if (dragon.showModel) {
-					dragonEyes.render(f5);
-				}
+				//if (dragon.showModel) {
+				//	dragonEyes.render(f5);
+				//}
 				GlStateManager.enableLighting();
 				//GlStateManager.popMatrix();
 			}

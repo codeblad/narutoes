@@ -119,7 +119,7 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
 				if (target instanceof EntityLivingBase) {
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, (int) (80+80*(power/20)), (int) (5+ItemJutsu.getDmgMult(player)*0.15)));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, (int) (80+80*(power/20)), (int) (8+ItemJutsu.getDmgMult(player)*0.25)));
 					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) (40+100*(power/20)), 2));
 				}
 			}
@@ -134,6 +134,7 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power));
+				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (20+power*2));
 				return true;
 			}
 

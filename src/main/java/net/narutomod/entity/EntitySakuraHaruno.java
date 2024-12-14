@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -46,12 +47,7 @@ import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.village.Village;
 import net.minecraft.potion.PotionEffect;
 
-import net.narutomod.item.ItemScrollHealing;
-import net.narutomod.item.ItemScrollEnhancedStrength;
-import net.narutomod.item.ItemMilitaryRationsPill;
-import net.narutomod.item.ItemMilitaryRationsPillGold;
-import net.narutomod.item.ItemIryoJutsu;
-import net.narutomod.item.ItemNinjaArmorSakura1;
+import net.narutomod.item.*;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.potion.PotionChakraEnhancedStrength;
 import net.narutomod.ElementsNarutomodMod;
@@ -112,13 +108,15 @@ public class EntitySakuraHaruno extends ElementsNarutomodMod.ModElement {
 			MerchantRecipeList commonTrades = new MerchantRecipeList();
 			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 1), ItemStack.EMPTY, new ItemStack(Items.BAKED_POTATO, 3), 0, 1));
 			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemMilitaryRationsPill.block, 2), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 10), ItemStack.EMPTY, new ItemStack(ItemScrollPoisonMist.block, 2), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 45), ItemStack.EMPTY, new ItemStack(ItemScrollEnhancedStrength.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Blocks.EMERALD_BLOCK, 10), ItemStack.EMPTY, new ItemStack(ItemScrollCellularActivation.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 15), ItemStack.EMPTY, new ItemStack(ItemMilitaryRationsPillGold.block, 1, 1), 0, 1));
 
 			MerchantRecipeList uncommonTrades = new MerchantRecipeList();
 			uncommonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 20), ItemStack.EMPTY, new ItemStack(ItemScrollHealing.block, 1), 0, 1));
-			uncommonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 15), ItemStack.EMPTY, new ItemStack(ItemMilitaryRationsPillGold.block, 1, 1), 0, 1));
 
 			MerchantRecipeList rareTrades = new MerchantRecipeList();
-			rareTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 45), ItemStack.EMPTY, new ItemStack(ItemScrollEnhancedStrength.block, 1), 0, 1));
 
 			trades.put(EntityNinjaMerchant.TradeLevel.COMMON, commonTrades);
 			trades.put(EntityNinjaMerchant.TradeLevel.UNCOMMON, uncommonTrades);

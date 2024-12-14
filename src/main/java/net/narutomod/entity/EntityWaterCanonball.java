@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.narutomod.item.ItemSuiton;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
@@ -73,6 +74,10 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 			this.explosionSize = (int)(power * 2f);
 			this.mult = 1+1*(power/5);
 			this.damage = 6+mult*ItemJutsu.getDmgMult(this.shootingEntity)*1.8f;
+			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter, ItemSuiton.block);
+			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+				damage*=1.25f;
+			}
 			Vec3d vec = shooter.getPositionEyes(1f).add(shooter.getLookVec().scale(shooter.width * 0.5f)).subtract(0d, 0.2d, 0d);
 			this.setLocationAndAngles(vec.x, vec.y, vec.z, shooter.rotationYawHead, shooter.rotationPitch);
 		}
@@ -147,7 +152,7 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 				if (power >= 0.5f) {
 					this.createJutsu(entity, power);
 					//if (entity instanceof EntityPlayer)
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);
 					return true;
 				}
 				return false;

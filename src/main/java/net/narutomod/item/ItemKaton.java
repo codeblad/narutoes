@@ -51,7 +51,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	//public static final int ENTITY2ID = 10123;
 	public static final ItemJutsu.JutsuEnum GREATFIREBALL = new ItemJutsu.JutsuEnum(0, "katonfireball", 'C', 50d, new EntityBigFireball.Jutsu());
 	public static final ItemJutsu.JutsuEnum GFANNIHILATION = new ItemJutsu.JutsuEnum(1, "tooltip.katon.annihilation", 'B', 50d, new EntityFirestream.EC.Jutsu1());
-	public static final ItemJutsu.JutsuEnum HIDINGINASH = new ItemJutsu.JutsuEnum(2, "hiding_in_ash", 'B', 50d, new EntityHidingInAsh.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum HIDINGINASH = new ItemJutsu.JutsuEnum(2, "hiding_in_ash", 'B', 10d, new EntityHidingInAsh.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum GREATFLAME = new ItemJutsu.JutsuEnum(3, "katonfirestream", 'C', 15d, new EntityFirestream.EC.Jutsu2());
 	public static final ItemJutsu.JutsuEnum FLAMESLICE = new ItemJutsu.JutsuEnum(4, "flame_slice", 'D', 20d, new EntityFlameSlice.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum BARRIER = new ItemJutsu.JutsuEnum(5, "flame_formation", 'B', 100d, new EntityFlameFormation.EC.Jutsu());
@@ -106,6 +106,10 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			//this.damage = fullScale * 10.0f;
 			this.mult = 1.0f + 2f*(fullScale/10);
 			this.damage = 10 + ItemJutsu.getDmgMult(shooter)*mult;
+			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter,ItemKaton.block);
+			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+				damage*=1.25f;
+			}
 			//this.guided = isGuided;
 			this.guided = false;
 			//this.setEntityScale(0.1f);
@@ -199,7 +203,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					this.createJutsu(entity, entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power,
 					 stack.getItem() instanceof RangedItem && ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) <= 0.5f);
 					//if (entity instanceof EntityPlayer)
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20);
 					return true;
 				}
 				return false;

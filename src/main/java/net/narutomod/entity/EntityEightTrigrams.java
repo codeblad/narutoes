@@ -12,7 +12,6 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
 import net.minecraft.potion.PotionEffect;
@@ -22,7 +21,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -30,14 +28,12 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.Minecraft;
 
+import net.narutomod.item.ItemIryoJutsu;
 import net.narutomod.item.ItemJutsu;
-import net.narutomod.potion.PotionHeaviness;
 import net.narutomod.procedure.ProcedureRenderView;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureSync;
-import net.narutomod.PlayerTracker;
 import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -92,6 +88,9 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 		public EntityCustom(EntityLivingBase userIn) {
 			this(userIn.world);
 			this.setOwnerPlayer(userIn);
+			if (ItemIryoJutsu.POWERMODE.jutsu.isActivated(userIn)) {
+				ItemIryoJutsu.POWERMODE.jutsu.deactivate(userIn);
+			}
 			this.setLocationAndAngles(userIn.posX, userIn.posY, userIn.posZ, 0.0f, 0.0f);
 		}
 

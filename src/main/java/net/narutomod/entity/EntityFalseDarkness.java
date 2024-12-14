@@ -19,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.item.ItemStack;
 
+import net.narutomod.item.ItemRaiton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
@@ -91,7 +92,12 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 					 SoundEvents.ENTITY_LIGHTNING_IMPACT, SoundCategory.WEATHER, 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, this.getPositionVector(), 
 					 this.target.getPositionEyes(1f), 0x000000FF, 40, 0f);
-					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.user), 10+(BASE_DAMAGE * (1+1*(this.power/20))) *ItemJutsu.getDmgMult(this.user), this.user);
+					float damage = 10+(BASE_DAMAGE * (1+1*(this.power/20))) *ItemJutsu.getDmgMult(this.user);
+					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemRaiton.block);
+					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+						damage*=1.25f;
+					}
+					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.user), damage, this.user);
 					this.world.spawnEntity(entity);
 					this.setDead();
 				}
@@ -122,7 +128,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 80d, 3d);
 				if (res != null && res.entityHit instanceof EntityLivingBase) {
 					entity.world.spawnEntity(new EC(entity, (EntityLivingBase)res.entityHit, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*5);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
 					return true;
 				}
 				return false;

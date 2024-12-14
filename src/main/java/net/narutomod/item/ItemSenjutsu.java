@@ -428,7 +428,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 
 		public EntitySitPlatform(EntityLivingBase entity) {
 			this(entity.world);
-			this.setLocationAndAngles(entity.posX, entity.posY+0.1d, entity.posZ, entity.rotationYaw, 0f);
+			this.setLocationAndAngles(entity.posX, entity.posY+0.15d, entity.posZ, entity.rotationYaw, 0f);
 			entity.startRiding(this);
 		}
 
@@ -438,7 +438,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public double getMountedYOffset() {
-			return -0.25d;
+			return -0.2d;
 		}
 
 		@Override @Nullable

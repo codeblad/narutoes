@@ -223,6 +223,14 @@ public class ProcedureOnPlayerDeath extends ElementsNarutomodMod.ModElement {
 						}
 						((stack)).shrink((int) 1);
 					}
+					((EntityPlayer) entity).inventory.clearMatchingItems(new ItemStack(ItemByakugan.helmet, (int) (1)).getItem(), -1, (int) (-1),
+							null);
+					((EntityPlayer) entity).inventory.clearMatchingItems(new ItemStack(ItemSharingan.helmet, (int) (1)).getItem(), -1, (int) (-1),
+							null);
+					((EntityPlayer) entity).inventory.clearMatchingItems(new ItemStack(ItemMangekyoSharingan.helmet, (int) (1)).getItem(), -1, (int) (-1),
+							null);
+					((EntityPlayer) entity).inventory.clearMatchingItems(new ItemStack(ItemMangekyoSharinganObito.helmet, (int) (1)).getItem(), -1, (int) (-1),
+							null);
 				}
 			}
 			ProcedureSync.EntityNBTTag.removeAndSync(entity, NarutomodModVariables.forceBowPose);

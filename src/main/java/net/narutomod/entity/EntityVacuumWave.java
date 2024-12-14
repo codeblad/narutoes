@@ -2,6 +2,7 @@
 package net.narutomod.entity;
 
 import net.minecraft.item.Item;
+import net.narutomod.item.ItemFuton;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
@@ -109,7 +110,12 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 							vec = vec.subtract(this.rotationYaw, this.rotationPitch);
 				            if (Math.abs(vec.x) <= 90f && Math.abs(vec.y) <= 90f) {
 							 	entity.hurtResistantTime = 10;
-								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 6+1*(1+0.35f*(this.power/10))* ItemJutsu.getDmgMult(this.shootingEntity));
+								 float damage = 5+0.8f*(1+0.35f*(this.power/10))* ItemJutsu.getDmgMult(this.shootingEntity);
+								ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemFuton.block);
+								if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+									damage*=1.25f;
+								}
+								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);
 				            }
 						}
 					}
@@ -122,7 +128,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0F) {
 					entity.world.spawnEntity(new EC(entity, power * 2f + 6f, 0));
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, (long) (20 + 20*power/3));
+					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (20 + 20*power/3));
 					return true;
 				}
 				return false;

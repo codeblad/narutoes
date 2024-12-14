@@ -1,11 +1,6 @@
 package net.narutomod.procedure;
 
-import net.narutomod.item.ItemTenseigan;
-import net.narutomod.item.ItemSharingan;
-import net.narutomod.item.ItemMangekyoSharinganObito;
-import net.narutomod.item.ItemMangekyoSharinganEternal;
-import net.narutomod.item.ItemMangekyoSharingan;
-import net.narutomod.item.ItemByakugan;
+import net.narutomod.item.*;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -54,11 +49,7 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 		double TenseiganEvolvedTime = 0;
 		boolean hasKey = false;
 		if ((((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
-				? ((EntityPlayerMP) entity).getAdvancements()
-						.getProgress(((WorldServer) (entity).world).getAdvancementManager()
-								.getAdvancement(new ResourceLocation("narutomod:achievementmedicalgenin")))
-						.isDone()
-				: false)) {
+				&& ProcedureUtils.getMatchingItemStack((EntityPlayer) entity, ItemIryoJutsu.block) != null)) {
 			stack0 = (new Object() {
 				public ItemStack getItemStack(int sltid) {
 					if (entity instanceof EntityPlayerMP) {
@@ -97,11 +88,12 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 				if (owner_uuid != null && other_uuid != null && !owner_uuid.equals(other_uuid)) {
 					EntityLivingBase owner = ProcedureUtils.searchLivingMatchingId(owner_uuid);
 					if ((((owner instanceof EntityPlayerMP) && ((owner).world instanceof WorldServer))
-							? ((EntityPlayerMP) owner).getAdvancements()
+							/*? ((EntityPlayerMP) owner).getAdvancements()
 									.getProgress(((WorldServer) (owner).world).getAdvancementManager()
 											.getAdvancement(new ResourceLocation("narutomod:mangekyosharinganopened")))
 									.isDone()
-							: false)) {
+							: false*/
+							)) {
 						newstack = new ItemStack(ItemMangekyoSharinganEternal.helmet, (int) (1));
 						((ItemSharingan.Base) newstack.getItem()).copyOwner(newstack, stack0);
 						if (entity instanceof EntityPlayerMP) {
@@ -164,11 +156,12 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 				if (owner_uuid != null && other_uuid != null && !owner_uuid.equals(other_uuid)) {
 					EntityLivingBase owner = ProcedureUtils.searchLivingMatchingId(owner_uuid);
 					if ((((owner instanceof EntityPlayerMP) && ((owner).world instanceof WorldServer))
-							? ((EntityPlayerMP) owner).getAdvancements()
+							/*? ((EntityPlayerMP) owner).getAdvancements()
 									.getProgress(((WorldServer) (owner).world).getAdvancementManager()
 											.getAdvancement(new ResourceLocation("narutomod:byakuganopened")))
 									.isDone()
-							: false)) {
+							: false*/))
+					{
 						{
 							ItemStack _stack = (stack0);
 							if (!_stack.hasTagCompound())

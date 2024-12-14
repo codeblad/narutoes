@@ -307,7 +307,7 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public float getCollisionDamage() {
-			return 1000;
+			return 500;
 		}
 
 		public Satellite(World world) {

@@ -36,6 +36,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.BlockLiquid;
 
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemSuiton;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
@@ -211,7 +212,11 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 				if (result.typeOfHit == RayTraceResult.Type.BLOCK
 				 || (result.entityHit != null && result.entityHit.equals(this.target))) {
 					float size = this.getEntityScale();
-					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*2.2f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
+					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*2.8f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
+					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);
+					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+						damage*=1.25f;
+					}
 					ProcedureAoeCommand.set(this, 0.0D, size).exclude(this.shootingEntity)
 					  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);
 					this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, size * 2.0F, false,
@@ -260,7 +265,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);
 				}
 				return power >= 1.0f ? this.createJutsu(entity, power)  : false;
 			}

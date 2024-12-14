@@ -221,14 +221,14 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 					float f = MathHelper.sqrt(power * 9f / 5f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EntityIceSpike entity1 = new EntityIceSpike(entity);
-						entity1.damage = 8+6 * ((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
+						entity1.damage = 8+3*((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
 						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
 						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
 						entity1.setLocationAndAngles(vec.x, vec.y + 0.5d, vec.z, entity.getRNG().nextFloat() * 360f, (entity.getRNG().nextFloat() - 0.5f) * 60f);
 						world.spawnEntity(entity1);
 					}
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*1);
 					return true;
 				}
 				return false;

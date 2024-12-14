@@ -144,7 +144,8 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 					entity.motionY = 0.45d;
 					player.world.spawnEntity(entity);
 				}*/
-				return super.processAffectedBlock(player, pos, facing);
+				//return super.processAffectedBlock(player, pos, facing);
+				return null;
 			}
 
 			@Override
@@ -163,11 +164,11 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 				EntityLivingBase attacker = (EntityLivingBase)event.getSource().getImmediateSource();
 				if (attacker.isPotionActive(potion)) {
 					int amplifier = attacker.getActivePotionEffect(potion).getAmplifier();
-					if (Chakra.pathway(attacker).consume((double)amplifier*0.7)) {
+					if (Chakra.pathway(attacker).consume((double)amplifier*0.95)) {
 						EntityLivingBase target = event.getEntityLiving();
 						target.world.playSound(null, target.posX, target.posY, target.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE,
 						  SoundCategory.BLOCKS, 1.0F, (1.0F + (target.getRNG().nextFloat() - target.getRNG().nextFloat()) * 0.2F) * 0.7F);
-						new Punch(attacker.world).execute(attacker, MathHelper.clamp((double)amplifier * 0.4d,0.0d,25d), MathHelper.clamp(0.1d * amplifier,0.0d,35d));
+						new Punch(attacker.world).execute(attacker, MathHelper.clamp((double)amplifier * 0.4d,0.0d,6d), MathHelper.clamp(0.1d * amplifier,0.0d,12d));
 						event.setAmount(event.getAmount() + amplifier);
 					}
 				}

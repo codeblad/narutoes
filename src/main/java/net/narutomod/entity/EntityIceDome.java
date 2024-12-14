@@ -336,11 +336,11 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (!entity.isRiding()) {
 					this.createJutsu(entity, entity.posX, entity.posY - 0.1d, entity.posZ);
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*1);
 					return true;
 				} else if (entity.getRidingEntity() instanceof EC) {
 					((EC)entity.getRidingEntity()).shootSpears();
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*5);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*5);
 					return true;
 				}
 				return false;

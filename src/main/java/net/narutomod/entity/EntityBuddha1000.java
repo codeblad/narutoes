@@ -105,7 +105,8 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 			this.stepHeight = this.height / 3;
 
 			float health = (20+ (80*(ItemJutsu.getDmgMult(summonerIn)/63))) * PlayerTracker.getDefense(summonerIn);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*4+2000);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*4.5+3000);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(150.0D+ItemJutsu.getDmgMult(summonerIn)*8);
 			this.setHealth(this.getMaxHealth());
 			this.chakraBurn = chakraUsagePerSec;

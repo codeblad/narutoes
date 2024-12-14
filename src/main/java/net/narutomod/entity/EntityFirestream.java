@@ -2,6 +2,7 @@
 package net.narutomod.entity;
 
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemKaton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -67,6 +68,10 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			this.range = MathHelper.clamp(rangeIn,5,50);
 			float mult = 1+1.5f*(((float) powa)/25);
 			this.damage = 2+ItemJutsu.getDmgMult(shooterIn)*0.85f*mult;
+			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter, ItemKaton.block);
+			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+				damage*=1.25f;
+			}
 		}
 
 		@Override
@@ -155,7 +160,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				  SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:katon_gokamekeku")),
 				  SoundCategory.NEUTRAL, 5, 1f);
 				entity.world.spawnEntity(new EC(entity, power * 0.8, power * 1.5, power));
-				ItemJutsu.setCurrentJutsuCooldown(stack, entity, 250);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 240);
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
 				return true;
 			}
@@ -175,7 +180,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				this.createJutsu(entity, power, (int)(power * 4f));
-				ItemJutsu.setCurrentJutsuCooldown(stack, entity, 200);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 120);
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
 				return true;
 			}

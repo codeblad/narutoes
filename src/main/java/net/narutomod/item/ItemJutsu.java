@@ -109,7 +109,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static void setCurrentJutsuCooldown(ItemStack stack, long cd) {
-		if (stack.getItem() instanceof Base) {
+		if (stack != null && stack.getItem() instanceof Base) {
 			((Base)stack.getItem()).setCurrentJutsuCooldown(stack, cd);
 		}
 	}

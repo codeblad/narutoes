@@ -31,10 +31,7 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 
-import net.narutomod.item.ItemScrollBodyReplacement;
-import net.narutomod.item.ItemScrollKageBunshin;
-import net.narutomod.item.ItemKunai;
-import net.narutomod.item.ItemNinjaArmorKonoha;
+import net.narutomod.item.*;
 import net.narutomod.ElementsNarutomodMod;
 
 import javax.annotation.Nullable;
@@ -81,7 +78,12 @@ public class EntityIrukaSensei extends ElementsNarutomodMod.ModElement {
 			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollBodyReplacement.block, 1), 0, 1));
 
 			MerchantRecipeList uncommonTrades = new MerchantRecipeList();
-			uncommonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 15), ItemStack.EMPTY, new ItemStack(ItemScrollKageBunshin.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollKageBunshin.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollEarthSpears.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollWaterCannon.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollGreatFireball.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollLightningBeast.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollFutonVacuum.block, 1), 0, 1));
 			uncommonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 30), ItemStack.EMPTY, new ItemStack(Items.GOLDEN_APPLE, 1, 1), 0, 1));
 
 			trades.put(EntityNinjaMerchant.TradeLevel.COMMON, commonTrades);

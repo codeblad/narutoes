@@ -292,7 +292,7 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 						if (!entity.isPotionActive(PotionHeaviness.potion) || entity.getActivePotionEffect(PotionHeaviness.potion).getAmplifier() < 1) {
 							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 22, 1, false, false));
 						}
-						if (this.chakra < 100d && Chakra.pathway(entity).consume(0.001d)) {
+						if (this.chakra < 100d && Chakra.pathway(entity).consume(0.02d)) {
 							this.chakra += 0.001d;
 						}
 					} else if (this.chakra > 0.0d) {

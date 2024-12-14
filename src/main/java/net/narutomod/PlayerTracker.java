@@ -2,6 +2,7 @@ package net.narutomod;
 
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -296,13 +297,20 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
 					defMult += 0.65f;
 				}
+				if (cheststack.getItem() == ItemRinnegan.body) {
+					defMult += 1.15f;
+				}
 				if (cheststack.getItem() == ItemBoneArmor.body) {
 					if (ItemBoneArmor.isLarchActive(cheststack)) {
 						defMult += 0.55f;
 					}
 				}
 				if (cheststack.getItem() == ItemTenseigan.body) {
-					defMult += .8f;
+					defMult += .9f;
+				}
+				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
+				if (stackwood != null) {
+					defMult+= 0.25f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
 					defMult+= 0.4f;
@@ -320,7 +328,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
 						defMult+= 0.1f;
 					} else {
-						defMult+= 0.7f;
+						defMult+= 0.6f;
 					}
 				}
 				if (ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity) > 0) {
@@ -339,7 +347,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
 				float newAmount = amount/defense;
-				if (event.getSource() == ProcedureUtils.SPECIAL_DAMAGE) {
+				if (event.getSource() == ProcedureUtils.SPECIAL_DAMAGE || event.getSource() == DamageSource.OUT_OF_WORLD) {
 					newAmount = amount;
 				}
 				event.setAmount(newAmount);

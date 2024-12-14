@@ -37,6 +37,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 
+import net.narutomod.item.ItemRaiton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.potion.PotionParalysis;
 import net.narutomod.item.ItemJutsu;
@@ -139,7 +140,12 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
-			return EntityLightningArc.onStruck(entityIn, ItemJutsu.causeJutsuDamage(this, this.getOwner()), 5+(1+1*this.power/5)*0.75f*ItemJutsu.getDmgMult(this.getOwner()));
+			float damage = 5+(1+1*this.power/5)*0.75f*ItemJutsu.getDmgMult(this.getOwner());
+			ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getOwner(), ItemRaiton.block);
+			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+				damage*=1.25f;
+			}
+			return EntityLightningArc.onStruck(entityIn, ItemJutsu.causeJutsuDamage(this, this.getOwner()), damage);
 		}
 
 		private BlockPos findDestination() {
@@ -245,7 +251,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity instanceof EntityPlayer && power >= 5.0f) {
 					entity.world.spawnEntity(new EC((EntityPlayer)entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*2);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*2);
 					return true;
 				}
 				return false;

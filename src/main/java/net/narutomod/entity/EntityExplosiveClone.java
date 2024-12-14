@@ -117,7 +117,7 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 			super(user);
 			float defense = PlayerTracker.getDefense(user);
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(user.getMaxHealth()*defense);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(user.getMaxHealth()*defense*0.25);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(ProcedureUtils.getModifiedSpeed(user) * 4.0d);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(48d);
 			this.setHealth(this.getMaxHealth());
@@ -234,7 +234,7 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (!entity.isSneaking()) {
 					this.createJutsu(entity);
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*2);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*2);
 					return true;
 				} else {
 					for (EC clone : entity.world.getEntities(EC.class, EntitySelectors.IS_ALIVE)) {

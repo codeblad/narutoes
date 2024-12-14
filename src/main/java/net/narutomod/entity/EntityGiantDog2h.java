@@ -82,7 +82,7 @@ public class EntityGiantDog2h extends ElementsNarutomodMod.ModElement {
 		}
 
 		public EntityCustom(EntityLivingBase player) {
-			this(player, 400d);
+			this(player, 800d);
 		}
 
 		@Override

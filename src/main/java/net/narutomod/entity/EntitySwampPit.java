@@ -125,7 +125,7 @@ public class EntitySwampPit extends ElementsNarutomodMod.ModElement {
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:yominuma")), SoundCategory.PLAYERS, 1, 1f);
 					entity.world.spawnEntity(new EC(entity, rtr.getBlockPos(), (int)power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*5);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*5);
 					return true;
 				}
 				return false;

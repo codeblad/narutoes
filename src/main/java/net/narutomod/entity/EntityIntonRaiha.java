@@ -125,6 +125,7 @@ public class EntityIntonRaiha extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power));
+				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (40+power*4));
 				return true;
 			}
 	

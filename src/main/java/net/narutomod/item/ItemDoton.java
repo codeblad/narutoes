@@ -419,7 +419,7 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 					if (rt != null && rt.typeOfHit == RayTraceResult.Type.BLOCK) {
 						entity.world.spawnEntity(new EntityEarthWall(
 						  entity.world, rt.hitVec.x, rt.hitVec.y, rt.hitVec.z, entity.rotationYaw, (double)power));
-						ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
+						ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);
 						return true;
 					}
 				}

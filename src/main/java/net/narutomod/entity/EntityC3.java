@@ -98,7 +98,7 @@ public class EntityC3 extends ElementsNarutomodMod.ModElement {
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.3D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(500D);
 		}
 
 		@Override
@@ -133,7 +133,7 @@ public class EntityC3 extends ElementsNarutomodMod.ModElement {
 			}
 			if (!this.world.isRemote && !this.hasNoGravity() && this.onGround) {// && this.detonateTicks == 0) {
 				new EventSphericalExplosion(this.world, null, (int)this.posX, (int)this.posY + 5, (int)this.posZ, this.explosionRange, 0, 0.3f);
-				ProcedureAoeCommand.set(this, 0d, this.explosionRange).damageEntities(ItemJutsu.causeJutsuDamage(this, null), this.explosionDamage+15.1f*ItemJutsu.getDmgMult(this.user));
+				ProcedureAoeCommand.set(this, 0d, this.explosionRange).damageEntities(ItemJutsu.causeJutsuDamage(this, null), this.explosionDamage+20f*ItemJutsu.getDmgMult(this.user));
 				this.setDead();
 				if (this.effectEntity != null) {
 					this.effectEntity.setLifespan(50);

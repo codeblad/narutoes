@@ -282,6 +282,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if ((stack.getItem() == ItemFuton.block && power >= 0.1f) || (stack.getItem() == ItemSenjutsu.block && power >= 2.0f)) {
 					EC.create(entity, power, stack.getItem() == ItemSenjutsu.block);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*2);
 					return true;
 				}
 				return false;
@@ -327,6 +328,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 				EC entity1 = EC.create(entity, 4.0f, true);
 				entity1.setBallColor(0xE0101010);
 				entity1.impactDamageMultiplier = this.multiplier;
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
 				return true;
 			}
 		}

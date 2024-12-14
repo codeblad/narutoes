@@ -122,7 +122,7 @@ public class ProcedureMeteorStrike extends ElementsNarutomodMod.ModElement {
 					entity1 = new EntityChibakuTenseiBall.Satellite((EntityLivingBase)entity, 
 					 ProcedureUtils.getNonAirBlocks(world, new AxisAlignedBB(spawnTo).expand(20d, 20d, 20d)));
 					world.spawnEntity(entity1);
-					((EntityChibakuTenseiBall.Satellite)entity1).setFallTime(5);
+					((EntityChibakuTenseiBall.Satellite)entity1).setFallTime(8);
 				}
 			}
 		}

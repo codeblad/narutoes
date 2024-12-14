@@ -224,7 +224,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				this.createJutsu(entity, power, power * 0.25f);
-				ItemJutsu.setCurrentJutsuCooldown(stack, entity, (long) (20+(power * power * 0.5)));
+				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (20+(power * power * 0.5)));
 				return true;
 			}
 

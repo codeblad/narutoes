@@ -1,7 +1,10 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemKaton;
+import net.narutomod.item.ItemSuiton;
 import net.narutomod.procedure.ProcedureAirPunch;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -30,6 +33,7 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 
 import com.google.common.collect.ImmutableMap;
+import net.narutomod.procedure.ProcedureUtils;
 
 
 @ElementsNarutomodMod.ModElement.Tag
@@ -122,6 +126,10 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				target.extinguish();
 				float damage = 5 + ((1+2*(EC.this.power/30)) * EC.this.damageModifier)*ItemJutsu.getDmgMult(player)*1.25f;
+				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityLivingBase) player, ItemSuiton.block);
+				if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+					damage*=1.25f;
+				}
 				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player),
 						damage);
 			}
@@ -148,7 +156,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 5.0f) {
 					this.createJutsu(entity, power, 100);
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 100);
+					ItemJutsu.setCurrentJutsuCooldown(stack,100);
 					return true;
 				}
 				return false;

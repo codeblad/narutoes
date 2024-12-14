@@ -159,7 +159,7 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= this.getBasePower()) {
 					this.createJutsu(entity, power);
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*8);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*8);
 					return true;
 				}
 				return false;

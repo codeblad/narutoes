@@ -212,6 +212,7 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 					if (entity instanceof EntityPuppet3rdKazekage.EntityCustom) {
 						((EntityPuppet3rdKazekage.EntityCustom)entity).setMouthOpen(false);
 					}
+					ItemJutsu.setCurrentJutsuCooldown(stack,20);
 					return true;
 				}
 				return false;

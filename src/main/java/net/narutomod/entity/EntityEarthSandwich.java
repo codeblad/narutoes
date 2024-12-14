@@ -36,6 +36,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.init.Blocks;
 import net.minecraft.block.Block;
 
+import net.narutomod.item.ItemSuiton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemDoton;
 import net.narutomod.item.ItemJutsu;
@@ -155,7 +156,12 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 						 	Vec3d vec = entry.getValue();
 							entity.setPositionAndUpdate(vec.x, vec.y, vec.z);
 							if (age > this.growTime - 5) {
-								entity.attackEntityFrom(DamageSource.IN_WALL, 5+0.85f*ItemJutsu.getDmgMult(this.user));
+								float damage = 5+0.85f*ItemJutsu.getDmgMult(this.user);
+								ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemDoton.block);
+								if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+									damage*=1.25f;
+								}
+								entity.attackEntityFrom(DamageSource.IN_WALL, damage);
 							}
 						} else if (!entity.isEntityAlive() || !entity.getEntityBoundingBox().intersects(this.getEntityBoundingBox())) {
 							iter.remove();
@@ -200,7 +206,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 							 .getObject(new ResourceLocation("narutomod:jutsu")), SoundCategory.NEUTRAL, 1, 1f);
 						}
 						entity.world.spawnEntity(new EC(entity, rt.hitVec, power));
-						ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*3);
+						ItemJutsu.setCurrentJutsuCooldown(stack, 20*3);
 						return true;
 					}
 				}

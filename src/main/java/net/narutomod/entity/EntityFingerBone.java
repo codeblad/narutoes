@@ -130,7 +130,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 					  SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:bonecrack"))),
 					  SoundCategory.PLAYERS, 0.5f, entity.getRNG().nextFloat() * 0.6f + 0.6f);
 				this.createJutsu(entity);
-				ItemJutsu.setCurrentJutsuCooldown(stack, entity, 10);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 10);
 				return true;
 			}
 

@@ -1,6 +1,7 @@
 
 package net.narutomod.item;
 
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
@@ -66,7 +67,7 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 
 	public static class Genjutsu implements ItemJutsu.IJutsuCallback {
 		private final double maxRange = 12.0d;
-		private final int duration = 100;
+		private int duration = 60;
 		private final int cooldown = 1200;
 
 		@Override
@@ -79,9 +80,16 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 				if (num > -0.95) {
 					return false;
 				}
+				ItemStack helmetStack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+				if (helmetStack.getItem() == ItemSharingan.helmet) {
+					this.duration = 80;
+				}
+				if (helmetStack.getItem() == ItemMangekyoSharingan.helmet && helmetStack.getItem() == ItemMangekyoSharinganObito.helmet && helmetStack.getItem() == ItemMangekyoSharinganEternal.helmet) {
+					this.duration = 1000;
+				}
 				entity.world.playSound(null, target.posX, target.posY, target.posZ,
 				  (SoundEvent) SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:genjutsu")), SoundCategory.NEUTRAL, 1f, 1f);
-				((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionParalysis.potion, this.duration/2, 1, false, false));
+				((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionParalysis.potion, this.duration, 1, false, false));
 				((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.NAUSEA, this.duration + 40, 0, false, true));
 				((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, this.duration, 0, false, true));
 				if (target instanceof EntityPlayerMP) {

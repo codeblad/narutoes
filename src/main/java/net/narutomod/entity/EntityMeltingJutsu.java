@@ -188,8 +188,8 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 				if (result.entityHit != null) {
 					result.entityHit.getEntityData().setBoolean("TempData_disableKnockback", true);
 					result.entityHit.hurtResistantTime = 10;
-					float damage = 0.45f*ItemJutsu.getDmgMult(this.shootingEntity);
-					damage *= 1+(1*(this.supapower/10));
+					float damage = 0.45f*ItemJutsu.getDmgMult(this.shootingEntity)*1+(1*(this.supapower/10));
+					damage += 2;
 					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), damage);
 					result.entityHit.setFire(15);
 				}
@@ -229,6 +229,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
 					entity.world.spawnEntity(new EC(entity, power));
+					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (power*5 + 50));
 					return true;
 				}
 				return false;

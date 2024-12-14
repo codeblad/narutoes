@@ -197,7 +197,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 						SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kirigakurenojutsu")),
 						SoundCategory.PLAYERS, 5, 1f);
 				entity.world.spawnEntity(new EntityMist(entity));
-				ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*30);
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*30);
 				return true;
 			}
 		}

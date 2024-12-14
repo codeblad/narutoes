@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.narutomod.item.ItemFuton;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
@@ -106,7 +107,12 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 				if (result.entityHit != null) {
 					if (!result.entityHit.equals(this.shootingEntity) && !(result.entityHit instanceof EC)) {
 						result.entityHit.hurtResistantTime = 10;
-						result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 5+2*(1+1*(this.power/5))*ItemJutsu.getDmgMult(this.shootingEntity));
+						float damage = 5+2*(1+1*(this.power/5))*ItemJutsu.getDmgMult(this.shootingEntity);
+						ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemFuton.block);
+						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+							damage*=1.25f;
+						}
+						result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);
 						this.setDead();
 					}
 				} else {
@@ -133,7 +139,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0F) {
 					this.createJutsu(entity, power);
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20);
 					return true;
 				}
 				return false;

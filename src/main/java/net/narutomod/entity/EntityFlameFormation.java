@@ -36,6 +36,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.narutomod.item.ItemKaton;
+import net.narutomod.procedure.ProcedureUtils;
 
 import java.util.Iterator;
 
@@ -75,7 +77,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 			this(userIn.world);
 			this.user = userIn;
 			this.setScale(size);
-			this.setLocationAndAngles(userIn.posX, userIn.posY-1, userIn.posZ, 0.0f, 0.0f);
+			this.setLocationAndAngles(userIn.posX, userIn.posY, userIn.posZ, 0.0f, 0.0f);
 		}
 
 		@Override
@@ -118,8 +120,8 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void applyEntityCollision(Entity entityIn) {
-			float newDMG = 5;
-			entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user), 10+ItemJutsu.getDmgMult(this.user)*2);
+			float damage = 10+ItemJutsu.getDmgMult(this.user)*2;
+			entityIn.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user), damage);
 			entityIn.setFire(15);
 		}
 
@@ -189,7 +191,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power));
-				ItemJutsu.setCurrentJutsuCooldown(stack, entity, 100);
+				ItemJutsu.setCurrentJutsuCooldown(stack,100);
 				return true;
 			}
 

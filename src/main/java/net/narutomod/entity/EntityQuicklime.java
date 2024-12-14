@@ -140,6 +140,7 @@ public class EntityQuicklime extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entityIn, float power) {
 				if (stack.getItem() instanceof ItemYooton.RangedItem) {
 					power = 1.0f / ((ItemYooton.RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entityIn);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
 					return this.createJutsu(entityIn, 2.0d, power) != null;
 				}
 				return false;

@@ -233,8 +233,14 @@ public class EntitySealing extends ElementsNarutomodMod.ModElement {
 			}
 
 			private boolean isTorchOrAir(World world, BlockPos pos, BlockPos centerPos) {
-				BlockPos[] torchPos = { new BlockPos(-2, 1, 1), new BlockPos(-1, 1, 2), new BlockPos(1, 1, 2), new BlockPos(2, 1, 1),
-				 new BlockPos(2, 1, -1), new BlockPos(1, 1, -2), new BlockPos(-1, 1, -2), new BlockPos(-2, 1, -1) };
+				BlockPos[] torchPos = { new BlockPos(-2, 1, 1),
+						new BlockPos(-1, 1, 2),
+						new BlockPos(1, 1, 2),
+						new BlockPos(2, 1, 1),
+				 		new BlockPos(2, 1, -1),
+						new BlockPos(1, 1, -2),
+						new BlockPos(-1, 1, -2),
+						new BlockPos(-2, 1, -1) };
 				IBlockState blockstate = world.getBlockState(pos);
 				for (BlockPos pos1 : torchPos) {
 					if (pos.equals(centerPos.add(pos1))) {

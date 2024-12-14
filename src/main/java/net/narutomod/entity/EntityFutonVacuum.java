@@ -18,10 +18,12 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.init.SoundEvents;
 
+import net.narutomod.item.ItemFuton;
 import net.narutomod.procedure.ProcedureAirPunch;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.procedure.ProcedureUtils;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
@@ -55,7 +57,7 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 			this(userIn.world);
 			this.user = userIn;
 			this.power = powerIn;
-			this.maxDuration = (int)(powerIn * 4f);
+			this.maxDuration = (int)(powerIn * 2f);
 			this.bulletSize = 1.5f;
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
 		}
@@ -110,7 +112,8 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
-					this.createJutsu(entity, power, (int)(power * 4f));
+					this.createJutsu(entity, power, (int)(power * 3f));
+					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (power*3*2+20));
 					return true;
 				}
 				return false;
@@ -154,7 +157,12 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				if (!target.equals(player)) {
 					EC.this.playImpactSound(target.posX, target.posY, target.posZ);
-					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player), 3.5f*(1+1*(EC.this.power/50)) * EC.this.damageModifier*ItemJutsu.getDmgMult(player));
+					float damage = 8+1.8f*(1+2*(EC.this.power/50)) * EC.this.damageModifier*ItemJutsu.getDmgMult(player);
+					ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityLivingBase) player, ItemFuton.block);
+					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+						damage*=1.25f;
+					}
+					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player), damage);
 				}
 			}
 	

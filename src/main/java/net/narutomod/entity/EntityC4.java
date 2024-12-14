@@ -123,7 +123,7 @@ public class EntityC4 extends ElementsNarutomodMod.ModElement {
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10.0d);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0d);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(800.0d);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5d);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0d);
 		}

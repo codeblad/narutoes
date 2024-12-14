@@ -127,6 +127,7 @@ public class EntityGedoStatue extends ElementsNarutomodMod.ModElement {
 			 || (res.entityHit instanceof EntityPlayer && EntityBijuManager.isJinchuriki((EntityPlayer)res.entityHit)
 			  && !EntityBijuManager.isJinchurikiOf((EntityPlayer)res.entityHit, EntityTenTails.EntityCustom.class))) {
 				if (entity.world.spawnEntity(new EntityGedoStatue.EntityCustom(entity, (EntityLivingBase)res.entityHit))) {
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*10);
 					return true;
 				} else if (entity instanceof EntityPlayer) {
 					((EntityPlayer)entity).sendStatusMessage(new TextComponentTranslation("chattext.gedomazo.cantspawn"), false);
@@ -420,7 +421,7 @@ public class EntityGedoStatue extends ElementsNarutomodMod.ModElement {
 				}
 				if (!this.world.isRemote && this.fuuinTarget != null) {
 					if (age > this.riseTime + 200) {
-						if (this.fuuinTarget instanceof EntityPlayer && EntityBijuManager.isJinchuriki((EntityPlayer)this.fuuinTarget)) {
+						if (this.fuuinTarget instanceof EntityPlayer && EntityBijuManager.isJinchuriki((EntityPlayer)this.fuuinTarget) && (this.fuuinTarget.getHealth() <= this.fuuinTarget.getMaxHealth()*0.15)) {
 							this.ogJinchuriki = (EntityPlayer)this.fuuinTarget;
 							EntityBijuManager bmgr = EntityBijuManager.getBijuManagerFrom(this.ogJinchuriki);
 							bmgr.setVesselEntity(null);

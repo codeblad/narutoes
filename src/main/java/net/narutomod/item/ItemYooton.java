@@ -149,7 +149,7 @@ public class ItemYooton extends ElementsNarutomodMod.ModElement {
 			scale *= 1.2F;
 			this.setEntityScale(scale);
 			this.explosionSize = Math.max((int)scale - 1, 0);
-			this.damage = 5*(1+1*(scale/20));
+			this.damage = 12+3.7f*(1+1*(scale/20))*ItemJutsu.getDmgMult(this.shootingEntity);
 			Vec3d vec3d = shooter.getLookVec();
 			this.setPosition(shooter.posX + vec3d.x, shooter.posY + 1.2D + vec3d.y, shooter.posZ + vec3d.z);
 		}
@@ -171,7 +171,7 @@ public class ItemYooton extends ElementsNarutomodMod.ModElement {
 				if (result.entityHit != null) {
 					if (result.entityHit.equals(this.shootingEntity) || result.entityHit instanceof EntityMagmaBall)
 						return;
-					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), this.damage*ItemJutsu.getDmgMult(this.shootingEntity));
+					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), this.damage);
 					result.entityHit.setFire(10);
 				}
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
@@ -207,6 +207,7 @@ public class ItemYooton extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				this.createJutsu(entity, entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power);
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*1);
 				return true;
 			}
 

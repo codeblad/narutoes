@@ -23,8 +23,10 @@ import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.client.renderer.entity.RenderManager;
 
+import net.narutomod.item.ItemDoton;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.procedure.ProcedureUtils;
 
 
 @ElementsNarutomodMod.ModElement.Tag
@@ -116,14 +118,17 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 					float f = MathHelper.sqrt(power * 18f / 4f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EC entity1 = new EC(entity, power);
-						entity1.damage = 10+6 * ((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
+						entity1.damage = 10+3 * ((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
+						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+							entity1.damage*=1.25f;
+						}
 						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
 						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
 						entity1.setLocationAndAngles(vec.x, vec.y + 0.5d, vec.z, entity.getRNG().nextFloat() * 360f, (entity.getRNG().nextFloat() - 0.5f) * 60f);
 						world.spawnEntity(entity1);
 					}
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*1);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);
 					return true;
 				}
 				return false;
