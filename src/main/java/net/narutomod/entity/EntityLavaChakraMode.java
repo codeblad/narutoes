@@ -30,6 +30,7 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.potion.PotionEffect;
@@ -201,13 +202,17 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 			public RenderCustom(RenderManager renderManagerIn) {
 				super(renderManagerIn);
 			}
+
+			@Override
+			public boolean shouldRender(EC livingEntity, ICamera camera, double camX, double camY, double camZ) {
+				return true;
+			}
 	
 			@Override
 			public void doRender(EC entity, double x, double y, double z, float entityYaw, float pt) {
 				EntityLivingBase user = entity.getUser();
 				if (user != null) {
 					RenderLivingBase userRenderer = (RenderLivingBase)this.renderManager.getEntityRenderObject(user);
-					ModelBase model = userRenderer.getMainModel();
 					float f = (float)user.ticksExisted + pt;
 		            float f1 = ProcedureUtils.interpolateRotation(user.prevRenderYawOffset, user.renderYawOffset, pt);
 		            float f2 = ProcedureUtils.interpolateRotation(user.prevRotationYawHead, user.rotationYawHead, pt);
@@ -239,7 +244,7 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 						GlStateManager.disableLighting();
 						GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 						OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-						this.renderModel(model, f6, f5, f, f3, f7, f4, user);
+						this.renderModel(userRenderer.getMainModel(), f6, f5, f, f3, f7, f4, user);
 			            GlStateManager.matrixMode(5890);
 			            GlStateManager.loadIdentity();
 			            GlStateManager.matrixMode(5888);
@@ -291,7 +296,7 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			protected ResourceLocation getEntityTexture(EC entity) {
-				return texture;
+				return this.texture;
 			}
 		}
 	}
