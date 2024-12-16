@@ -48,8 +48,8 @@ import javax.annotation.Nullable;
 public abstract class EntitySusanooBase extends EntityCreature implements IRangedAttackMob {
 	private static final DataParameter<Integer> OWNER_ID = EntityDataManager.<Integer>createKey(EntitySusanooBase.class, DataSerializers.VARINT);
 	private static final DataParameter<Integer> FLAME_COLOR = EntityDataManager.<Integer>createKey(EntitySusanooBase.class, DataSerializers.VARINT);
-	public static final double BXP_REQUIRED_L0 = 2000.0d;
-	public static final double BXP_REQUIRED_L1 = 5000.0d;
+	public static final double BXP_REQUIRED_L0 = 5000.0d;
+	public static final double BXP_REQUIRED_L1 = 8000.0d;
 	public static final double BXP_REQUIRED_L2 = 10000.0d;
 	public static final double BXP_REQUIRED_L3 = 20000.0d;
 	public static final double BXP_REQUIRED_L4 = 40000.0d;
@@ -268,8 +268,8 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 				}
 				 */
 				// susanoo jump here
-				if (this.onGround && this.rotationPitch < -30 && terminal != 0) {
-					this.jumpPower = 10f;
+				if (terminal != 0) {
+					this.checkJump((EntityLivingBase) entity);
 				}
 				if (this.jumpPower >= 0 && !this.onGround) {
 					this.jumpPower-= 1.6f;
@@ -283,6 +283,15 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		} else {
 			this.jumpMovementFactor = 0.02F;
 			super.travel(ti, tj, tk);
+		}
+	}
+
+	private void checkJump(EntityLivingBase entity) {
+		if (this.world.isRemote) {
+			if ((boolean)ReflectionHelper.getPrivateValue(EntityLivingBase.class, entity, 49) && this.onGround) {
+				this.jumpPower = 10f;
+				ReflectionHelper.setPrivateValue(EntityLivingBase.class, entity, false, 49);
+			}
 		}
 	}
 

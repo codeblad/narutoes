@@ -335,7 +335,7 @@ public class EntityNineTails extends ElementsNarutomodMod.ModElement {
 					if (this.hitTrace.typeOfHit != RayTraceResult.Type.MISS) {
 						ProcedureAoeCommand.set(this.world, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z, 0d, 3d)
 						 .exclude(this.shootingEntity).resetHurtResistanceTime()
-						 .damageEntities(DamageSource.causeIndirectMagicDamage(this, this.shootingEntity), this.power * this.damageMultiplier);
+						 .damageEntities(DamageSource.causeIndirectMagicDamage(this, this.shootingEntity), 120);
 						this.world.newExplosion(this.shootingEntity, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z,
 						 5.0f + this.damageMultiplier, true, net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 					}

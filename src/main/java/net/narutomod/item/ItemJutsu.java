@@ -122,7 +122,11 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		if (stack.getItem() instanceof Base) {
 			Base baseitem = (Base)stack.getItem();
 			if (baseitem.getCurrentJutsuXp(stack) < baseitem.getCurrentJutsuRequiredXp(stack)) {
-				baseitem.addCurrentJutsuXp(stack, 1);
+				int xp = 2;
+				if (((Base) stack.getItem()).isAffinity(stack)) {
+					xp = 6;
+				}
+				baseitem.addCurrentJutsuXp(stack, xp);
 			}
 		}
 	}

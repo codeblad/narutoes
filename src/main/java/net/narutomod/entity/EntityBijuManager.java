@@ -538,7 +538,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 			Chakra.Pathway cp = Chakra.pathway(this.jinchurikiPlayer);
 			int i = this.cloakLevel <= 0 ? 1 : 0;
 			if (i == 1) {
-				if (this.jinchurikiPlayer.world.getTotalWorldTime() < this.auraCD) {
+				if (this.jinchurikiPlayer.world.getTotalWorldTime() < this.auraCD && !this.jinchurikiPlayer.isCreative()) {
 					if (!this.jinchurikiPlayer.world.isRemote) {
 						this.jinchurikiPlayer.sendStatusMessage(
 								new TextComponentTranslation("chattext.cooldown.formatted", (this.auraCD - this.jinchurikiPlayer.world.getTotalWorldTime()) / 20L), true);
@@ -630,7 +630,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 			T biju = this.spawnEntity(this.jinchurikiPlayer);
 			if (biju != null) {
 				biju.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(200.0D);
-				biju.setLifeSpan(Math.min(this.cloakXp[2],1800) + 600);
+				biju.setLifeSpan(Math.min(this.cloakXp[2],1800) + 1800);
 			}
 			this.cloakCD = l+120*20;
 		}

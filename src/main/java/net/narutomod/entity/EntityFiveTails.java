@@ -31,6 +31,7 @@ import net.minecraft.potion.PotionEffect;
 
 import net.narutomod.item.ItemFutton;
 import net.narutomod.item.ItemKaton;
+import net.narutomod.item.ItemSteamArmor;
 import net.narutomod.item.ItemSuiton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
@@ -70,6 +71,9 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 			super.setVesselEntity(player);
 			if (player instanceof EntityPlayer && !ProcedureUtils.hasItemInInventory((EntityPlayer)player, ItemFutton.block)) {
 				ItemHandlerHelper.giveItemToPlayer((EntityPlayer)player, new ItemStack(ItemFutton.block));
+				ItemHandlerHelper.giveItemToPlayer((EntityPlayer)player, new ItemStack(ItemSteamArmor.helmet));
+				ItemHandlerHelper.giveItemToPlayer((EntityPlayer)player, new ItemStack(ItemSteamArmor.body));
+				ItemHandlerHelper.giveItemToPlayer((EntityPlayer)player, new ItemStack(ItemSteamArmor.legs));
 				if (!ProcedureUtils.hasItemInInventory((EntityPlayer)player, ItemKaton.block)) {
 					ItemHandlerHelper.giveItemToPlayer((EntityPlayer)player, new ItemStack(ItemKaton.block));
 				}
@@ -161,8 +165,8 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.8D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(40.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(1.2D);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(5000.0D);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(30.0D);
 		}

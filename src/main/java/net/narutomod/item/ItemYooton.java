@@ -59,7 +59,7 @@ public class ItemYooton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:yooton")
 	public static final Item block = null;
 	public static final int ENTITYID = 270;
-	public static final ItemJutsu.JutsuEnum ROCKS = new ItemJutsu.JutsuEnum(0, "magmaball", 'S', 200, 40d, new EntityMagmaBall.Jutsu());
+	public static final ItemJutsu.JutsuEnum ROCKS = new ItemJutsu.JutsuEnum(0, "magmaball", 'S', 200, 50d, new EntityMagmaBall.Jutsu());
 	public static final ItemJutsu.JutsuEnum STREAM = new ItemJutsu.JutsuEnum(1, "melting_jutsu", 'S', 200, 50d, new EntityMeltingJutsu.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum CHAKRAMODE = new ItemJutsu.JutsuEnum(2, "lava_chakra_mode", 'S', 250, 10d, new EntityLavaChakraMode.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum QUICKLIME = new ItemJutsu.JutsuEnum(3, "quicklime", 'S', 200, 50d, new EntityQuicklime.EC.Jutsu());

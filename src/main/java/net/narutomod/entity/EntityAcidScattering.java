@@ -68,8 +68,8 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 			this.setIdlePosition();
 			this.width = widthIn;
 			this.range = 10+rangeIn;
-			this.dmg = 0.8f*(1+1*(rangeIn/30));
-			this.potionAmplifier = (int)(rangeIn * 0.5f);
+			this.dmg = 8+0.8f*(1+1*(rangeIn/30))*ItemJutsu.getDmgMult(shooter);
+			this.potionAmplifier = (int) (5+ItemJutsu.getDmgMult(shooter)*0.5);
 		}
 
 		@Override
@@ -83,6 +83,10 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 
 		public void setPotionAmplifier(int amp) {
 			this.potionAmplifier = amp;
+		}
+
+		public void setDamage(int amp) {
+			this.dmg = amp;
 		}
 
 		public void setDuration(int ticks) {
@@ -130,13 +134,13 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 
 		protected void shoot(float directionYaw, float directionPitch, float range, float radius) {
 			float angle = (float)(Math.atan(radius / range) * 180d / Math.PI);
-			for (int i = 0; i < (int)(MathHelper.sqrt(radius) * 3.0d); i++) {
+			for (int i = 0; i < (int)(MathHelper.sqrt(radius) * 2.5d); i++) {
 				Vec3d vec = Vec3d.fromPitchYaw(directionPitch + (float)((this.rand.nextDouble()-0.5d) * angle * 3.0d),
 				 directionYaw + (float)((this.rand.nextDouble()-0.5d) * angle * 3.0d)).scale(range * 0.1d);
 				this.world.spawnEntity(new EntityAcidParticle(this, vec.x, vec.y, vec.z));
 			}
 			Particles.Renderer particles = new Particles.Renderer(this.world);
-			for (int i = 0; i < 50; i++) {
+			for (int i = 0; i < 40; i++) {
 				Vec3d vec = Vec3d.fromPitchYaw(directionPitch + (float)((this.rand.nextDouble()-0.5d) * angle * 3.0d),
 				 directionYaw + (float)((this.rand.nextDouble()-0.5d) * angle * 3.0d)).scale(range * 0.1d);
 				particles.spawnParticles(Particles.Types.SPIT, this.posX, this.posY, this.posZ, 1, 0, 0, 0,
@@ -233,8 +237,8 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 					this.hitTime = age;
 					if (!this.world.isRemote && this.ecEntity != null) {
 						this.hitEntity.getEntityData().setBoolean("TempData_disableKnockback", true);
-						this.hitEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, shooter), 8+ecEntity.dmg*ItemJutsu.getDmgMult(shooter));
-						this.hitEntity.addPotionEffect(new PotionEffect(PotionCorrosion.potion, 100, (int) (5+ItemJutsu.getDmgMult(shooter)*0.5), false, false));
+						this.hitEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, shooter), ecEntity.dmg);
+						this.hitEntity.addPotionEffect(new PotionEffect(PotionCorrosion.potion, 100, (int) ecEntity.potionAmplifier, false, false));
 					}
 				}
 			} else {

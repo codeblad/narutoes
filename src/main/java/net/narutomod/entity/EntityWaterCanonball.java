@@ -97,6 +97,9 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 				return;
 			}
 			if (!this.world.isRemote && (result.entityHit == null || !result.entityHit.equals(this.shootingEntity))) {
+				if (!this.shootingEntity.getPassengers().isEmpty() && this.shootingEntity.isPassenger(result.entityHit)) {
+					return;
+				}
 				float size = this.fullScale / 3.2f;
 				ProcedureAoeCommand.set(this.world, result.hitVec.x, result.hitVec.y, result.hitVec.z, 0.0D, size)
 				 .exclude(this.shootingEntity).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.damage);

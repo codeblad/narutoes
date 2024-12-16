@@ -47,6 +47,7 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 		private float power;
 		private int maxDuration;
 		private float bulletSize;
+		private float damage;
 
 		public EC(World world) {
 			super(world);
@@ -59,6 +60,11 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 			this.power = powerIn;
 			this.maxDuration = (int)(powerIn * 2f);
 			this.bulletSize = 1.5f;
+			this.damage = 8+1.8f*(1+2*(this.power/50))*ItemJutsu.getDmgMult(userIn);
+			ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityLivingBase) userIn, ItemFuton.block);
+			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+				this.damage*=1.25f;
+			}
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
 		}
 
@@ -77,6 +83,10 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 
 		public void setDamageModifier(float dm) {
 			this.damageModifier = dm;
+		}
+
+		public void setDamage(float dm) {
+			this.damage = dm;
 		}
 
 		@Override
@@ -157,11 +167,6 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				if (!target.equals(player)) {
 					EC.this.playImpactSound(target.posX, target.posY, target.posZ);
-					float damage = 8+1.8f*(1+2*(EC.this.power/50)) * EC.this.damageModifier*ItemJutsu.getDmgMult(player);
-					ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityLivingBase) player, ItemFuton.block);
-					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-						damage*=1.25f;
-					}
 					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player), damage);
 				}
 			}
@@ -182,7 +187,7 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected float getBreakChance(BlockPos pos, Entity player, double range) {
 				EC.this.playImpactSound(pos.getX(), pos.getY(), pos.getZ());
-				return 0.2F;
+				return 0F;
 			}
 		}
 	}

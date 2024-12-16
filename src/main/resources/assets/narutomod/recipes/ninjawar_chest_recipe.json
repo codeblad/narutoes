@@ -1,0 +1,36 @@
+{
+  "group": "narutomod",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "0 2",
+    "345",
+    "6 8"
+  ],
+  "key": {
+    "0": {
+      "item": "minecraft:netherbrick"
+    },
+    "2": {
+      "item": "minecraft:netherbrick"
+    },
+    "3": {
+      "item": "minecraft:netherbrick"
+    },
+    "4": {
+      "item": "minecraft:iron_chestplate"
+    },
+    "5": {
+      "item": "minecraft:netherbrick"
+    },
+    "6": {
+      "item": "minecraft:netherbrick"
+    },
+    "8": {
+      "item": "minecraft:netherbrick"
+    }
+  },
+  "result": {
+    "item": "narutomod:ninja_armor_war_1body",
+    "count": 1
+  }
+}

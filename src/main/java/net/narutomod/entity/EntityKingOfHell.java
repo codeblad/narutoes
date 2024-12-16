@@ -143,10 +143,10 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 		public void onKillCommand() {
 		}
 
-		@Override
+		/*@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
 			return false;
-		}
+		}*/
 
 		@Override
 		public boolean processInteract(EntityPlayer entity, EnumHand hand) {
@@ -275,9 +275,9 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1024.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(800.0D);
 		}
 
 		@Override

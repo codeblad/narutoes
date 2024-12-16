@@ -47,7 +47,7 @@ public class ItemDojutsu extends ElementsNarutomodMod.ModElement {
 			if (!this.isOwner(itemstack, entity) && !entity.isCreative()) {
 				UUID uuid = ProcedureUtils.getOwnerId(itemstack);
 				if (uuid != null && !uuid.equals(entity.getEntityData().getUniqueId("lastWornForeignDojutsu"))) {
-					entity.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 22, 0, false, false));
+					entity.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 40, 0, false, false));
 					entity.getEntityData().setUniqueId("lastWornForeignDojutsu", uuid);
 				}
 				if (entity.ticksExisted % 20 == 5) {

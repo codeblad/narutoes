@@ -313,7 +313,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult+= 0.25f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.4f;
+					defMult+= 0.3f;
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
 					defMult+= 0.25f;
@@ -341,9 +341,9 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 						defMult+= 3.5;
 					}
 				}
-				if (targetEntity.getEntityData().hasKey("bigRatio")) {
-					float ratio = targetEntity.getEntityData().getFloat("bigRatio");
-					defMult += 0.85f*ratio;
+				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
+					ItemYoton.EntityBiggerMe PENIS = (ItemYoton.EntityBiggerMe) targetEntity.getRidingEntity();
+					defMult += 0.85*PENIS.bigRatio;
 				}
 				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
 				float newAmount = amount/defense;

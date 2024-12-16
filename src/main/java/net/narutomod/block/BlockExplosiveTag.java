@@ -246,11 +246,14 @@ public class BlockExplosiveTag extends ElementsNarutomodMod.ModElement {
 				$_dependencies.put("world", world);
 				if (!entity.world.isRemote) {
 					IBlockState b1 = entity.world.getBlockState(pos.add(0,-1,0));
+					IBlockState b2 = entity.world.getBlockState(pos.add(0,-2,0));
 					boolean structure = true;
-					if (b1.getBlock() != Blocks.GOLD_BLOCK) {
+					if (b1.getBlock() != Blocks.GOLD_BLOCK || b2.getBlock() != Blocks.GOLD_BLOCK) {
 						structure = false;
 					}
 					if (structure) {
+						entity.world.setBlockToAir(pos.add(0,-1,0));
+						entity.world.setBlockToAir(pos.add(0,-2,0));
 						Biome biome = entity.world.getBiome(pos);
 						if (biome == Biomes.BIRCH_FOREST){
 							EntitySlugSage.EntityCustom spawn = new EntitySlugSage.EntityCustom(entity.world);

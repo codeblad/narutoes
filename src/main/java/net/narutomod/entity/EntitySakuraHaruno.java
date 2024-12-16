@@ -110,11 +110,11 @@ public class EntitySakuraHaruno extends ElementsNarutomodMod.ModElement {
 			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemMilitaryRationsPill.block, 2), 0, 1));
 			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 10), ItemStack.EMPTY, new ItemStack(ItemScrollPoisonMist.block, 2), 0, 1));
 			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 45), ItemStack.EMPTY, new ItemStack(ItemScrollEnhancedStrength.block, 1), 0, 1));
-			commonTrades.add(new MerchantRecipe(new ItemStack(Blocks.EMERALD_BLOCK, 10), ItemStack.EMPTY, new ItemStack(ItemScrollCellularActivation.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Blocks.EMERALD_BLOCK, 40), ItemStack.EMPTY, new ItemStack(ItemScrollCellularActivation.block, 1), 0, 1));
 			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 15), ItemStack.EMPTY, new ItemStack(ItemMilitaryRationsPillGold.block, 1, 1), 0, 1));
 
 			MerchantRecipeList uncommonTrades = new MerchantRecipeList();
-			uncommonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 20), ItemStack.EMPTY, new ItemStack(ItemScrollHealing.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 20), ItemStack.EMPTY, new ItemStack(ItemScrollHealing.block, 1), 0, 1));
 
 			MerchantRecipeList rareTrades = new MerchantRecipeList();
 

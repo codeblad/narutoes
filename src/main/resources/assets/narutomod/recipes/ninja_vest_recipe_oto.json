@@ -1,0 +1,46 @@
+{
+  "group": "narutomod",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "0 2",
+    "345",
+    "678"
+  ],
+  "key": {
+    "0": {
+      "item": "minecraft:wool",
+      "data": 10
+    },
+    "2": {
+      "item": "minecraft:wool",
+      "data": 10
+    },
+    "3": {
+      "item": "minecraft:wool",
+      "data": 10
+    },
+    "4": {
+      "item": "minecraft:leather_chestplate"
+    },
+    "5": {
+      "item": "minecraft:wool",
+      "data": 10
+    },
+    "6": {
+      "item": "minecraft:wool",
+      "data": 10
+    },
+    "7": {
+      "item": "minecraft:wool",
+      "data": 10
+    },
+    "8": {
+      "item": "minecraft:wool",
+      "data": 10
+    }
+  },
+  "result": {
+    "item": "narutomod:ninja_armor_otobody",
+    "count": 1
+  }
+}

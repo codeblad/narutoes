@@ -54,7 +54,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 	public static class EC extends EntityBeamBase.Base implements ItemJutsu.IJutsu {
 		private final AirPunch stream = new AirPunch();
 		private final float damageModifier = 0.5f;
-		private int maxLife = 100;
+		private int maxLife = 20;
 		private float power;
 
 		public EC(World a) {
@@ -64,6 +64,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 		public EC(EntityLivingBase shooter, float scale) {
 			super(shooter);
 			this.power = scale;
+			this.maxLife = (int) (20+80*scale/5);
 		}
 
 		public void shoot() {
@@ -155,8 +156,8 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 5.0f) {
-					this.createJutsu(entity, power, 100);
-					ItemJutsu.setCurrentJutsuCooldown(stack,100);
+					this.createJutsu(entity, power, (int) (10+70*power/30));
+					ItemJutsu.setCurrentJutsuCooldown(stack,(int) (10+70*power/30));
 					return true;
 				}
 				return false;

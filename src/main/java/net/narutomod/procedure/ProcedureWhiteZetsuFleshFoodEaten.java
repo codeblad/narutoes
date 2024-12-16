@@ -45,6 +45,8 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 		boolean flag = false;
 		if ((!(world.isRemote))) {
 			if (ItemSharingan.isWearingMangekyo((EntityLivingBase) entity)) {
+				float dmg = (float) ((Math.random() * 110) + 10);
+				entity.attackEntityFrom(DamageSource.STARVE, dmg);
 				//if (entity instanceof EntityLivingBase)
 					//((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.INSTANT_HEALTH, (int) 10, (int) 4, (false), (false)));
 			} else {
@@ -68,7 +70,7 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 							&& (!((entity instanceof EntityPlayer)
 									? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemRinnegan.helmet, (int) (1)))
 									: false)))
-							&& (Math.random() < 0.2)))) {
+							&& (Math.random() < 0.1)))) {
 				rinneganstack = new ItemStack(ItemRinnegan.helmet, (int) (1));
 				((ItemDojutsu.Base) rinneganstack.getItem()).setOwner(rinneganstack, (EntityLivingBase) entity);
 				if (entity instanceof EntityPlayer) {
@@ -99,7 +101,7 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 							? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemMokuton.block, (int) (1)))
 							: false)))
 					&& (entity.isEntityAlive()))) {
-				flag = (boolean) (Math.random() < 0.2);
+				flag = (boolean) (Math.random() < 0.25);
 				if ((flag)) {
 					if (entity instanceof EntityPlayer) {
 						ItemStack _setstack = new ItemStack(ItemMokuton.block, (int) (1));

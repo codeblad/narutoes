@@ -11,12 +11,14 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.*;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -27,8 +29,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.PlayerTracker;
-import net.narutomod.item.ItemSenjutsu;
-import net.narutomod.item.ItemSummoningContract;
+import net.narutomod.item.*;
 import net.narutomod.procedure.ProcedureUtils;
 
 import java.util.ArrayList;
@@ -125,22 +126,43 @@ public class EntitySnakeSage extends ElementsNarutomodMod.ModElement {
         }
 
         @Override
+        protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source) {
+            this.entityDropItem(new ItemStack(ItemKusanagiSword.block, 1), 0.0f);
+        }
+
+        @Override
         protected boolean processInteract(EntityPlayer player, EnumHand hand) {
-            if (PlayerTracker.getBattleXp(player) >= 10000 && ProcedureUtils.getMatchingItemStack(player,ItemSenjutsu.block) == null) {
-                ItemStack stack = new ItemStack(ItemSenjutsu.block,1);
-                ItemHandlerHelper.giveItemToPlayer(player, stack);
-                stack.setCount(1);
-                if (!stack.hasTagCompound()) {
-                    stack.setTagCompound(new NBTTagCompound());
+            if (!this.world.isRemote && ProcedureUtils.getMatchingItemStack(player,ItemSenjutsu.block) == null) {
+                ItemStack pill = ProcedureUtils.getMatchingItemStack(player, ItemMilitaryRationsPillGold.block);
+                boolean giveItem = true;
+                if (pill == null) {
+                    giveItem = false;
+                    ProcedureUtils.sendChat(player, TextFormatting.GREEN + "Snake Sage" + ": "
+                            + TextFormatting.WHITE + "Why do you not have the perc on you?");
                 }
-                stack.getTagCompound().setString("Type", "snake");
-                ItemStack stack2 = new ItemStack(ItemSummoningContract.block,1);
-                ItemHandlerHelper.giveItemToPlayer(player, stack2);
-                stack2.setCount(1);
-                if (!stack2.hasTagCompound()) {
-                    stack2.setTagCompound(new NBTTagCompound());
+                if (PlayerTracker.getBattleXp(player) < 10000) {
+                    giveItem = false;
+                    ProcedureUtils.sendChat(player, TextFormatting.GREEN + "Snake Sage" + ": "
+                            + TextFormatting.WHITE + "You are too weak to become a sage!");
                 }
-                stack2.getTagCompound().setString("Type", "snake");
+                if (giveItem) {
+                    pill.shrink(1);
+                    ItemStack stack = new ItemStack(ItemSenjutsu.block, 1);
+                    ItemHandlerHelper.giveItemToPlayer(player, stack);
+                    stack.setCount(1);
+                    if (!stack.hasTagCompound()) {
+                        stack.setTagCompound(new NBTTagCompound());
+                    }
+                    stack.getTagCompound().setString("Type", "snake");
+                    ItemStack stack2 = new ItemStack(ItemSummoningContract.block, 1);
+                    ItemHandlerHelper.giveItemToPlayer(player, stack2);
+                    stack2.setCount(1);
+                    if (!stack2.hasTagCompound()) {
+                        stack2.setTagCompound(new NBTTagCompound());
+                    }
+                    stack2.getTagCompound().setString("Type", "snake");
+                    this.setDead();
+                }
             }
             return super.processInteract(player, hand);
         }

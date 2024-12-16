@@ -35,7 +35,8 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.block.material.Material;
+
+import net.minecraft.block.material.Material;
 
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemRinnegan;
@@ -171,8 +172,8 @@ public class EntityTenTails extends ElementsNarutomodMod.ModElement {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.8D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(100000.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1000.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20000.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(400.0D);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(40.0D);
 		}
 
@@ -253,7 +254,8 @@ public class EntityTenTails extends ElementsNarutomodMod.ModElement {
 				this.setDead();
 			}
 			if (this.getAge() == 1 && this.getSpawnSound() != null) {
-				this.playSound(this.getSpawnSound(), this.getSpawnSoundVolume(), this.rand.nextFloat() * 0.6f + 0.6f);
+				this.playSound(this.getSpawnSound(),
+ this.getSpawnSoundVolume(), this.rand.nextFloat() * 0.6f + 0.6f);
 			}
 			if (!this.world.isRemote && this.isFuuinInProgress()) {
 				this.setTransparency(1.0f - this.getFuuinProgress());

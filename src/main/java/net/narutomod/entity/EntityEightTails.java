@@ -254,12 +254,13 @@ public class EntityEightTails extends ElementsNarutomodMod.ModElement {
 
 		public EntitySmallBijudama(EntityLivingBase shooter, int orderIndex) {
 			super(shooter);
+			this.shootingEntity = shooter;
 			this.order = orderIndex;
 			this.setOGSize(0.8F, 0.8F);
 			this.setEntityScale(this.fullScale);
 			this.explosionSize = Math.max((int)this.fullScale * 2, 0);
-			this.damage = this.fullScale * 50.0f;
-			Vec3d vec = shooter.getLookVec().scale(2d);
+			this.damage = 230;
+			Vec3d vec = shooter.getLookVec().scale(4d);
 			this.setPosition(shooter.posX + vec.x, shooter.posY + shooter.getEyeHeight() - 0.2d * this.height + vec.y, shooter.posZ + vec.z);
 		}
 
@@ -279,6 +280,9 @@ public class EntityEightTails extends ElementsNarutomodMod.ModElement {
 			}
 			if (!this.world.isRemote) {
 				if (result.entityHit != null && (result.entityHit.equals(this.shootingEntity) || result.entityHit instanceof EntitySmallBijudama)) {
+					return;
+				}
+				if (!this.shootingEntity.getPassengers().isEmpty() && this.shootingEntity.isPassenger(result.entityHit)) {
 					return;
 				}
 				ProcedureAoeCommand.set(this, 0.0D, 2d * this.fullScale).exclude(this.shootingEntity)

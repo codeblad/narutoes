@@ -104,7 +104,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.fullScale = fullScale;
 			this.explosionSize = Math.max((int)fullScale - 1, 0);
 			//this.damage = fullScale * 10.0f;
-			this.mult = 1.0f + 2f*(fullScale/10);
+			this.mult = 1.0f + 3f*(fullScale/10);
 			this.damage = 10 + ItemJutsu.getDmgMult(shooter)*mult;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter,ItemKaton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
@@ -226,7 +226,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 30.0f;
+				return 20.0f;
 			}
 	
 			@Override

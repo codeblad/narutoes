@@ -23,7 +23,7 @@ public class ProcedureChakraRegenerationOnPotionActiveTick extends ElementsNarut
 		Entity entity = (Entity) dependencies.get("entity");
 		if ((entity instanceof EntityPlayerMP)) {
 			if (entity.ticksExisted % 20 == 0)
-				Chakra.pathway((EntityPlayer) entity).consume(-0.05f, true);
+				Chakra.pathway((EntityPlayer) entity).consume(-0.01f, true);
 		}
 	}
 }

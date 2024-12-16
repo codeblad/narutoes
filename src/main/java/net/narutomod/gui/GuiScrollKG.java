@@ -37,7 +37,9 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 				ItemFuton.block,
 				ItemRaiton.block,
 				ItemDoton.block,
-				ItemSuiton.block
+				ItemSuiton.block,
+				ItemYoton.block,
+				ItemInton.block
 		};
 
 		public static Item[] kgArray = {
@@ -192,6 +194,43 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 				giveJutsu(jutsuArray[num2], player);
 				giveJutsu(ItemIryoJutsu.block, player);
 				player.getEntityData().setBoolean("kgReceived",true);
+			} else if (buttonID == 14) {
+				//Cube
+				giveJutsu(ItemFuton.block, player);
+				giveJutsu(ItemDoton.block, player);
+			} else if (buttonID == 15) {
+				//Wood
+				giveJutsu(ItemRaiton.block, player);
+				giveJutsu(ItemFuton.block, player);
+			} else if (buttonID == 16) {
+				//Akimichi
+				int num1 = player.world.rand.nextInt(5);
+				int num2 = randNum(player, num1);
+				giveJutsu(jutsuArray[num1], player);
+				giveJutsu(jutsuArray[num2], player);
+				giveJutsu(ItemYoton.block, player);
+			} else if (buttonID == 17) {
+				//Nara
+				int num1 = player.world.rand.nextInt(5);
+				int num2 = randNum(player, num1);
+				giveJutsu(jutsuArray[num1], player);
+				giveJutsu(jutsuArray[num2], player);
+				giveJutsu(ItemInton.block, player);
+			} else if (buttonID == 18) {
+				//Aburame
+				int num1 = player.world.rand.nextInt(5);
+				int num2 = randNum(player, num1);
+				giveJutsu(jutsuArray[num1], player);
+				giveJutsu(jutsuArray[num2], player);
+				giveJutsu(ItemInton.block, player);
+			} else if (buttonID == 19) {
+				//Hiruzen
+				giveJutsu(jutsuArray[0], player);
+				giveJutsu(jutsuArray[1], player);
+				giveJutsu(jutsuArray[2], player);
+				giveJutsu(jutsuArray[3], player);
+				giveJutsu(jutsuArray[4], player);
+				player.getEntityData().setBoolean("kgReceived", true);
 			}
 			player.getEntityData().setInteger("KekkeiGenkai", realNum);
 
@@ -224,15 +263,21 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 			this.buttonList.add(new GuiButton(2, this.guiLeft + 100, this.guiTop + 25, 39, 20, "Dust"));
 			this.buttonList.add(new GuiButton(3, this.guiLeft + 150, this.guiTop + 25, 39, 20, "Explosion"));
 			this.buttonList.add(new GuiButton(4, this.guiLeft + 200, this.guiTop + 25, 39, 20, "Ice"));
-			this.buttonList.add(new GuiButton(5, this.guiLeft + 0, this.guiTop + 75, 39, 20, "Lava"));
-			this.buttonList.add(new GuiButton(6, this.guiLeft + 50, this.guiTop + 75, 39, 20, "Magnet"));
-			this.buttonList.add(new GuiButton(7, this.guiLeft + 100, this.guiTop + 75, 39, 20, "Scorch"));
-			this.buttonList.add(new GuiButton(8, this.guiLeft + 150, this.guiTop + 75, 39, 20, "Storm"));
-			this.buttonList.add(new GuiButton(9, this.guiLeft + 200, this.guiTop + 75, 39, 20, "Senju"));
-			this.buttonList.add(new GuiButton(10, this.guiLeft + 0, this.guiTop + 125, 39, 20, "Gates"));
-			this.buttonList.add(new GuiButton(11, this.guiLeft + 50, this.guiTop + 125, 39, 20, "Hyuga"));
-			this.buttonList.add(new GuiButton(12, this.guiLeft + 100, this.guiTop + 125, 39, 20, "Uchiha"));
-			this.buttonList.add(new GuiButton(13, this.guiLeft + 150, this.guiTop + 125, 39, 20, "Medical"));
+			this.buttonList.add(new GuiButton(5, this.guiLeft + 0, this.guiTop + 50, 39, 20, "Lava"));
+			this.buttonList.add(new GuiButton(6, this.guiLeft + 50, this.guiTop + 50, 39, 20, "Magnet"));
+			this.buttonList.add(new GuiButton(7, this.guiLeft + 100, this.guiTop + 50, 39, 20, "Scorch"));
+			this.buttonList.add(new GuiButton(8, this.guiLeft + 150, this.guiTop + 50, 39, 20, "Storm"));
+			this.buttonList.add(new GuiButton(9, this.guiLeft + 200, this.guiTop + 50, 39, 20, "codyblade"));
+			this.buttonList.add(new GuiButton(10, this.guiLeft + 0, this.guiTop + 75, 39, 20, "Gates"));
+			this.buttonList.add(new GuiButton(11, this.guiLeft + 50, this.guiTop + 75, 39, 20, "Hyuga"));
+			this.buttonList.add(new GuiButton(12, this.guiLeft + 100, this.guiTop + 75, 39, 20, "Uchiha"));
+			this.buttonList.add(new GuiButton(13, this.guiLeft + 150, this.guiTop + 75, 39, 20, "Medical"));
+			this.buttonList.add(new GuiButton(14, this.guiLeft + 200, this.guiTop + 75, 39, 20, "loosenedcube"));
+			this.buttonList.add(new GuiButton(15, this.guiLeft + 0, this.guiTop + 100, 39, 20, "therealwoodman"));
+			this.buttonList.add(new GuiButton(16, this.guiLeft + 50, this.guiTop + 100, 39, 20, "Akimichi"));
+			this.buttonList.add(new GuiButton(17, this.guiLeft + 100, this.guiTop + 100, 39, 20, "Nara"));
+			this.buttonList.add(new GuiButton(18, this.guiLeft + 200, this.guiTop + 100, 39, 20, "Aburame"));
+			this.buttonList.add(new GuiButton(19, this.guiLeft + 150, this.guiTop + 100, 39, 20, "Hiruzen"));
 		}
 	}
 }

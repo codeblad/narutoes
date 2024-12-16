@@ -94,6 +94,10 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			this.flameColor = color;
 		}
 
+		public void setTrueDamage(float amount) {
+			this.damage = amount;
+		}
+
 		public void setDamage(float amount) {
 			this.damage *= amount;
 		}

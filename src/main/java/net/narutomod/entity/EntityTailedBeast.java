@@ -3,6 +3,7 @@ package net.narutomod.entity;
 
 import net.minecraft.util.math.*;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -631,6 +632,8 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			super.move(type, x, y, z);
 		}
 
+		public float fall = 0;
+
 		@Override
 		public void travel(float ti, float tj, float tk) {
 			if (this.isBeingRidden() && this.canBeSteered()) {
@@ -644,14 +647,38 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				this.rotationYawHead = entity.rotationYaw;
 				this.stepHeight = this.height / 3.0F;
 				if (entity instanceof EntityLivingBase) {
+					float terminal = -200f;
+					if (this.onGround) {
+						this.fall = 0;
+					} else {
+						this.fall -= 1.6f;
+						if (this.fall < terminal) {
+							this.fall = terminal;
+						}
+					}
+
 					this.setAIMoveSpeed((float) this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
 					float forward = ((EntityLivingBase) entity).moveForward;
 					float strafe = ((EntityLivingBase) entity).moveStrafing;
-					super.travel(strafe, 0.0F, forward);
+					if (this instanceof EntitySevenTails.EntityCustom) {
+						this.fall = 0;
+					} else {
+						this.checkJump((EntityLivingBase) entity);
+					}
+					super.travel(strafe, this.fall, forward);
 				}
 			} else {
 				this.jumpMovementFactor = 0.02F;
 				super.travel(ti, tj, tk);
+			}
+		}
+
+		private void checkJump(EntityLivingBase entity) {
+			if (this.world.isRemote) {
+				if ((boolean) ReflectionHelper.getPrivateValue(EntityLivingBase.class, entity, 49) && this.onGround) {
+					this.fall = 20f;
+					ReflectionHelper.setPrivateValue(EntityLivingBase.class, entity, false, 49);
+				}
 			}
 		}
 
@@ -1044,7 +1071,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 
 		@Nullable
 		public static EntityTailBeastBall spawn(EntityLivingBase summonerIn, float maxscale, float maxdamage) {
-			double chakraUsage = 100d * maxscale;
+			double chakraUsage = 150d * maxscale;
 			EntityLivingBase user = null;
 			if (summonerIn instanceof Base) {
 				user = ((Base)summonerIn).getBijuManager().getJinchurikiPlayer();
@@ -1368,7 +1395,11 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 	            this.entity.renderYawOffset = this.entity.rotationYaw;
 				f = (float)(-(MathHelper.atan2(d2, MathHelper.sqrt(d0 * d0 + d1 * d1)) * (180D / Math.PI)));
 				this.entity.rotationPitch = this.limitAngle(this.entity.rotationPitch, f, 60.0F);
-	            this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue())*0.3f);
+	            if (this.baseEntity.isBeingRidden()) {
+					this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue()));
+				} else {
+					this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue())*0.3f);
+				}
 			} else {
 				super.onUpdateMoveHelper();
 			}

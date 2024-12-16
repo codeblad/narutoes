@@ -94,7 +94,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 				for (EntityLivingBase entity : 
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
 					if (!entity.equals(this.shootingEntity)) {
-						entity.hurtResistantTime = 10;
+						//entity.hurtResistantTime = 10;
 						if (ticksAlive < 5) {
 							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
 									this.damage);
@@ -118,7 +118,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 					float f = MathHelper.sqrt(power * 18f / 4f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EC entity1 = new EC(entity, power);
-						entity1.damage = 10+3 * ((float) 1 /MathHelper.clamp(Math.round(power)+1,1,10000)) * ItemJutsu.getDmgMult(entity);
+						entity1.damage = 10+3f*(1+2.5f*(1/100))*ItemJutsu.getDmgMult(entity);
 						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 							entity1.damage*=1.25f;
 						}

@@ -89,6 +89,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 	public static class EntityBiggerMe extends EntityClone.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 40;
 		private float scale;
+		public float bigRatio = 1;
 
 		public EntityBiggerMe(World a) {
 			super(a);
@@ -107,7 +108,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(user.getHealth() * scaleIn);
 			this.setHealth(this.getMaxHealth());
 			this.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 999999, (int)scaleIn, false, false));
-			user.getEntityData().setFloat("bigRatio",ratio);
+			this.bigRatio = ratio;
 			user.startRiding(this);
 		}
 
@@ -204,7 +205,6 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 				      this.rand.nextGaussian() * 0.02D);
 				}
 				this.setDead();
-				this.getSummoner().getEntityData().removeTag("bigRatio");
 			}
 			super.onUpdate();
 		}

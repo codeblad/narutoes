@@ -47,7 +47,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 132;
 	public static final int ENTITY2ID = 10132;
-	public static final ItemJutsu.JutsuEnum CHAKRAFLOW = new ItemJutsu.JutsuEnum(0, "futonchakraflow", 'D', 120d, new ChakraFlow.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHAKRAFLOW = new ItemJutsu.JutsuEnum(0, "futonchakraflow", 'D', 150d, new ChakraFlow.Jutsu());
 	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(1, "rasenshuriken", 'S', 1250d, new EntityRasenshuriken.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum VACUUMS = new ItemJutsu.JutsuEnum(2, "futon_vacuum", 'B', 20d, new EntityFutonVacuum.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum BIGBLOW = new ItemJutsu.JutsuEnum(3, "futon_great_breakthrough", 'C', 15d, new EntityFutonGreatBreakthrough.EC.Jutsu());
@@ -151,7 +151,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 					if (!this.holdingWeapon) {
 						this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:chakraflow")), 0.8f, 1.0f);
 					}
-					if (this.ticksExisted % 10 == 1 && !net.narutomod.Chakra.pathway(this.getUser()).consume(CHAKRAFLOW.chakraUsage * 0.1d)) {
+					if (this.ticksExisted % 10 == 1 && !net.narutomod.Chakra.pathway(this.getUser()).consume(CHAKRAFLOW.chakraUsage * 0.25d)) {
 						this.setDead();
 					}
 				}

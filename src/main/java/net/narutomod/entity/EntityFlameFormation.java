@@ -78,7 +78,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 			this(userIn.world);
 			this.user = userIn;
 			this.setScale(size);
-			this.setLocationAndAngles(userIn.posX, userIn.posY, userIn.posZ, 0.0f, 0.0f);
+			this.setLocationAndAngles(userIn.posX, userIn.posY-2, userIn.posZ, 0.0f, 0.0f);
 		}
 
 		@Override

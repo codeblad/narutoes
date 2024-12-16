@@ -188,7 +188,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 				if (summoner != null) {
 					summoner.addPotionEffect(new PotionEffect(PotionFeatherFalling.potion, 60, 5));
 				}
-				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getSummoner(), ItemSenjutsu.block);
+				ItemStack stack = ProcedureUtils.getMatchingItemStack(summoner, ItemSenjutsu.block);
 				if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
 					item.setJutsuCooldown(stack, SNAKE8H, 20*25);

@@ -141,7 +141,7 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 			}
 			//MANGENKYO OBTAINMENT METHOD
 			if ((((itemstack).getItem() == new ItemStack(ItemSharingan.helmet, (int) (1)).getItem())
-					&& ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 1000))) {
+					&& ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 5000))) {
 				if ((PlayerTracker.Deaths.hasRecentNearby((EntityPlayer) entity, 40D, 6000D) && (!(world.isRemote)))) {
 					if ((Math.random() < 0.5)) {
 						mangekyo = new ItemStack(ItemMangekyoSharingan.helmet, (int) (1));
@@ -186,7 +186,7 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 			}
 		} else {
 			if (entity instanceof EntityLivingBase)
-				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 22, (int) 0, (false), (false)));
+				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 40, (int) 0, (false), (false)));
 			if ((entity.getEntityData().getBoolean("susanoo_activated"))) {
 				{
 					Map<String, Object> $_dependencies = new HashMap<>();

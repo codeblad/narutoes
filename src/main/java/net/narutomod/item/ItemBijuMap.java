@@ -240,7 +240,18 @@ public class ItemBijuMap extends ElementsNarutomodMod.ModElement {
 
 			NBTTagCompound nbt = stack.getTagCompound();
 
+
+			//do some bullshit based on position!?
+
 			if (nbt.getBoolean("hasInitialized")) {
+				final EntityBijuManager bm = EntityBijuManager.getClosestBiju(player);
+				if (bm != null) {
+					final BlockPos target = bm.getPosition();
+					BlockPos newBP = new BlockPos(nbt.getInteger("posX"),nbt.getInteger("posY"),nbt.getInteger("posZ"));
+					if (target.getDistance(nbt.getInteger("posX"),nbt.getInteger("posY"),nbt.getInteger("posZ")) > 100) {
+						stack.shrink(1);
+					}
+				}
 				return;
 			}
 
@@ -257,6 +268,9 @@ public class ItemBijuMap extends ElementsNarutomodMod.ModElement {
 
 				// This way the map will find a tailed beast once one is available :P
 				nbt.setBoolean("hasInitialized", true);
+				nbt.setInteger("posX",target.getX());
+				nbt.setInteger("posY",target.getY());
+				nbt.setInteger("posZ",target.getZ());
 			}
 			else if (isSelected && worldIn.getTotalWorldTime() % 20 == 0) {
 				player.sendStatusMessage(new TextComponentTranslation("overlay.no_biju_available"), true);

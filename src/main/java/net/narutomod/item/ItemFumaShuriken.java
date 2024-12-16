@@ -75,7 +75,7 @@ public class ItemFumaShuriken extends ElementsNarutomodMod.ModElement {
 			setFull3D();
 			setUnlocalizedName("fuma_shuriken");
 			setRegistryName("fuma_shuriken");
-			maxStackSize = 64;
+			maxStackSize = 1;
 			setCreativeTab(TabModTab.tab);
 		}
 
@@ -95,12 +95,12 @@ public class ItemFumaShuriken extends ElementsNarutomodMod.ModElement {
 		public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityLivingBase entityLivingBase, int timeLeft) {
 			if (!world.isRemote && entityLivingBase instanceof EntityPlayerMP) {
 				EntityPlayerMP entity = (EntityPlayerMP) entityLivingBase;
-				float power = 1.2f;
+				float power = 2.1f;
 				EntityArrowCustom entityarrow = new EntityArrowCustom(world, entity);
 				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 2, 0);
 				entityarrow.setSilent(true);
 				entityarrow.setIsCritical(false);
-				entityarrow.setDamage(13);
+				entityarrow.setDamage(13+ItemJutsu.getDmgMult(entityLivingBase)*0.15f);
 				entityarrow.setKnockbackStrength(0);
 				itemstack.damageItem(1, entity);
 				int x = (int) entity.posX;

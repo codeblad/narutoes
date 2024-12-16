@@ -1,6 +1,7 @@
 package net.narutomod.procedure;
 
 import net.minecraft.item.Item;
+import net.minecraft.nbt.NBTTagCompound;
 import net.narutomod.gui.GuiScrollKG;
 import net.narutomod.item.*;
 import net.narutomod.gui.GuiScrollGenjutsuGui;
@@ -101,10 +102,41 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 		if ((//(((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).experienceLevel : 0) >= 10)
 				/*&&*/ ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 0))) {
 			if (!world.isRemote && (entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 1000 && !(entity.getEntityData().getBoolean("kgReceived"))) {
-				Item jutsu = GuiScrollKG.GuiContainerMod.kgArray[entity.getEntityData().getInteger("KekkeiGenkai")];
-				entity.getEntityData().setBoolean("kgReceived",true);
-				if (jutsu != ItemMokuton.block && jutsu != ItemIryoJutsu.block) {
-					GuiScrollKG.GuiContainerMod.giveJutsu(jutsu, (EntityPlayer)entity);
+				if (entity.getEntityData().getInteger("KekkeiGenkai") <= 12) {
+					Item jutsu = GuiScrollKG.GuiContainerMod.kgArray[entity.getEntityData().getInteger("KekkeiGenkai")];
+					entity.getEntityData().setBoolean("kgReceived",true);
+					if (jutsu != ItemMokuton.block && jutsu != ItemIryoJutsu.block) {
+						GuiScrollKG.GuiContainerMod.giveJutsu(jutsu, (EntityPlayer)entity);
+					}
+				} else if (entity.getEntityData().getInteger("KekkeiGenkai") == 14) {
+					entity.getEntityData().setBoolean("kgReceived",true);
+					ItemStack scroll = new ItemStack(ItemScrollRasengan.block,1);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entity,scroll);
+				} else if (entity.getEntityData().getInteger("KekkeiGenkai") == 15) {
+					entity.getEntityData().setBoolean("kgReceived",true);
+					ItemStack scroll = new ItemStack(ItemScrollHiraishin.block,1);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entity,scroll);
+				} else if (entity.getEntityData().getInteger("KekkeiGenkai") == 16) {
+					entity.getEntityData().setBoolean("kgReceived",true);
+					ItemStack scroll = new ItemStack(ItemScrollMultiSize.block,1);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entity,scroll);
+				} else if (entity.getEntityData().getInteger("KekkeiGenkai") == 17) {
+					entity.getEntityData().setBoolean("kgReceived",true);
+					ItemStack scroll = new ItemStack(ItemScrollShadowImitation.block,1);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entity,scroll);
+				} else if (entity.getEntityData().getInteger("KekkeiGenkai") == 18) {
+					entity.getEntityData().setBoolean("kgReceived",true);
+					ItemStack scroll = new ItemStack(ItemScrollKikaichuSphere.block,1);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entity,scroll);
+				} else if (entity.getEntityData().getInteger("KekkeiGenkai") == 19) {
+					entity.getEntityData().setBoolean("kgReceived",true);
+					ItemStack stack2 = new ItemStack(ItemSummoningContract.block,1);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entity, stack2);
+					stack2.setCount(1);
+					if (!stack2.hasTagCompound()) {
+						stack2.setTagCompound(new NBTTagCompound());
+					}
+					stack2.getTagCompound().setString("Type", "enma");
 				}
 			}
 			if (((!(world.isRemote)) && (!(entity.getEntityData().getBoolean((NarutomodModVariables.FirstGotNinjutsu)))))) {
@@ -477,7 +509,7 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 					if ((!((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).capabilities.isCreativeMode : false))) {
 						if (entity instanceof EntityLivingBase)
 							((EntityLivingBase) entity)
-									.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 22, (int) 0, (false), (false)));
+									.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 40, (int) 0, (false), (false)));
 					}
 				} /*else if (((ModConfig.AUTO_KEKKEIGENKAI_ASSIGNMENT && ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 300))
 						&& (((((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))

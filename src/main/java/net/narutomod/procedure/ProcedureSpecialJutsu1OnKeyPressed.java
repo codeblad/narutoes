@@ -1,17 +1,12 @@
 package net.narutomod.procedure;
 
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
-import net.narutomod.entity.EntityBijuManager;
-import net.narutomod.entity.EntityEightTails;
-import net.narutomod.entity.EntityNineTails;
-import net.narutomod.entity.EntityTailedBeast;
+import net.minecraft.util.math.Vec3d;
+import net.narutomod.Chakra;
+import net.narutomod.entity.*;
+import net.narutomod.item.*;
 import net.narutomod.world.WorldKamuiDimension;
-import net.narutomod.item.ItemTenseigan;
-import net.narutomod.item.ItemRinnegan;
-import net.narutomod.item.ItemMangekyoSharinganObito;
-import net.narutomod.item.ItemMangekyoSharinganEternal;
-import net.narutomod.item.ItemMangekyoSharingan;
-import net.narutomod.item.ItemByakugan;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraft.world.World;
@@ -121,13 +116,88 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 				ProcedureByakuganActivate.executeProcedure($_dependencies);
 			}
 		} else if (EntityBijuManager.cloakLevel((EntityPlayer) entity) == 3) {
-			if ((!(is_pressed))) {
-				EntityTailedBeast.Base biju = EntityBijuManager.getBijuOfPlayerInWorld((EntityPlayer) entity);
+			EntityTailedBeast.Base biju = EntityBijuManager.getBijuOfPlayerInWorld((EntityPlayer) entity);
+			if (((is_pressed))) {
 				biju.setSwingingArms(true);
 				int tails = EntityBijuManager.getTails((EntityPlayer) entity);
-				if (tails == 9) {
-					biju.mouthShootingJutsu = EntityNineTails.EntityBeam.shoot((EntityLivingBase) entity, 0.6f, 0.8f);
+				Chakra.Pathway cp = Chakra.pathway((EntityLivingBase) entity);
+				float cd = 20;
+				if (world.getTotalWorldTime() > biju.getEntityData().getFloat("bijuACD") || ((EntityPlayer)entity).isCreative()   ) {
+					if (tails == 9) {
+						cd = 100;
+						if (cp.consume(1000d)) {
+							biju.mouthShootingJutsu = EntityNineTails.EntityBeam.shoot((EntityLivingBase) entity, 0.6f, 0.8f);
+							biju.getEntityData().setFloat("bijuACD",world.getTotalWorldTime()+cd);
+						}
+					} else if (tails == 8 ){
+						cd = 150;
+						if (biju.getEntityData().getInteger("bijuBlast")  < 7) {
+							if (cp.consume(200d) && biju.ticksExisted%5 == 0) {
+								biju.getEntityData().setInteger("bijuBlast", biju.getEntityData().getInteger("bijuBlast")+1);
+								biju.mouthShootingJutsu = EntityEightTails.EntitySmallBijudama.shoot(biju, 1, 1.2f, 0.025f);
+							}
+						} else {
+							biju.getEntityData().setInteger("bijuBlast", 0);
+							biju.getEntityData().setFloat("bijuACD",world.getTotalWorldTime()+cd);
+						}
+					}else if (tails == 7 ){
+						cd = 150;
+						if (biju instanceof EntitySevenTails.EntityCustom) {
+							if (cp.consume(30d)) {
+								((EntitySevenTails.EntityCustom) biju).blindUse++;
+								((EntitySevenTails.EntityCustom) biju).blindPowder();
+							} else {
+								((EntitySevenTails.EntityCustom) biju).blindUse=100;
+							}
+							if (((EntitySevenTails.EntityCustom) biju).blindUse > 40 ){
+								biju.getEntityData().setFloat("bijuACD",world.getTotalWorldTime()+cd);
+								((EntitySevenTails.EntityCustom) biju).blindUse=0;
+							}
+						}
+					}else if (tails == 6) {
+						cd = 200;
+						if (cp.consume(500d)) {
+							biju.mouthShootingJutsu = EntityAcidScattering.EC.Jutsu.createJutsu(biju, 100);
+							((EntityAcidScattering.EC)biju.mouthShootingJutsu).setPotionAmplifier(40);
+							((EntityAcidScattering.EC)biju.mouthShootingJutsu).setDamage(120);
+							biju.getEntityData().setFloat("bijuACD",world.getTotalWorldTime()+cd);
+						}
+					}else if (tails == 4) {
+						cd = 80+100;
+						if (cp.consume(850d)) {
+							biju.mouthShootingJutsu = new EntityFirestream.EC.Jutsu2().createJutsu(biju, (float)biju.getBijudamaMinRange(), 80, 0xff00ff80);
+							((EntityFirestream.EC)biju.mouthShootingJutsu).setTrueDamage(130f);
+							biju.getEntityData().setFloat("bijuACD",world.getTotalWorldTime()+cd);
+						}
+					}else if (tails == 3) {
+						cd = 100;
+						if (cp.consume(500d)) {
+							biju.mouthShootingJutsu = EntityWaterCanonball.EC.Jutsu.createJutsu(biju, 10.0f);
+							((EntityWaterCanonball.EC)biju.mouthShootingJutsu).setDamage(400f);
+							biju.getEntityData().setFloat("bijuACD",world.getTotalWorldTime()+cd);
+						}
+					}else if (tails == 2) {
+						cd = 40;
+						if (cp.consume(350d)) {
+							biju.mouthShootingJutsu = new ItemKaton.EntityBigFireball(biju, 10.0f, false);
+							Vec3d vec = biju.getLookVec();
+							((ItemKaton.EntityBigFireball)biju.mouthShootingJutsu).shoot(vec.x,vec.y,vec.z, 1.2f, 0);
+							((ItemKaton.EntityBigFireball)biju.mouthShootingJutsu).setDamage(250.0f);
+							biju.world.spawnEntity(biju.mouthShootingJutsu);
+							biju.getEntityData().setFloat("bijuACD",world.getTotalWorldTime()+cd);
+						}
+					}else if (tails == 1) {
+						cd = 120;
+						if (cp.consume(800d)) {
+							biju.mouthShootingJutsu = new EntityFutonVacuum.EC.Jutsu().createJutsu(biju, (float)biju.getBijudamaMinRange(), 40);
+							((EntityFutonVacuum.EC)biju.mouthShootingJutsu).setDamage(150.0f);
+							((EntityFutonVacuum.EC)biju.mouthShootingJutsu).setBulletSize(40.0f);
+							biju.getEntityData().setFloat("bijuACD",world.getTotalWorldTime()+cd);
+						}
+					}
 				}
+			} else {
+				biju.setSwingingArms(false);
 			}
 		}
 	}

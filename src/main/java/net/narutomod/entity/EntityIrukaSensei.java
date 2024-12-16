@@ -78,12 +78,12 @@ public class EntityIrukaSensei extends ElementsNarutomodMod.ModElement {
 			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollBodyReplacement.block, 1), 0, 1));
 
 			MerchantRecipeList uncommonTrades = new MerchantRecipeList();
-			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollKageBunshin.block, 1), 0, 1));
-			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollEarthSpears.block, 1), 0, 1));
-			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollWaterCannon.block, 1), 0, 1));
-			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollGreatFireball.block, 1), 0, 1));
-			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollLightningBeast.block, 1), 0, 1));
-			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 5), ItemStack.EMPTY, new ItemStack(ItemScrollFutonVacuum.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 2), ItemStack.EMPTY, new ItemStack(ItemScrollKageBunshin.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 2), ItemStack.EMPTY, new ItemStack(ItemScrollEarthSpears.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 2), ItemStack.EMPTY, new ItemStack(ItemScrollWaterCannon.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 2), ItemStack.EMPTY, new ItemStack(ItemScrollGreatFireball.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 2), ItemStack.EMPTY, new ItemStack(ItemScrollLightningBeast.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 2), ItemStack.EMPTY, new ItemStack(ItemScrollFutonVacuum.block, 1), 0, 1));
 			uncommonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 30), ItemStack.EMPTY, new ItemStack(Items.GOLDEN_APPLE, 1, 1), 0, 1));
 
 			trades.put(EntityNinjaMerchant.TradeLevel.COMMON, commonTrades);

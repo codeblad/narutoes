@@ -221,26 +221,33 @@ public class EntitySevenTails extends ElementsNarutomodMod.ModElement {
 			if (target != null) {
 				if (this.getMeleeTime() <= 0 && this.getDistance(target) < this.getBijudamaMinRange()) {
 					this.setMeleeTime(80);
+					this.blindPowder();
 				}
-				Particles.Renderer particles = new Particles.Renderer(this.world);
-				for (int i = 0; i < 100; i++) {
-					particles.spawnParticles(Particles.Types.FALLING_DUST, this.posX, this.posY + 0.5d * this.height , this.posZ,
-					 1, 0.5d * this.width, 0.4d * this.height, 0.5d * this.width,
-					 (this.rand.nextDouble()-0.5d) * 8.0d, (this.rand.nextDouble()-0.5d) * 4.0d, (this.rand.nextDouble()-0.5d) * 8.0d, 0xD0FFFFFF, 240);
+
+			}
+		}
+
+		public int blindUse = 0;
+
+		public void blindPowder() {
+			Particles.Renderer particles = new Particles.Renderer(this.world);
+			for (int i = 0; i < 100; i++) {
+				particles.spawnParticles(Particles.Types.FALLING_DUST, this.posX, this.posY + 0.5d * this.height , this.posZ,
+						1, 0.5d * this.width, 0.4d * this.height, 0.5d * this.width,
+						(this.rand.nextDouble()-0.5d) * 8.0d, (this.rand.nextDouble()-0.5d) * 4.0d, (this.rand.nextDouble()-0.5d) * 8.0d, 0xD0FFFFFF, 240);
+			}
+			particles.send();
+			for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(25d), new Predicate<EntityLivingBase>() {
+				@Override
+				public boolean apply(@Nullable EntityLivingBase p_apply_1_) {
+					return p_apply_1_ != null && p_apply_1_ != EntityCustom.this && p_apply_1_ != EntityCustom.this.getBijuManager().getJinchurikiPlayer();
 				}
-				particles.send();
-				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(20d), new Predicate<EntityLivingBase>() {
-					@Override
-					public boolean apply(@Nullable EntityLivingBase p_apply_1_) {
-						return p_apply_1_ != null && p_apply_1_ != EntityCustom.this && p_apply_1_ != EntityCustom.this.getBijuManager().getJinchurikiPlayer();
-					}
-				})) {
-					if (this.rand.nextFloat() < 0.005f) {
-						if (entity instanceof EntityPlayer) {
-							ProcedureRenderView.sendToPlayer(entity, 100, 100, 1.0f, 1.0f, 1.0f, 1.0f);
-						} else if (entity instanceof EntityLiving) {
-							entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 5));
-						}
+			})) {
+				if (this.rand.nextFloat() < 0.005f) {
+					if (entity instanceof EntityPlayer && (this.getSummoningPlayer() != null && !entity.equals(this.getSummoningPlayer()))) {
+						ProcedureRenderView.sendToPlayer(entity, 100, 100, 1.0f, 1.0f, 1.0f, 1.0f);
+					} else if (entity instanceof EntityLiving) {
+						entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 5));
 					}
 				}
 			}
