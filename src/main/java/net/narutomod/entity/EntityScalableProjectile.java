@@ -55,6 +55,7 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 			super(world);
 			this.isImmuneToFire = false;
 			//this.setEntityInvulnerable(true);
+			this.setAlwaysRenderNameTag(false);
 		}
 
 		public Base(EntityLivingBase shooter) {
@@ -62,7 +63,6 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 			this.shootingEntity = shooter;
 			//this.setPosition(shooter.posX, shooter.posY + shooter.height + 0.5D, shooter.posZ);
 			this.setNoGravity(true);
-			this.setAlwaysRenderNameTag(false);
 		}
 
 		@Override
@@ -216,7 +216,7 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 					float f = this.motionFactor;
 					if (f > 0f) {
 						this.ticksInAir++;
-						RayTraceResult raytraceresult = this.forwardsRaycast(true, this.ticksInAir >= 25, this.shootingEntity);
+						RayTraceResult raytraceresult = this.forwardsRaycast(true, this.ticksInAir >= (int)(20f / f), this.shootingEntity);
 						if (raytraceresult != null && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
 							this.onImpact(raytraceresult);
 							//f *= 0.4F;
@@ -275,8 +275,8 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
             double d = (double)MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
             float yaw = -(float)(MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
             float pitch = -(float)(MathHelper.atan2(this.motionY, d) * (180D / Math.PI));
-            float deltaYaw = ProcedureUtils.subtractDegreesWrap(yaw, this.prevRotationYaw);
-            float deltaPitch = ProcedureUtils.subtractDegreesWrap(pitch, this.prevRotationPitch);
+            float deltaYaw = ProcedureUtils.subtractDegreesWrap(yaw, this.rotationYaw);
+            float deltaPitch = ProcedureUtils.subtractDegreesWrap(pitch, this.rotationPitch);
             float roll = MathHelper.wrapDegrees(deltaYaw * 1.5f);
             this.prevRotationYaw = yaw - deltaYaw;
             this.prevRotationPitch = pitch - deltaPitch;
@@ -323,11 +323,12 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 				this.setDead();
 			}
 			this.setEntityScale(compound.getFloat("scale"));
-			this.setSize(this.ogWidth * this.getEntityScale(), this.ogHeight * getEntityScale());
+			//this.setSize(this.ogWidth * this.getEntityScale(), this.ogHeight * getEntityScale());
 			this.motionFactor = compound.getFloat("speed");
 			this.ticksAlive = compound.getInteger("life");
 			this.ticksInAir = compound.getInteger("flighttime");
 			this.ticksInGround = compound.getInteger("groundtime");
+			this.maxInGroundTime = compound.getInteger("maxInGroundTime");
 		}
 
 		@Override
@@ -339,6 +340,7 @@ public class EntityScalableProjectile extends ElementsNarutomodMod.ModElement {
 			compound.setInteger("life", this.ticksAlive);
 			compound.setInteger("flighttime", this.ticksInAir);
 			compound.setInteger("groundtime", this.ticksInGround);
+			compound.setInteger("maxInGroundTime", this.maxInGroundTime);
 		}
 	}
 

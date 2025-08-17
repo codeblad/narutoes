@@ -99,6 +99,9 @@ public class ProcedureAmaterasu extends ElementsNarutomodMod.ModElement {
 				RayTraceResult t = ProcedureUtils.objectEntityLookingAt(entity, 30d);
 				i = (double) ItemJutsu.getDmgMult(entity);
 				if (t.typeOfHit == RayTraceResult.Type.ENTITY) {
+					if (t.entityHit instanceof EntityLivingBase) {
+						((EntityLivingBase) t.entityHit).setRevengeTarget((EntityLivingBase) entity);
+					}
 					entity = t.entityHit;
 					if (entity instanceof EntityLivingBase)
 						((EntityLivingBase) entity)

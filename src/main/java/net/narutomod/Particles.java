@@ -38,6 +38,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.Block;
 
+import net.narutomod.entity.EntityPaperBind;
 import net.narutomod.potion.PotionCorrosion;
 import net.narutomod.procedure.ProcedureUtils;
 
@@ -89,6 +90,7 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.BLOCK_DUST.getID(), new BlockDust.Factory());
 		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.SAND.getID(), new Sand.Factory());
 		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.WATER_SPLASH.getID(), new WaterSplash.Factory());
+		Minecraft.getMinecraft().effectRenderer.registerParticle(Types.PAPER.getID(), new Paper.Factory());
 	}
 
 	public static void spawnParticle(World world, Types type, double x, double y, double z, int count, 
@@ -692,11 +694,11 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 
 	@SideOnly(Side.CLIENT)
 	public static class MobAppearance extends Particle {
-		private static final Map<Integer, Class <? extends Entity>> particleEntities = ImmutableMap.of(
-			net.narutomod.entity.EntityItachi.ENTITYID_RANGED, net.narutomod.entity.EntityItachi.Entity4MobAppearance.class
-		);
-	    private Entity entity;
-	    private int entityTypeId;
+		//private static final Map<Integer, Class <? extends Entity>> particleEntities = ImmutableMap.of(
+		//	net.narutomod.entity.EntityItachi.ENTITYID_RANGED, net.narutomod.entity.EntityItachi.Entity4MobAppearance.class
+		//);
+	    private EntityLivingBase entity;
+	    //private int entityTypeId;
 	
 	    protected MobAppearance(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, int id) {
 	        super(worldIn, xCoordIn, yCoordIn, zCoordIn, 0.0D, 0.0D, 0.0D);
@@ -708,29 +710,32 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 	        this.motionZ = 0.0D;
 	        this.particleGravity = 0.0F;
 	        this.particleMaxAge = 30;
-	        this.entityTypeId = id;
-	        if (particleEntities.containsKey(id)) {
-	            try {
-	            	this.entity = particleEntities.get(this.entityTypeId).getConstructor(World.class).newInstance(this.world);
-	            } catch (Exception e) {
-	            	throw new RuntimeException("Unregistered custom mob appearance particle type " + this.entityTypeId, e);
-	            }
+	        Entity entity1 = worldIn.getEntityByID(id);
+	        if (entity1 instanceof EntityLivingBase) {
+	        	this.entity = (EntityLivingBase)entity1;
 	        }
+	        //if (particleEntities.containsKey(id)) {
+	        //    try {
+	        //    	this.entity = particleEntities.get(this.entityTypeId).getConstructor(World.class).newInstance(this.world);
+	        //    } catch (Exception e) {
+	        //    	throw new RuntimeException("Unregistered custom mob appearance particle type " + this.entityTypeId, e);
+	        //    }
+	        //}
 	    }
 	
 	    public int getFXLayer() {
 	        return 3;
 	    }
 	
-	    public void onUpdate() {
+	    /*public void onUpdate() {
 	        super.onUpdate();
 			if (this.entity == null) {
 	        	Entity entity1 = this.world.getEntityByID(this.entityTypeId);
-	        	if (entity1 instanceof EntityPlayer) {
+	        	if (entity1 instanceof EntityLivingBase) {
 	        		this.entity = entity1;
 	        	}
 			}
-	    }
+	    }*/
 	
 	    @Override
 	    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, 
@@ -755,24 +760,18 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 	            GlStateManager.translate(0.0F, -f4 * 1.5f, -1.5F);
 	            GlStateManager.scale(f4, f4, f4);
 	            float f5 = this.entity.rotationYaw;
-	            float f6 = this.entity.prevRotationYaw;
-	            float f7 = 0f;
-	            float f8 = 0f;
+	            float f6 = this.entity.renderYawOffset;
+	            float f7 = this.entity.getRotationYawHead();
+	            float f8 = this.entity.rotationPitch;
 	            this.entity.rotationYaw = 0.0F;
-	            this.entity.prevRotationYaw = 0.0F;
-	            if (this.entity instanceof EntityLivingBase) {
-	            	f7 = ((EntityLivingBase)this.entity).rotationYawHead;
-	            	f8 = ((EntityLivingBase)this.entity).prevRotationYawHead;
-		            ((EntityLivingBase)this.entity).rotationYawHead = 0.0F;
-		            ((EntityLivingBase)this.entity).prevRotationYawHead = 0.0F;
-	            }
-	            rendermanager.renderEntity(this.entity, 0.0D, 0.0D, 0.0D, 0.0F, partialTicks, false);
+	            this.entity.setRotationYawHead(0.0F);
+	            this.entity.setRenderYawOffset(0.0F);
+	            this.entity.rotationPitch = 0.0F;
+	            rendermanager.renderEntity(this.entity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
 	            this.entity.rotationYaw = f5;
-	            this.entity.prevRotationYaw = f6;
-	            if (this.entity instanceof EntityLivingBase) {
-		            ((EntityLivingBase)this.entity).rotationYawHead = f7;
-		            ((EntityLivingBase)this.entity).prevRotationYawHead = f8;
-	            }
+	            this.entity.setRenderYawOffset(f6);
+	            this.entity.setRotationYawHead(f7);
+	            this.entity.rotationPitch = f8;
 	            GlStateManager.popMatrix();
 	            GlStateManager.enableDepth();
 	        }
@@ -782,7 +781,7 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 	    public static class Factory implements IParticleFactory {
 	        public Particle createParticle(int particleID, World worldIn, double xCoordIn, 
 	        		double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn, int... parameters) {
-                int arg0 = (parameters.length > 0) ? parameters[0] : net.narutomod.entity.EntityItachi.ENTITYID;
+                int arg0 = (parameters.length > 0) ? parameters[0] : -1;
                 return new MobAppearance(worldIn, xCoordIn, yCoordIn, zCoordIn, arg0);
             }
         }
@@ -1549,7 +1548,7 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		 float rotationYZ, float rotationXY, float rotationXZ) {
 			float f1 = (float)this.particleAge + partialTicks;
 			float f2 = f1 / (float)this.particleMaxAge;
-			float f3 = this.particleScale * (f2 * 0.6f + 0.7f);
+			float f3 = this.particleScale * (f2 * 0.8f + 0.5f);
 			float f4 = this.particleAlpha * (1.0F - f2);
 			this.renderBuffer(buffer, entityIn, partialTicks, this.rotateX, this.rotateY, this.rotateZ - 30.0F * f1, f3, f4);
 		}
@@ -1773,6 +1772,84 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 	    }
 	}
 
+	@SideOnly(Side.CLIENT)
+	public static class Paper extends Smoke {
+		private final EntityPaperBind.EntityPaper entity;
+		
+		protected Paper(World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double motionX, double motionY, double motionZ) {
+			super(worldIn, xCoordIn, yCoordIn, zCoordIn, motionX, motionY, motionZ, -1, 4f, 0, 0, -1, -0.004f, 0d);
+			this.motionX = motionX;
+			this.motionY = motionY;
+			this.motionZ = motionZ;
+			this.entity = new EntityPaperBind.EntityPaper(worldIn);
+		}
+
+		@Override
+		public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ,
+				float rotationXY, float rotationXZ) {
+            RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
+            rendermanager.setRenderPosition(Particle.interpPosX, Particle.interpPosY, Particle.interpPosZ);
+			rendermanager.setDebugBoundingBox(false);
+			//rendermanager.setRenderOutlines(false);
+			double x = this.prevPosX + (this.posX - this.prevPosX) * partialTicks - interpPosX;
+			double y = this.prevPosY + (this.posY - this.prevPosY) * partialTicks - interpPosY;
+			double z = this.prevPosZ + (this.posZ - this.prevPosZ) * partialTicks - interpPosZ;
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(x, y, z);
+			GlStateManager.disableLighting();
+            rendermanager.renderEntity(this.entity, 0.0D, 0.0D, 0.0D, 0.0F, partialTicks, false);
+            GlStateManager.enableLighting();
+            GlStateManager.popMatrix();
+		}
+
+		@Override
+		public void onUpdate() {
+			this.prevPosX = this.posX;
+			this.prevPosY = this.posY;
+			this.prevPosZ = this.posZ;
+			if (this.particleMaxAge == 0 || this.particleAge++ >= this.particleMaxAge) {
+				this.setExpired();
+				return;
+			}
+			this.motionY += this.floatMotionY;
+			this.move(this.motionX, this.motionY, this.motionZ);
+			this.entity.ticksExisted = this.particleAge;
+			this.entity.motionX = this.motionX;
+			this.entity.motionY = this.motionY;
+			this.entity.motionZ = this.motionZ;
+			this.entity.updateInFlightRotations();
+			if (this.posY == this.prevPosY) {
+				this.motionX *= 1.1D;
+				this.motionZ *= 1.1D;
+			}
+			this.motionX *= 0.96D;
+			this.motionY *= 0.96D;
+			this.motionZ *= 0.96D;
+			if (this.onGround) {
+				this.motionX *= 0.7D;
+				this.motionZ *= 0.7D;
+			}
+		}
+
+		@Override
+		public boolean shouldDisableDepth() {
+			return false;
+		}
+
+		@Override
+	    public int getFXLayer() {
+	        return 3;
+	    }
+
+		@SideOnly(Side.CLIENT)
+		public static class Factory implements IParticleFactory {
+			public Particle createParticle(int particleID, World worldIn, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn,
+					double ySpeedIn, double zSpeedIn, int... parameters) {
+				return new Paper(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
+			}
+		}
+	}
+
 	public enum Types {
 		SMOKE("smoke_colored", 54678400, 7), 
 		SUSPENDED("suspended_colored", 54678401, 3), 
@@ -1792,7 +1869,8 @@ public class Particles extends ElementsNarutomodMod.ModElement {
 		WATER_SPLASH("water_splash", 54678415, 1),
 		SPIT("spit", 54678416, 4),
 		CLAY_SPIT("clay_spit", 54678417, 3),
-		CONCENTRIC_SPHERES("concentric_spheres", 54678418, 3);
+		CONCENTRIC_SPHERES("concentric_spheres", 54678418, 3),
+		PAPER("paper", 54678419, 0);
 		
 		private final String particleName;
 		private final int particleID;

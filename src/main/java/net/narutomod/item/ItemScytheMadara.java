@@ -136,10 +136,9 @@ public class ItemScytheMadara extends ElementsNarutomodMod.ModElement {
 		public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot slot) {
 			Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(slot);
 			if (slot == EntityEquipmentSlot.MAINHAND) {
-				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
-						new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Ranged item modifier", 13d, 0));
-				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
-						new AttributeModifier(ATTACK_SPEED_MODIFIER, "Ranged item modifier", -2.4, 0));
+				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Ranged item modifier", 15d, 0));
+				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Ranged item modifier", -2.4, 0));
+				multimap.put(EntityPlayer.REACH_DISTANCE.getName(), new AttributeModifier(ProcedureUtils.REACH_MODIFIER, "Tool modifier", 1.5, 0));
 			}
 			return multimap;
 		}
@@ -182,21 +181,22 @@ public class ItemScytheMadara extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
+			if (attacker.isHandActive() || this.isThrown(itemstack)) {
+				return true;
+			}
 			if (!attacker.world.isRemote && attacker.equals(target)) {
-				if (itemstack.hasTagCompound() && !this.isThrown(itemstack)) {
+				if (!itemstack.isEmpty()) {
 					itemstack.damageItem(1, attacker);
-					if (!itemstack.isEmpty()) {
-						itemstack.getTagCompound().setBoolean(USE_THROWN_MODEL, true);
-						EntityCustom entityarrow = new EntityCustom(attacker.world, attacker);
-						Vec3d vec = attacker.getLookVec();
-						entityarrow.shoot(vec.x, vec.y, vec.z, 2.0f, 0);
-						entityarrow.setDamage(14d);
-						attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ, SoundEvents.ENTITY_ARROW_SHOOT,
-								SoundCategory.NEUTRAL, 1, 1f / (itemRand.nextFloat() * 0.5f + 1f) + 1f);
-						attacker.world.spawnEntity(entityarrow);
-						this.setEntity(itemstack, entityarrow);
-						entityarrow.setItemStack(itemstack);
-					}
+					itemstack.getTagCompound().setBoolean(USE_THROWN_MODEL, true);
+					EntityCustom entityarrow = new EntityCustom(attacker.world, attacker);
+					Vec3d vec = attacker.getLookVec();
+					entityarrow.shoot(vec.x, vec.y, vec.z, 2.0f, 0);
+					entityarrow.setDamage(14d);
+					attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ, SoundEvents.ENTITY_ARROW_SHOOT,
+							SoundCategory.NEUTRAL, 1, 1f / (itemRand.nextFloat() * 0.5f + 1f) + 1f);
+					attacker.world.spawnEntity(entityarrow);
+					this.setEntity(itemstack, entityarrow);
+					entityarrow.setItemStack(itemstack);
 				}
 				return true;
 			}
@@ -245,6 +245,7 @@ public class ItemScytheMadara extends ElementsNarutomodMod.ModElement {
 	public static class EntityCustom extends EntityArrow {
 		private static final DataParameter<Integer> SHOOTERID = EntityDataManager.<Integer>createKey(EntityCustom.class, DataSerializers.VARINT);
 		private final double chainMaxLength = 32.0d;
+		private final Vec3d needleEyeOffset = new Vec3d(0d, 2.6d, 0d); 
 		private double damage;
 		private ItemStack itemstack = ItemStack.EMPTY;
 
@@ -342,10 +343,9 @@ public class ItemScytheMadara extends ElementsNarutomodMod.ModElement {
 		}
 
 		protected Vec3d getNeedleEyePos(float pt) {
-			Vec3d vec0 = new Vec3d(this.lastTickPosX + (this.posX - this.lastTickPosX) * pt, this.lastTickPosY + (this.posY - this.lastTickPosY) * pt, this.lastTickPosZ + (this.posZ - this.lastTickPosZ) * pt);
-			float f0 = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * pt;
-			float f1 = -this.prevRotationPitch - (this.rotationPitch - this.prevRotationPitch) * pt - 90F;
-			return new Vec3d(0d, 2.6d, 0d).rotatePitch(-f1 * (float)Math.PI / 180F).rotateYaw(f0 * (float)Math.PI / 180F).add(vec0);
+			return this.needleEyeOffset.rotatePitch((this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * pt + 90F) * (float)Math.PI / 180F)
+			 .rotateYaw((this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * pt) * (float)Math.PI / 180F)
+			 .addVector(this.lastTickPosX + (this.posX - this.lastTickPosX) * pt, this.lastTickPosY + (this.posY - this.lastTickPosY) * pt, this.lastTickPosZ + (this.posZ - this.lastTickPosZ) * pt);
 		}
 
 		protected void retrieve(double x, double y, double z, float speed) {

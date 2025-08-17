@@ -166,8 +166,13 @@ public class EntitySakuraHaruno extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		protected double meleeReach() {
+			return 1.5d;
+		}
+
+		@Override
 		public boolean isOnSameTeam(Entity entityIn) {
-			return EntityNinjaMob.TeamKonoha.contains(entityIn.getClass()) || this.healableEntities.contains(entityIn);
+			return super.isOnSameTeam(entityIn) || this.healableEntities.contains(entityIn);
 		}
 
 		@Override
@@ -385,7 +390,7 @@ public class EntitySakuraHaruno extends ElementsNarutomodMod.ModElement {
 				this.bipedHead.cubeList.add(new ModelBox(this.bipedHead, 0, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.0F, false));
 				this.bipedHeadwear = new ModelRenderer(this);
 				this.bipedHeadwear.setRotationPoint(0.0F, 0.0F, 0.0F);
-				this.bipedHeadwear.cubeList.add(new ModelBox(this.bipedHeadwear, 32, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.6F, false));
+				this.bipedHeadwear.cubeList.add(new ModelBox(this.bipedHeadwear, 32, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.8F, false));
 				this.bipedBody = new ModelRenderer(this);
 				this.bipedBody.setRotationPoint(0.0F, 0.0F, 0.0F);
 				this.bipedBody.cubeList.add(new ModelBox(this.bipedBody, 16, 16, -4.0F, 0.0F, -2.0F, 8, 12, 4, 0.0F, false));

@@ -75,7 +75,6 @@ import java.util.UUID;
 import java.util.Random;
 import java.util.List;
 import net.minecraft.util.EntityDamageSource;
-import scala.sys.Prop;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemEightGates extends ElementsNarutomodMod.ModElement {
@@ -87,7 +86,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 	private static final ResourceLocation HIRUDORA_TEXTURE = new ResourceLocation("narutomod:textures/WhiteTiger.png");
 	private static final ResourceLocation SEKIZO_TEXTURE = new ResourceLocation("narutomod:textures/longcube_white.png");
 	private static final ResourceLocation NGDRAGON_TEXTURE = new ResourceLocation("narutomod:textures/dragon_red.png");
-	private static final int NGD_SUSPEND_TIME = 10;
+	private static final int NGD_SUSPEND_TIME = 20;
 	private static Random rng = new Random();
 	
 	public ItemEightGates(ElementsNarutomodMod instance) {
@@ -156,21 +155,11 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				entity.fallDistance = 0;
 				entity.removePotionEffect(MobEffects.SATURATION);
 				if (entity.ticksExisted % 10 == 0) {
-					int realStrength = this.strength;
-					if (this.gate <= 6) {
-						realStrength += ItemJutsu.getDmgMult(entity);
-					}
-					if (this.gate == 7) {
-						realStrength += ItemJutsu.getDmgMult(entity)*1.6;
-					}
-					if (this.gate == 8) {
-						realStrength += ItemJutsu.getDmgMult(entity)*2.5;
-					}
 					entity.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 42, 3, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 12, 8, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.HASTE, 12, 3, false, false));
-					entity.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 12, realStrength, false, false));
-					//entity.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 12, this.resistance, false, false));
+					entity.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 12, this.strength, false, false));
+					entity.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 12, this.resistance, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 12, this.speed, false, false));
 					if (entity.getHealth() > 0.0f && (!(entity instanceof EntityPlayer) || !((EntityPlayer) entity).isCreative())) {
 						if (this.damage >= 0.0f) {
@@ -257,7 +246,6 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class RangedItem extends Item {
-		//gates power here
 		private final UUID GATE_MODIFIER = UUID.fromString("f6944d0f-5c81-45db-9261-6a9ad9fe4840");
 		private static final String GATE_KEY = "gateOpened";
 		private static final String SEKIZO_KEY = "sekizoPunchCount";
@@ -265,13 +253,13 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		private static final String XP_KEY = "battleExperience";
 		private final Properties GATE[] = {new Properties(0, "", 0, 0, 0, 0, 0, 0, 0, 0f, false),
 			new Properties(1, I18n.translateToLocal("chattext.eightgates.gate1"), 220, 0, 0, 3, 2, 0, 10, -1f, false),
-			new Properties(2, I18n.translateToLocal("chattext.eightgates.gate2"), 240, 0, 0, 4, 6, 0, 40, -5f, false),
-			new Properties(3, I18n.translateToLocal("chattext.eightgates.gate3"), 280, 20, 0x10FFFFFF, 5, 10, 1, 60, -3f, false),
-			new Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 360, 25, 0x18FFFFFF, 7, 20, 2, 60, 0.2f, false),
-			new Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 520, 30, 0x20FFFFFF, 9, 32, 2, 60, 0.3f, false),
-			new Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 840, 30, 0x3000FF00, 12, 40, 3, 60, 0.4f, false),
-			new Properties(7, I18n.translateToLocal("chattext.eightgates.gate7"), 1480, 30, 0x300000FF, 16, 50, 3, 60, 0.5f, false),
-			new Properties(8, I18n.translateToLocal("chattext.eightgates.gate8"), 2760, 30, 0x30FF0000, 20, 60, 4, 60, 0.6f, true)};
+			new Properties(2, I18n.translateToLocal("chattext.eightgates.gate2"), 240, 0, 0, 4, 16, 0, 40, -5f, false),
+			new Properties(3, I18n.translateToLocal("chattext.eightgates.gate3"), 280, 20, 0x10FFFFFF, 5, 32, 1, 60, -3f, false),
+			new Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 360, 25, 0x18FFFFFF, 7, 64, 2, 60, 0.4f, false),
+			new Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 520, 30, 0x20FFFFFF, 15, 68, 2, 60, 0.6f, false),
+			new Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 840, 30, 0x3000FF00, 31, 72, 3, 60, 0.8f, false),
+			new Properties(7, I18n.translateToLocal("chattext.eightgates.gate7"), 1480, 30, 0x300000FF, 84, 76, 3, 60, 1.0f, false),
+			new Properties(8, I18n.translateToLocal("chattext.eightgates.gate8"), 2760, 30, 0x30FF0000, 349, 80, 4, 60, 1.2f, true)};
 						
 		public RangedItem() {
 			this.setMaxDamage(0);
@@ -343,9 +331,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			int punchnum = this.getSekizoPunchNum(itemstack, attacker.ticksExisted);
 			if (punchnum >= 0) {
 				EntitySekizo bullet = new EntitySekizo(attacker);
-				float mult = 1+5*((float) punchnum /4);
-				float damage = 800+(ItemJutsu.getDmgMult(attacker)*21F)*mult;
-				bullet.shoot(30, damage);
+				bullet.shoot(30, (float) ProcedureUtils.getModifiedAttackDamage(attacker) * 1.0F * (float) Math.pow(2d, punchnum));
 				world.playSound(null, attacker.posX, attacker.posY, attacker.posZ,
 				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:sekizo")),
 				 SoundCategory.NEUTRAL, 2.0F, 1.0F);
@@ -361,18 +347,14 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void attackAsakujaku(EntityLivingBase attacker, double x, double y, double z) {
-			if (this.asaCool > 0) {
-				return;
-			}
-			this.asaCool = 10;
 			World world = attacker.world;
 			Vec3d vec3d = attacker.getPositionEyes(1.0F);
-			for (int i = 0; i < 12; i++) {
+			for (int i = 0; i < 10; i++) {
 				Entity bullet = new EntitySmallFireball(world, attacker, x, y, z) {
 					@Override
 					public void onUpdate() {
 						super.onUpdate();
-						if (this.ticksExisted > 14) {
+						if (this.ticksExisted > 12) {
 							this.setDead();
 						}
 					}
@@ -384,7 +366,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 									return;
 								}
 								result.entityHit.attackEntityFrom(DamageSource.causeFireballDamage(this, this.shootingEntity),
-								 10+ItemJutsu.getDmgMult(attacker)*4);
+								 (float)ProcedureUtils.getModifiedAttackDamage(attacker) * 0.5f);
 								result.entityHit.setFire(10);
 							}
 							boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
@@ -394,7 +376,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					}
 					@Override
 					protected float getMotionFactor() {
-						return 1.2f;
+						return 1.1f;
 					}
 				};
 				bullet.setPosition(vec3d.x, vec3d.y, vec3d.z);
@@ -528,8 +510,6 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			return stack.hasTagCompound() ? stack.getTagCompound().getInteger(XP_KEY) : 0;
 		}
 
-		float asaCool = 0;
-
 		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
 			if (player.isSneaking()) {
@@ -545,6 +525,16 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						player.world.playSound(null, player.posX, player.posY, player.posZ,
 						 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:opengate")),
 						 SoundCategory.NEUTRAL, 1, 1);
+					}
+					if (gateOpened >= 6f) {
+						ProcedureAoeCommand.set(player, 0d, gateOpened * 2f).exclude(player).knockback(2f);
+						for (Entity entity2 : ProcedureAoeCommand.getInstance().getEntitiesList()) {
+							if (entity2 instanceof ItemJutsu.IJutsu && !(entity2 instanceof EntityLivingBase)) {
+								entity2.setDead();
+							}
+						}
+						ProcedureUtils.purgeHarmfulEffects(player);
+						player.extinguish();
 					}
 					if (gateOpened >= 8f - increments && gateOpened < 8f) {
 						player.world.playSound(null, player.posX, player.posY, player.posZ, 
@@ -589,9 +579,6 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
-			if (this.asaCool > 0) {
-				--this.asaCool;
-			}
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (/* !world.isRemote && */ entity instanceof EntityLivingBase) {
 				EntityLivingBase player = (EntityLivingBase) entity;
@@ -628,7 +615,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			++inc;
 			EntityLivingBase owner = this.getOwner(stack);
 			if (owner != null) {
-				/*IAttributeInstance iattributeinstance = owner.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
+				IAttributeInstance iattributeinstance = owner.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
 				if (iattributeinstance != null) {
 					if (!iattributeinstance.getModifiers().isEmpty())
 						for (AttributeModifier attributemodifier : iattributeinstance.getModifiers())
@@ -636,7 +623,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					else
 						return (inc + "-empty");
 				} else
-					return (inc + "-null");*/
+					return (inc + "-null");
 			}
 			return "";
 		}
@@ -647,7 +634,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			int gateOpened = (int) this.getGateOpened(stack);
 			if ((slot == EntityEquipmentSlot.MAINHAND || slot == EntityEquipmentSlot.OFFHAND) && gateOpened > 0) {
 				double health = (double) this.GATE[gateOpened].health;
-				//multimap.put(SharedMonsterAttributes.MAX_HEALTH.getName(), new AttributeModifier(GATE_MODIFIER, "8gates.maxhealth", health, 0));
+				multimap.put(SharedMonsterAttributes.MAX_HEALTH.getName(), new AttributeModifier(GATE_MODIFIER, "8gates.maxhealth", health, 0));
 			}
 			return multimap;
 		}
@@ -742,6 +729,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityHirudora extends EntityScalableProjectile.Base {
 		private float fullScale = 6f;
+		private final float damageMultiplier = 3.0f;
 		//private float realMotionFactor;
 		
 		public EntityHirudora(World a) {
@@ -791,7 +779,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					}
 				}
 			}
-			if (!this.world.isRemote && (this.ticksInAir > 40 || this.shootingEntity == null || !this.shootingEntity.isEntityAlive()))
+			if (!this.world.isRemote && (this.ticksInAir > 30 || this.shootingEntity == null || !this.shootingEntity.isEntityAlive()))
 				this.setDead();
 		}
 
@@ -814,7 +802,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && this.shootingEntity != null) {
 				ProcedureAoeCommand.set(this, 0.0D, 0.5d * this.getEntityScale()).exclude(this.shootingEntity)
 				 .damageEntities(DamageSource.causeIndirectDamage(this, this.shootingEntity).setDamageBypassesArmor(),
-				 500+ItemJutsu.getDmgMult(this.shootingEntity)*24);
+				 (float) ProcedureUtils.getModifiedAttackDamage(this.shootingEntity) * this.damageMultiplier);
 				this.shootingEntity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 40d);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 70.0F, false,
 						ForgeEventFactory.getMobGriefingEvent(this.world, (EntityLivingBase) this.shootingEntity));
@@ -828,7 +816,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EntityNGDragon extends EntityScalableProjectile.Base {
-		private float fullScale = 6f;
+		private final float fullScale = 6f;
 		public float prevLimbSwingAmount;
 		public float limbSwingAmount;
 		public float limbSwing;
@@ -882,7 +870,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						this.shoot(vec.x, vec.y, vec.z, 1.2f, 0f);
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:dragon_roar")), 2f, 1f);
 					}
-					this.shootingEntity.setPositionAndUpdate(this.posX, this.posY, this.posZ);
+					this.shootingEntity.setPositionAndUpdate(this.posX, this.posY + 0.5d, this.posZ);
 				}
 			}
 			this.updateLimbSwing();
@@ -915,7 +903,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						ProcedureUtils.pushEntity(new Vec3d(this.posX, this.posY, this.posZ), result.entityHit, 30.0D, 2.0F);
 					}
 					ProcedureAoeCommand.set(this, 0.0D, 5.0D).exclude(this.shootingEntity)
-					 .damageEntities(ds, 2000+ItemJutsu.getDmgMult(this.shootingEntity)*250);
+					 .damageEntities(ds, f * 16f);
 				}
 				this.world.newExplosion(this, this.posX, this.posY, this.posZ, 10.0F, false,
 				 ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
@@ -1026,11 +1014,20 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				this.bindEntityTexture(entity);
 				GlStateManager.pushMatrix();
 				float scale = entity.getEntityScale();
-				GlStateManager.translate((float) x, (float) y + scale, (float) z);
+				GlStateManager.translate((float) x, (float) y + scale, (float) z + scale);
 				GlStateManager.rotate(-entity.prevRotationYaw - (entity.rotationYaw - entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
 				GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * pt - 180.0F, 1.0F, 0.0F, 0.0F);
 				GlStateManager.scale(scale, scale, scale);
+				GlStateManager.enableBlend();
+				GlStateManager.disableLighting();
+				GlStateManager.color(1.0F, 1.0F, 1.0F, scale / entity.fullScale * 0.8F);
+				//GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
+				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
 				this.model.render(entity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+				GlStateManager.enableLighting();
+				GlStateManager.disableBlend();
 				GlStateManager.popMatrix();
 			}
 	
@@ -1083,20 +1080,8 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer bone3;
 			private final ModelRenderer jaw;
 			private final ModelRenderer teethLower;
-			private final ModelRenderer hornRight;
-			private final ModelRenderer hornRight0;
-			private final ModelRenderer hornRight1;
-			private final ModelRenderer hornRight2;
-			private final ModelRenderer hornRight3;
-			private final ModelRenderer hornRight4;
-			private final ModelRenderer hornRight5;
-			private final ModelRenderer hornLeft;
-			private final ModelRenderer hornLeft0;
-			private final ModelRenderer hornLeft1;
-			private final ModelRenderer hornLeft2;
-			private final ModelRenderer hornLeft3;
-			private final ModelRenderer hornLeft4;
-			private final ModelRenderer hornLeft5;
+			private final ModelRenderer[] hornRight = new ModelRenderer[7];
+			private final ModelRenderer[] hornLeft = new ModelRenderer[7];
 			private final ModelRenderer[] whiskerLeft = new ModelRenderer[6];
 			private final ModelRenderer[] whiskerRight = new ModelRenderer[6];
 			private final ModelRenderer spine;
@@ -1146,7 +1131,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				jaw = new ModelRenderer(this);
 				jaw.setRotationPoint(0.0F, 11.0F, -9.0F);
 				head.addChild(jaw);
-				setRotationAngle(jaw, 0.5236F, 0.0F, 0.0F);
+				setRotationAngle(jaw, 0.7854F, 0.0F, 0.0F);
 				jaw.cubeList.add(new ModelBox(jaw, 176, 65, -6.0F, 0.0F, -16.75F, 12, 4, 16, 1.0F, false));
 		
 				teethLower = new ModelRenderer(this);
@@ -1154,89 +1139,89 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				jaw.addChild(teethLower);
 				teethLower.cubeList.add(new ModelBox(teethLower, 112, 144, -6.0F, -16.0F, -25.75F, 12, 2, 16, 0.5F, false));
 		
-				hornRight = new ModelRenderer(this);
-				hornRight.setRotationPoint(-6.0F, -2.0F, -13.0F);
-				head.addChild(hornRight);
-				setRotationAngle(hornRight, 0.0873F, -0.5236F, 0.0F);
-				hornRight.cubeList.add(new ModelBox(hornRight, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 1.0F, false));
+				hornRight[0] = new ModelRenderer(this);
+				hornRight[0].setRotationPoint(-6.0F, -2.0F, -13.0F);
+				head.addChild(hornRight[0]);
+				setRotationAngle(hornRight[0], 0.0873F, -0.5236F, 0.0F);
+				hornRight[0].cubeList.add(new ModelBox(hornRight[0], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 1.0F, false));
 		
-				hornRight0 = new ModelRenderer(this);
-				hornRight0.setRotationPoint(0.0F, 0.0F, 7.0F);
-				hornRight.addChild(hornRight0);
-				setRotationAngle(hornRight0, 0.0873F, 0.0873F, 0.0F);
-				hornRight0.cubeList.add(new ModelBox(hornRight0, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.7F, false));
+				hornRight[1] = new ModelRenderer(this);
+				hornRight[1].setRotationPoint(0.0F, 0.0F, 7.0F);
+				hornRight[0].addChild(hornRight[1]);
+				setRotationAngle(hornRight[1], 0.0873F, 0.0873F, 0.0F);
+				hornRight[1].cubeList.add(new ModelBox(hornRight[1], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.7F, false));
 		
-				hornRight1 = new ModelRenderer(this);
-				hornRight1.setRotationPoint(0.0F, 0.0F, 7.0F);
-				hornRight0.addChild(hornRight1);
-				setRotationAngle(hornRight1, 0.0873F, 0.0873F, 0.0F);
-				hornRight1.cubeList.add(new ModelBox(hornRight1, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.4F, false));
+				hornRight[2] = new ModelRenderer(this);
+				hornRight[2].setRotationPoint(0.0F, 0.0F, 7.0F);
+				hornRight[1].addChild(hornRight[2]);
+				setRotationAngle(hornRight[2], 0.0873F, 0.0873F, 0.0F);
+				hornRight[2].cubeList.add(new ModelBox(hornRight[2], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.4F, false));
 		
-				hornRight2 = new ModelRenderer(this);
-				hornRight2.setRotationPoint(0.0F, 0.0F, 6.5F);
-				hornRight1.addChild(hornRight2);
-				setRotationAngle(hornRight2, 0.0873F, 0.0873F, 0.0F);
-				hornRight2.cubeList.add(new ModelBox(hornRight2, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.1F, false));
+				hornRight[3] = new ModelRenderer(this);
+				hornRight[3].setRotationPoint(0.0F, 0.0F, 6.5F);
+				hornRight[2].addChild(hornRight[3]);
+				setRotationAngle(hornRight[3], 0.0873F, 0.0873F, 0.0F);
+				hornRight[3].cubeList.add(new ModelBox(hornRight[3], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.1F, false));
 		
-				hornRight3 = new ModelRenderer(this);
-				hornRight3.setRotationPoint(0.0F, 0.0F, 6.0F);
-				hornRight2.addChild(hornRight3);
-				setRotationAngle(hornRight3, 0.0873F, 0.0873F, 0.0F);
-				hornRight3.cubeList.add(new ModelBox(hornRight3, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.2F, false));
+				hornRight[4] = new ModelRenderer(this);
+				hornRight[4].setRotationPoint(0.0F, 0.0F, 6.0F);
+				hornRight[3].addChild(hornRight[4]);
+				setRotationAngle(hornRight[4], 0.0873F, 0.0873F, 0.0F);
+				hornRight[4].cubeList.add(new ModelBox(hornRight[4], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.2F, false));
 		
-				hornRight4 = new ModelRenderer(this);
-				hornRight4.setRotationPoint(0.0F, 0.0F, 5.5F);
-				hornRight3.addChild(hornRight4);
-				setRotationAngle(hornRight4, 0.0873F, 0.0873F, 0.0F);
-				hornRight4.cubeList.add(new ModelBox(hornRight4, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.5F, false));
-
-				hornRight5 = new ModelRenderer(this);
-				hornRight5.setRotationPoint(0.0F, 0.0F, 5.0F);
-				hornRight4.addChild(hornRight5);
-				setRotationAngle(hornRight5, 0.0873F, 0.0873F, 0.0F);
-				hornRight5.cubeList.add(new ModelBox(hornRight5, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.8F, false));
+				hornRight[5] = new ModelRenderer(this);
+				hornRight[5].setRotationPoint(0.0F, 0.0F, 5.5F);
+				hornRight[4].addChild(hornRight[5]);
+				setRotationAngle(hornRight[5], 0.0873F, 0.0873F, 0.0F);
+				hornRight[5].cubeList.add(new ModelBox(hornRight[5], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.5F, false));
 		
-				hornLeft = new ModelRenderer(this);
-				hornLeft.setRotationPoint(6.0F, -2.0F, -13.0F);
-				head.addChild(hornLeft);
-				setRotationAngle(hornLeft, 0.0873F, 0.5236F, 0.0F);
-				hornLeft.cubeList.add(new ModelBox(hornLeft, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 1.0F, true));
+				hornRight[6] = new ModelRenderer(this);
+				hornRight[6].setRotationPoint(0.0F, 0.0F, 5.0F);
+				hornRight[5].addChild(hornRight[6]);
+				setRotationAngle(hornRight[6], 0.0873F, 0.0873F, 0.0F);
+				hornRight[6].cubeList.add(new ModelBox(hornRight[6], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.8F, false));
 		
-				hornLeft0 = new ModelRenderer(this);
-				hornLeft0.setRotationPoint(0.0F, 0.0F, 7.0F);
-				hornLeft.addChild(hornLeft0);
-				setRotationAngle(hornLeft0, 0.0873F, -0.0873F, 0.0F);
-				hornLeft0.cubeList.add(new ModelBox(hornLeft0, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.7F, true));
+				hornLeft[0] = new ModelRenderer(this);
+				hornLeft[0].setRotationPoint(6.0F, -2.0F, -13.0F);
+				head.addChild(hornLeft[0]);
+				setRotationAngle(hornLeft[0], 0.0873F, 0.5236F, 0.0F);
+				hornLeft[0].cubeList.add(new ModelBox(hornLeft[0], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 1.0F, true));
 		
-				hornLeft1 = new ModelRenderer(this);
-				hornLeft1.setRotationPoint(0.0F, 0.0F, 7.0F);
-				hornLeft0.addChild(hornLeft1);
-				setRotationAngle(hornLeft1, 0.0873F, -0.0873F, 0.0F);
-				hornLeft1.cubeList.add(new ModelBox(hornLeft1, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.4F, true));
+				hornLeft[1] = new ModelRenderer(this);
+				hornLeft[1].setRotationPoint(0.0F, 0.0F, 7.0F);
+				hornLeft[0].addChild(hornLeft[1]);
+				setRotationAngle(hornLeft[1], 0.0873F, -0.0873F, 0.0F);
+				hornLeft[1].cubeList.add(new ModelBox(hornLeft[1], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.7F, true));
 		
-				hornLeft2 = new ModelRenderer(this);
-				hornLeft2.setRotationPoint(0.0F, 0.0F, 6.5F);
-				hornLeft1.addChild(hornLeft2);
-				setRotationAngle(hornLeft2, 0.0873F, -0.0873F, 0.0F);
-				hornLeft2.cubeList.add(new ModelBox(hornLeft2, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.1F, true));
+				hornLeft[2] = new ModelRenderer(this);
+				hornLeft[2].setRotationPoint(0.0F, 0.0F, 7.0F);
+				hornLeft[1].addChild(hornLeft[2]);
+				setRotationAngle(hornLeft[2], 0.0873F, -0.0873F, 0.0F);
+				hornLeft[2].cubeList.add(new ModelBox(hornLeft[2], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.4F, true));
 		
-				hornLeft3 = new ModelRenderer(this);
-				hornLeft3.setRotationPoint(0.0F, 0.0F, 6.0F);
-				hornLeft2.addChild(hornLeft3);
-				setRotationAngle(hornLeft3, 0.0873F, -0.0873F, 0.0F);
-				hornLeft3.cubeList.add(new ModelBox(hornLeft3, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.2F, true));
+				hornLeft[3] = new ModelRenderer(this);
+				hornLeft[3].setRotationPoint(0.0F, 0.0F, 6.5F);
+				hornLeft[2].addChild(hornLeft[3]);
+				setRotationAngle(hornLeft[3], 0.0873F, -0.0873F, 0.0F);
+				hornLeft[3].cubeList.add(new ModelBox(hornLeft[3], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, 0.1F, true));
 		
-				hornLeft4 = new ModelRenderer(this);
-				hornLeft4.setRotationPoint(0.0F, 0.0F, 5.5F);
-				hornLeft3.addChild(hornLeft4);
-				setRotationAngle(hornLeft4, 0.0873F, -0.0873F, 0.0F);
-				hornLeft4.cubeList.add(new ModelBox(hornLeft4, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.5F, true));
-
-				hornLeft5 = new ModelRenderer(this);
-				hornLeft5.setRotationPoint(0.0F, 0.0F, 5.0F);
-				hornLeft4.addChild(hornLeft5);
-				setRotationAngle(hornLeft5, 0.0873F, -0.0873F, 0.0F);
-				hornLeft5.cubeList.add(new ModelBox(hornLeft5, 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.8F, true));
+				hornLeft[4] = new ModelRenderer(this);
+				hornLeft[4].setRotationPoint(0.0F, 0.0F, 6.0F);
+				hornLeft[3].addChild(hornLeft[4]);
+				setRotationAngle(hornLeft[4], 0.0873F, -0.0873F, 0.0F);
+				hornLeft[4].cubeList.add(new ModelBox(hornLeft[4], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.2F, true));
+		
+				hornLeft[5] = new ModelRenderer(this);
+				hornLeft[5].setRotationPoint(0.0F, 0.0F, 5.5F);
+				hornLeft[4].addChild(hornLeft[5]);
+				setRotationAngle(hornLeft[5], 0.0873F, -0.0873F, 0.0F);
+				hornLeft[5].cubeList.add(new ModelBox(hornLeft[5], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.5F, true));
+		
+				hornLeft[6] = new ModelRenderer(this);
+				hornLeft[6].setRotationPoint(0.0F, 0.0F, 5.0F);
+				hornLeft[5].addChild(hornLeft[6]);
+				setRotationAngle(hornLeft[6], 0.0873F, -0.0873F, 0.0F);
+				hornLeft[6].cubeList.add(new ModelBox(hornLeft[6], 0, 0, -1.0F, -2.0F, 0.0F, 2, 4, 6, -0.8F, true));
 		
 				whiskerLeft[0] = new ModelRenderer(this);
 				whiskerLeft[0].setRotationPoint(6.0F, 6.0F, -24.0F);
@@ -1373,20 +1358,9 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
-				GlStateManager.enableAlpha();
-				GlStateManager.enableBlend();
-				GlStateManager.disableLighting();
-				GlStateManager.color(1.0F, 1.0F, 1.0F, 0.8F);
-				//GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
-				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
 				this.head.render(f5);
 				this.spine.render(f5);
 				this.eyes.render(f5);
-				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-				GlStateManager.enableLighting();
-				GlStateManager.disableBlend();
-				//GlStateManager.disableAlpha();
 			}
 	
 			public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
@@ -1398,7 +1372,13 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			@Override
 			public void setRotationAngles(float limbSwing, float f1, float ageInTicks, float f3, float f4, float f5, Entity e) {
 				super.setRotationAngles(limbSwing, f1, ageInTicks, f3, f4, f5, e);
-				for (int i = 2; i < 6; i++) {
+				for (int i = 1; i < hornRight.length; i++) {
+					hornRight[i].rotateAngleX = 0.0873F + MathHelper.sin((ageInTicks - i) * 0.2F) * 0.0873F;
+					hornRight[i].rotateAngleY = MathHelper.cos((ageInTicks - i) * 0.3F) * 0.0873F;
+					hornLeft[i].rotateAngleX = 0.0873F + MathHelper.sin((ageInTicks - i) * 0.2F) * 0.0873F;
+					hornLeft[i].rotateAngleY = -MathHelper.cos((ageInTicks - i) * 0.3F) * 0.0873F;
+				}
+				for (int i = 2; i < whiskerRight.length; i++) {
 					whiskerLeft[i].rotateAngleZ = 0.0873F * ageInTicks;
 					whiskerRight[i].rotateAngleZ = -0.0873F * ageInTicks;
 				}
@@ -1423,8 +1403,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					//spine8.rotateAngleX = f6 * 0.05F * f1;
 				}
 			}
-		}
-
+		}
 	
 		@SideOnly(Side.CLIENT)
 		public class ModelHirudora extends ModelBase {

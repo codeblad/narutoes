@@ -44,15 +44,6 @@
       }
     ]
   },
-  "KamuiSFX": {
-    "category": "master",
-    "sounds": [
-      {
-        "name": "narutomod:kamui sound efect ",
-        "stream": false
-      }
-    ]
-  },
   "MonsterGrowl": {
     "category": "master",
     "sounds": [
@@ -773,15 +764,6 @@
       }
     ]
   },
-  "eightgatesrelease": {
-    "category": "master",
-    "sounds": [
-      {
-        "name": "narutomod:eightgatesrelease",
-        "stream": false
-      }
-    ]
-  },
   "waterblast": {
     "category": "master",
     "sounds": [
@@ -1183,6 +1165,51 @@
     "sounds": [
       {
         "name": "narutomod:gunbai_deflect",
+        "stream": false
+      }
+    ]
+  },
+  "ray": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:ray",
+        "stream": false
+      }
+    ]
+  },
+  "paperflip": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:paperflip",
+        "stream": false
+      }
+    ]
+  },
+  "eightgatesrelease": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:eightgatesrelease",
+        "stream": false
+      }
+    ]
+  },
+  "kamui": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:kamui_sound_efect_",
+        "stream": false
+      }
+    ]
+  },
+  "grill_open": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:grill_open",
         "stream": false
       }
     ]

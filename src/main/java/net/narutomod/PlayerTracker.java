@@ -4,13 +4,13 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
@@ -35,6 +35,8 @@ import net.minecraft.potion.PotionEffect;
 import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.item.*;
+import net.narutomod.entity.EntitySummonAnimal;
+import net.narutomod.item.ItemIryoJutsu;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
 
@@ -79,13 +81,16 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	}
 
 	private static void addBattleXp(EntityPlayer entity, double xp, boolean sendMessage) {
-		entity.getEntityData().setDouble(BATTLEXP, Math.min(getBattleXp(entity) + xp, ModConfig.MAX_NINJAXP));
-		if (entity instanceof EntityPlayerMP) {
-			sendBattleXPToTracking((EntityPlayerMP)entity);
-			if (sendMessage) {
-				entity.sendStatusMessage(new TextComponentString(
-				 net.minecraft.util.text.translation.I18n.translateToLocal("chattext.ninjaexperience")+
-				 String.format("%.1f", getBattleXp(entity))), true);
+
+		if (xp != 0.0d) {
+			entity.getEntityData().setDouble(BATTLEXP, Math.min(getBattleXp(entity) + xp, ModConfig.MAX_NINJAXP));
+			if (entity instanceof EntityPlayerMP) {
+				sendBattleXPToTracking((EntityPlayerMP)entity);
+				if (sendMessage) {
+					entity.sendStatusMessage(new TextComponentString(
+					 net.minecraft.util.text.translation.I18n.translateToLocal("chattext.ninjaexperience")+
+					 String.format("%.1f", getBattleXp(entity))), true);
+				}
 			}
 		}
 	}
@@ -351,6 +356,13 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					newAmount = amount;
 				}
 				event.setAmount(newAmount);
+			}
+			
+			if (sourceEntity instanceof EntitySummonAnimal.ISummon) {
+				Entity summoner = ((EntitySummonAnimal.ISummon)sourceEntity).getSummoner();
+				if (summoner != null) {
+					sourceEntity = summoner;
+				}
 			}
 			if (!targetEntity.equals(sourceEntity) && sourceEntity instanceof EntityLivingBase && amount > 0f) {
 				/*if (this.isOffCooldown(targetEntity) && targetEntity instanceof EntityPlayer && amount < ((EntityPlayer)targetEntity).getHealth()) {

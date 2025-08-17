@@ -43,6 +43,8 @@ import net.narutomod.ElementsNarutomodMod;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
+import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.model.ModelBox;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
@@ -130,7 +132,7 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				if (this.rand.nextInt(20) == 0) {
-					this.playSound(SoundEvents.BLOCK_LAVA_AMBIENT, 0.5f, this.rand.nextFloat() * 0.6f + 0.6f);
+					this.playSound(SoundEvents.BLOCK_LAVA_AMBIENT, 0.6f, this.rand.nextFloat() * 0.6f + 0.7f);
 				}
 				if (this.world instanceof WorldServer && this.rand.nextInt(10) == 0) {
 					((WorldServer)this.world).spawnParticle(EnumParticleTypes.LAVA, user.posX, 
@@ -260,33 +262,16 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 				if (modelIn instanceof ModelBiped) {
 					ModelBiped model = (ModelBiped)modelIn;
 			        GlStateManager.pushMatrix();
-			        if (model.isChild) {
-			            float f = 2.0F;
-			            GlStateManager.scale(0.75F, 0.75F, 0.75F);
-			            GlStateManager.translate(0.0F, 16.0F * f5, 0.0F);
-			            model.bipedHead.render(f5);
-			            GlStateManager.popMatrix();
-			            GlStateManager.pushMatrix();
-			            GlStateManager.scale(0.5F, 0.5F, 0.5F);
-			            GlStateManager.translate(0.0F, 24.0F * f5, 0.0F);
-			            model.bipedBody.render(f5);
-			            model.bipedRightArm.render(f5);
-			            model.bipedLeftArm.render(f5);
-			            model.bipedRightLeg.render(f5);
-			            model.bipedLeftLeg.render(f5);
-			            model.bipedHeadwear.render(f5);
-			        } else {
-			            if (entityIn.isSneaking()) {
-			                GlStateManager.translate(0.0F, 0.2F, 0.0F);
-			            }
-			            model.bipedHead.render(f5);
-			            model.bipedBody.render(f5);
-			            model.bipedRightArm.render(f5);
-			            model.bipedLeftArm.render(f5);
-			            model.bipedRightLeg.render(f5);
-			            model.bipedLeftLeg.render(f5);
-			            model.bipedHeadwear.render(f5);
-			        }
+		            if (entityIn.isSneaking()) {
+		                GlStateManager.translate(0.0F, 0.2F, 0.0F);
+		            }
+		            model.bipedHead.render(f5);
+		            model.bipedBody.render(f5);
+		            model.bipedRightArm.render(f5);
+		            model.bipedLeftArm.render(f5);
+		            model.bipedRightLeg.render(f5);
+		            model.bipedLeftLeg.render(f5);
+		            model.bipedHeadwear.render(f5);
 			        GlStateManager.popMatrix();
 				} else {
 					modelIn.setRotationAngles(f0, f1, f2, f3, f4, f5, entityIn);

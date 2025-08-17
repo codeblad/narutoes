@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemNinjaArmor extends ElementsNarutomodMod.ModElement {
-	private static final ItemArmor.ArmorMaterial ENUMA = EnumHelper.addArmorMaterial("NINJA_ARMOR", "narutomod:sasuke_",
+	protected static final ItemArmor.ArmorMaterial ENUMA = EnumHelper.addArmorMaterial("NINJA_ARMOR", "narutomod:sasuke_",
 	 200, new int[]{2, 5, 6, 2}, 0, SoundEvents.ITEM_ARMOR_EQUIP_LEATHER, 1f);
 
 	public ItemNinjaArmor(ElementsNarutomodMod instance) {
@@ -55,7 +55,7 @@ public class ItemNinjaArmor extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
-			this.armorData.setSlotVisible(entity);
+			this.armorData.setSlotVisible(stack, entity, slot);
 			return this.armorData.texture;
 		}
 	}
@@ -75,7 +75,7 @@ public class ItemNinjaArmor extends ElementsNarutomodMod.ModElement {
 
 		public void setSlotVisible() { }
 
-		public void setSlotVisible(Entity entity) {
+		public void setSlotVisible(ItemStack stack, Entity entity, EntityEquipmentSlot slot) {
 			this.setSlotVisible();
 		}
 	}
@@ -175,6 +175,7 @@ public class ItemNinjaArmor extends ElementsNarutomodMod.ModElement {
 			if (type == Type.KONOHA || type == Type.SUNA || type == Type.WAR1 || type == Type.OBITOWAR) {
 				collar.setRotationPoint(0.0F, 0.0F, 0.0F);
 				bipedHeadwear.addChild(collar);
+				setRotationAngle(collar, 0.0436F, 0.0F, 0.0F);
 				collar.cubeList.add(new ModelBox(collar, 32, 7, -4.0F, -1.5F, -4.0F, 8, 1, 8, 1.0F, false));
 			} else {
 				collar.showModel = false;

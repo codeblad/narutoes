@@ -33,7 +33,6 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAILookIdle;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
@@ -65,6 +64,7 @@ import net.narutomod.entity.EntityCrow;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureBasicNinjaSkills;
 import net.narutomod.procedure.ProcedureSync;
+import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.item.ItemSharingan;
 import net.narutomod.item.ItemMangekyoSharingan;
 import net.narutomod.item.ItemInton;
@@ -92,9 +92,6 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
 				.id(new ResourceLocation("narutomod", "itachi"), ENTITYID)
 				.name("itachi").tracker(64, 3, true).egg(-16777216, -65485).build());
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(Entity4MobAppearance.class)
-				.id(new ResourceLocation("narutomod", "itachi_mob_appearance"), ENTITYID_RANGED)
-				.name("itachi_mob_appearance").tracker(64, 1, true).build());
 	}
 
 	@Override
@@ -121,7 +118,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		private static final int GENJUTSU_COOLDOWN = 100; // 5 seconds
 		private boolean isReal;
 		private int lookedAtTime;
-		private final int genjutsuDuration = 120;
+		private final int genjutsuDuration = 200;
 		private int lastGenjutsuTime;
 		private final int invisCD = 200;
 		private int lastInvisTime = -invisCD;
@@ -150,7 +147,10 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 			((ItemSharingan.Base)stack.getItem()).setOwner(stack, this);
 			((ItemSharingan.Base)stack.getItem()).setColor(stack, 0x20ec1c24);
 			this.setItemStackToSlot(EntityEquipmentSlot.HEAD, stack);
-			this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ItemAkatsukiRobe.body, 1));
+			ItemStack stack1 = new ItemStack(ItemAkatsukiRobe.body);
+			stack1.setTagCompound(new NBTTagCompound());
+			stack1.getTagCompound().setBoolean("collarOpen", true);
+			this.setItemStackToSlot(EntityEquipmentSlot.CHEST, stack1);
 			this.setItemToInventory(new ItemStack(ItemKunai.block), 0);
 			this.setItemToInventory(new ItemStack(ItemAkatsukiRobe.helmet), 1);
 			this.setIsReal(this.rand.nextInt(ModConfig.ITACHI_REAL_CHANCE) == 0);
@@ -213,17 +213,8 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 					this.susanooEntity.setAttackTarget(target);
 				}
 				if (this.lookedAtTime >= 5 && this.ticksExisted > this.lastGenjutsuTime + this.genjutsuDuration + GENJUTSU_COOLDOWN
-				 && ((ItemInton.Genjutsu)ItemInton.GENJUTSU.jutsu).canTargetBeAffected(this, target) && this.consumeChakra(GENJUTSU_CHAKRA)) {
-					if (target instanceof EntityPlayerMP) {
-						ProcedureSync.MobAppearanceParticle.send((EntityPlayerMP)target, ENTITYID_RANGED);
-					}
-					this.world.playSound(null, target.posX, target.posY, target.posZ,
-					 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:genjutsu")), SoundCategory.NEUTRAL, 1f, 1f);
-					if (!this.world.isRemote) {
-						target.addPotionEffect(new PotionEffect(PotionParalysis.potion, this.genjutsuDuration, 1, false, false));
-						target.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, this.genjutsuDuration+40, 0, false, true));
-						target.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 60, 0, false, true));
-					}
+				 && this.consumeChakra(GENJUTSU_CHAKRA)) {
+					ItemInton.Genjutsu.createJutsu(this, target, this.genjutsuDuration);
 					this.lastGenjutsuTime = this.ticksExisted;
 					this.lookedAtTime = 0;
 				}
@@ -240,7 +231,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 					this.susanooEntity.setDead();
 				}
 			}
-			if ((this.getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() == ItemAkatsukiRobe.helmet) != (target == null)) {
+			if ((this.getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() == ItemMangekyoSharingan.helmet) != (target != null)) {
 				this.swapWithInventory(EntityEquipmentSlot.HEAD, 1);
 			}
 		}
@@ -264,12 +255,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		public SoundEvent getDeathSound() {
 			return SoundEvents.ENTITY_ILLAGER_DEATH;
 		}
-
-		@Override
-		public boolean isOnSameTeam(Entity entityIn) {
-			return super.isOnSameTeam(entityIn) || EntityNinjaMob.TeamAkatsuki.contains(entityIn.getClass());
-		}
-
+
 		private boolean isSusanooActive() {
 			return this.susanooEntity != null && this.susanooEntity.isEntityAlive();
 		}
@@ -294,11 +280,12 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 					this.susanooEntity = new EntitySusanooClothed.EntityCustom(this, false);
 					this.susanooEntity.setLifeSpan(this.susanooCD);
 					this.world.spawnEntity(this.susanooEntity);
-					this.startRiding(this.susanooEntity);
+					this.startRiding(this.susanooEntity, true);
 					this.lastSusanooTime = this.ticksExisted;
 					this.susanooEntity.attackEntityFrom(source, amount);
 					ret = false;
 				} else if (this.ticksExisted > this.lastInvisTime + this.invisCD && this.consumeChakra(INVIS_CHAKRA)) {
+					ProcedureOnLivingUpdate.setUntargetable(this, 5);
 					this.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, 100, 1, false, false));
 					for (int i = 0; i < 100; i++) {
 						Entity entityToSpawn = new EntityCrow.EntityCustom(this.world);
@@ -341,7 +328,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 							.getObject(new ResourceLocation("narutomod:sharingansfx")), SoundCategory.NEUTRAL, 1f, 1f);
 					PotionEffect effect = target.getActivePotionEffect(PotionAmaterasuFlame.potion);
 					int amplifier = effect != null ? effect.getAmplifier() + 2 : 3;
-					target.addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 60, amplifier, false, false));
+					target.addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 1200, amplifier, false, false));
 				} else if (chance <= 2 && distanceFactor >= 0.5333f && this.consumeChakra(FIREBALL_CHAKRA)) {
 					double d0 = target.posX - this.posX;
 					double d1 = target.posY - (this.posY + this.getEyeHeight());
@@ -371,8 +358,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void removeTrackingPlayer(EntityPlayerMP player) {
-			super.removeTrackingPlayer(player);
-
+			super.removeTrackingPlayer(player);
 			if (this.bossInfo.getPlayers().contains(player)) {
 				this.bossInfo.removePlayer(player);
 			}
@@ -413,13 +399,6 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static class Entity4MobAppearance extends EntityCustom {
-		public Entity4MobAppearance(World worldIn) {
-			super(worldIn);
-			this.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(ItemMangekyoSharingan.helmet));
-		}
-	}
-
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();
@@ -429,8 +408,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void register() {
-			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager ->
- {
+			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager -> {
 				class ModelItachi extends EntityNinjaMob.ModelNinja {
 					ModelItachi() {
 						super(0.0F);

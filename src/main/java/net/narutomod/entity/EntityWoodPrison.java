@@ -105,18 +105,17 @@ public class EntityWoodPrison extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.blockpos != null) {
 				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class,
-				 new AxisAlignedBB(this.posX - this.radius, this.posY, this.posZ - this.radius, 
-				 this.posX + this.radius, this.posY + this.tHeight, this.posZ + this.radius))) {
-					if (entity != this.owner) {
-						entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 100, 3, false, false));
-						entity.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 1200, 2, false, false));
-					}
+				 new AxisAlignedBB(this.posX - this.radius - 1, this.posY, this.posZ - this.radius - 1, 
+				 this.posX + this.radius + 1, this.posY + this.tHeight + 1, this.posZ + this.radius + 1))) {
+				 	entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 100, 3, false, false));
+					entity.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 1200, 2, false, false));
 				}
+				int bottom = Math.min(-this.tHeight, -3);
 				Map<BlockPos, IBlockState> map = Maps.newHashMap();
-				for (BlockPos pos : Iterables.concat(BlockPos.getAllInBoxMutable(this.blockpos.add(-this.radius, -3, -this.radius), this.blockpos.add(-this.radius, this.tHeight, this.radius)),
-				 BlockPos.getAllInBoxMutable(this.blockpos.add(-this.radius, -3, -this.radius), this.blockpos.add(this.radius, this.tHeight, -this.radius)),
-				 BlockPos.getAllInBoxMutable(this.blockpos.add(this.radius, -3, -this.radius), this.blockpos.add(this.radius, this.tHeight, this.radius)),
-				 BlockPos.getAllInBoxMutable(this.blockpos.add(-this.radius, -3, this.radius), this.blockpos.add(this.radius, this.tHeight, this.radius)),
+				for (BlockPos pos : Iterables.concat(BlockPos.getAllInBoxMutable(this.blockpos.add(-this.radius, bottom, -this.radius), this.blockpos.add(-this.radius, this.tHeight, this.radius)),
+				 BlockPos.getAllInBoxMutable(this.blockpos.add(-this.radius, bottom, -this.radius), this.blockpos.add(this.radius, this.tHeight, -this.radius)),
+				 BlockPos.getAllInBoxMutable(this.blockpos.add(this.radius, bottom, -this.radius), this.blockpos.add(this.radius, this.tHeight, this.radius)),
+				 BlockPos.getAllInBoxMutable(this.blockpos.add(-this.radius, bottom, this.radius), this.blockpos.add(this.radius, this.tHeight, this.radius)),
  				 BlockPos.getAllInBoxMutable(this.blockpos.add(-this.radius, this.tHeight, -this.radius), this.blockpos.add(this.radius, this.tHeight, this.radius)) )) {
 					if (this.world.getBlockState(pos).getCollisionBoundingBox(this.world, pos) == null) {
 						map.put(pos.toImmutable(), pos.getY() - this.blockpos.getY() == this.tHeight 

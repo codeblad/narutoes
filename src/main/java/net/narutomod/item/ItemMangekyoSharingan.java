@@ -24,15 +24,20 @@ import net.minecraft.util.text.translation.I18n;
 
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.entity.EntitySusanooBase;
+import net.narutomod.procedure.ProcedureAmaterasu;
+import net.narutomod.procedure.ProcedureSusanoo;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
+import com.google.common.collect.Maps;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 	@ObjectHolder("narutomod:mangekyosharinganhelmet")
 	public static final Item helmet = null;
-	private static final double AMATERASU_CHAKRA_USAGE = 150d;
+	public static final double AMATERASU_CHAKRA_USAGE = 100d;
 	
 	public ItemMangekyoSharingan(ElementsNarutomodMod instance) {
 		super(instance, 69);
@@ -58,6 +63,16 @@ public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
+			public ItemSharingan.Type getSubType() {
+				return ItemSharingan.Type.AMATERASU;
+			}
+
+			@Override
+			public boolean isMangekyo() {
+				return true;
+			}
+
+			@Override
 			public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
 				return "narutomod:textures/mangekyosharinganhelmet_sasuke.png";
 			}
@@ -72,6 +87,41 @@ public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 			@Override
 			public String getItemStackDisplayName(ItemStack stack) {
 				return TextFormatting.RED + super.getItemStackDisplayName(stack) + TextFormatting.WHITE;
+			}
+
+			@Override
+			public boolean onJutsuKey1(boolean is_pressed, ItemStack stack, EntityPlayer entity) {
+				Map<String, Object> $_dependencies = Maps.newHashMap();
+				$_dependencies.put("is_pressed", is_pressed);
+				$_dependencies.put("entity", entity);
+				$_dependencies.put("world", entity.world);
+				$_dependencies.put("x", (int)entity.posX);
+				$_dependencies.put("y", (int)entity.posY);
+				$_dependencies.put("z", (int)entity.posZ);
+				ProcedureAmaterasu.executeProcedure($_dependencies);
+				return true;
+			}
+
+			@Override
+			public boolean onJutsuKey2(boolean is_pressed, ItemStack stack, EntityPlayer entity) {
+				if (!is_pressed) {
+					Map<String, Object> $_dependencies = Maps.newHashMap();
+					$_dependencies.put("entity", entity);
+					$_dependencies.put("world", entity.world);
+					ProcedureSusanoo.executeProcedure($_dependencies);
+				}
+				return true;
+			}
+
+			@Override
+			public boolean onSwitchJutsuKey(boolean is_pressed, ItemStack stack, EntityPlayer entity) {
+				if (entity.getRidingEntity() instanceof EntitySusanooBase) {
+					if (!is_pressed) {
+						ProcedureSusanoo.upgrade(entity);
+					}
+					return true;
+				}
+				return false;
 			}
 		}.setUnlocalizedName("mangekyosharinganhelmet").setRegistryName("mangekyosharinganhelmet").setCreativeTab(TabModTab.tab));
 	}

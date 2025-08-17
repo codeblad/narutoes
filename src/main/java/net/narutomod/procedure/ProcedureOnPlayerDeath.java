@@ -233,6 +233,8 @@ public class ProcedureOnPlayerDeath extends ElementsNarutomodMod.ModElement {
 							null);
 				}
 			}
+			PlayerTracker.PlayerHook.addPersistentData(entity, NarutomodModVariables.FirstGotNinjutsu,
+					entity.getEntityData().getBoolean(NarutomodModVariables.FirstGotNinjutsu));
 			ProcedureSync.EntityNBTTag.removeAndSync(entity, NarutomodModVariables.forceBowPose);
 			entity.getEntityData().setBoolean("susanoo_activated", (false));
 			entity.getEntityData().setInteger("ForceExtinguish", 5);

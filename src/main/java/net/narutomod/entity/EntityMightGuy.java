@@ -54,6 +54,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.client.renderer.entity.RenderBiped;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.entity.monster.IMob;
@@ -116,8 +117,7 @@ public class EntityMightGuy extends ElementsNarutomodMod.ModElement {
 		private ScoreObjective customerKillCount;
 		private int killCount;
 		private float gateOpened;
-
-		private int blockingTicks;
+		private int blockingTicks;
 
 		public EntityCustom(World world) {
 			super(world, 120, 5000d);
@@ -240,8 +240,7 @@ public class EntityMightGuy extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean isOnSameTeam(Entity entityIn) {
-			return super.isOnSameTeam(entityIn) || EntityNinjaMob.TeamKonoha.contains(entityIn.getClass())
-					|| (this.isTrackingCustomer() && entityIn.equals(this.customer));
+			return super.isOnSameTeam(entityIn) || (this.isTrackingCustomer() && entityIn.equals(this.customer));
 		}
 
 		@Override
@@ -371,11 +370,11 @@ public class EntityMightGuy extends ElementsNarutomodMod.ModElement {
 							+ TextFormatting.WHITE + I18n.translateToLocal("chattext.mightguy.interact4"));
 					this.getVillage().modifyPlayerReputation(this.customer.getUniqueID(), -3);
 				} else {
-					/*ProcedureUtils.sendChat(this.customer, TextFormatting.GREEN + I18n.translateToLocal("entity.mightguy.name") + ": "
+					ProcedureUtils.sendChat(this.customer, TextFormatting.GREEN + I18n.translateToLocal("entity.mightguy.name") + ": "
 							+ TextFormatting.WHITE + I18n.translateToLocal("chattext.mightguy.interact3"));
 					this.getVillage().modifyPlayerReputation(this.customer.getUniqueID(), 3);
 					ItemHandlerHelper.giveItemToPlayer(this.customer, new ItemStack(ItemEightGates.block));
-					ProcedureUtils.grantAdvancement((EntityPlayerMP)this.customer, "narutomod:openedgates", true);*/
+					ProcedureUtils.grantAdvancement((EntityPlayerMP)this.customer, "narutomod:openedgates", true);
 				}
 				this.customer.sendStatusMessage(new TextComponentString(
 						"Villagers killed: " + villagersKilled + ", your kills: " + kills + ", Might Guy's kills: " + this.killCount), false);
@@ -396,7 +395,7 @@ public class EntityMightGuy extends ElementsNarutomodMod.ModElement {
 							+ TextFormatting.WHITE + I18n.translateToLocal("chattext.mightguy.interact1"));
 					long startTime = this.world.getTotalWorldTime() + 18000L - (this.world.getWorldTime() % 24000L);
 					new EventVillageSiege(this.world, null, village.getCenter().getX(), village.getCenter().getY(),
-							village.getCenter().getZ(), startTime, village.getVillageRadius() + 5, 60) {
+							village.getCenter().getZ(), startTime, village.getVillageRadius() + 5, 40) {
 						@Override
 						protected void doOnTick(int currentTick) {
 							if (currentTick == 0) startTrackingCustomer();
@@ -588,11 +587,14 @@ public class EntityMightGuy extends ElementsNarutomodMod.ModElement {
 		public class ModelMightguy extends EntityNinjaMob.ModelNinja {
 			public ModelMightguy() {
 				super(0f, 0f, 64, 64);
-				bipedBody.cubeList.add(new ModelBox(bipedBody, 16, 32, -4.0F, 0.0F, -2.0F, 8, 12, 4, 0.25F, false));
-				bipedRightArm.cubeList.add(new ModelBox(bipedRightArm, 40, 32, -3.0F, -2.0F, -2.0F, 4, 12, 4, 0.25F, false));
-				bipedLeftArm.cubeList.add(new ModelBox(bipedLeftArm, 48, 48, -1.0F, -2.0F, -2.0F, 4, 12, 4, 0.25F, false));
-				bipedRightLeg.cubeList.add(new ModelBox(bipedRightLeg, 0, 32, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.25F, false));
-				bipedLeftLeg.cubeList.add(new ModelBox(bipedLeftLeg, 0, 48, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.25F, false));
+				bipedHeadwear = new ModelRenderer(this);
+				bipedHeadwear.setRotationPoint(0.0F, 0.0F, 0.0F);
+				bipedHeadwear.cubeList.add(new ModelBox(bipedHeadwear, 32, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.25F, false));
+				//bipedBody.cubeList.add(new ModelBox(bipedBody, 16, 32, -4.0F, 0.0F, -2.0F, 8, 12, 4, 0.25F, false));
+				//bipedRightArm.cubeList.add(new ModelBox(bipedRightArm, 40, 32, -3.0F, -2.0F, -2.0F, 4, 12, 4, 0.25F, false));
+				//bipedLeftArm.cubeList.add(new ModelBox(bipedLeftArm, 48, 48, -1.0F, -2.0F, -2.0F, 4, 12, 4, 0.25F, false));
+				//bipedRightLeg.cubeList.add(new ModelBox(bipedRightLeg, 0, 32, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.25F, false));
+				//bipedLeftLeg.cubeList.add(new ModelBox(bipedLeftLeg, 0, 48, -2.0F, 0.0F, -2.0F, 4, 12, 4, 0.25F, false));
 			}
 
 			@Override

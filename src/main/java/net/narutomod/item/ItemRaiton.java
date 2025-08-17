@@ -11,13 +11,9 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraft.world.World;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.entity.player.EntityPlayer;
@@ -50,11 +46,11 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 129;
 	public static final int ENTITY2ID = 10129;
 	public static final ItemJutsu.JutsuEnum CHIDORI = new ItemJutsu.JutsuEnum(0, "chidori", 'A', EntityChidori.CHAKRA_USAGE, new EntityChidori.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum CHAKRAMODE = new ItemJutsu.JutsuEnum(1, "raitonchakramode", 'B', 50d, new EntityChakraMode.Jutsu());
-	public static final ItemJutsu.JutsuEnum CHASINGDOG = new ItemJutsu.JutsuEnum(2, "lightning_beast", 'C', 40d, new EntityLightningBeast.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum GIAN = new ItemJutsu.JutsuEnum(3, "false_darkness", 'B', 150d, new EntityFalseDarkness.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHAKRAMODE = new ItemJutsu.JutsuEnum(1, "raitonchakramode", 'B', 10d, new EntityChakraMode.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHASINGDOG = new ItemJutsu.JutsuEnum(2, "lightning_beast", 'C', 20d, new EntityLightningBeast.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum GIAN = new ItemJutsu.JutsuEnum(3, "false_darkness", 'B', 100d, new EntityFalseDarkness.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum KIRIN = new ItemJutsu.JutsuEnum(4, "kirin", 'S', 1500d, new EntityKirin.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum BLACKPANTHER = new ItemJutsu.JutsuEnum(5, "lightning_panther", 'S', 80d, new EntityLightningPanther.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum BLACKPANTHER = new ItemJutsu.JutsuEnum(5, "lightning_panther", 'S', 50d, new EntityLightningPanther.EC.Jutsu());
 
 	public ItemRaiton(ElementsNarutomodMod instance) {
 		super(instance, 373);
@@ -80,54 +76,13 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			this.setRegistryName("raiton");
 			this.setCreativeTab(TabModTab.tab);
 		}
-
-		/*@Override
-		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
-			super.onUpdate(itemstack, world, entity, par4, par5);
-			if (!world.isRemote && entity instanceof EntityPlayer && entity.ticksExisted % 10 == 3) {
-				if (((RangedItem)itemstack.getItem()).canActivateJutsu(itemstack, CHIDORI, (EntityPlayer)entity) == EnumActionResult.SUCCESS
-				 && !this.isJutsuEnabled(itemstack, KIRIN)) {
-					this.enableJutsu(itemstack, KIRIN, true);
-					((EntityPlayer)entity).sendStatusMessage(new TextComponentTranslation("chattext.jutsu.enabled", KIRIN.getName()), false);
-				}
-			}
-		}
-*/
-
-		@Override
-		public void onUsingTick(ItemStack stack, EntityLivingBase player, int timeLeft) {
-			if (!player.world.isRemote) {
-				ItemJutsu.JutsuEnum jutsu = this.getCurrentJutsu(stack);
-				if (jutsu == KIRIN) {
-					EntityKirin.chargingEffects(player, this.getPower(stack, player, timeLeft));
-					if ((this.getMaxUseDuration() - timeLeft) % 100 == 99) {
-						EntityKirin.startWeatherThunder(player, 200);
-					}
-				} else if (jutsu == BLACKPANTHER) {
-					EntityLightningArc.spawnAsParticle(player.world, player.posX + this.itemRand.nextGaussian() * 0.3d, 
-					  player.posY + this.itemRand.nextDouble() * 1.3d, player.posZ + this.itemRand.nextGaussian() * 0.3d,
-					  1.0d, 0d, 0.15d, 0d, 0);
-					Particles.spawnParticle(player.world, Particles.Types.SMOKE, player.posX, player.posY, player.posZ,
-					  20, 0.3d, 0.0d, 0.3d, 0d, 0.5d, 0d, 0x20000000, 50, 5, 0xF0, player.getEntityId());
-				}
-			}
-			super.onUsingTick(stack, player, timeLeft);
-		}
-
-		@Override
-		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {
-			ActionResult<ItemStack> result = super.onItemRightClick(world, entity, hand);
-			if (result.getType() == EnumActionResult.SUCCESS && this.getCurrentJutsu(entity.getHeldItem(hand)) == KIRIN && !world.isRemote) {
-				EntityKirin.startWeatherThunder(entity, 200);
-			}
-			return result;
-		}
-	}
+	}
 
 	public static class EntityChakraMode extends Entity implements ItemJutsu.IJutsu {
 		private final double CHAKRA_BURN = CHAKRAMODE.chakraUsage; // per second
 		private EntityLivingBase summoner;
 		private ItemStack usingItemstack;
+		private int strengthAmplifier = 12;
 		private float modifier;
 
 		public EntityChakraMode(World a) {
@@ -142,6 +97,9 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			if (stack.getItem() == block) {
 				this.usingItemstack = stack;
 				this.modifier = ((RangedItem)stack.getItem()).getModifier(stack, summonerIn);
+			}
+			if (summonerIn.isPotionActive(MobEffects.STRENGTH)) {
+				this.strengthAmplifier += summonerIn.getActivePotionEffect(MobEffects.STRENGTH).getAmplifier() + 1;
 			}
 		}
 
@@ -170,13 +128,14 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					if (!chakra.consume(this.CHAKRA_BURN)) {
 						this.setDead();
 					}
-					//this.summoner.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, 3, false, false));
-					this.summoner.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 24, false, false));
-					this.summoner.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 22, 2+(int)(1.9*ItemJutsu.getDmgMult(this.summoner))/3, false, false));
+					int i = Math.max((int)(MathHelper.sqrt(chakra.getAmount()) / (2.5d * 3d)), 9) - 9;
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, 3, false, false));
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 32, false, false));
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 22, this.strengthAmplifier + i, false, false));
 					this.summoner.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 5, false, false));
 				}
 				if (this.modifier > 0.0f) {
-					//ProcedureWhenPlayerAttcked.setExtraDamageReduction(this.summoner, 1.0f - this.modifier);
+					ProcedureWhenPlayerAttcked.setExtraDamageReduction(this.summoner, 1.0f - this.modifier);
 				}
 				if (this.summoner instanceof EntityPlayer) {
 					if (!this.summoner.isSprinting()) {
@@ -261,17 +220,16 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					if (ItemKaton.FLAMESLICE.jutsu.isActivated(entity)) {
 						ItemKaton.FLAMESLICE.jutsu.deactivate(entity);
 					}
-					if (ItemIryoJutsu.POWERMODE.jutsu.isActivated(entity)) {
-						ItemIryoJutsu.POWERMODE.jutsu.deactivate(entity);
-					}
-					if (ItemRanton.CLOUD.jutsu.isActivated(entity)) {
-						ItemRanton.CLOUD.jutsu.deactivate(entity);
-					}
 					entity1 = new EntityChakraMode(entity, stack);
 					stack.getTagCompound().setInteger(ID_KEY, entity1.getEntityId());
 					entity.world.spawnEntity(entity1);
 					return true;
 				}
+			}
+
+			@Override
+			public boolean isActivated(ItemStack stack) {
+				return stack.getTagCompound().hasKey(ID_KEY);
 			}
 
 			@Override

@@ -79,6 +79,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 		private int ticksAlive;
 		protected int fallTicks;
 		private int blocksTotal;
+		private float health;
 		private boolean breakOnImpact;
 
 		public Base(World world) {
@@ -105,6 +106,10 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 				if (!this.isAirOrLiquid(blockstate, pos)) {
 					Vec3d vec = new Vec3d(pos).addVector(0.5d, 0.0d, 0.5d).subtract(this.getPositionVector());
 					this.blocksMap.put(vec, blockstate);
+				}
+				float hardness = blockstate.getBlockHardness(world, pos);
+				if (hardness > 0.0f) {
+					this.health += hardness * 3f;
 				}
 			}
 			this.blocksTotal = this.blocksMap.size();
@@ -149,6 +154,10 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			this.fallTime = ticks;
 		}
 
+		public int getFallTime() {
+			return this.fallTime;
+		}
+
 		public void explodeOnImpact(boolean explode) {
 			this.breakOnImpact = explode;
 		}
@@ -166,11 +175,18 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			super.setDead();
 		}*/
 
+		public final float getHealth() {
+			return this.health;
+		}
+
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
-			if (!this.world.isRemote && amount > 3f * this.mass()) {
-				this.breakOnImpact = true;
-				this.onImpact(amount);
+			if (!this.world.isRemote && this.health > 0.0f && source != DamageSource.FALLING_BLOCK) {
+				this.health -= amount;
+				if (this.health <= 0.0f) {
+					this.breakOnImpact = true;
+					this.onImpact(amount);
+				}
 				return true;
 			}
 			return false;
@@ -318,9 +334,9 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			double dx = x;
 			double dy = y;
 			double dz = z;
-			List<AxisAlignedBB> list = this.world.getCollisionBoxes(this, this.getCollisionBoundingBox().expand(x, y, z));
+			//List<AxisAlignedBB> list = this.world.getCollisionBoxes(this, this.getCollisionBoundingBox().expand(x, y, z));
 			ProcedureUtils.CollisionHelper ch = new ProcedureUtils.CollisionHelper(this);
-			ch.collideWithAABBs(list, x, y, z);
+			ch.collideWithAABBs(x, y, z);
 			x = ch.minX(x);
 			y = ch.minY(y);
 			z = ch.minZ(z);
@@ -339,10 +355,12 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 					float hitarea = f / this.collisionForce() * 0.2f;
 					//canMoveThrough = !this.containsUnbreakableBlocks(list) && hitarea < 1.0f;
 					canMoveThrough = this.ticksAlive > 20 ? (f < 1000.0f && hitarea < 1.0f) : true;
-					double d = MathHelper.clamp(1.0d - hitarea, 0.0d, 0.8d);
-					this.motionX *= d;
-					this.motionY *= d;
-					this.motionZ *= d;
+					if (this.ticksAlive > 20) {
+						double d = MathHelper.clamp(1.0d - hitarea, 0.0d, 0.8d);
+						this.motionX *= d;
+						this.motionY *= d;
+						this.motionZ *= d;
+					}
 					if (canMoveThrough && !this.world.isRemote) {
 				        for (BlockPos pos : list1) {
 					    	ProcedureUtils.breakBlockAndDropWithChance(this.world, pos, this.destroyHardness(), 
@@ -434,6 +452,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 					}
 				}
 			}
+			this.health = compound.getFloat("health");
 		}
 
 		@Override
@@ -466,6 +485,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			if (!nbttaglist2.hasNoTags()) {
 				compound.setTag("entityMap", nbttaglist2);
 			}
+			compound.setFloat("health", this.health);
 		}
 	}
 

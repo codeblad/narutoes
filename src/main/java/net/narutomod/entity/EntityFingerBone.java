@@ -1,3 +1,10 @@
+import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
+
+import net.minecraft.world.World;
 
 package net.narutomod.entity;
 
@@ -108,18 +115,31 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				return;
 			}
 			if (!this.world.isRemote) {
-				if (result.typeOfHit == RayTraceResult.Type.BLOCK && this.world instanceof WorldServer) {
-					((WorldServer)this.world).spawnParticle(EnumParticleTypes.BLOCK_DUST,
-					 result.hitVec.x, result.hitVec.y, result.hitVec.z, 4, 0D, 0D, 0D, 0.15D,
-					 Block.getIdFromBlock(Blocks.BONE_BLOCK));
-				}
-				this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
-				 1f, 0.4f + this.rand.nextFloat() * 0.6f);
 				if (result.entityHit != null) {
 					result.entityHit.hurtResistantTime = 10;
-					result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.shootingEntity), this.damage+ItemJutsu.getDmgMult(shootingEntity)*1.75f);
+					if (result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.shootingEntity), this.damage)) {
+						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
+						 1f, 0.4f + this.rand.nextFloat() * 0.6f);
+						this.setDead();
+					} else if (!result.entityHit.noClip) {
+						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
+						 1f, 0.4f + this.rand.nextFloat() * 0.6f);
+						this.motionX *= -0.1d;
+						this.motionY *= -0.1d;
+						this.motionZ *= -0.1d;
+					}
+				} else {
+					if (MathHelper.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ) > 0.4d) {
+						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
+						 1f, 0.4f + this.rand.nextFloat() * 0.6f);
+						if (this.world instanceof WorldServer) {
+							((WorldServer)this.world).spawnParticle(EnumParticleTypes.BLOCK_DUST,
+							 result.hitVec.x, result.hitVec.y, result.hitVec.z, 4, 0D, 0D, 0D, 0.15D,
+							 Block.getIdFromBlock(Blocks.BONE_BLOCK));
+						}
+					}
+					this.setDead();
 				}
-				this.setDead();
 			}
 		}
 
@@ -130,7 +150,6 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 					  SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:bonecrack"))),
 					  SoundCategory.PLAYERS, 0.5f, entity.getRNG().nextFloat() * 0.6f + 0.6f);
 				this.createJutsu(entity);
-				ItemJutsu.setCurrentJutsuCooldown(stack, 10);
 				return true;
 			}
 
@@ -226,7 +245,6 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				modelRenderer.rotateAngleY = y;
 				modelRenderer.rotateAngleZ = z;
 			}
-	
-	}
+		}
 	}
 }

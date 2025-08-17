@@ -42,7 +42,7 @@ public class ItemIryoJutsu extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:iryo_jutsu")
 	public static final Item block = null;
 	public static final int ENTITYID = 210;
-	public static final ItemJutsu.JutsuEnum HEALING = new ItemJutsu.JutsuEnum(0, "healingjutsu", 'A', 0.5d, new HealingJutsu());
+	public static final ItemJutsu.JutsuEnum HEALING = new ItemJutsu.JutsuEnum(0, "healingjutsu", 'A', 0.25d, new HealingJutsu());
 	public static final ItemJutsu.JutsuEnum POISONMIST = new ItemJutsu.JutsuEnum(1, "poison_mist", 'B', 20d, new EntityPoisonMist.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum MEDMODE = new ItemJutsu.JutsuEnum(2, "cellular_activation", 'A', 20d, new EntityCellularActivation.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum POWERMODE = new ItemJutsu.JutsuEnum(3, "enhanced_strength", 'A', 30d, new EntityEnhancedStrength.EC.Jutsu());
@@ -87,18 +87,7 @@ public class ItemIryoJutsu extends ElementsNarutomodMod.ModElement {
 			 * (player instanceof EntityPlayer && ((EntityPlayer)player).isCreative() 
 			  ? 1f : (float)this.getCurrentJutsuXp(stack) / (float)this.getCurrentJutsuRequiredXp(stack));
 		}
-
-		@Override
-		public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
-			if (this.getCurrentJutsu(stack) == HEALING) {
-				if (!player.world.isRemote) {
-					this.executeJutsu(stack, player, this.xpModifier(player, stack) / 15f);
-				}
-				return;
-			}
-			super.onUsingTick(stack, player, count);
-		}
-	}
+	}
 
 	public static class HealingJutsu implements ItemJutsu.IJutsuCallback {
 		@Override
@@ -131,6 +120,12 @@ public class ItemIryoJutsu extends ElementsNarutomodMod.ModElement {
 			 10 + target.getRNG().nextInt(25), 0, 0xF0, -1, 0);
 			target.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 80, 6, false, false));
 			target.heal(power * 0.02f);
+		}
+
+		@Override
+		public void onUsingTick(ItemStack stack, EntityLivingBase player, float power) {
+			RangedItem item = (RangedItem)stack.getItem();
+			item.executeJutsu(stack, player, item.xpModifier(player, stack) / 15f);
 		}
 
 		public static class PlayerHook {

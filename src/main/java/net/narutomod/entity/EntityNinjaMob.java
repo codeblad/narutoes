@@ -16,7 +16,6 @@ import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
 import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
@@ -26,19 +25,24 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.EntityMoveHelper;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityCreature;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.EntityAITarget;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.DataParameter;
@@ -63,6 +67,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNavigate;
 import net.minecraft.pathfinding.PathNavigateGround;
+import net.minecraft.pathfinding.PathNavigateSwimmer;
 
 import net.narutomod.item.ItemOnBody;
 import net.narutomod.potion.PotionFeatherFalling;
@@ -73,6 +78,7 @@ import net.narutomod.ModConfig;
 import net.narutomod.PlayerRender;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.NarutomodMod;
+import net.narutomod.NarutomodModVariables;
 
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
@@ -85,12 +91,28 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	public static final List<Class <? extends Base>> TeamKonoha = Arrays.asList(EntityTenten.EntityCustom.class, EntitySakuraHaruno.EntityCustom.class, EntityIrukaSensei.EntityCustom.class, EntityMightGuy.EntityCustom.class);
 	public static final List<Class <? extends Base>> TeamZabuza = Arrays.asList(EntityZabuzaMomochi.EntityCustom.class, EntityHaku.EntityCustom.class);
-	public static final List<Class <? extends Base>> TeamAkatsuki = Arrays.asList(EntityItachi.EntityCustom.class, EntityKisameHoshigaki.EntityCustom.class, EntitySasori.EntityCustom.class, EntityDeidara.EntityCustom.class, EntityHidan.EntityCustom.class, EntityKakuzu.EntityCustom.class);
+	public static final List<Class <? extends Base>> TeamPain = Arrays.asList(EntityPainDeva.EntityCustom.class, EntityPainAsura.EntityCustom.class, EntityPainAnimal.EntityCustom.class, EntityPainHuman.EntityCustom.class, EntityPainNaraka.EntityCustom.class, EntityPainPreta.EntityCustom.class, EntityNagato.EntityCustom.class);
+	public static final List<Class <? extends Base>> TeamAkatsukiMembers = Arrays.asList(EntityItachi.EntityCustom.class, EntityKisameHoshigaki.EntityCustom.class, EntitySasori.EntityCustom.class, EntityDeidara.EntityCustom.class, EntityHidan.EntityCustom.class, EntityKakuzu.EntityCustom.class, EntityKonan.EntityCustom.class, EntityZetsu.EntityCustom.class, EntityObito.EntityTobi.class);
+	public static final List<Class <? extends Base>> TeamAkatsuki = Stream.concat(TeamPain.stream(), TeamAkatsukiMembers.stream()).collect(Collectors.toList());
+	private static final Map<String, List<Class <? extends Base>>> TEAMSMap = Maps.newHashMap();
+
+	public static final void registerTeam(String teamName, List<Class <? extends Base>> teamList) {
+		TEAMSMap.put(teamName, teamList);
+	}
+
+	static {
+		registerTeam("Konaha", TeamKonoha);
+		registerTeam("Zabuza", TeamZabuza);
+		registerTeam("Pain", TeamPain);
+		registerTeam("Akatsuki", TeamAkatsuki);
+	}
 
 	public EntityNinjaMob(ElementsNarutomodMod instance) {
 		super(instance, 404);
@@ -157,6 +179,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			}
 		});
 		private final PathwayNinjaMob chakraPathway;
+		private boolean selfSetChakra;
 		private final int inventorySize = 2;
 		private final NonNullList<ItemStack> inventory = NonNullList.<ItemStack>withSize(inventorySize, ItemStack.EMPTY);
 		public int peacefulTicks;
@@ -233,13 +256,41 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		}
 
 		public boolean consumeChakra(double amount) {
-			return this.chakraPathway.consume(amount);
+			this.selfSetChakra = true;
+			boolean ret = this.chakraPathway.consume(amount);
+			this.selfSetChakra = false;
+			return ret;
+		}
+
+		protected void onExternalConsumeChakra(double amount) {
 		}
 
 		private void fixOnClientSpawn() {
-			if (this.world.isRemote && this.ticksExisted < 20) {
+			if (this.world.isRemote && this.ticksExisted < 10) {
 				this.chakraPathway.fixOnClientSpawn();
 			}
+		}
+
+		protected double meleeReach() {
+			return 2.0d * this.width + 1.8;
+		}
+
+		@Override
+		public boolean isOnSameTeam(Entity entityIn) {
+			if (super.isOnSameTeam(entityIn)) {
+				return true;
+			}
+			if (entityIn instanceof EntityClone.Base) {
+				entityIn = ((EntityClone.Base)entityIn).getSummoner();
+			}
+			if (entityIn instanceof Base) {
+				for (List<Class <? extends Base>> list : TEAMSMap.values()) {
+					if (list.contains(entityIn.getClass()) && list.contains(this.getClass())) {
+						return true;
+					}
+				}
+			}
+			return false;
 		}
 
 		@Override
@@ -259,21 +310,13 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			this.fixOnClientSpawn();
 			super.onUpdate();
 			BlockPos pos = new BlockPos(this);
-			if (this.navigator instanceof PathNavigateGround
+			if (!(this.navigator instanceof PathNavigateSwimmer)
 			 && this.world.getBlockState(pos).getMaterial() == Material.WATER
 			 && this.world.getBlockState(pos.up()).getMaterial() != Material.WATER) {
 				this.motionY = 0.01d;
 				this.onGround = true;
 			}
 			if (!this.world.isRemote && this.isEntityAlive()) {
-		    	//if (this.haltAITicks > 0) {
-		    	//	--this.haltAITicks;
-		    	//	if (!this.isAIDisabled()) {
-		    	//		this.setNoAI(true);
-		    	//	}
-		    	//} else if (this.isAIDisabled() && !this.getEntityData().getBoolean(NarutomodModVariables.tempDisableAI)) {
-		    	//	this.setNoAI(false);
-		    	//}
 				if (this.ticksExisted % 200 == 1) {
 					this.addPotionEffect(new PotionEffect(PotionFeatherFalling.potion, 201, 1, false, false));
 				}
@@ -330,6 +373,13 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void setRevengeTarget(@Nullable EntityLivingBase livingBase) {
+			this.ticksExisted += 120;
+			super.setRevengeTarget(livingBase);
+			this.ticksExisted -= 120;
+		}
+
+		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
 			return ProcedureUtils.attackEntityAsMob(this, entityIn);
 		}
@@ -370,25 +420,43 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			return this.inventorySize;
 		}
 
-	    protected boolean isValidLightLevel() {
-	        BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
-	        if (this.world.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
-	            return false;
-	        } else {
-	            int i = this.world.getLightFromNeighbors(blockpos);
-	            if (this.world.isThundering()) {
-	                int j = this.world.getSkylightSubtracted();
-	                this.world.setSkylightSubtracted(10);
-	                i = this.world.getLightFromNeighbors(blockpos);
-	                this.world.setSkylightSubtracted(j);
-	            }
-	            return i <= this.rand.nextInt(8);
-	        }
-	    }
-
 		@Override
 		public boolean getCanSpawnHere() {
 			return super.getCanSpawnHere() && (this instanceof IMob ? this.world.getDifficulty() != EnumDifficulty.PEACEFUL : true);
+		}
+
+		@Override
+		protected void despawnEntity() {
+			net.minecraftforge.fml.common.eventhandler.Event.Result result = null;
+			if (this.isNoDespawnRequired()) {
+				this.idleTime = 0;
+			} else if ((this.idleTime & 0x1F) == 0x1F && (result = net.minecraftforge.event.ForgeEventFactory.canEntityDespawn(this)) != net.minecraftforge.fml.common.eventhandler.Event.Result.DEFAULT) {
+				if (result == net.minecraftforge.fml.common.eventhandler.Event.Result.DENY) {
+					this.idleTime = 0;
+				} else {
+					this.setDead();
+				}
+			} else {
+				Entity entity = this.world.getClosestPlayerToEntity(this, -1.0D);
+				if (entity != null) {
+					double d3 = entity.getDistanceSq(this);
+					if (d3 < 16384.0D) {
+						this.idleTime = 0;
+					} else if (this.canDespawn() && this.idleTime > 600 && this.rand.nextInt(800) == 0) {
+						this.setDead();
+					}
+				}
+			}
+		}
+
+		@Override
+		protected boolean canBeRidden(Entity entityIn) {
+			return false;
+		}
+
+		@Override
+		public double getYOffset() {
+			return -0.35d;
 		}
 
 		@Override
@@ -428,6 +496,10 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		@Override
 		public Vec3d getLookVec() {
 			return this.getVectorForRotation(this.rotationPitch, this.rotationYawHead); 
+		}
+
+		public boolean isIdle() {
+			return this.peacefulTicks > 0;
 		}
 
 		protected boolean canSeeInvisible(Entity entityIn) {
@@ -523,6 +595,14 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
+			public boolean consume(double amountIn, boolean ignoreMax) {
+				if (!Base.this.selfSetChakra) {
+					Base.this.onExternalConsumeChakra(amountIn);
+				}
+				return super.consume(amountIn, ignoreMax);
+			}
+
+			@Override
 			protected void onUpdate() {
 				//Base usr = (Base)this.user;
 				if ((this.user.getAttackTarget() == null || !this.user.getAttackTarget().isEntityAlive()) 
@@ -544,11 +624,17 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	public static class AILeapAtTarget extends EntityAIBase {
 	    protected EntityLiving leaper;
 	    protected EntityLivingBase target;
-	    protected float leapStrength;
+	    private float leapStrength;
+	    private float maxLeapDistance;
 	
 	    public AILeapAtTarget(EntityLiving leapingEntity, float leapStrengthIn) {
+	    	this(leapingEntity, leapStrengthIn, leapStrengthIn * 20.0f);
+	    }
+
+	    public AILeapAtTarget(EntityLiving leapingEntity, float leapStrengthIn, float maxDistanceIn) {
 	        this.leaper = leapingEntity;
 	        this.leapStrength = leapStrengthIn;
+	        this.maxLeapDistance = maxDistanceIn;
 	        this.setMutexBits(5);
 	    }
 	
@@ -558,8 +644,8 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	            return false;
 	        } else {
 	            double d0 = this.leaper.getDistance(this.target);
-	            if (d0 >= 3.0D && d0 <= this.leapStrength * 20.0d && this.leaper.onGround) {
-                    return this.leaper.getRNG().nextInt(5) == 0;
+	            if (d0 >= 3.0D && d0 <= this.maxLeapDistance && this.leaper.onGround) {
+                    return this.leaper.getRNG().nextInt(10) == 0;
 	            } else {
 	                return false;
 	            }
@@ -577,12 +663,130 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	        double d2 = this.target.posY + (double)this.target.height * 0.4d - this.leaper.posY + d4 * 0.2d;
 	        double d3 = MathHelper.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
 	        if (d3 >= 1.0E-4D) {
-	            this.leaper.motionX = d0 / d3 * (double)this.leapStrength;
-	            this.leaper.motionZ = d1 / d3 * (double)this.leapStrength;
-	        	this.leaper.motionY = d2 / d3 * (double)this.leapStrength;
+	        	if (this.leapStrength > 0.0f) {
+		            this.leaper.motionX = d0 / d3 * (double)this.leapStrength;
+		            this.leaper.motionZ = d1 / d3 * (double)this.leapStrength;
+		        	this.leaper.motionY = d2 / d3 * (double)this.leapStrength;
+	        	} else {
+		            double d5 = this.target.posY - this.leaper.posY;
+		            this.leaper.rotationYaw = (float)(MathHelper.atan2(d1, d0) * (180D / Math.PI)) - 90.0F;
+		            this.leaper.motionX = d0 * 0.145d;
+		            this.leaper.motionZ = d1 * 0.145d;
+		            this.leaper.motionY = 0.32d + (Math.max(d5, 0.0d) + d4 * 0.6d) * 0.1d;
+	        	}
 	        }
 	    }
 	}	
+
+	public static class AIAttackMelee extends EntityAIBase {
+	    protected EntityCreature attacker;
+	    protected int attackTick;
+	    double speedTowardsTarget;
+	    boolean longMemory;
+	    Path path;
+	    private int delayCounter;
+	    private double targetX;
+	    private double targetY;
+	    private double targetZ;
+	    protected final int attackInterval = 20;
+	
+	    public AIAttackMelee(EntityCreature creature, double speedIn, boolean useLongMemory) {
+	        this.attacker = creature;
+	        this.speedTowardsTarget = speedIn;
+	        this.longMemory = useLongMemory;
+	        this.setMutexBits(3);
+	    }
+	
+	    @Override
+	    public boolean shouldExecute() {
+	        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+	        if (entitylivingbase == null) {
+	            return false;
+	        } else if (!entitylivingbase.isEntityAlive()) {
+	            return false;
+	        } else {
+	            this.path = this.attacker.getNavigator().getPathToEntityLiving(entitylivingbase);
+	            if (this.path != null) {
+	                return true;
+	            } else {
+	                return this.getAttackReachSqr(entitylivingbase) >= this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
+	            }
+	        }
+	    }
+	
+	    @Override
+	    public boolean shouldContinueExecuting() {
+	        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+	        if (entitylivingbase == null) {
+	            return false;
+	        } else if (!entitylivingbase.isEntityAlive()) {
+	            return false;
+	        } else if (!this.longMemory) {
+	            return !this.attacker.getNavigator().noPath();
+	        } else if (!this.attacker.isWithinHomeDistanceFromPosition(new BlockPos(entitylivingbase))) {
+	            return false;
+	        } else {
+	            return !(entitylivingbase instanceof EntityPlayer) || !((EntityPlayer)entitylivingbase).isSpectator() && !((EntityPlayer)entitylivingbase).isCreative();
+	        }
+	    }
+	
+	    @Override
+	    public void startExecuting() {
+	        this.attacker.getNavigator().setPath(this.path, this.speedTowardsTarget);
+	        this.delayCounter = 0;
+	    }
+	
+	    @Override
+	    public void resetTask() {
+	        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+	        if (entitylivingbase instanceof EntityPlayer && (((EntityPlayer)entitylivingbase).isSpectator() || ((EntityPlayer)entitylivingbase).isCreative())) {
+	            this.attacker.setAttackTarget((EntityLivingBase)null);
+	        }
+	        this.attacker.getNavigator().clearPath();
+	    }
+	
+	    @Override
+	    public void updateTask() {
+	        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+	        this.attacker.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
+	        double d0 = this.attacker.getDistanceSq(entitylivingbase.posX, entitylivingbase.getEntityBoundingBox().minY, entitylivingbase.posZ);
+	        --this.delayCounter;
+	        if ((this.longMemory || this.attacker.getEntitySenses().canSee(entitylivingbase)) && this.delayCounter <= 0
+	         && (this.targetX == 0.0D && this.targetY == 0.0D && this.targetZ == 0.0D
+	         || entitylivingbase.getDistanceSq(this.targetX, this.targetY, this.targetZ) >= 1.0D || this.attacker.getRNG().nextFloat() < 0.05F)) {
+	            this.targetX = entitylivingbase.posX;
+	            this.targetY = entitylivingbase.getEntityBoundingBox().minY;
+	            this.targetZ = entitylivingbase.posZ;
+	            this.delayCounter = 4 + this.attacker.getRNG().nextInt(7);
+	            if (d0 > 1024.0D) {
+	                this.delayCounter += 10;
+	            } else if (d0 > 256.0D) {
+	                this.delayCounter += 5;
+	            }
+	            if (d0 > this.getAttackReachSqr(entitylivingbase) * 0.8d && !this.attacker.getNavigator().tryMoveToEntityLiving(entitylivingbase, this.speedTowardsTarget)) {
+	                this.delayCounter += 15;
+	            }
+	        }
+	        this.attackTick = Math.max(this.attackTick - 1, 0);
+	        this.checkAndPerformAttack(entitylivingbase, d0);
+	    }
+	
+	    protected void checkAndPerformAttack(EntityLivingBase target, double distanceToTarget) {
+	        if (distanceToTarget <= this.getAttackReachSqr(target) && this.attackTick <= 0) {
+	            this.attackTick = 20;
+	            this.attacker.swingArm(EnumHand.MAIN_HAND);
+	            this.attacker.attackEntityAsMob(target);
+	        }
+	    }
+	
+	    protected double getAttackReachSqr(EntityLivingBase attackTarget) {
+			double d = this.attacker.width * 2f + 1.8f;
+			if (this.attacker instanceof Base) {
+				d = ((Base)this.attacker).meleeReach();
+			}
+			return (d + attackTarget.width) * (d + attackTarget.width);
+	    }
+	}
 
 	public static class AIAttackRangedTactical<T extends EntityCreature & IRangedAttackMob> extends EntityAIBase {
 	    protected final T entity;
@@ -612,7 +816,11 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	    }
 	
 	    public boolean shouldExecute() {
-	        return this.entity.getAttackTarget() != null;
+			if (this.entity.tasks.isControlFlagDisabled(this.getMutexBits())) {
+				return false;
+			}
+	    	EntityLivingBase target = this.entity.getAttackTarget();
+	        return target != null && target.isEntityAlive();
 	    }
 	
 	    public boolean shouldContinueExecuting() {
@@ -646,12 +854,14 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	            } else {
 	                --this.seeTime;
 	            }
-	            if (d0 <= (double)this.maxAttackDistance && this.seeTime >= 20) {
-	                this.entity.getNavigator().clearPath();
-	                ++this.strafingTime;
-	            } else {
+	            if (d0 > (double)this.maxAttackDistance) {
 	                this.entity.getNavigator().tryMoveToEntityLiving(entitylivingbase, this.moveSpeedAmp);
 	                this.strafingTime = -1;
+	            } else if (this.seeTime < 20) {
+	            	this.strafingTime = -1;
+	            } else {
+	                this.entity.getNavigator().clearPath();
+	                ++this.strafingTime;
 	            }
 	            if (this.strafingTime >= 20) {
 	                if (this.entity.getRNG().nextFloat() < 0.3F) {
@@ -821,7 +1031,7 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 
 	public static class NavigateGround extends PathNavigateGround {
 		private BlockPos targetPosition;
-	
+
 		public NavigateGround(EntityLiving entityLivingIn, World worldIn) {
 			super(entityLivingIn, worldIn);
 		}
@@ -848,6 +1058,11 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		        this.speed = speedIn;
 		        return true;
 		    }
+		}
+
+		@Nullable
+		protected BlockPos getTargetPosition() {
+			return this.targetPosition;
 		}
 
 		@Override
@@ -880,6 +1095,12 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 	public static class MoveHelper extends EntityMoveHelper {
 		public MoveHelper(EntityLiving entityIn) {
 			super(entityIn);
+		}
+
+		@Override
+		public void strafe(float forward, float strafe) {
+			super.strafe(forward, strafe);
+			this.speed = 0.75f;
 		}
 
 		@Override
@@ -999,6 +1220,20 @@ public class EntityNinjaMob extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void preRenderCallback(T entity, float partialTickTime) {
 			GlStateManager.scale(0.9375F, 0.9375F, 0.9375F);
+		}
+
+		@Override
+		protected int getColorMultiplier(T entity, float lightBrightness, float partialTickTime) {
+			double d = entity.getEntityData().getDouble(NarutomodModVariables.DeathAnimationTime);
+			if (d > 0d) {
+				int type = (int)entity.getEntityData().getDouble("deathAnimationType");
+				if (type == 1) {
+					return ((int) (16d + 239d * (d / 200)) << 24) | 0x00707070;
+				} else if (type == 2) {
+					return 0x30000000;
+				}
+			}
+			return 0;
 		}
 	}
 

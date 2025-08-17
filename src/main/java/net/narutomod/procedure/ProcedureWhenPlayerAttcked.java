@@ -26,7 +26,7 @@ import net.narutomod.item.ItemRinnegan;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.entity.EntitySusanooBase;
 import net.narutomod.entity.EntityShieldBase;
-import net.narutomod.entity.EntityKingOfHell;
+//import net.narutomod.entity.EntityKingOfHell;
 import net.narutomod.entity.EntityTailedBeast;
 import net.narutomod.PlayerTracker;
 import net.narutomod.NarutomodModVariables;
@@ -85,10 +85,10 @@ public class ProcedureWhenPlayerAttcked extends ElementsNarutomodMod.ModElement 
 					 (float)((EntityLivingBase)ridingEntity).getTotalArmorValue(), 0f) - f);
 				}*/
 			}
-			if (ridingEntity instanceof EntityKingOfHell.EntityCustom) {
-				evt.setCanceled(true);
-				ridingEntity.attackEntityFrom(evt.getSource(), evt.getAmount());
-			}
+			//if (ridingEntity instanceof EntityKingOfHell.EntityCustom) {
+			//	evt.setCanceled(true);
+			//	ridingEntity.attackEntityFrom(evt.getSource(), evt.getAmount());
+			//}
 		}
 		if (attacker instanceof EntityPlayer && !evt.getSource().getImmediateSource().equals(attacker)) {
 			((EntityLivingBase)attacker).setLastAttackedEntity(entity);
@@ -108,6 +108,10 @@ public class ProcedureWhenPlayerAttcked extends ElementsNarutomodMod.ModElement 
 		}
 	}
 
+	public static void setInvulnerable(Entity entity, int ticks) {
+		entity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, ticks);
+	}
+
 	public static void setExtraDamageReduction(Entity entity, float reduction) {
 		if (reduction <= 0.0f) {
 			entity.getEntityData().removeTag("ExtraDamageReduction");
@@ -117,14 +121,14 @@ public class ProcedureWhenPlayerAttcked extends ElementsNarutomodMod.ModElement 
 	}
 
 	public static float getExtraDamageReduction(Entity entity) {
-		return entity.getEntityData().getFloat("ExtraDamageReduction");
+		return Math.min(entity.getEntityData().getFloat("ExtraDamageReduction"), 1.0f);
 	}
 
 	@SubscribeEvent
 	public void onLivingDamaged(LivingDamageEvent event) {
 		EntityLivingBase target = event.getEntityLiving();
 		float f = getExtraDamageReduction(target);
-		if (f > 0.0f) {
+		if (f > 0.0f && !event.getSource().isDamageAbsolute()) {
 			event.setAmount(event.getAmount() * (1.0f - f));
 		}
 		//if (target instanceof EntityPlayer && ItemRinnegan.hasRinnesharingan((EntityPlayer)target)) {

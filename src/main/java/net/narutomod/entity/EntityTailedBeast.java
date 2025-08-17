@@ -1,9 +1,7 @@
 
 package net.narutomod.entity;
 
-import net.minecraft.util.math.*;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -32,6 +30,10 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.EntitySelectors;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.item.Item;
@@ -125,7 +127,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		MinecraftForge.EVENT_BUS.register(new PlayerHooks());
 	}
 
-	public static abstract class Base extends EntityMob implements IRangedAttackMob, EntityBijuManager.ITailBeast {
+	public static abstract class Base extends EntityMob implements IRangedAttackMob, EntityBijuManager.ITailBeast, ICollisionData {
 		private static final DataParameter<Integer> AGE = EntityDataManager.<Integer>createKey(Base.class, DataSerializers.VARINT);
 		private static final DataParameter<Integer> VESSEL = EntityDataManager.<Integer>createKey(Base.class, DataSerializers.VARINT);
 		private static final DataParameter<Boolean> SHOOT = EntityDataManager.<Boolean>createKey(Base.class, DataSerializers.BOOLEAN);
@@ -149,7 +151,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		protected boolean canPassengerDismount = true;
 		protected boolean spawnedBySpawner;
 		protected final ProcedureUtils.CollisionHelper collisionData;
-		public Entity mouthShootingJutsu;
+		protected Entity mouthShootingJutsu;
 		private int meleeTime;
 
 		public Base(World world) {
@@ -165,9 +167,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && this.getBijuManager().hasSpawnPos()) {
 				this.setHomePosAndDistance(this.getBijuManager().getSpawnPos(), 128);
 			}
-			setEntityBoundingBox(getEntityBoundingBox().expand(5,0,5));
 		}
-
 
 		public Base(EntityPlayer player) {
 			this(player.world);
@@ -269,7 +269,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(this.getTargetRange());
 			this.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(100.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(200.0D);
 		}
 
 		@Override
@@ -298,10 +298,10 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				@Override
 				public void resetTask() {
 					super.resetTask();
-					Base.this.meleeTime = 200;
+					Base.this.meleeTime = 100;
 				}
 			});
-			this.tasks.addTask(1, new AILeapAtTarget(this, 36.0d, 2.0f) {
+			this.tasks.addTask(1, new AILeapAtTarget(this, 36.0d) {
 				@Override
 				public boolean shouldExecute() {
 					return !Base.this.isMotionHalted() && super.shouldExecute();
@@ -396,7 +396,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			if (this.meleeTime > 0) {
 				--this.meleeTime;
 			} else if (target != null && this.getDistance(target) <= ProcedureUtils.getReachDistance(this) * 0.6d) {
-				this.meleeTime = 120;
+				this.meleeTime = 80;
 			}
 		}
 
@@ -447,14 +447,13 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public int getTalkInterval() {
-			return 500 - this.angerLevel * 120;
+			return 320 - this.angerLevel * 120;
 		}
 
 		@Override
 		public boolean canBePushed() {
 			return false;
 		}
-
 
 		@Override
 		protected void collideWithEntity(Entity entityIn) {
@@ -617,8 +616,13 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public ProcedureUtils.CollisionHelper getCollisionData() {
+			return this.collisionData;
+		}
+
+		@Override
 		public void move(MoverType type, double x, double y, double z) {
-			this.collisionData.collideWithAABBs(this.world.getCollisionBoxes(this, this.getEntityBoundingBox().expand(x, y, z)), x, y, z);
+			this.collisionData.collideWithAABBs(x, y, z);
 			if (this.couldBreakBlocks()) {
 				for (BlockPos pos : this.collisionData.getHitBlocks()) {
 					if (this.canBreakList.contains(this.world.getBlockState(pos).getMaterial())) {
@@ -631,8 +635,6 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			}
 			super.move(type, x, y, z);
 		}
-
-		public float fall = 0;
 
 		@Override
 		public void travel(float ti, float tj, float tk) {
@@ -647,38 +649,14 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				this.rotationYawHead = entity.rotationYaw;
 				this.stepHeight = this.height / 3.0F;
 				if (entity instanceof EntityLivingBase) {
-					float terminal = -200f;
-					if (this.onGround) {
-						this.fall = 0;
-					} else {
-						this.fall -= 1.6f;
-						if (this.fall < terminal) {
-							this.fall = terminal;
-						}
-					}
-
 					this.setAIMoveSpeed((float) this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
 					float forward = ((EntityLivingBase) entity).moveForward;
 					float strafe = ((EntityLivingBase) entity).moveStrafing;
-					if (this instanceof EntitySevenTails.EntityCustom) {
-						this.fall = 0;
-					} else {
-						this.checkJump((EntityLivingBase) entity);
-					}
-					super.travel(strafe, this.fall, forward);
+					super.travel(strafe, 0.0F, forward);
 				}
 			} else {
 				this.jumpMovementFactor = 0.02F;
 				super.travel(ti, tj, tk);
-			}
-		}
-
-		private void checkJump(EntityLivingBase entity) {
-			if (this.world.isRemote) {
-				if ((boolean) ReflectionHelper.getPrivateValue(EntityLivingBase.class, entity, 49) && this.onGround) {
-					this.fall = 20f;
-					ReflectionHelper.setPrivateValue(EntityLivingBase.class, entity, false, 49);
-				}
 			}
 		}
 
@@ -798,8 +776,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				float maxhp = this.getMaxHealth();
 				if (hp > maxhp * 0.1f && this.isFaceDown()) {
 					this.setFaceDown(false);
-				}
- else if (hp <= maxhp * 0.1f && !this.isFaceDown()) {
+				} else if (hp <= maxhp * 0.1f && !this.isFaceDown()) {
 					this.setFaceDown(true);
 				}
 				if (this.isAIDisabled() && jinchuriki != null && jinchuriki.getHealth() <= 0.0F) {
@@ -840,7 +817,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				return;
 			}
 			if ((this.mouthShootingJutsu == null || this.mouthShootingJutsu.isDead) && (flag || (distanceFactor >= 1.0f && this.canShootBijudama()))) {
-				this.mouthShootingJutsu = EntityTailBeastBall.spawn(this, 15f, 1000f);
+				this.mouthShootingJutsu = EntityTailBeastBall.spawn(this, 14f, 1000f);
 				if (this.mouthShootingJutsu != null) {
 					this.setSwingingArms(true);
 					this.tailBeastBallTime = ATTACK_CD_MAX;
@@ -984,7 +961,6 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
@@ -1008,7 +984,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 						if (living.getAttackTarget() != null) {
 							this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:nagiharai")), 10f, 1f);
 							this.shoot(living.getAttackTarget().posX - this.posX, living.getAttackTarget().posY - this.posY - (this.height / 2.0F), 
-							  living.getAttackTarget().posZ - this.posZ, 1.2F, 0.0F);
+							  living.getAttackTarget().posZ - this.posZ, 1.05F, 0.0F);
 						} else {
 							this.setDead();
 						}
@@ -1017,9 +993,8 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				} else if (!this.isLaunched()) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:nagiharai")), 10f, 1f);
 					Vec3d vec = this.shootingEntity.getLookVec();
-					this.shoot(vec.x, vec.y, vec.z, 1.2F, 0.0F);
+					this.shoot(vec.x, vec.y, vec.z, 1.05F, 0.0F);
 					this.closeMouth();
-
 				}
 			}
 			if (!this.world.isRemote && this.ticksAlive > this.buildupTime + 100) {
@@ -1043,7 +1018,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				float radius = MathHelper.sqrt(this.getEntityScale()) * 6f;
 				new EventSphericalExplosion(this.world, this.shootingEntity, (int) this.posX, (int) this.posY,
 				 (int) this.posZ, (int)radius, 0, 0.33f);
-				ProcedureAoeCommand.set(this, 0d, radius * 1.5).exclude(excludePlayer)
+				ProcedureAoeCommand.set(this, 0d, radius * 1.2).exclude(excludePlayer)
 				 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.maxDamage);
 				this.setDead();
 			}
@@ -1071,7 +1046,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 
 		@Nullable
 		public static EntityTailBeastBall spawn(EntityLivingBase summonerIn, float maxscale, float maxdamage) {
-			double chakraUsage = 150d * maxscale;
+			double chakraUsage = 100d * maxscale;
 			EntityLivingBase user = null;
 			if (summonerIn instanceof Base) {
 				user = ((Base)summonerIn).getBijuManager().getJinchurikiPlayer();
@@ -1128,7 +1103,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 						 new TextComponentString(String.format("%.1f", cd.power)), true);
 					}
 				} else {
-					if (spawn(entity, cd.power, 150+ItemJutsu.getDmgMult(entity)*(1+12*cd.power/14)) != null) {
+					if (spawn(entity, cd.power, cd.power * 70f) != null) {
 						cd.cooldown = entity.ticksExisted + (int)(cd.power * 7.143f);
 					}
 					cd.power = 0f;
@@ -1143,13 +1118,11 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 	public static class AILeapAtTarget extends EntityAIBase {
 	    private EntityLiving leaper;
 	    private EntityLivingBase leapTarget;
-	    private float leapStrength;
 	    private double leapRange;
 	
-	    public AILeapAtTarget(EntityLiving leapingEntity, double range, float strength) {
+	    public AILeapAtTarget(EntityLiving leapingEntity, double range) {
 	        this.leaper = leapingEntity;
 	        this.leapRange = range;
-	        this.leapStrength = strength;
 	        this.setMutexBits(5);
 	    }
 	
@@ -1188,28 +1161,29 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 	            	d3 = d;
 	            }
 	            this.leaper.rotationYaw = (float)(MathHelper.atan2(d1, d0) * (180D / Math.PI)) - 90.0F;
-	            this.leaper.motionX = d0 * 0.1d;
-	            this.leaper.motionZ = d1 * 0.1d;
+	            this.leaper.motionX = d0 * 0.145d;
+	            this.leaper.motionZ = d1 * 0.145d;
 	            this.leaper.motionY = 0.32d + (Math.max(d2, 0.0d) + d3 * 0.6d) * 0.1d;
             }
 	    }
 	}
 
 	public static class NavigateGround extends PathNavigateGround {
-		protected Base baseEntity; 
 		private BlockPos targetPos;
-	
-    private int ticksAtLastPos;
+	    private int ticksAtLastPos;
 	    private Vec3d lastPosCheck = Vec3d.ZERO;
 
-		public NavigateGround(Base entityLivingIn, World worldIn) {
+		public NavigateGround(EntityLiving entityLivingIn, World worldIn) {
 			super(entityLivingIn, worldIn);
-			this.baseEntity = entityLivingIn;
 		}
 
 		@Override
 		protected PathFinder getPathFinder() {
 			return null;
+		}
+
+		public double getSpeed() {
+			return this.speed;
 		}
 
 		@Override
@@ -1282,13 +1256,16 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdateNavigation() {
 			++this.totalTicks;
+//System.out.println("------ totalTicks="+totalTicks+(currentPath!=null?(", isFinished?"+currentPath.isFinished()):", currentPath=null"));
 			if (!this.noPath()) {
 				this.checkForStuck(this.getEntityPosition());
 				if (!this.noPath()) {
 					Vec3d vec3d2 = this.currentPath.getCurrentPos();
+//System.out.println("       vec3d2:"+vec3d2+", currentPathIndex:"+currentPath.getCurrentPathIndex()+", pathLength:"+currentPath.getCurrentPathLength());
 					if (this.distanceTo(vec3d2.x, vec3d2.y, vec3d2.z) < 0.5d * (this.entity.width + 1.0d)) {
 						this.currentPath.incrementPathIndex();
 					} else {
+//System.out.println("       setMoveTo speed="+speed);
 		                this.entity.getMoveHelper().setMoveTo(vec3d2.x, vec3d2.y, vec3d2.z, this.speed);
 					}
 				}
@@ -1297,7 +1274,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 
 	    @Override
 	    protected void checkForStuck(Vec3d positionVec3) {
-	        if (this.totalTicks - this.ticksAtLastPos > 60) {
+	        if (this.totalTicks - this.ticksAtLastPos > 30) {
 	            if (positionVec3.squareDistanceTo(this.lastPosCheck) < this.entity.width * this.entity.width) {
 	                this.clearPath();
 	            }
@@ -1347,10 +1324,10 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 	    }
 	}
 
-	public static class MoveHelper extends EntityMoveHelper {
-		private Base baseEntity;
+	public static class MoveHelper<T extends EntityLiving & ICollisionData> extends EntityMoveHelper {
+		private T baseEntity;
 		
-		public MoveHelper(Base entity) {
+		public MoveHelper(T entity) {
 			super(entity);
 			this.baseEntity = entity;
 		}
@@ -1368,20 +1345,21 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 	                return;
 	            }
 				if (this.entity.collidedHorizontally) {
+					ProcedureUtils.CollisionHelper collisionData = this.baseEntity.getCollisionData();
 					double d5 = this.entity.posY;
 					for (EnumFacing face : EnumFacing.HORIZONTALS) {
-						for (BlockPos pos : this.baseEntity.collisionData.hitsOnSide(face)) {
+						for (BlockPos pos : collisionData.hitsOnSide(face)) {
 							double d6 = this.getHighestSolidTop(this.entity.world, pos);
 							if (d6 > d5) {
 								d5 = d6;
 							}
 						}
 					}
-					if (d5 - this.entity.posY > 2d * this.entity.height || this.baseEntity.collisionData.hitOnSide(EnumFacing.UP)) {
-						if (this.baseEntity.collisionData.hitOnAxis(EnumFacing.Axis.X)) {
+					if (d5 - this.entity.posY > 2d * this.entity.height || collisionData.hitOnSide(EnumFacing.UP)) {
+						if (collisionData.hitOnAxis(EnumFacing.Axis.X)) {
 							d0 = 0.0d;
 						}
-						if (this.baseEntity.collisionData.hitOnAxis(EnumFacing.Axis.Z)) {
+						if (collisionData.hitOnAxis(EnumFacing.Axis.Z)) {
 							d1 = 0.0d;
 						}
 					} else if (this.entity.onGround) {
@@ -1395,11 +1373,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 	            this.entity.renderYawOffset = this.entity.rotationYaw;
 				f = (float)(-(MathHelper.atan2(d2, MathHelper.sqrt(d0 * d0 + d1 * d1)) * (180D / Math.PI)));
 				this.entity.rotationPitch = this.limitAngle(this.entity.rotationPitch, f, 60.0F);
-	            if (this.baseEntity.isBeingRidden()) {
-					this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue()));
-				} else {
-					this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue())*0.3f);
-				}
+	            this.entity.setAIMoveSpeed((float)(this.speed * this.entity.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue()));
 			} else {
 				super.onUpdateMoveHelper();
 			}
@@ -1634,7 +1608,6 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				if (shooter instanceof EntityPlayer && shooter == this.renderManager.renderViewEntity && this.renderManager.options.thirdPersonView == 0 && entity.ticksExisted <= entity.buildupTime) {
 					alpha = 0.2F;
 				}
-
 				this.mainModel.render(entity, alpha, 0.0F, ageInTicks, 0.0F, 0.0F, 0.0625F);
 				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 				GlStateManager.enableLighting();
@@ -2125,7 +2098,6 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-
 	public static abstract class SaveBase extends WorldSavedData implements SaveData.ISaveData {
 		public SaveBase(String name) {
 			super(name);
@@ -2269,5 +2241,9 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
+	}
+
+	public interface ICollisionData {
+		ProcedureUtils.CollisionHelper getCollisionData();
 	}
 }

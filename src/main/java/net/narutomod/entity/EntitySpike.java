@@ -39,19 +39,19 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 
 	public static abstract class Base extends EntityScalableProjectile.Base {
 		private static final DataParameter<Integer> COLOR = EntityDataManager.<Integer>createKey(Base.class, DataSerializers.VARINT);
-		private Vec3d tipOffset = Vec3d.ZERO;
+		private Vec3d tipOffset = new Vec3d(0d, 1.825d, 0d);
 
 		public Base(World worldIn) {
 			super(worldIn);
-			this.setOGSize(0.5f, 1.82f);
-			this.maxInGroundTime = 100;
+			this.setOGSize(0.5f, 1.825f);
+			this.maxInGroundTime = 400;
 			//this.setNoGravity(true);
 		}
 
 		public Base(EntityLivingBase userIn) {
 			super(userIn);
-			this.setOGSize(0.5f, 1.82f);
-			this.maxInGroundTime = 100;
+			this.setOGSize(0.5f, 1.825f);
+			this.maxInGroundTime = 400;
 			//this.setNoGravity(false);
 		}
 
@@ -84,29 +84,65 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public AxisAlignedBB getCollisionBoundingBox() {
+			return this.onGround && !this.hasNoGravity() && this.getEntityBoundingBox().getAverageEdgeLength() > 0.6d ? this.getEntityBoundingBox() : null;
+		}
+
+		@Override
 		public void shoot(double x, double y, double z, float speed, float inaccuracy) {
 			super.shoot(x, y, z, speed, inaccuracy);
 			this.rotationPitch = MathHelper.wrapDegrees(this.rotationPitch + 90f);
 			this.prevRotationPitch = this.rotationPitch;
-			this.tipOffset = new Vec3d(0d, 1.82d, 0d);
+			//this.tipOffset = new Vec3d(0d, 1.82d, 0d);
 		}
 
-		@Override
-		protected void checkOnGround() {
-			Vec3d vec = this.getTransformedTip();
+		protected boolean isOnGround(Vec3d vec) {
 			BlockPos pos = new BlockPos(vec);
 			if (!this.world.isAirBlock(pos)) {
 				AxisAlignedBB aabb = this.world.getBlockState(pos).getCollisionBoundingBox(this.world, pos);
 				if (aabb != net.minecraft.block.Block.NULL_AABB && aabb.offset(pos).contains(vec)) {
+					return true;
+				}
+			}
+			return false;		
+		}
+
+		@Override
+		protected void checkOnGround() {
+			Vec3d vec1 = this.getPositionVector();
+			Vec3d vec2 = this.getTransformedTip().subtract(vec1);
+			double d = 1d / vec2.lengthVector(); 
+			for (double d1 = 0.0d; true; d1 += d) {
+				if (d1 > 1.0d) {
+					d1 = 1.0d;
+				}
+				if (this.isOnGround(vec1.add(vec2.scale(d1)))) {
 					this.onGround = true;
 					this.setNoGravity(false);
+					break;
+				}
+				if (d1 >= 1.0d) {
+					break;
 				}
 			}
 		}
 
-		private Vec3d getTransformedTip() {
+		protected Vec3d getTransformedTip() {
 			return this.tipOffset.scale(this.getEntityScale()).rotatePitch(-this.rotationPitch * 0.017453292F)
 			 .rotateYaw(-this.rotationYaw * 0.017453292F).add(this.getPositionVector());
+		}
+
+		@Override
+		public void updateInFlightRotations() {
+            double d = (double)MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+            float yaw = -(float)(MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
+            float pitch = -(float)(MathHelper.atan2(this.motionY, d) * (180D / Math.PI)) + 90F;
+            float deltaYaw = ProcedureUtils.subtractDegreesWrap(yaw, this.rotationYaw);
+            float deltaPitch = ProcedureUtils.subtractDegreesWrap(pitch, this.rotationPitch);
+            this.prevRotationYaw = yaw - deltaYaw;
+            this.prevRotationPitch = pitch - deltaPitch;
+            this.rotationPitch = this.prevRotationPitch + (pitch - this.prevRotationPitch) * 0.2F;
+            this.rotationYaw = this.prevRotationYaw + (yaw - this.prevRotationYaw) * 0.2F;
 		}
 
 		@Override
@@ -119,6 +155,7 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 					vec2 = raytraceresult.hitVec;
 				}
 				Entity entity = null;
+				Vec3d hitvec = null;
 				AxisAlignedBB bigAABB = this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D);
 				double d0 = 0.0D;
 				for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this, bigAABB)) {
@@ -128,13 +165,14 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 							double d = vec1.distanceTo(result.hitVec);
 							if (d < d0 || d0 == 0.0D) {
 								entity = entity1;
+								hitvec = result.hitVec;
 								d0 = d;
 							}
 						}
 					}
 				}
 				if (entity != null) {
-					raytraceresult = new RayTraceResult(entity);
+					raytraceresult = new RayTraceResult(entity, hitvec);
 				}
 			}
 			return raytraceresult;
@@ -167,13 +205,16 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public void doRender(T entity, double x, double y, double z, float entityYaw, float pt) {
+				if (entity.prevRotationYaw == 0.0f && entity.prevRotationPitch == 0.0f) {
+					entity.prevRotationYaw = entity.rotationYaw;
+					entity.prevRotationPitch = entity.rotationPitch;
+				}
 				GlStateManager.pushMatrix();
 				this.bindEntityTexture(entity);
-				float scale = entity.getEntityScale();
 				GlStateManager.translate(x, y, z);
-				GlStateManager.rotate(-entity.prevRotationYaw - (entity.rotationYaw - entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
+				GlStateManager.rotate(-ProcedureUtils.interpolateRotation(entity.prevRotationYaw, entity.rotationYaw, pt), 0.0F, 1.0F, 0.0F);
 				GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * pt - 180.0F, 1.0F, 0.0F, 0.0F);
-				GlStateManager.scale(scale, scale, scale);
+				this.prepareScale(entity.getEntityScale());
 				int color = entity.getColor();
 				float alpha = (color >> 24 & 0xFF) / 255.0F;
 				float red = (color >> 16 & 0xFF) / 255.0F;
@@ -199,13 +240,18 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 				}
 				GlStateManager.popMatrix();
 			}
+
+			protected void prepareScale(float scale) {
+				GlStateManager.scale(scale, scale, scale);
+			}
 		}
 	
+
 		// Made with Blockbench 3.8.3
 		// Exported for Minecraft version 1.7 - 1.12
 		// Paste this class into your mod and generate all required imports
 		@SideOnly(Side.CLIENT)
-		static class ModelSpike extends ModelBase {
+		public static class ModelSpike extends ModelBase {
 			private final ModelRenderer bone;
 			private final ModelRenderer bone2;
 			private final ModelRenderer bone3;
@@ -254,7 +300,102 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 				modelRenderer.rotateAngleY = y;
 				modelRenderer.rotateAngleZ = z;
 			}
-	
+		}
+
+		@SideOnly(Side.CLIENT)
+		public static class ModelCrystal extends ModelBase {
+			private final ModelRenderer sides;
+			private final ModelRenderer south;
+			private final ModelRenderer north;
+			private final ModelRenderer west;
+			private final ModelRenderer east;
+			private final ModelRenderer bottom;
+			private final ModelRenderer tip;
+			private final ModelRenderer south2;
+			private final ModelRenderer north2;
+			private final ModelRenderer west2;
+			private final ModelRenderer east2;
+		
+			public ModelCrystal() {
+				textureWidth = 64;
+				textureHeight = 32;
+		
+				sides = new ModelRenderer(this);
+				sides.setRotationPoint(0.0F, 0.0F, 0.0F);
+				
+		
+				south = new ModelRenderer(this);
+				south.setRotationPoint(0.0F, 0.0F, 4.0F);
+				sides.addChild(south);
+				setRotationAngle(south, 0.0436F, 0.0F, 0.0F);
+				south.cubeList.add(new ModelBox(south, 0, 0, -4.0F, -26.0F, 0.0F, 8, 26, 0, 0.0F, false));
+		
+				north = new ModelRenderer(this);
+				north.setRotationPoint(0.0F, 0.0F, -4.0F);
+				sides.addChild(north);
+				setRotationAngle(north, -0.0436F, 0.0F, 0.0F);
+				north.cubeList.add(new ModelBox(north, 8, 0, -4.0F, -26.0F, 0.0F, 8, 26, 0, 0.0F, false));
+		
+				west = new ModelRenderer(this);
+				west.setRotationPoint(4.0F, 0.0F, 0.0F);
+				sides.addChild(west);
+				setRotationAngle(west, -0.0436F, -1.5708F, 0.0F);
+				west.cubeList.add(new ModelBox(west, 8, 0, -4.0F, -26.0F, 0.0F, 8, 26, 0, 0.0F, false));
+		
+				east = new ModelRenderer(this);
+				east.setRotationPoint(-4.0F, 0.0F, 0.0F);
+				sides.addChild(east);
+				setRotationAngle(east, 0.0436F, -1.5708F, 0.0F);
+				east.cubeList.add(new ModelBox(east, 0, 0, -4.0F, -26.0F, 0.0F, 8, 26, 0, 0.0F, false));
+		
+				bottom = new ModelRenderer(this);
+				bottom.setRotationPoint(0.0F, 0.0F, 0.0F);
+				sides.addChild(bottom);
+				setRotationAngle(bottom, -1.5708F, 0.0F, 0.0F);
+				bottom.cubeList.add(new ModelBox(bottom, 24, 16, -4.0F, -4.0F, 0.0F, 8, 8, 0, 0.0F, false));
+		
+				tip = new ModelRenderer(this);
+				tip.setRotationPoint(0.0F, 0.0F, 0.0F);
+				sides.addChild(tip);
+				setRotationAngle(tip, 0.0F, 0.7854F, 0.0F);
+				
+		
+				south2 = new ModelRenderer(this);
+				south2.setRotationPoint(0.0F, -24.0F, 2.75F);
+				tip.addChild(south2);
+				setRotationAngle(south2, 0.3491F, 0.0F, 0.0F);
+				south2.cubeList.add(new ModelBox(south2, 24, 0, -4.0F, -8.0F, 0.0F, 8, 16, 0, 0.0F, false));
+		
+				north2 = new ModelRenderer(this);
+				north2.setRotationPoint(0.0F, -24.0F, -2.75F);
+				tip.addChild(north2);
+				setRotationAngle(north2, -0.3491F, 0.0F, 0.0F);
+				north2.cubeList.add(new ModelBox(north2, 32, 0, -4.0F, -8.0F, 0.0F, 8, 16, 0, 0.0F, false));
+		
+				west2 = new ModelRenderer(this);
+				west2.setRotationPoint(2.75F, -24.0F, 0.0F);
+				tip.addChild(west2);
+				setRotationAngle(west2, -0.3491F, -1.5708F, 0.0F);
+				west2.cubeList.add(new ModelBox(west2, 32, 0, -4.0F, -8.0F, 0.0F, 8, 16, 0, 0.0F, false));
+		
+				east2 = new ModelRenderer(this);
+				east2.setRotationPoint(-2.75F, -24.0F, 0.0F);
+				tip.addChild(east2);
+				setRotationAngle(east2, 0.3491F, -1.5708F, 0.0F);
+				east2.cubeList.add(new ModelBox(east2, 24, 0, -4.0F, -8.0F, 0.0F, 8, 16, 0, 0.0F, false));
+			}
+		
+			@Override
+			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+				sides.render(f5);
+			}
+		
+			public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+				modelRenderer.rotateAngleX = x;
+				modelRenderer.rotateAngleY = y;
+				modelRenderer.rotateAngleZ = z;
+			}
+		}
 	}
 	}
 }

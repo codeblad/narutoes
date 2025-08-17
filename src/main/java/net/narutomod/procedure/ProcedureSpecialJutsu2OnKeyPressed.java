@@ -1,11 +1,6 @@
 package net.narutomod.procedure;
 
-import net.narutomod.item.ItemTenseigan;
-import net.narutomod.item.ItemRinnegan;
-import net.narutomod.item.ItemMangekyoSharinganObito;
-import net.narutomod.item.ItemMangekyoSharinganEternal;
-import net.narutomod.item.ItemMangekyoSharingan;
-import net.narutomod.item.ItemByakugan;
+import net.narutomod.item.ItemDojutsu;
 import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
@@ -17,7 +12,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 
 import java.util.Map;
-import java.util.HashMap;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureSpecialJutsu2OnKeyPressed extends ElementsNarutomodMod.ModElement {
@@ -34,27 +28,12 @@ public class ProcedureSpecialJutsu2OnKeyPressed extends ElementsNarutomodMod.Mod
 			System.err.println("Failed to load dependency entity for procedure SpecialJutsu2OnKeyPressed!");
 			return;
 		}
-		if (dependencies.get("x") == null) {
-			System.err.println("Failed to load dependency x for procedure SpecialJutsu2OnKeyPressed!");
-			return;
-		}
-		if (dependencies.get("y") == null) {
-			System.err.println("Failed to load dependency y for procedure SpecialJutsu2OnKeyPressed!");
-			return;
-		}
-		if (dependencies.get("z") == null) {
-			System.err.println("Failed to load dependency z for procedure SpecialJutsu2OnKeyPressed!");
-			return;
-		}
 		if (dependencies.get("world") == null) {
 			System.err.println("Failed to load dependency world for procedure SpecialJutsu2OnKeyPressed!");
 			return;
 		}
 		boolean is_pressed = (boolean) dependencies.get("is_pressed");
 		Entity entity = (Entity) dependencies.get("entity");
-		int x = (int) dependencies.get("x");
-		int y = (int) dependencies.get("y");
-		int z = (int) dependencies.get("z");
 		World world = (World) dependencies.get("world");
 		double which_path = 0;
 		boolean f1 = false;
@@ -71,6 +50,7 @@ public class ProcedureSpecialJutsu2OnKeyPressed extends ElementsNarutomodMod.Mod
 		}
 		stack = ((entity instanceof EntityLivingBase) ? ((EntityLivingBase) entity).getHeldItemMainhand() : ItemStack.EMPTY);
 		helmet = ((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY);
+		
 		if ((((helmet).getItem() == new ItemStack(ItemRinnegan.helmet, (int) (1)).getItem())
 				|| ((helmet).getItem() == new ItemStack(ItemTenseigan.helmet, (int) (1)).getItem()))) {
 			if ((!(is_pressed))) {
@@ -205,11 +185,13 @@ public class ProcedureSpecialJutsu2OnKeyPressed extends ElementsNarutomodMod.Mod
 					}
 				}
 			}
+		if ((helmet.getItem() instanceof ItemDojutsu.Base
+				&& ((ItemDojutsu.Base) helmet.getItem()).onJutsuKey2(is_pressed, helmet, (EntityPlayer) entity))) {
+			return;
 		} else if (EntityBijuManager.isJinchuriki((EntityPlayer) entity)) {
 			if ((!(is_pressed))) {
 				EntityBijuManager.toggleBijuCloak((EntityPlayer) entity);
 			}
 		}
-		entity.getEntityData().setBoolean((CTRL_pressed), (false));
 	}
 }

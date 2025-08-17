@@ -3,6 +3,7 @@ package net.narutomod.entity;
 
 import net.narutomod.item.ItemClaw;
 import net.narutomod.item.ItemKunaiBlade;
+import net.narutomod.item.ItemNinjutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -19,7 +20,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.EntityLiving;
@@ -59,7 +59,7 @@ public class EntityPuppetHundred extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityCustom extends EntityPuppet.Base {
 		private static final DataParameter<Float> MODEL_SCALE = EntityDataManager.<Float>createKey(EntityCustom.class, DataSerializers.FLOAT);
-		public static final float MAXHEALTH = 50.0f;
+		public static final float MAXHEALTH = 60.0f;
 		private static final Vec3d offsetToOwner = new Vec3d(0.0d, 3.0d, 2.0d);
 		public final int style;
 
@@ -70,8 +70,8 @@ public class EntityPuppetHundred extends ElementsNarutomodMod.ModElement {
 			this.style = this.rand.nextInt(3);
 		}
 
-		public EntityCustom(EntityLivingBase ownerIn) {
-			super(ownerIn);
+		public EntityCustom(EntityLivingBase ownerIn, double chakraUsage) {
+			super(ownerIn, chakraUsage);
 			//this.setEntityScale(this.rand.nextFloat() + 0.9f);
 			this.setEntityScale(0.9375f + (float)Math.abs(this.rand.nextGaussian()) * 0.5f);
 			Vec3d vec = ownerIn.getLookVec();
@@ -135,7 +135,7 @@ public class EntityPuppetHundred extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void initEntityAI() {
 			super.initEntityAI();
-			this.tasks.addTask(1, new EntityAIAttackMelee(this, 2.0d, true));
+			this.tasks.addTask(1, new EntityNinjaMob.AIAttackMelee(this, 2.0d, true));
 		}
 
 		@Override
@@ -192,7 +192,7 @@ public class EntityPuppetHundred extends ElementsNarutomodMod.ModElement {
 
 		protected boolean allPuppetsDead() {
 			for (int i = 0; i < this.puppetEntity.length; i++) {
-				if (this.puppetEntity[i] != null && this.puppetEntity[i].isEntityAlive() && this.puppetEntity[i].getOwner() != null) {
+				if (this.puppetEntity[i] != null && this.puppetEntity[i].isEntityAlive() && this.puppetEntity[i].getSummoner() != null) {
 					return false;
 				}
 			}
@@ -224,7 +224,7 @@ public class EntityPuppetHundred extends ElementsNarutomodMod.ModElement {
 					}
 					this.setInvisible(true);
 				} else if (this.summoner != null && this.spawnedPuppets < this.puppetEntity.length) {
-					this.puppetEntity[this.spawnedPuppets] = new EntityCustom(this.summoner);
+					this.puppetEntity[this.spawnedPuppets] = new EntityCustom(this.summoner, ItemNinjutsu.PUPPET.chakraUsage * 0.2d);
 					this.puppetEntity[this.spawnedPuppets].setLocationAndAngles(this.posX, this.posY, this.posZ, this.summoner.rotationYaw, 0f);
 					this.puppetEntity[this.spawnedPuppets].onInitialSpawn(this.world.getDifficultyForLocation(this.getPosition()), null);
 					this.world.spawnEntity(this.puppetEntity[this.spawnedPuppets]);

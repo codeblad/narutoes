@@ -190,8 +190,14 @@ public class ItemGunbai extends ElementsNarutomodMod.ModElement {
 			return entity instanceof EntityChakraball ? (EntityChakraball)entity : null;
 		}
 
-		private boolean isThrown(ItemStack stack) {
+		public boolean isThrown(ItemStack stack) {
 			return stack.hasTagCompound() && stack.getTagCompound().getBoolean(USE_THROWN_MODEL);
+		}
+
+		public void resetThrown(ItemStack stack) {
+			if (stack.hasTagCompound()) {
+				stack.getTagCompound().removeTag(USE_THROWN_MODEL);
+			}
 		}
 
 		@Override
@@ -282,6 +288,9 @@ public class ItemGunbai extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
+			if (attacker.isHandActive()) {
+				return true;
+			}
 			if (!attacker.world.isRemote && attacker.equals(target)) {
 				this.throwItemAt(itemstack, attacker, null);
 				return true;
@@ -494,15 +503,13 @@ public class ItemGunbai extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && this.arrowShake <= 0 && this.itemstack != null && this.itemstack.getItem() == block) {
 				boolean flag = false;
 				if (this.shootingEntity == null && this.inGround) {
-					if (this.itemstack.hasTagCompound()) {
-						this.itemstack.getTagCompound().removeTag(USE_THROWN_MODEL);
-					}
+					((RangedItem)this.itemstack.getItem()).resetThrown(this.itemstack);
 					flag = entityIn.inventory.addItemStackToInventory(this.itemstack);
 	            	((WorldServer)this.world).getEntityTracker().sendToTracking(this, new SPacketCollectItem(this.getEntityId(), entityIn.getEntityId(), 1));
 				} else if (entityIn.equals(this.shootingEntity) && this.ticksExisted > 15) {
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(entityIn, this.itemstack);
 					if (stack != null && ((RangedItem)stack.getItem()).isThrown(stack)) {
-						stack.getTagCompound().removeTag(USE_THROWN_MODEL);
+						((RangedItem)stack.getItem()).resetThrown(stack);
 						flag = true;
 					}
 				}
@@ -513,7 +520,7 @@ public class ItemGunbai extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected ItemStack getArrowStack() {
+		public ItemStack getArrowStack() {
 			return this.itemstack;
 		}
 

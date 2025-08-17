@@ -30,7 +30,6 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.ai.EntityAIAttackRanged;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
@@ -39,6 +38,7 @@ import net.minecraft.entity.ai.EntityAIWatchClosest2;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAILookIdle;
 import net.minecraft.entity.ai.EntityAISwimming;
+import net.minecraft.entity.ai.EntityAITarget;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.IRangedAttackMob;
@@ -67,7 +67,6 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.nbt.NBTTagCompound;
 
 import javax.annotation.Nullable;
-import com.google.common.base.Predicate;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityHidan extends ElementsNarutomodMod.ModElement {
@@ -81,8 +80,7 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-		 .id(new ResourceLocation("narutomod", "hidan"), ENTITYID)
-.name("hidan").tracker(64, 3, true).egg(-16777216, -6750157).build());
+		 .id(new ResourceLocation("narutomod", "hidan"), ENTITYID).name("hidan").tracker(64, 3, true).egg(-16777216, -6750157).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityJashinSymbol.class)
 		 .id(new ResourceLocation("narutomod", "hidan_symbol"), ENTITYID_RANGED).name("hidan_symbol").tracker(64, 3, true).build());
 	}
@@ -101,6 +99,7 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityCustom extends EntityNinjaMob.Base implements IMob, IRangedAttackMob {
 		private static final DataParameter<Integer> JASHIN_TICKS = EntityDataManager.<Integer>createKey(EntityCustom.class, DataSerializers.VARINT);
+		private final DamageSource selfDamage = DamageSource.causeMobDamage(this).setDamageIsAbsolute().setDamageIsAbsolute();
 		private final int transitionTime = 60;
 		private int jashinTransitionDirection;
 		private EntityLivingBase curseTarget;
@@ -118,7 +117,10 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 		public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, @Nullable IEntityLivingData livingdata) {
 			this.setItemToInventory(new ItemStack(ItemScytheHidan.block), 0);
 			this.setItemToInventory(new ItemStack(ItemSpearRetractable.block), 1);
-			this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ItemAkatsukiRobe.body));
+			ItemStack stack = new ItemStack(ItemAkatsukiRobe.body);
+			stack.setTagCompound(new NBTTagCompound());
+			stack.getTagCompound().setBoolean("collarOpen", true);
+			this.setItemStackToSlot(EntityEquipmentSlot.CHEST, stack);
 			return super.onInitialSpawn(difficulty, livingdata);
 		}
 
@@ -164,6 +166,11 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		protected double meleeReach() {
+			return 4.8d;
+		}
+
+		@Override
 		protected void initEntityAI() {
 			super.initEntityAI();
 			this.targetTasks.addTask(1, new EntityAIHurtByTarget(this, false));
@@ -183,14 +190,10 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 					 && EntityCustom.this.getHeldItemMainhand().getItem() == ItemScytheHidan.block;
 				}
 			});
-			this.tasks.addTask(4, new EntityAIAttackMelee(this, 1.0d, true) {
+			this.tasks.addTask(4, new EntityNinjaMob.AIAttackMelee(this, 1.0d, true) {
 				@Override
 				public boolean shouldExecute() {
 					return EntityCustom.this.jashinTransitionDirection == 0 && super.shouldExecute();
-				}
-				@Override
-				protected double getAttackReachSqr(EntityLivingBase attackTarget) {
-					return 16.0d;
 				}
 			});
 			this.tasks.addTask(5, new EntityAIWatchClosest(this, null, 48.0F, 1.0F) {
@@ -204,12 +207,18 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 					return false;
 				}
 			});
-			this.tasks.addTask(6, new EntityAIWatchClosest2(this, EntityPlayer.class, 32.0F, 1.0F));
-			this.tasks.addTask(7, new EntityAIWander(this, 0.5d));
-			this.tasks.addTask(8, new EntityAILookIdle(this));
+			this.tasks.addTask(6, new EntityClone.AIFollowSummoner(this, 0.6d, 4f) {
+				@Override @Nullable
+				protected EntityLivingBase getFollowEntity() {
+					return (EntityLivingBase)EntityCustom.this.world.findNearestEntityWithinAABB(EntityKakuzu.EntityCustom.class,
+					 EntityCustom.this.getEntityBoundingBox().grow(256d, 16d, 256d), EntityCustom.this);
+				}
+			});
+			this.tasks.addTask(7, new EntityAIWatchClosest2(this, EntityPlayer.class, 32.0F, 1.0F));
+			this.tasks.addTask(8, new EntityAIWander(this, 0.5d));
+			this.tasks.addTask(9, new EntityAILookIdle(this));
 		}
-
-
+
 		@Override
 		protected void updateAITasks() {
 			ItemStack stack = this.getHeldItemMainhand();
@@ -224,7 +233,7 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 					this.scytheOnRetrieval = true;
 				}
 			} else {
-				if (this.curseTarget != null && this.curseTarget.isEntityAlive()) {
+				if (this.curseTarget != null && EntityAITarget.isSuitableTarget(this, this.curseTarget, false, false)) {
 					if (this.jashinSymbol != null && !this.jashinSymbol.isDead) {
 						AxisAlignedBB bb1 = this.getEntityBoundingBox();
 						AxisAlignedBB bb2 = this.jashinSymbol.getEntityBoundingBox().expand(0d, 1d, 0d);
@@ -240,7 +249,7 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 						 && this.ticksExisted > this.lastJashinTime + 40 && this.ticksExisted % 40 == 2) {
 						 	ItemSpearRetractable.setHurtSelf(stack);
 							this.swingArm(EnumHand.MAIN_HAND);
-							this.attackEntityFrom(ProcedureUtils.SPECIAL_DAMAGE, 100.0f * this.rand.nextFloat() * Math.min((float)(this.ticksExisted - this.lastJashinTime) / 160f, 1.0f));
+							this.attackEntityFrom(this.selfDamage, 100.0f * this.rand.nextFloat() * Math.min((float)(this.ticksExisted - this.lastJashinTime) / 160f, 1.0f));
 							this.curseTarget.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 60, this.rand.nextInt(5)));
 						}
 					} else if (this.onGround) {
@@ -303,7 +312,8 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 			if (this.curseTarget != null && this.curseTarget.isEntityAlive() && this.jashinTransitionDirection > 0) {
 				this.curseTarget.attackEntityFrom(source.setDamageBypassesArmor(), amount);
 			}
-			return super.attackEntityFrom(source, amount * (this.rand.nextFloat() * 0.08f + 0.08f));
+			amount *= source != this.selfDamage && source.isUnblockable() && source.isDamageAbsolute() ? 1.0f : (this.rand.nextFloat() * 0.08f + 0.08f);
+			return super.attackEntityFrom(source, amount);
 		}
 
 		@Override
@@ -312,7 +322,7 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 			if (this.scytheOnRetrieval) {
 				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().grow(1.0D, 0.5D, 1.0D))) {
 					if (entity instanceof ItemScytheHidan.EntityCustom && this.equals(((ItemScytheHidan.EntityCustom)entity).getShooter())) {
-						this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(ItemScytheHidan.block));
+						this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, ((ItemScytheHidan.EntityCustom)entity).getArrowStack());
 						entity.setDead();
 						this.scytheOnRetrieval = false;
 					}
@@ -326,11 +336,6 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && this.jashinSymbol != null) {
 				this.jashinSymbol.fadeOut();
 			}
-		}
-
-		@Override
-		public boolean isOnSameTeam(Entity entityIn) {
-			return super.isOnSameTeam(entityIn) || EntityNinjaMob.TeamAkatsuki.contains(entityIn.getClass());
 		}
 
 		@Override
@@ -381,7 +386,7 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 				if (this.ticksExisted % 20 == 2) {
 					float health = this.getHealth();
 					if (health > 0.0f && health < this.getMaxHealth()) {
-						this.setHealth(health + 1.0f);
+						this.heal(1.0f);
 					}
 				}
 				if (this.jashinTransitionDirection != 0) {

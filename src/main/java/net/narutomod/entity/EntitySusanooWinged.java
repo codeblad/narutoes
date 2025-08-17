@@ -41,6 +41,10 @@ import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureTotsukaSwordToolInHandTick;
 import net.narutomod.procedure.ProcedureKagutsuchiSwordToolInUseTick;
 import net.narutomod.potion.PotionAmaterasuFlame;
+import net.narutomod.item.ItemSharingan;
+import net.narutomod.item.ItemKamuiShuriken;
+import net.narutomod.item.ItemKagutsuchiSwordRanged;
+import net.narutomod.item.ItemTotsukaSword;
 import net.narutomod.NarutomodMod;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -103,14 +107,14 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(30.0D+ItemJutsu.getDmgMult(player)*3.2);
 			this.getEntityData().setDouble("entityModelScale", (double)MODELSCALE);
 			Item helmet = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem();
-			if (helmet == ItemMangekyoSharingan.helmet || helmet == ItemMangekyoSharinganEternal.helmet) {
-				//this.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, new ItemStack(ItemKagutsuchiSwordRanged.block));
-				ItemHandlerHelper.giveItemToPlayer(player, kagutsuchi);
-				//this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("susanoo.sword.damage", 300d, 0));
-			}
-			if (helmet == ItemMangekyoSharinganObito.helmet || helmet == ItemMangekyoSharinganEternal.helmet) {
-				//this.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, new ItemStack(ItemKamuiShuriken.block));
-				ItemHandlerHelper.giveItemToPlayer(player, kamuiShuriken);
+			if (player instanceof EntityPlayer && helmet instanceof ItemSharingan.Base) {
+				if (((ItemSharingan.Base)helmet).isEternal() || ((ItemSharingan.Base)helmet).getSubType() == ItemSharingan.Type.AMATERASU) {
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer)player, kagutsuchi);
+				}
+				if (
+((ItemSharingan.Base)helmet).isEternal() || ((ItemSharingan.Base)helmet).getSubType() == ItemSharingan.Type.KAMUI) {
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer)player, kamuiShuriken);
+				}
 			}
 			this.setHealth(this.getMaxHealth()*ratio);
 		}

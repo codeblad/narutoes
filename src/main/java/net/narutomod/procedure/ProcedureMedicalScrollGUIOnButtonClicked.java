@@ -1,6 +1,10 @@
 package net.narutomod.procedure;
 
 import net.narutomod.item.*;
+import net.narutomod.item.ItemTenseigan;
+import net.narutomod.item.ItemSharingan;
+import net.narutomod.item.ItemMangekyoSharinganEternal;
+import net.narutomod.item.ItemByakugan;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -78,10 +82,8 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 					return ItemStack.EMPTY;
 				}
 			}.getItemStack((int) (1)));
-			if (((((stack0).getItem() == new ItemStack(ItemMangekyoSharingan.helmet, (int) (1)).getItem())
-					|| ((stack0).getItem() == new ItemStack(ItemMangekyoSharinganObito.helmet, (int) (1)).getItem()))
-					&& (((stack1).getItem() == new ItemStack(ItemMangekyoSharingan.helmet, (int) (1)).getItem())
-							|| ((stack1).getItem() == new ItemStack(ItemMangekyoSharinganObito.helmet, (int) (1)).getItem())))) {
+			if (((stack0.getItem() instanceof ItemSharingan.Base && ((ItemSharingan.Base) stack0.getItem()).isMangekyo())
+					&& (stack1.getItem() instanceof ItemSharingan.Base && ((ItemSharingan.Base) stack1.getItem()).isMangekyo()))) {
 				UUID owner_uuid = ProcedureUtils.getOwnerId(stack0);
 				UUID other_uuid = ProcedureUtils.getOwnerId(stack1);
 				System.out.println("-- owner_uuid=" + owner_uuid + ", other_uuid=" + other_uuid);

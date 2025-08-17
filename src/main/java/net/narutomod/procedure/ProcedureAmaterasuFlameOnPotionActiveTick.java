@@ -1,13 +1,12 @@
 package net.narutomod.procedure;
 
 import net.narutomod.potion.PotionAmaterasuFlame;
-import net.narutomod.item.ItemMangekyoSharinganEternal;
-import net.narutomod.item.ItemMangekyoSharingan;
+import net.narutomod.item.ItemSharingan;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 
@@ -34,10 +33,9 @@ public class ProcedureAmaterasuFlameOnPotionActiveTick extends ElementsNarutomod
 		double w = 0;
 		double h = 0;
 		double amp = 0;
-		if (((((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY)
-				.getItem() == new ItemStack(ItemMangekyoSharingan.helmet, (int) (1)).getItem())
-				|| (((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY)
-						.getItem() == new ItemStack(ItemMangekyoSharinganEternal.helmet, (int) (1)).getItem()))) {
+		ItemStack stack = ((EntityLivingBase) entity).getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+		if ((stack.getItem() instanceof ItemSharingan.Base && ((((ItemSharingan.Base) stack.getItem()).getSubType() == ItemSharingan.Type.AMATERASU)
+				|| ((ItemSharingan.Base) stack.getItem()).isEternal()))) {
 			((EntityLivingBase) entity).removePotionEffect(PotionAmaterasuFlame.potion);
 			(entity).extinguish();
 		} else {

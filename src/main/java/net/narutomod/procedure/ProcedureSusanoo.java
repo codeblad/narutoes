@@ -81,11 +81,15 @@ public class ProcedureSusanoo extends ElementsNarutomodMod.ModElement {
 			player.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, (int)8, 2));
 		}
 		player.addPotionEffect(new PotionEffect(PotionFeatherFalling.potion, 60, 5));
+		
+	public static boolean isActivated(Entity entity) {
+		Entity susanoo = entity.world.getEntityByID(getSummonedSusanooId(entity));
+		return susanoo instanceof EntitySusanooBase && susanoo.isEntityAlive();
 	}
 
 	public static void execute(EntityPlayer player) {
 		World world = player.world;
-		boolean flag = (player.isCreative() || ProcedureUtils.hasItemInInventory(player, ItemRinnegan.helmet));
+		boolean flag = (player.isCreative() || ProcedureUtils.hasAnyItemOfSubtype(player, ItemRinnegan.Base.class));
 		ItemStack helmet = player.inventory.armorInventory.get(3);
 		if (player.isCreative()) {
 			player.getEntityData().setDouble("susanoo_cd", 0);
@@ -131,6 +135,11 @@ public class ProcedureSusanoo extends ElementsNarutomodMod.ModElement {
 			handleSusanCD(player, entitySpawned);
 			if (entitySpawned != null) {
 				entitySpawned.setDead();
+				if (!flag && (!(helmet.getItem() instanceof ItemSharingan.Base) || !((ItemSharingan.Base)helmet.getItem()).isEternal())) {
+					player.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, (int)cooldown, 3));
+					player.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, (int)cooldown, 2));
+				}
+				player.addPotionEffect(new PotionEffect(PotionFeatherFalling.potion, 60, 5));
 			}
 		}
 	}

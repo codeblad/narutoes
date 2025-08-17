@@ -38,6 +38,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.item.ItemStack;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.nbt.NBTTagCompound;
 
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
@@ -65,10 +66,14 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 				.id(new ResourceLocation("narutomod", "rasengan"), ENTITYID).name("rasengan").tracker(64, 3, true).build());
 	}
 
+	//@Override
+	//public void init(FMLInitializationEvent event) {
+	//	MinecraftForge.EVENT_BUS.register(new EC.EventHook());
+	//}
+
 	public static class EC extends EntityScalableProjectile.Base implements ProcedureSync.CPacketVec3d.IHandler, ItemJutsu.IJutsu {
 		private static final DataParameter<Integer> OWNER_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private final int growTime = 30;
-		private ItemStack usingItemstack;
 		private float fullScale;
 		private Vec3d angles;
 		private DamageSource damageSource;
@@ -77,17 +82,16 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			super(a);
 			this.setOGSize(0.35F, 0.35F);
 			this.isImmuneToFire = true;
-			this.damageSource = ItemJutsu.NINJUTSU_DAMAGE;
+			this.damageSource = ItemJutsu.causeJutsuDamage(this, this.getOwner());
 		}
 
-		public EC(EntityLivingBase shooter, float scale, @Nullable ItemStack stack) {
+		public EC(EntityLivingBase shooter, float scale) {
 			super(shooter);
 			this.setOGSize(0.35F, 0.35F);
 			this.setEntityScale(0.1f);
 			this.setOwner(shooter);
 			this.setLocationAndAngles(shooter.posX, shooter.posY, shooter.posZ, 0.0f, 0.0f);
 			this.fullScale = scale;
-			this.usingItemstack = stack;
 			this.isImmuneToFire = true;
 			this.damageSource = ItemJutsu.causeJutsuDamage(this, shooter);
 		}
@@ -119,16 +123,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				if (this.shootingEntity != null) {
 					ProcedureSync.EntityNBTTag.removeAndSync(this.shootingEntity, NarutomodModVariables.forceBowPose);
-				}
-				if (this.usingItemstack != null) {
-					ItemStack stack = this.usingItemstack;
-					if (this.shootingEntity instanceof EntityPlayer) {
-						stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)this.shootingEntity, stack.getItem());
-					}
-					if (stack != null && stack.hasTagCompound()) {
-						stack.getTagCompound().removeTag(Jutsu.SIZE_KEY);
-						stack.getTagCompound().removeTag(Jutsu.ID_KEY);
-					}
+					ItemNinjutsu.RASENGAN.jutsu.deactivate(this.shootingEntity);
 				}
 			}
 		}
@@ -136,7 +131,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (!this.world.isRemote && this.ticksAlive == 1 && this.shootingEntity != null) {
+			if (!this.world.isRemote && this.shootingEntity != null && !this.shootingEntity.getEntityData().getBoolean(NarutomodModVariables.forceBowPose)) {
 				ProcedureSync.EntityNBTTag.setAndSync(this.shootingEntity, NarutomodModVariables.forceBowPose, true);
 			}
 			if (!this.world.isRemote && this.ticksAlive <= this.growTime) {
@@ -218,10 +213,8 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 					return false;
 				} else if (summoner.equals(entityIn)) {
 					return true;
-				} else if (entityIn instanceof EntityKageBunshin.EC) {
-					if (summoner.equals(((EntityKageBunshin.EC)entityIn).getSummoner())) {
-						return true;
-					}
+				} else if (entityIn instanceof EntityKageBunshin.EC && summoner.equals(((EntityKageBunshin.EC)entityIn).getSummoner())) {
+					return true;
 				}
 			}
 			return false;
@@ -251,6 +244,37 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			this.angles = vec;
 		}
 
+		@Override
+		protected void readEntityFromNBT(NBTTagCompound compound) {
+			super.readEntityFromNBT(compound);
+			this.fullScale = compound.getFloat("fullScale");
+			this.damageSource = compound.getBoolean("isSenjutsu") ? ItemJutsu.causeSenjutsuDamage(this, this.getOwner())
+			 : ItemJutsu.causeJutsuDamage(this, this.getOwner());
+		}
+
+		@Override
+		protected void writeEntityToNBT(NBTTagCompound compound) {
+			super.writeEntityToNBT(compound);
+			compound.setFloat("fullScale", this.fullScale);
+			compound.setBoolean("isSenjutsu", ItemJutsu.isDamageSourceSenjutsu(this.damageSource));
+		}
+
+		/*public static class EventHook {
+			@SubscribeEvent
+			public void onAttack(LivingAttackEvent event) {
+				if (!event.getEntity().world.isRemote && !ItemJutsu.isDamageSourceJutsu(event.getSource())) {
+					Entity attacker = event.getSource().getImmediateSource();
+					if (attacker instanceof EntityLivingBase && ItemNinjutsu.RASENGAN.jutsu.isActivated((EntityLivingBase)attacker)) {
+						Entity jutsuEntity = ItemNinjutsu.RASENGAN.jutsu.getJutsu((EntityLivingBase)attacker);
+						if (jutsuEntity instanceof EC) {
+							event.setCanceled(true);
+							jutsuEntity.applyEntityCollision(event.getEntity());
+						}
+					}
+				}
+			}
+		}*/
+
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			private static final String ID_KEY = "RasenganEntityId";
 			private static final String SIZE_KEY = "RasenganSize";
@@ -262,7 +286,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 					entity1.setDead();
 				} else if ((stack.getItem() == ItemNinjutsu.block && power >= 0.5f)
 				 || (stack.getItem() == ItemSenjutsu.block && power >= 3.0f)) {
-					EC entity2 = this.createJutsu(entity, power, stack);
+					EC entity2 = this.createJutsu(entity, power);
 					if (stack.getItem() == ItemSenjutsu.block) {
 						entity2.damageSource = ItemJutsu.causeSenjutsuDamage(entity2, entity);
 					}
@@ -282,10 +306,10 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 				return false;
 			}
 
-			public static EC createJutsu(EntityLivingBase entity, float power, @Nullable ItemStack stack) {
+			public static EC createJutsu(EntityLivingBase entity, float power) {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 				  .getObject(new ResourceLocation("narutomod:rasengan_start")), SoundCategory.NEUTRAL, 1.0F, 1.0F);
-				EC entity2 = new EC(entity, power, stack);
+				EC entity2 = new EC(entity, power);
 				entity.world.spawnEntity(entity2);
 				return entity2;
 			}
@@ -296,13 +320,30 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
+			public boolean isActivated(EntityLivingBase entity) {
+				return this.getData(entity) != null;
+			}
+
+			@Override
+			public void deactivate(EntityLivingBase entity) {
+				ItemJutsu.IJutsuCallback.JutsuData jd = this.getData(entity);
+				if (jd != null) {
+					if (!jd.entity.isDead) {
+						jd.entity.setDead();
+					}
+					jd.stack.getTagCompound().removeTag(ID_KEY);
+					jd.stack.getTagCompound().removeTag(SIZE_KEY);
+				}
+			}
+
+			@Override
 			public float getPower(ItemStack stack) {
 				return stack.hasTagCompound() ? stack.getTagCompound().getFloat(SIZE_KEY) : 0.0f;
 			}
 
 			@Override
 			public float getBasePower() {
-				return 0.0f;
+				return 0.45f;
 			}
 	
 			@Override
@@ -313,6 +354,25 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			@Override
 			public float getMaxPower() {
 				return 3.0f;
+			}
+
+			@Override @Nullable
+			public Entity getJutsu(EntityLivingBase entity) {
+				ItemJutsu.IJutsuCallback.JutsuData jd = this.getData(entity);
+				if (jd != null) {
+					return jd.entity;
+				}
+				return null;
+			}
+
+			@Override @Nullable
+			public ItemJutsu.IJutsuCallback.JutsuData getData(EntityLivingBase entity) {
+				ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, ItemNinjutsu.block);
+				if (stack != null && stack.hasTagCompound() && stack.getTagCompound().hasKey(ID_KEY)) {
+					Entity entity1 = entity.world.getEntityByID(stack.getTagCompound().getInteger(ID_KEY));
+					return entity1 instanceof EC ? new JutsuData(entity1, stack) : null;
+				}
+				return null;
 			}
 		}
 
@@ -331,7 +391,6 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			public float getMaxPower() {
 				return 6.0f;
 			}
-
 		}
 	}
 
@@ -438,19 +497,24 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 			            GlStateManager.translate(-0.05F, entity.height + 0.125F, 0.0F);
 		            }
 				}
+				float f1 = partialTicks + entity.ticksExisted;
 				GlStateManager.translate(0f, 0.5F - 0.175F * scale, 0f);
 				GlStateManager.scale(scale, scale, scale);
-				GlStateManager.rotate((partialTicks + entity.ticksExisted) * 30.0F, 1.0F, 1.0F, 0.0F);
 				GlStateManager.enableAlpha();
 				GlStateManager.enableBlend();
 				GlStateManager.disableCull();
 				GlStateManager.disableLighting();
 				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-				for (int i = 0; i < 10; i++) {
-					GlStateManager.rotate(rand.nextFloat() * 30f, 0f, 1f, 0f);
-					GlStateManager.rotate(rand.nextFloat() * 30f, 1f, 1f, 0f);
-					this.mainModel.render(entity, alpha, 0.0F, partialTicks + entity.ticksExisted, 0.0F, 0.0F, 0.0625F);
+				for (int i = 9; i >= 0; i--) {
+					GlStateManager.pushMatrix();
+					GlStateManager.rotate(20.0F * i, 1.0F, 0.0F, 0.0F);
+					GlStateManager.rotate(f1 * 60.0F, 0.0F, 1.0F, 0.0F);
+					float f2 = 1F - (float)i / 27F;
+					GlStateManager.scale(f2, f2, f2);
+					GlStateManager.color(0.66F + 0.34F * i / 9, 0.87F + 0.13F * i / 9, 1.0F, 0.3F * alpha);
+					this.mainModel.render(entity, 0.0F, 0.0F, f1, 0.0F, 0.0F, 0.0625F);
+					GlStateManager.popMatrix();
 				}
 				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 				GlStateManager.enableLighting();
@@ -492,79 +556,61 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 		// Paste this class into your mod and generate all required imports
 		@SideOnly(Side.CLIENT)
 		public class ModelRasengan extends ModelBase {
-			private final ModelRenderer core;
-			private final ModelRenderer bone;
-			private final ModelRenderer bone8;
-			private final ModelRenderer bone7;
-			private final ModelRenderer bone6;
 			private final ModelRenderer shell;
-			private final ModelRenderer bone5;
 			private final ModelRenderer bone4;
+			private final ModelRenderer bone9;
 			private final ModelRenderer bone3;
+			private final ModelRenderer bone10;
 			private final ModelRenderer bone2;
+			private final ModelRenderer bone11;
 		
 			public ModelRasengan() {
 				textureWidth = 32;
 				textureHeight = 32;
 		
-				core = new ModelRenderer(this);
-				core.setRotationPoint(0.0F, 0.0F, 0.0F);
-				bone = new ModelRenderer(this);
-				bone.setRotationPoint(0.0F, 0.0F, 0.0F);
-				core.addChild(bone);
-				bone.cubeList.add(new ModelBox(bone, 0, 0, -0.5F, -0.5F, -0.5F, 1, 1, 1, 0.0F, false));
-				bone.cubeList.add(new ModelBox(bone, 0, 0, -1.0F, -1.0F, -1.0F, 2, 2, 2, 0.0F, false));
-				bone.cubeList.add(new ModelBox(bone, 0, 0, -1.5F, -1.5F, -1.5F, 3, 3, 3, 0.0F, false));
-				bone8 = new ModelRenderer(this);
-				bone8.setRotationPoint(0.0F, 0.0F, 0.0F);
-				core.addChild(bone8);
-				setRotationAngle(bone8, 0.0F, 0.0F, 0.7854F);
-				bone8.cubeList.add(new ModelBox(bone8, 0, 0, -0.5F, -0.5F, -0.5F, 1, 1, 1, 0.0F, false));
-				bone8.cubeList.add(new ModelBox(bone8, 0, 0, -1.0F, -1.0F, -1.0F, 2, 2, 2, 0.0F, false));
-				bone8.cubeList.add(new ModelBox(bone8, 0, 0, -1.5F, -1.5F, -1.5F, 3, 3, 3, 0.0F, false));
-				bone7 = new ModelRenderer(this);
-				bone7.setRotationPoint(0.0F, 0.0F, 0.0F);
-				core.addChild(bone7);
-				setRotationAngle(bone7, 0.0F, -0.7854F, 0.0F);
-				bone7.cubeList.add(new ModelBox(bone7, 0, 0, -0.5F, -0.5F, -0.5F, 1, 1, 1, 0.0F, false));
-				bone7.cubeList.add(new ModelBox(bone7, 0, 0, -1.0F, -1.0F, -1.0F, 2, 2, 2, 0.0F, false));
-				bone7.cubeList.add(new ModelBox(bone7, 0, 0, -1.5F, -1.5F, -1.5F, 3, 3, 3, 0.0F, false));
-				bone6 = new ModelRenderer(this);
-				bone6.setRotationPoint(0.0F, 0.0F, 0.0F);
-				core.addChild(bone6);
-				setRotationAngle(bone6, -0.7854F, 0.0F, 0.0F);
-				bone6.cubeList.add(new ModelBox(bone6, 0, 0, -0.5F, -0.5F, -0.5F, 1, 1, 1, 0.0F, false));
-				bone6.cubeList.add(new ModelBox(bone6, 0, 0, -1.0F, -1.0F, -1.0F, 2, 2, 2, 0.0F, false));
-				bone6.cubeList.add(new ModelBox(bone6, 0, 0, -1.5F, -1.5F, -1.5F, 3, 3, 3, 0.0F, false));
-		
 				shell = new ModelRenderer(this);
 				shell.setRotationPoint(0.0F, 0.0F, 0.0F);
-				bone5 = new ModelRenderer(this);
-				bone5.setRotationPoint(0.0F, 0.0F, 0.0F);
-				shell.addChild(bone5);
-				bone5.cubeList.add(new ModelBox(bone5, 0, 0, -2.0F, -2.0F, -2.0F, 4, 4, 4, 0.0F, false));
+				shell.cubeList.add(new ModelBox(shell, 0, 0, -2.0F, -2.0F, -2.0F, 4, 4, 4, 0.0F, false));
+		
 				bone4 = new ModelRenderer(this);
 				bone4.setRotationPoint(0.0F, 0.0F, 0.0F);
 				shell.addChild(bone4);
-				setRotationAngle(bone4, 0.0F, 0.0F, 0.7854F);
+				setRotationAngle(bone4, 0.0F, 0.0F, 0.5236F);
 				bone4.cubeList.add(new ModelBox(bone4, 0, 0, -2.0F, -2.0F, -2.0F, 4, 4, 4, 0.0F, false));
+		
+				bone9 = new ModelRenderer(this);
+				bone9.setRotationPoint(0.0F, 0.0F, 0.0F);
+				shell.addChild(bone9);
+				setRotationAngle(bone9, 0.0F, 0.0F, 1.0472F);
+				bone9.cubeList.add(new ModelBox(bone9, 0, 0, -2.0F, -2.0F, -2.0F, 4, 4, 4, 0.0F, false));
+		
 				bone3 = new ModelRenderer(this);
 				bone3.setRotationPoint(0.0F, 0.0F, 0.0F);
 				shell.addChild(bone3);
-				setRotationAngle(bone3, 0.0F, -0.7854F, 0.0F);
+				setRotationAngle(bone3, 0.0F, -0.5236F, 0.0F);
 				bone3.cubeList.add(new ModelBox(bone3, 0, 0, -2.0F, -2.0F, -2.0F, 4, 4, 4, 0.0F, false));
+		
+				bone10 = new ModelRenderer(this);
+				bone10.setRotationPoint(0.0F, 0.0F, 0.0F);
+				shell.addChild(bone10);
+				setRotationAngle(bone10, 0.0F, -1.0472F, 0.0F);
+				bone10.cubeList.add(new ModelBox(bone10, 0, 0, -2.0F, -2.0F, -2.0F, 4, 4, 4, 0.0F, false));
+		
 				bone2 = new ModelRenderer(this);
 				bone2.setRotationPoint(0.0F, 0.0F, 0.0F);
 				shell.addChild(bone2);
-				setRotationAngle(bone2, -0.7854F, 0.0F, 0.0F);
+				setRotationAngle(bone2, -0.5236F, 0.0F, 0.0F);
 				bone2.cubeList.add(new ModelBox(bone2, 0, 0, -2.0F, -2.0F, -2.0F, 4, 4, 4, 0.0F, false));
+		
+				bone11 = new ModelRenderer(this);
+				bone11.setRotationPoint(0.0F, 0.0F, 0.0F);
+				shell.addChild(bone11);
+				setRotationAngle(bone11, -1.0472F, 0.0F, 0.0F);
+				bone11.cubeList.add(new ModelBox(bone11, 0, 0, -2.0F, -2.0F, -2.0F, 4, 4, 4, 0.0F, false));
 			}
 	
 			@Override
 			public void render(Entity entity, float alpha, float f1, float f2, float f3, float f4, float f5) {
-				GlStateManager.color(1f, 1f, 1f, 0.3f * alpha);
-				core.render(f5);
-				GlStateManager.color(0.66F, 0.87F, 1.0F, 0.3F * alpha);
 				shell.render(f5);
 			}
 	

@@ -69,7 +69,7 @@ public class ProcedureOnLivingUpdate extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static void setNoClip(Entity player, boolean noClip, boolean allowMouseClicks) {
-		if (player instanceof EntityPlayerMP) {
+		if (!player.world.isRemote) {
 			byte flag = noClip ? (byte)(1|(allowMouseClicks?2:0)) : (byte)0;
 			player.noClip = noClip;
 			if (noClip) {
@@ -77,7 +77,9 @@ public class ProcedureOnLivingUpdate extends ElementsNarutomodMod.ModElement {
 			} else {
 				player.getEntityData().removeTag(NarutomodModVariables.noClipFlag);
 			}
-			NarutomodMod.PACKET_HANDLER.sendTo(new CustomDataMessage(player, flag), (EntityPlayerMP) player);
+			if (player instanceof EntityPlayerMP) {
+				NarutomodMod.PACKET_HANDLER.sendTo(new CustomDataMessage(player, flag), (EntityPlayerMP) player);
+			}
 			NarutomodMod.PACKET_HANDLER.sendToAllTracking(new CustomDataMessage(player, flag), player);
 		}
 	}
@@ -102,7 +104,7 @@ public class ProcedureOnLivingUpdate extends ElementsNarutomodMod.ModElement {
 			public IMessage onMessage(CustomDataMessage message, MessageContext context) {
 				Minecraft.getMinecraft().addScheduledTask(() -> {
 					Entity player = Minecraft.getMinecraft().world.getEntityByID(message.id);
-					if (player instanceof EntityPlayer) {
+					if (player != null) {
 						if (message.flag == 0) {
 							player.getEntityData().removeTag(NarutomodModVariables.noClipFlag);
 							player.noClip = false;
@@ -141,6 +143,7 @@ public class ProcedureOnLivingUpdate extends ElementsNarutomodMod.ModElement {
 			if (entity.noClip) {
 				if (!entity.hasNoGravity()) {
 					if (world.isAirBlock(new BlockPos(entity.posX, entity.posY-0.1d, entity.posZ)) || entity.isSneaking()) {
+					//if (world.isAirBlock(new BlockPos(entity.posX+entity.motionX, entity.posY+entity.motionY, entity.posZ+entity.motionZ)) || entity.isSneaking()) {
 						entity.motionY -= 0.01d;
 					} else {
 						entity.motionY = 0;
@@ -149,8 +152,10 @@ public class ProcedureOnLivingUpdate extends ElementsNarutomodMod.ModElement {
 			}
 		}
 		double d = entity.getEntityData().getDouble(NarutomodModVariables.DeathAnimationTime);
-		if (!world.isRemote && d > 0.0D) {
-			event.setCanceled(true);
+		if (d > 0.0D) {
+			if (entity instanceof EntityPlayer) {
+				event.setCanceled(true);
+			}
 			{
 				java.util.HashMap<String, Object> $_dependencies = new java.util.HashMap<>();
 				$_dependencies.put("entity", entity);
@@ -159,7 +164,7 @@ public class ProcedureOnLivingUpdate extends ElementsNarutomodMod.ModElement {
 			}
 			d -= 1.0D;
 			entity.getEntityData().setDouble(NarutomodModVariables.DeathAnimationTime, d);
-			if (d <= 0.0D) {
+			if (d <= 0.0D && !world.isRemote) {
 				ProcedureUtils.clearDeathAnimations(entity);
 				if (entity instanceof EntityPlayer) {
 					entity.attackEntityFrom(ProcedureUtils.SPECIAL_DAMAGE, Float.MAX_VALUE);
@@ -182,6 +187,14 @@ public class ProcedureOnLivingUpdate extends ElementsNarutomodMod.ModElement {
 				entity.getEntityData().setInteger("FearEffect", i - 1);
 			} else {
 				entity.getEntityData().removeTag("FearEffect");
+			}
+		}
+		if (entity.getEntityData().hasKey("tempDisableMouseClicks")) {
+			int i = entity.getEntityData().getInteger("tempDisableMouseClicks");
+			if (i > 0) {
+				entity.getEntityData().setInteger("tempDisableMouseClicks", i - 1);
+			} else {
+				entity.getEntityData().removeTag("tempDisableMouseClicks");
 			}
 		}
 		if (entity.getEntityData().hasKey("ForceExtinguish")) {
@@ -221,8 +234,11 @@ public class ProcedureOnLivingUpdate extends ElementsNarutomodMod.ModElement {
 		}
 		if (world.isRemote && entity.getEntityData().hasKey("GlowingTicks")) {
 			int i = entity.getEntityData().getInteger("GlowingTicks");
-			entity.setGlowing(i > 0);
-			if (i > 0) {
+			boolean shouldGlow = i > 0;
+			if (entity.isGlowing() != shouldGlow) {
+				entity.setGlowing(shouldGlow);
+			}
+			if (shouldGlow) {
 				setGlowingFor(entity, i - 1);
 			} else {
 				entity.getEntityData().removeTag("GlowingTicks");
@@ -258,6 +274,19 @@ public class ProcedureOnLivingUpdate extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
+	public static void disableMouseClicks(EntityPlayer player, int ticks) {
+		if (ticks == 0 || ticks > player.getEntityData().getInteger("tempDisableMouseClicks")) {
+			player.getEntityData().setInteger("tempDisableMouseClicks", ticks);
+			if (player instanceof EntityPlayerMP) {
+				ProcedureSync.EntityNBTTag.sendToSelf((EntityPlayerMP)player, "tempDisableMouseClicks", ticks);
+			}
+		}
+	}
+
+	public static boolean isMouseDisabled(EntityPlayer player) {
+		return player.getEntityData().getInteger("tempDisableMouseClicks") > 0;
+	}
+
 	@SubscribeEvent
 	public void onLivingJoinsWorld(EntityJoinWorldEvent event) {
 		Entity entity = event.getEntity();
@@ -272,6 +301,18 @@ public class ProcedureOnLivingUpdate extends ElementsNarutomodMod.ModElement {
 		if (isNoClip(event.getEntity())) {
 			event.setCanceled(true);
 		}
+	}
+
+	public static void forceBowPose(Entity entity, boolean pose) {
+		if (pose) {
+			ProcedureSync.EntityNBTTag.setAndSync(entity, NarutomodModVariables.forceBowPose, true);
+		} else {
+			ProcedureSync.EntityNBTTag.removeAndSync(entity, NarutomodModVariables.forceBowPose);
+		}
+	}
+
+	public static boolean isForcedBowPose(Entity entity) {
+		return entity.getEntityData().getBoolean(NarutomodModVariables.forceBowPose);
 	}
 
 	@SideOnly(Side.CLIENT)

@@ -32,7 +32,6 @@ import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.ai.EntityAIHurtByTarget;
-import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.ai.EntityAIAttackRanged;
 import net.minecraft.entity.ai.EntityAITarget;
 import net.minecraft.entity.ai.EntityAIAvoidEntity;
@@ -146,6 +145,14 @@ public class EntityZabuzaMomochi extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		protected void applyEntityAttributes() {
+			super.applyEntityAttributes();
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10D);
+		}
+
+		@Override
 		protected void initEntityAI() {
 			super.initEntityAI();
 			this.tasks.addTask(0, new EntityAISwimming(this));
@@ -156,12 +163,7 @@ public class EntityZabuzaMomochi extends ElementsNarutomodMod.ModElement {
 			}, 10f, 1.25d, 1.5d));
 			this.tasks.addTask(2, new EntityNinjaMob.AIAttackRangedJutsu(this, WATERDRAGON_CD, 12.0F));
 			this.tasks.addTask(2, new EntityNinjaMob.AILeapAtTarget(this, 1.0f));
-			this.tasks.addTask(3, new EntityAIAttackMelee(this, 1.5d, true) {
-				@Override
-				protected double getAttackReachSqr(EntityLivingBase attackTarget) {
-					return 5.3d + attackTarget.width;
-				}
-			});
+			this.tasks.addTask(3, new EntityNinjaMob.AIAttackMelee(this, 1.5d, true));
 			this.tasks.addTask(4, new EntityAIWatchClosest2(this, EntityPlayer.class, 15.0F, 1.0F));
 			this.tasks.addTask(5, new EntityAIWander(this, 0.5));
 			this.tasks.addTask(6, new EntityAIWatchClosest(this, EntityMob.class, 8.0F));
@@ -179,11 +181,8 @@ public class EntityZabuzaMomochi extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected void applyEntityAttributes() {
-			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10D);
+		protected double meleeReach() {
+			return 4.8d;
 		}
 
 		@Override
@@ -196,11 +195,6 @@ public class EntityZabuzaMomochi extends ElementsNarutomodMod.ModElement {
 
 		public boolean isClone() {
 			return this.original != null;
-		}
-
-		@Override
-		public boolean isOnSameTeam(Entity entityIn) {
-			return super.isOnSameTeam(entityIn) || EntityNinjaMob.TeamZabuza.contains(entityIn.getClass());
 		}
 
 		@Override
@@ -434,51 +428,51 @@ public class EntityZabuzaMomochi extends ElementsNarutomodMod.ModElement {
 				this.bipedHead.setRotationPoint(0.0F, 0.0F, 0.0F);
 				this.bipedHead.cubeList.add(new ModelBox(this.bipedHead, 0, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.0F, false));
 				hair = new ModelRenderer(this);
-				hair.setRotationPoint(0.0F, 0.0F, 0.0F);
+				hair.setRotationPoint(0.0F, -0.5F, 0.0F);
 				bipedHead.addChild(hair);
-				ModelRenderer bone = new ModelRenderer(this);
-				bone.setRotationPoint(-2.0F, -5.0F, 0.0F);
-				hair.addChild(bone);
-				setRotationAngle(bone, 0.0F, 0.0F, -0.1745F);
-				bone.cubeList.add(new ModelBox(bone, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, false));
-				ModelRenderer bone3 = new ModelRenderer(this);
-				bone3.setRotationPoint(-2.0F, -5.0F, 2.0F);
-				hair.addChild(bone3);
-				setRotationAngle(bone3, -0.0873F, 0.0F, -0.1309F);
-				bone3.cubeList.add(new ModelBox(bone3, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, false));
+				ModelRenderer bone1 = new ModelRenderer(this);
+				bone1.setRotationPoint(-2.0F, -5.0F, 0.0F);
+				hair.addChild(bone1);
+				setRotationAngle(bone1, 0.0F, 0.0F, -0.5236F);
+				bone1.cubeList.add(new ModelBox(bone1, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, false));
 				ModelRenderer bone2 = new ModelRenderer(this);
-				bone2.setRotationPoint(-2.0F, -5.0F, -2.0F);
+				bone2.setRotationPoint(-2.0F, -4.5F, -2.0F);
 				hair.addChild(bone2);
-				setRotationAngle(bone2, 0.0873F, 0.0F, -0.1309F);
+				setRotationAngle(bone2, 0.3491F, 0.0F, -0.3491F);
 				bone2.cubeList.add(new ModelBox(bone2, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, false));
-				ModelRenderer bone9 = new ModelRenderer(this);
-				bone9.setRotationPoint(0.0F, -5.0F, -2.0F);
-				hair.addChild(bone9);
-				setRotationAngle(bone9, 0.1309F, 0.0F, 0.0F);
-				bone9.cubeList.add(new ModelBox(bone9, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, false));
-				ModelRenderer bone10 = new ModelRenderer(this);
-				bone10.setRotationPoint(0.0F, -5.0F, 2.0F);
-				hair.addChild(bone10);
-				setRotationAngle(bone10, -0.1309F, 0.0F, 0.0F);
-				bone10.cubeList.add(new ModelBox(bone10, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, false));
+				ModelRenderer bone3 = new ModelRenderer(this);
+				bone3.setRotationPoint(-2.0F, -4.5F, 2.0F);
+				hair.addChild(bone3);
+				setRotationAngle(bone3, -0.3491F, 0.0F, -0.3491F);
+				bone3.cubeList.add(new ModelBox(bone3, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, false));
+				ModelRenderer bone4 = new ModelRenderer(this);
+				bone4.setRotationPoint(0.0F, -5.0F, -2.0F);
+				hair.addChild(bone4);
+				setRotationAngle(bone4, 0.5236F, 0.0F, 0.0F);
+				bone4.cubeList.add(new ModelBox(bone4, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, false));
+				ModelRenderer bone5 = new ModelRenderer(this);
+				bone5.setRotationPoint(0.0F, -5.0F, 2.0F);
+				hair.addChild(bone5);
+				setRotationAngle(bone5, -0.5236F, 0.0F, 0.0F);
+				bone5.cubeList.add(new ModelBox(bone5, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, false));
 				ModelRenderer bone6 = new ModelRenderer(this);
 				bone6.setRotationPoint(2.0F, -5.0F, 0.0F);
 				hair.addChild(bone6);
-				setRotationAngle(bone6, 0.0F, 0.0F, 0.1309F);
+				setRotationAngle(bone6, 0.0F, 0.0F, 0.5236F);
 				bone6.cubeList.add(new ModelBox(bone6, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, true));
 				ModelRenderer bone7 = new ModelRenderer(this);
-				bone7.setRotationPoint(2.0F, -5.0F, 2.0F);
+				bone7.setRotationPoint(2.0F, -4.5F, 2.0F);
 				hair.addChild(bone7);
-				setRotationAngle(bone7, -0.0873F, 0.0F, 0.1309F);
+				setRotationAngle(bone7, -0.3491F, 0.0F, 0.3491F);
 				bone7.cubeList.add(new ModelBox(bone7, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, true));
 				ModelRenderer bone8 = new ModelRenderer(this);
-				bone8.setRotationPoint(2.0F, -5.0F, -2.0F);
+				bone8.setRotationPoint(2.0F, -4.5F, -2.0F);
 				hair.addChild(bone8);
-				setRotationAngle(bone8, 0.0873F, 0.0F, 0.1309F);
+				setRotationAngle(bone8, 0.3491F, 0.0F, 0.3491F);
 				bone8.cubeList.add(new ModelBox(bone8, 24, 0, -2.0F, -4.0F, -2.0F, 4, 4, 4, 0.0F, true));
 				this.bipedHeadwear = new ModelRenderer(this);
 				this.bipedHeadwear.setRotationPoint(0.0F, 0.0F, 0.0F);
-				this.bipedHeadwear.cubeList.add(new ModelBox(this.bipedHeadwear, 32, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.25F, false));
+				this.bipedHeadwear.cubeList.add(new ModelBox(this.bipedHeadwear, 32, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.4F, false));
 				this.bipedBody = new ModelRenderer(this);
 				this.bipedBody.setRotationPoint(0.0F, 0.0F, 0.0F);
 				this.bipedBody.cubeList.add(new ModelBox(this.bipedBody, 16, 16, -4.0F, 0.0F, -2.0F, 8, 12, 4, 0.0F, false));
