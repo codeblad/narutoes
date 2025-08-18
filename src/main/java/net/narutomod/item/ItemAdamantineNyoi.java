@@ -100,7 +100,7 @@ public class ItemAdamantineNyoi extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class RangedItem extends ItemJutsu.Base implements ItemOnBody.Interface {
-		private static final float DAMAGE = 20.0f;
+		private static final float DAMAGE = 18.0f;
 
 		public RangedItem(ItemJutsu.JutsuEnum... list) {
 			super(ItemJutsu.JutsuEnum.Type.OTHER, list);
@@ -122,7 +122,9 @@ public class ItemAdamantineNyoi extends ElementsNarutomodMod.ModElement {
 			}
 			return multimap;
 		}
-
+
+
+
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
@@ -149,7 +151,8 @@ public class ItemAdamantineNyoi extends ElementsNarutomodMod.ModElement {
 			Entity entity = world.getEntityByID(stack.getTagCompound().getInteger("staffEntityId"));
 			return entity instanceof EntityExtend && !entity.isDead ? (EntityExtend)entity : null;
 		}
-
+
+
 		@Override
 		public EnumAction getItemUseAction(ItemStack itemstack) {
 			return this.getCurrentJutsu(itemstack) == WEAPON ? EnumAction.BLOCK : EnumAction.BOW;
@@ -178,7 +181,7 @@ public class ItemAdamantineNyoi extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Integer> SHOOTERID = EntityDataManager.<Integer>createKey(EntityExtend.class, DataSerializers.VARINT);
 		private static final DataParameter<Integer> SEGMENT = EntityDataManager.<Integer>createKey(EntityExtend.class, DataSerializers.VARINT);
 		private final EntityExtend[] segment = new EntityExtend[60];
-		private final int lifeSpan = 300;
+		private final int lifeSpan = 100;
 		private final float lengthMultiplier = 2.0f;
 		private double renderTick;
 		private boolean checked;
@@ -285,10 +288,10 @@ public class ItemAdamantineNyoi extends ElementsNarutomodMod.ModElement {
 							Vec3d vec2 = this.segment[i].collisionhelper.getUpdatedMotion();
 							float f = MathHelper.sqrt((float)vec2.lengthVector() * scale);
 							for (Map.Entry<Entity, EnumFacing> entry : this.segment[i].collisionhelper.getEntitiesHitMap().entrySet()) {
-								entry.getKey().attackEntityFrom(DamageSource.causeIndirectDamage(this, shooter), f * this.damage * 1.75f);
+								entry.getKey().attackEntityFrom(DamageSource.causeIndirectDamage(this, shooter), 10+ItemJutsu.getDmgMult(this.shootingEntity)*3.5f);
 								ProcedureUtils.CollisionHelper.reposHitEntity(this.segment[i].getEntityBoundingBox().offset(vec2), entry.getKey(), entry.getValue());
-								entry.getKey().addVelocity(vec2.x, vec2.y, vec2.z);
-								entry.getKey().velocityChanged = true;
+								/*entry.getKey().addVelocity(vec2.x, vec2.y, vec2.z);
+								entry.getKey().velocityChanged = true;*/
 							}
 							if (this.segment[i].collisionhelper.anyBlockHits()) {
 								if (net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, shooter)) {

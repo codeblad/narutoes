@@ -166,9 +166,9 @@ public class EntityTwoTails extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.8D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10000.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(3000.0D);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(30.0D);
 		}
 
@@ -470,7 +470,8 @@ public class EntityTwoTails extends ElementsNarutomodMod.ModElement {
 				body = new ModelRenderer(this);
 				body.setRotationPoint(0.0F, 3.0F, 0.0F);
 
-				torso = new ModelRenderer(this);
+		
+		torso = new ModelRenderer(this);
 				torso.setRotationPoint(6.0F, 8.0F, 4.25F);
 				body.addChild(torso);
 				
@@ -1270,7 +1271,8 @@ public class EntityTwoTails extends ElementsNarutomodMod.ModElement {
 				bodyFlamed = new ModelRenderer(this);
 				bodyFlamed.setRotationPoint(0.0F, 3.0F, 0.0F);
 
-				torso2 = new ModelRenderer(this);
+		
+		torso2 = new ModelRenderer(this);
 				torso2.setRotationPoint(6.0F, 8.0F, 4.25F);
 				bodyFlamed.addChild(torso2);
 				

@@ -61,12 +61,12 @@ public class ItemRinnegan extends ElementsNarutomodMod.ModElement {
 	protected static final UUID RINNESHARINGAN_MODIFIER = UUID.fromString("135da083-a632-483e-85bd-2281f15ca7e0");
 	public static final double SHINRATENSEI_CHAKRA_USAGE = 10d;
 	public static final double BANSHOTENIN_CHAKRA_USAGE = 0.5d; // per tick
-	public static final double CHIBAKUTENSEI_CHAKRA_USAGE = 5000d;
+	public static final double CHIBAKUTENSEI_CHAKRA_USAGE = 1500d;
 	public static final double NARAKAPATH_CHAKRA_USAGE = 100d;
-	public static final double PRETAPATH_CHAKRA_USAGE = 10d;
-	public static final double ANIMALPATH_CHAKRA_USAGE = 200d;
+	public static final double PRETAPATH_CHAKRA_USAGE = 500d;
+	public static final double ANIMALPATH_CHAKRA_USAGE = 500d;
 	public static final double OUTERPATH_CHAKRA_USAGE = 2000d;
-	public static final double TENGAISHINSEI_CHAKRA_USAGE = 5000d;
+	public static final double TENGAISHINSEI_CHAKRA_USAGE = 3000d;
 	
 	public ItemRinnegan(ElementsNarutomodMod instance) {
 		super(instance, 20);
@@ -194,7 +194,8 @@ public class ItemRinnegan extends ElementsNarutomodMod.ModElement {
 				this.armorModel.robeRightArm.showModel = show;
 				this.armorModel.robeLeftArm.showModel = show;
 				this.armorModel.backSpikes.showModel = !show;
-				this.armorModel.isSneak = living.isSneaking();
+
+				this.armorModel.isSneak = living.isSneaking();
 				this.armorModel.isRiding = living.isRiding();
 				this.armorModel.isChild = living.isChild();
 				return this.armorModel;
@@ -322,8 +323,8 @@ public class ItemRinnegan extends ElementsNarutomodMod.ModElement {
 		public Multimap<String, AttributeModifier> getAttributeModifiers(EntityEquipmentSlot slot, ItemStack stack) {
 			Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
 			if (slot == EntityEquipmentSlot.HEAD && isRinnesharinganActivated(stack)) {
-				multimap.put(SharedMonsterAttributes.MAX_HEALTH.getName(),
-				 new AttributeModifier(RINNESHARINGAN_MODIFIER, "rinnesharingan.maxhealth", 380d, 0));
+				/*multimap.put(SharedMonsterAttributes.MAX_HEALTH.getName(),
+				 new AttributeModifier(RINNESHARINGAN_MODIFIER, "rinnesharingan.maxhealth", 380d, 0));*/
 			}
 			return multimap;
 		}
@@ -489,7 +490,8 @@ public class ItemRinnegan extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new EventHook());
-	}*/
+	}
+*/
 
 	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {

@@ -62,7 +62,7 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 			this.isWearingSteamArmor = ItemSteamArmor.isWearingFullSet(userIn);
 			if (this.isWearingSteamArmor) {
 				this.duration = (int)(power * 60f);
-				power *= 1.5f;
+				power *= 2f;
 			} else {
 				this.duration = (int)(power * 30f);
 			}

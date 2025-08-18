@@ -1,6 +1,8 @@
 
 package net.narutomod.item;
 
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -48,6 +50,8 @@ import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 
 import com.google.common.collect.Multimap;
+
+import javax.annotation.Nullable;
 //import java.util.Collection;
 
 @ElementsNarutomodMod.ModElement.Tag
@@ -103,7 +107,7 @@ public class ItemBlackReceiver extends ElementsNarutomodMod.ModElement {
 				EntityPlayerMP entity = (EntityPlayerMP) entityLivingBase;
 				float power = 1f;
 				EntityArrowCustom entityarrow = new EntityArrowCustom(world, entity);
-				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 2, 0);
+				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 5, 0);
 				entityarrow.setSilent(true);
 				entityarrow.setIsCritical(true);
 				entityarrow.setDamage(35+ItemJutsu.getDmgMult(entityLivingBase)*1.8);
@@ -211,6 +215,25 @@ public class ItemBlackReceiver extends ElementsNarutomodMod.ModElement {
 					}
 				}
 			}
+		}
+
+		public static void shoot(EntityLivingBase shooter, @Nullable EntityLivingBase target, float power) {
+			EntityArrowCustom entityarrow = new EntityArrowCustom(shooter.world, shooter);
+			Vec3d vec = shooter.getLookVec();
+			if (target != null) {
+				vec = target.getPositionVector().addVector(0, target.height * 0.5, 0).subtract(entityarrow.getPositionVector());
+				vec = vec.addVector(0, MathHelper.sqrt(vec.x * vec.x + vec.z * vec.z) * 0.32d / power, 0);
+			}
+			entityarrow.shoot(vec.x, vec.y, vec.z, power, 0);
+			entityarrow.setSilent(true);
+			entityarrow.setIsCritical(true);
+			entityarrow.setDamage(10);
+			entityarrow.setKnockbackStrength(0);
+			shooter.world.playSound(null, shooter.posX, shooter.posY, shooter.posZ,
+					net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:hand_shoot")),
+					SoundCategory.NEUTRAL, 1, 1f / (shooter.getRNG().nextFloat() * 0.5f + 1f) + (power / 4));
+			entityarrow.pickupStatus = EntityArrow.PickupStatus.DISALLOWED;
+			shooter.world.spawnEntity(entityarrow);
 		}
 	}
 

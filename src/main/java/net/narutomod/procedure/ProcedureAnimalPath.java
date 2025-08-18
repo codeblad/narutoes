@@ -80,8 +80,8 @@ public class ProcedureAnimalPath extends ElementsNarutomodMod.ModElement {
 				EntitySummonAnimal.Base entityToSpawn = d < 20
 						? new EntityGiantDog2h.EntityCustom((EntityLivingBase) entity)
 						: d < 40
-								? new EntityGiantChameleon.EntityCustom((EntityLivingBase) entity)
-								: new EntityGiantBird.EntityCustom((EntityLivingBase) entity);
+						? new EntityGiantChameleon.EntityCustom((EntityLivingBase) entity)
+						: new EntityGiantBird.EntityCustom((EntityLivingBase) entity);
 				if (EntitySummonAnimal.getAllSummons(entity, entityToSpawn.getClass()).isEmpty()) {
 					if (Chakra.pathway((EntityPlayer) entity).consume(ItemRinnegan.getAnimalPathChakraUsage((EntityLivingBase) entity))) {
 						world.playSound((EntityPlayer) null, (entity.posX), (entity.posY), (entity.posZ),

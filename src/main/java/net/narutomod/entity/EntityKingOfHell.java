@@ -122,10 +122,10 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 			return false;
 		}
 
-		@Override
+		/*@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
 			return false;
-		}
+		}*/
 
 		@Override
 		protected void turnBodyAndHead(Entity passenger) {
@@ -171,7 +171,8 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 			int i = getArmSwingAnimationEnd();
 			if (this.isSwingInProgress) {
 				this.swingProgressInt++;
-				if (this.swingProgressInt == i / 2) {
+				if (this.swingProgressInt == i / 2)
+ {
 					this.isSwingInProgress = false;
 				}
 				if (this.swingProgressInt >= i) {
@@ -194,7 +195,7 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 					this.healingPlayer.clearActivePotions();
 					this.healingPlayer.addPotionEffect(new PotionEffect(MobEffects.ABSORPTION, 160, 4));
 				}
-				this.healingPlayer.heal(0.3F);
+				this.healingPlayer.heal(0.2F);
 				this.healingPlayer.setSneaking(false);
 				if (this.healingPlayer.getHealth() >= this.healingPlayer.getMaxHealth()) {
 					this.healingPlayer.dismountRidingEntity();
@@ -221,16 +222,20 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 					this.setHealth(0.0F);
 				} else {
 					if (this.isArmsOpen()) {
-						if (this.healingPlayer != null) {
+						if (this.healingPlayer != null)
+ {
 							this.rejuvenatePlayer();
-						} else {
+						} else
+ {
 							this.toggleArmSwing();
 						}
 					}
 					if (summoner != null) {
-						if (summoner.getHealth() <= 0.0F) {
+						if (summoner.getHealth() <= 0.0F)
+ {
 							this.setHealth(0.0F);
-						} else if (summoner.getHealth() < 4.0F) {
+						} else if (summoner.getHealth() < 4.0F)
+ {
 							this.rejuvenateSummoningPlayer();
 						}
 					}
@@ -259,8 +264,9 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1024.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(800.0D);
 		}
 
 		@Override

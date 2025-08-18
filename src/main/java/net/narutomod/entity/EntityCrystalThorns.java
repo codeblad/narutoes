@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.item.Item;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.procedure.ProcedureUtils;
@@ -213,7 +214,7 @@ public class EntityCrystalThorns extends ElementsNarutomodMod.ModElement {
 						entity.hurtResistantTime = 10;
 						//entity.getEntityData().setBoolean("TempData_disableKnockback", true);
 						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),
-						 this.damage * (1f - (float)(this.ticksAlive - 1) / this.growTime));
+						 12+ ItemJutsu.getDmgMult(this.shootingEntity)*3 * (1f - (float)(this.ticksAlive - 1) / this.growTime));
 					}
 				}
 			}

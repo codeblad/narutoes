@@ -112,6 +112,8 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 					entity.getEntityData().setBoolean("kgReceived",true);
 					ItemStack scroll = new ItemStack(ItemScrollRasengan.block,1);
 					ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entity,scroll);
+					ItemStack scroll2 = new ItemStack(ItemScrollMultiClone.block,1);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entity,scroll2);
 				} else if (entity.getEntityData().getInteger("KekkeiGenkai") == 15) {
 					entity.getEntityData().setBoolean("kgReceived",true);
 					ItemStack scroll = new ItemStack(ItemScrollHiraishin.block,1);
@@ -137,6 +139,16 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 						stack2.setTagCompound(new NBTTagCompound());
 					}
 					stack2.getTagCompound().setString("Type", "enma");
+				} else if (entity.getEntityData().getInteger("KekkeiGenkai") == 20) {
+					Item jutsu = GuiScrollKG.GuiContainerMod.kgArray[21];
+					entity.getEntityData().setBoolean("kgReceived",true);
+					if (jutsu != ItemMokuton.block && jutsu != ItemIryoJutsu.block) {
+						GuiScrollKG.GuiContainerMod.giveJutsu(jutsu, (EntityPlayer)entity);
+					}
+				} else if (entity.getEntityData().getInteger("KekkeiGenkai") == 21) {
+					entity.getEntityData().setBoolean("kgReceived",true);
+					ItemStack scroll = new ItemStack(ItemScrollShikigami.block,1);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entity,scroll);
 				}
 			}
 			if (((!(world.isRemote)) && (!(entity.getEntityData().getBoolean((NarutomodModVariables.FirstGotNinjutsu)))))) {

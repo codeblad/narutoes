@@ -67,7 +67,7 @@ public class ItemBoneDrill extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate(ItemStack p_77663_1_, World p_77663_2_, Entity entity, int p_77663_4_, boolean p_77663_5_) {
-			this.damage = 15 + ItemJutsu.getDmgMult(entity)*2f;
+			this.damage = 15 + ItemJutsu.getDmgMult(entity)*2.5f;
 			super.onUpdate(p_77663_1_, p_77663_2_, entity, p_77663_4_, p_77663_5_);
 		}
 

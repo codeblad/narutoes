@@ -1,5 +1,6 @@
 package net.narutomod.procedure;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Lists;
+import net.narutomod.entity.EntityShieldBase;
+import net.narutomod.item.ItemRinnegan;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureBanShoTenin extends ElementsNarutomodMod.ModElement {
@@ -106,6 +109,64 @@ public class ProcedureBanShoTenin extends ElementsNarutomodMod.ModElement {
 			}
 		}
 		entity.getEntityData().setInteger(BSTN_CD, cooldown);
+	}
+
+	public static long execute(boolean is_pressed, EntityLivingBase entity, RayTraceResult t) {
+		long cooldown = 0;
+		Entity grabbedEntity = null;
+		ProcedurePullAndHold procedure = map.get(entity);
+		if (procedure == null) {
+			procedure = new ProcedurePullAndHold();
+			map.put(entity, procedure);
+		}
+		if (is_pressed) {
+			double chakraUsage = ItemRinnegan.getBanshoteninChakraUsage(entity);
+			Chakra.Pathway cp = Chakra.pathway(entity);
+			if (cp.getAmount() < chakraUsage) {
+				is_pressed = false;
+				cp.warningDisplay();
+			} else if (t != null && procedure.getGrabbedEntity() == null) {
+				if (t.entityHit != null && !(t.entityHit instanceof EntityChibakuTenseiBall.EntityCustom)
+						&& (!(t.entityHit instanceof EntityEarthBlocks.Base) || t.entityHit.ticksExisted > 5)
+						&& !(t.entityHit instanceof EntityShieldBase) && t.entityHit.height < 24) {
+					grabbedEntity = t.entityHit;
+					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
+							SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:BanshoTenin")),
+							SoundCategory.PLAYERS, 5.0F, 1.0F);
+				} else if (entity.isSneaking() && t.typeOfHit == RayTraceResult.Type.BLOCK) {
+					entity.world.playSound(null, t.getBlockPos(), SoundEvent.REGISTRY
+							.getObject(new ResourceLocation("narutomod:rocks")), SoundCategory.NEUTRAL, 5.0F, 0.5F);
+					EntityEarthBlocks.Base entity1 = ProcedureGravityPower.dislodgeBlocks(entity.world, t.getBlockPos(), 5);
+					if (entity1 != null && cp.consume(chakraUsage * 50d)) {
+						entity1.motionX = 0.2D * t.sideHit.getDirectionVec().getX();
+						entity1.motionY = 0.2D * t.sideHit.getDirectionVec().getY();
+						entity1.motionZ = 0.2D * t.sideHit.getDirectionVec().getZ();
+						procedure.addEarthBlock(entity1);
+					}
+				}
+			}
+			if (procedure.getGrabbedEntity() != null) {
+				cp.consume(chakraUsage);
+			}
+		} else if (procedure.getGrabbedEntity() != null) {
+			cooldown = entity.world.getTotalWorldTime() + 100;
+		}
+		procedure.execute(is_pressed, entity, grabbedEntity);
+		return cooldown;
+	}
+
+	public static boolean isInUse(Entity entity) {
+		if (map.containsKey(entity)) {
+			return map.get(entity).getGrabbedEntity() != null;
+		}
+		return false;
+	}
+
+	public static boolean grabbedEarthBlocks(Entity entity) {
+		if (map.containsKey(entity)) {
+			return !map.get(entity).getGrabbedEarthBlocks().isEmpty();
+		}
+		return false;
 	}
 
 	public static List<EntityEarthBlocks.Base> getGrabbedEarthBlocks(Entity entity) {

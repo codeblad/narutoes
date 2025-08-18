@@ -224,7 +224,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 		public void applyEntityCollision(Entity entityIn) {
 			if (this.ticksAlive > this.growTime && this.shootingEntity != null
 			 && !entityIn.equals(this.shootingEntity) && !this.bunshinHasSameSummoner(entityIn)) {
-				if (entityIn.attackEntityFrom(this.damageSource, 15f + (1+2f*(this.fullScale/6))*ItemJutsu.getDmgMult(this.shootingEntity)*2.25f)) {
+				if (entityIn.attackEntityFrom(this.damageSource, 15f + (1+2f*(this.fullScale/6))*ItemJutsu.getDmgMult(this.shootingEntity)*3.4f)) {
 					this.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 1.0F, this.rand.nextFloat() * 0.5F + 0.5F);
 					Vec3d vec = ProcedureUtils.pushEntity(this.shootingEntity, entityIn, 20d, 2f);
 					Vec3d vec1 = this.shootingEntity.getLookVec().add(this.shootingEntity.getPositionEyes(1.0f));

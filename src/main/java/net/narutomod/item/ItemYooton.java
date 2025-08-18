@@ -149,7 +149,7 @@ public class ItemYooton extends ElementsNarutomodMod.ModElement {
 			scale *= 1.2F;
 			this.setEntityScale(scale);
 			this.explosionSize = Math.max((int)scale - 1, 0);
-			this.damage = 12+3.7f*(1+1*(scale/20))*ItemJutsu.getDmgMult(this.shootingEntity);
+			this.damage = 12+4f*(0.5f+1.75f*(scale/20))*ItemJutsu.getDmgMult(this.shootingEntity);
 			Vec3d vec3d = shooter.getLookVec();
 			this.setPosition(shooter.posX + vec3d.x, shooter.posY + 1.2D + vec3d.y, shooter.posZ + vec3d.z);
 		}

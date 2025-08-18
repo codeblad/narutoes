@@ -11,7 +11,7 @@
       "vmArgs": "-Dforge.logging.console.level\u003ddebug -Dforge.logging.markers\u003dREGISTRIES",
       "args": "",
       "env": {
-        "MCP_TO_SRG": "C:\\Users\\Joshua\\Documents\\GitHub\\narutostuff\\narutoes\\build\\createSrgToMcp\\output.srg",
+        "MCP_TO_SRG": "C:\\Users\\Joshua\\Documents\\GitHub\\narutoes\\build\\createSrgToMcp\\output.srg",
         "MOD_CLASSES": "examplemod%%${workspaceFolder}\\bin\\main;examplemod%%${workspaceFolder}\\bin\\main",
         "mainClass": "net.minecraft.launchwrapper.Launch",
         "MCP_MAPPINGS": "snapshot_20171003-1.12",
@@ -34,7 +34,7 @@
       "vmArgs": "-Dforge.logging.console.level\u003ddebug -Dforge.logging.markers\u003dREGISTRIES",
       "args": "",
       "env": {
-        "MCP_TO_SRG": "C:\\Users\\Joshua\\Documents\\GitHub\\narutostuff\\narutoes\\build\\createSrgToMcp\\output.srg",
+        "MCP_TO_SRG": "C:\\Users\\Joshua\\Documents\\GitHub\\narutoes\\build\\createSrgToMcp\\output.srg",
         "MOD_CLASSES": "examplemod%%${workspaceFolder}\\bin\\main;examplemod%%${workspaceFolder}\\bin\\main",
         "mainClass": "net.minecraft.launchwrapper.Launch",
         "MCP_MAPPINGS": "snapshot_20171003-1.12",

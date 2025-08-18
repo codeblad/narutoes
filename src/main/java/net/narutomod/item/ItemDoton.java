@@ -1,6 +1,8 @@
 
 package net.narutomod.item;
 
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -36,6 +38,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.block.Block;
 
+import net.narutomod.NarutomodModVariables;
 import net.narutomod.entity.EntityEarthSpears;
 import net.narutomod.entity.EntitySwampPit;
 import net.narutomod.entity.EntityEarthSandwich;
@@ -166,14 +169,20 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			if (this.user != null && this.user.isEntityAlive()) {
+				boolean newPressed = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed);
+				if (newPressed) {
+					this.setDead();
+					return;
+				}
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
-				boolean flag = this.ticksExisted % 20 != 0;
+				boolean flag = this.ticksExisted % 10 != 0;
 				boolean flag1 = this.user instanceof EntityPlayer && (flag 
 				 || Chakra.pathway((EntityPlayer)this.user).getAmount() >= HIDINGINROCK.chakraUsage);
 				if (this.ticksExisted > this.waitTime && !this.isUserInEarth() || !flag1) {
 					this.setDead();
 				} else {
 					this.setUserIntangible(true);
+					((EntityLivingBase) this.user).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 10, 15));
 					if (!flag && flag1) {
 						Chakra.pathway((EntityPlayer)this.user).consume(HIDINGINROCK.chakraUsage);
 					}
@@ -182,6 +191,8 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 				this.setDead();
 			}
 		}
+
+
 
 		@Override
 		protected void readEntityFromNBT(NBTTagCompound compound) {

@@ -85,7 +85,7 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 			this.setEntityInvulnerable(true);
 			this.canDie = false;
 			this.ownerPlayer = null;
-			this.effectRadius = 18d;
+			this.effectRadius = 8d;
 			this.effectDuration = 120;
 		}
 
@@ -137,14 +137,15 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 					for (EntityPlayer player : this.world.getEntitiesWithinAABB(EntityPlayer.class, this.getEntityBoundingBox().grow(this.effectRadius))) {
 						if (!this.pMap.containsKey(player)) {
 							ProcedureRenderView.changeFog(player, 1, 100, 0, 0.0F, 0.0F, 0.0F, 0.0F);
-							ProcedureSync.RenderDistance.sendToSelf((EntityPlayerMP)player, VIEW_DISTANCE, this);
+							//ProcedureSync.RenderDistance.sendToSelf((EntityPlayerMP)player, VIEW_DISTANCE, this);
 						}
 					}
 				}
 
-				if (this.ticksExisted > 3 && this.ticksExisted < 20) {
-					ProcedureAoeCommand.set(this, 0.0D, this.effectRadius).exclude(this.ownerPlayer).effect(PotionHeaviness.potion, 15, 4, true)
-					 .effect(MobEffects.WEAKNESS, 15, 255, true).effect(MobEffects.MINING_FATIGUE, 15, 5, true);
+				if (this.ticksExisted > 3 && this.ticksExisted < 20)
+ {
+					ProcedureAoeCommand.set(this, 0.0D, this.effectRadius).exclude(this.ownerPlayer).effect(PotionHeaviness.potion, 30, 4, true)
+					 .effect(MobEffects.WEAKNESS, 30, 255, true).effect(MobEffects.MINING_FATIGUE, 15, 5, true);
 				}
 				if (this.ownerPlayer instanceof EntityPlayer) {
 					//((EntityPlayer)this.ownerPlayer).sendStatusMessage(new TextComponentString(I18n.translateToLocal("tooltip.byakugan.jutsu2")), true);

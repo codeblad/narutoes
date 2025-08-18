@@ -1,6 +1,8 @@
 
 package net.narutomod.item;
 
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -65,7 +67,7 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 
 	public static class Genjutsu implements ItemJutsu.IJutsuCallback {
 		private final double maxRange;
-		private final int duration;
+		int duration;
 		private final int cooldown = 1200;
 
 		public Genjutsu() {
@@ -80,7 +82,17 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 			Entity target = ProcedureUtils.objectEntityLookingAt(entity, this.maxRange).entityHit;
-			if (target instanceof EntityLivingBase && this.createJutsu(entity, (EntityLivingBase)target, this.duration)) {				
+
+			ItemStack helmetStack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+			if (helmetStack.getItem() == ItemSharingan.helmet) {
+				this.duration = 80;
+			}
+			if (helmetStack.getItem() == ItemMangekyoSharingan.helmet && helmetStack.getItem() == ItemMangekyoSharinganObito.helmet && helmetStack.getItem() == ItemMangekyoSharinganEternal.helmet) {
+				this.duration = 120;
+			}
+
+			if (target instanceof EntityLivingBase && this.createJutsu(entity, (EntityLivingBase)target, this.duration)) {
+				
 				if (stack != null && entity instanceof EntityPlayer) {
 					ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, this.cooldown);
 				}
@@ -90,7 +102,15 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 		}
 
 		public static boolean createJutsu(EntityLivingBase entity, EntityLivingBase target, int durationIn) {
+
+
 			if (canTargetBeAffected(entity, target)) {
+				Vec3d lookAt = entity.getLookVec().normalize();
+				Vec3d lookAt2 = target.getLookVec().normalize();
+				double num = lookAt.dotProduct(lookAt2);
+				if (num > -0.95) {
+					return false;
+				}
 				entity.world.playSound(null, target.posX, target.posY, target.posZ,
 				  SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:genjutsu")), SoundCategory.NEUTRAL, 1f, 1f);
 				target.addPotionEffect(new PotionEffect(PotionParalysis.potion, durationIn, 1, false, false));

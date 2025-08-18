@@ -161,9 +161,9 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.8D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10000.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(3000.0D);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(30.0D);
 		}
 
@@ -811,7 +811,8 @@ public class EntityFiveTails extends ElementsNarutomodMod.ModElement {
 				body.addChild(tail[0][0]);
 				setRotationAngle(tail[0][0], -0.7854F, 0.0F, 0.0F);
 				tail[0][0].cubeList.add(new ModelBox(tail[0][0], 33, 36, -1.0F, -2.5F, -1.0F, 2, 3, 2, 0.0F, false));
-				
+		
+		
 				tail[0][1] = new ModelRenderer(this);
 				tail[0][1].setRotationPoint(0.0F, -2.0F, 0.0F);
 				tail[0][0].addChild(tail[0][1]);

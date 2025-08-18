@@ -96,7 +96,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static float getDefense(Entity entity) {
-		return 1+19*ItemJutsu.getDmgMult(entity)/63;
+		return 2+25*ItemJutsu.getDmgMult(entity)/63;
 	}
 
 	private static void logBattleExp(EntityPlayer entity, double xp) {
@@ -179,8 +179,11 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					double d1 = deadguy.y - player.posY;
 					double d2 = deadguy.z - player.posZ;
 					double d3 = d0 * d0 + d1 * d1 + d2 * d2;
+					// require guy to be strong for mangekyo here
 					if (d3 < distance * distance && player.world.getTotalWorldTime() - deadguy.time <= timeframe
-					 && (!checkTeam || player.isOnScoreboardTeam(deadguy.team))) {
+					 && (!checkTeam || player.isOnScoreboardTeam(deadguy.team))
+							&& player.getEntityData().getDouble((NarutomodModVariables.BATTLEXP)) >= 5000
+					)  {
 						return true;
 					}
 				}
@@ -232,7 +235,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 		public void onTick(TickEvent.PlayerTickEvent event) {
 			if (event.phase == TickEvent.Phase.START && event.player instanceof EntityPlayerMP) {
 				//double d = getBattleXp(event.player) * 0.0008d;
-				double d = 80*(ItemJutsu.getDmgMult(event.player)/63);
+				double d = 130*(ItemJutsu.getDmgMult(event.player)/63);
 				if (d > 0d) {
 					IAttributeInstance maxHealthAttr = event.player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
 					AttributeModifier attr = maxHealthAttr.getModifier(HP_UUID);

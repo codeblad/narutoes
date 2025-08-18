@@ -47,8 +47,8 @@ public class EntityC3 extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends EntityLiving implements ItemJutsu.IJutsu {
-		private final int growTime = 30;
-		private final int fuseTime = 100;
+		private final int growTime = 20;
+		private final int fuseTime = 50;
 		private final int explosionRange = 32;
 		private final float explosionDamage = 50.0f;
 		private EntitySpecialEffect.EntityCustom effectEntity;
@@ -133,7 +133,7 @@ public class EntityC3 extends ElementsNarutomodMod.ModElement {
 			}
 			if (!this.world.isRemote && !this.hasNoGravity() && this.onGround) {// && this.detonateTicks == 0) {
 				new EventSphericalExplosion(this.world, null, (int)this.posX, (int)this.posY + 5, (int)this.posZ, this.explosionRange, 0, 0.3f);
-				ProcedureAoeCommand.set(this, 0d, this.explosionRange).damageEntities(ItemJutsu.causeJutsuDamage(this, null), this.explosionDamage+20f*ItemJutsu.getDmgMult(this.user));
+				ProcedureAoeCommand.set(this, 0d, this.explosionRange).damageEntities(ItemJutsu.causeJutsuDamage(this, null), this.explosionDamage+30f*ItemJutsu.getDmgMult(this.user));
 				this.setDead();
 				if (this.effectEntity != null) {
 					this.effectEntity.setLifespan(50);

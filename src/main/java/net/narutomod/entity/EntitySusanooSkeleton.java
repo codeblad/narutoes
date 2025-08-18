@@ -62,7 +62,7 @@ public class EntitySusanooSkeleton extends ElementsNarutomodMod.ModElement {
 		public EntityCustom(EntityLivingBase player, boolean full) {
 			super(player);
 			this.setSize(2.4F, 2.4F);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(20+ItemJutsu.getDmgMult(player)*1.5);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(25+ItemJutsu.getDmgMult(player)*1.75);
 			float ratio = 1;
 			if (!full) {
 				this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(0.0D);
@@ -72,7 +72,7 @@ public class EntitySusanooSkeleton extends ElementsNarutomodMod.ModElement {
 				this.chakraUsage = 20d;
 				ratio = player.getEntityData().getFloat("susanratio");
 				float health = (20+ (80*(ItemJutsu.getDmgMult(player)/63))) * PlayerTracker.getDefense(player);
-				this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*0.35+150);
+				this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*0.5+200);
 			}
 			this.setHealth(this.getMaxHealth()*ratio);
 			this.stepHeight = this.height / 3.0F;

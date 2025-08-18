@@ -69,7 +69,7 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 			this.width = widthIn;
 			this.range = 10+rangeIn;
 			this.dmg = 8+0.8f*(1+1*(rangeIn/30))*ItemJutsu.getDmgMult(shooter);
-			this.potionAmplifier = (int) (5+ItemJutsu.getDmgMult(shooter)*0.5);
+			this.potionAmplifier = (int) (5+ItemJutsu.getDmgMult(shooter)*0.75);
 		}
 
 		@Override

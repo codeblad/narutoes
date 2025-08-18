@@ -117,7 +117,8 @@ public class EntityMightGuy extends ElementsNarutomodMod.ModElement {
 		private ScoreObjective customerKillCount;
 		private int killCount;
 		private float gateOpened;
-		private int blockingTicks;
+
+		private int blockingTicks;
 
 		public EntityCustom(World world) {
 			super(world, 120, 5000d);
@@ -385,7 +386,7 @@ public class EntityMightGuy extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		@Override
+		/*@Override
 		public boolean processInteract(EntityPlayer player, EnumHand hand) {
 			if (!this.world.isRemote && this.getVillage() != null) {
 				Village village = this.getVillage();
@@ -406,7 +407,7 @@ public class EntityMightGuy extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			return super.processInteract(player, hand);
-		}
+		}*/
 
 		private void tryOpenGate(float gate) {
 			if (this.getHeldItemMainhand().getItem() == ItemEightGates.block) {

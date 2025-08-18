@@ -55,8 +55,8 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> YAW = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> PITCH = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private int inTargetTime;
-		private final float baseImpactDamage = 20.0f;
-		private final float baseSkewerDamage = 50.0f;
+		private final float baseImpactDamage = 5.0f;
+		private final float baseSkewerDamage = 10.0f;
 		
 		public EC(World world) {
 			super(world);
@@ -147,7 +147,7 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 		protected void onImpact(RayTraceResult result) {
 			if (!this.world.isRemote 
 			 && result.entityHit instanceof EntityLivingBase && !result.entityHit.equals(this.shootingEntity)) {
-				if (result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setProjectile(), this.baseImpactDamage)) {
+				if (result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setProjectile(), this.baseImpactDamage+0.6f* ItemJutsu.getDmgMult(this.shootingEntity))) {
 					Vec3d vec = this.getPositionVector().addVector(this.motionX, this.motionY, this.motionZ).subtract(result.entityHit.getPositionVector());
 					float relYaw = ((EntityLivingBase)result.entityHit).renderYawOffset;
 					float yaw = MathHelper.wrapDegrees(this.rotationYaw - relYaw);
@@ -183,7 +183,7 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 						entity.setEntityScale(0.4f + this.rand.nextFloat() * 0.4f);
 						this.world.spawnEntity(entity);
 					}
-					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setDamageBypassesArmor(), this.baseSkewerDamage * (1f + this.rand.nextFloat() * 0.5f));
+					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setDamageBypassesArmor(), this.baseSkewerDamage +3.25f* ItemJutsu.getDmgMult(this.shootingEntity));
 				}
 				this.setDead();
 			}
@@ -196,7 +196,8 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 				Vec3d vec1 = entity.getPositionEyes(1f).add(vec);
 				Vec3d vec2 = vec1.add(vec);
 		 		entity.swingArm(EnumHand.MAIN_HAND);
-				this.createJutsu(entity.world, entity, vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z, 2.0f, 0.0f);
+				this.createJutsu(entity.world, entity, vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z, 2.5f, 0.0f);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);
 				return true;
 			}
 

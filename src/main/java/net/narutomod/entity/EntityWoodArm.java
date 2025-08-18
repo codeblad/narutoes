@@ -36,7 +36,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends ItemMokuton.WoodSegment implements ItemJutsu.IJutsu {
-		private int lifespan = 300;
+		private int lifespan = 100;
 		private EC prevSegment;
 		private Entity target;
 		private double targetDistance;
@@ -50,9 +50,9 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 
 		public EC(EntityLivingBase user, Entity targetIn) {
 			this(user.world);
-			this.setSize(0.5f, 1.0f);
+			this.setSize(0.6f, 1.25f);
 			this.setParent(user);
-			this.setOffset(-0.4d, 1.2d, 0d, 0f, 90f);
+			this.setOffset(-0.5d, 1.2d, 0.65d, 0f, 90f);
 			this.setPositionAndRotationFromParent(1f);
 			this.prevSegment = this;
 			this.target = targetIn;
@@ -60,9 +60,10 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 
 		public EC(EC segment, float yawOffset, float pitchOffset) {
 			super(segment, yawOffset, pitchOffset);
-			this.setSize(0.5f, 1.0f);
+			this.setSize(0.6f, 1.25f);
 			this.target = segment.target;
 		}
+
 
 		@Override
 		public ItemJutsu.JutsuEnum.Type getJutsuType() {
@@ -107,7 +108,8 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 								this.targetDistance = MathHelper.sqrt(vec.x * vec.x + vec.z * vec.z);
 								this.targetYOffset = vec.y;
 								this.targetYawOffset = MathHelper.wrapDegrees(ProcedureUtils.getYawFromVec(vec.x, vec.z) - parent.rotationYaw);
-							} else if (this.target instanceof EntityLivingBase) {
+							}
+ else if (this.target instanceof EntityLivingBase) {
 								((EntityLivingBase)this.target).addPotionEffect(new PotionEffect(PotionHeaviness.potion, 3, (int)((float)this.reachedCount * 6 / captureCount), false, false));
 							}
 						}
@@ -117,10 +119,11 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 					this.world.spawnEntity(this.prevSegment);
 				}
 				if (this.ticksExisted == 1 && this.targetTargetable()
-				 && this.getEntityBoundingBox().intersects(this.target.getEntityBoundingBox())) {
+				 && this.getEntityBoundingBox().expand(2,-2,2).intersects(this.target.getEntityBoundingBox())) {
 				 	this.target.getEntityData().setBoolean("TempData_disableKnockback", true);
+
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this,
-					 parent instanceof EntityLivingBase ? (EntityLivingBase)parent : null), 4.0f);
+							parent instanceof EntityLivingBase ? (EntityLivingBase)parent : null), 2+2f* ItemJutsu.getDmgMult(parent));
 				}
 				if (this.targetDistance != 0d && this.targetTargetable() && this.ticksExisted < this.lifespan - 40) {
 					Vec3d vec = new Vec3d(0d, 0d, this.targetDistance)

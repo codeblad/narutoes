@@ -1,5 +1,6 @@
 package net.narutomod.procedure;
 
+import net.narutomod.NarutomodModVariables;
 import net.narutomod.item.ItemDojutsu;
 import net.narutomod.entity.EntityTailedBeast;
 import net.narutomod.entity.EntityBijuManager;
@@ -34,6 +35,7 @@ public class ProcedureSpecialJutsu3OnKeyPressed extends ElementsNarutomodMod.Mod
 		}
 		boolean is_pressed = (boolean) dependencies.get("is_pressed");
 		Entity entity = (Entity) dependencies.get("entity");
+		entity.getEntityData().setBoolean((NarutomodModVariables.JutsuKey3Pressed), (is_pressed));
 		World world = (World) dependencies.get("world");
 		ItemStack helmet = ItemStack.EMPTY;
 		if (((world.isRemote) || ((EntityPlayer) entity).isSpectator())) {

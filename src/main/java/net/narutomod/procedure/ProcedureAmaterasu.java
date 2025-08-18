@@ -97,7 +97,7 @@ public class ProcedureAmaterasu extends ElementsNarutomodMod.ModElement {
 				entity.getEntityData().setDouble("amaterasu_cd", (cooldown));
 				Chakra.pathway((EntityPlayer) entity).consume(chakraUsage * 0.15d);
 				RayTraceResult t = ProcedureUtils.objectEntityLookingAt(entity, 30d);
-				i = (double) ItemJutsu.getDmgMult(entity);
+				i = (double) 1+ItemJutsu.getDmgMult(entity)*1.25;
 				if (t.typeOfHit == RayTraceResult.Type.ENTITY) {
 					if (t.entityHit instanceof EntityLivingBase) {
 						((EntityLivingBase) t.entityHit).setRevengeTarget((EntityLivingBase) entity);

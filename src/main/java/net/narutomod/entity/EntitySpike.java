@@ -300,7 +300,8 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 				modelRenderer.rotateAngleY = y;
 				modelRenderer.rotateAngleZ = z;
 			}
-		}
+	
+	}
 
 		@SideOnly(Side.CLIENT)
 		public static class ModelCrystal extends ModelBase {
@@ -397,5 +398,5 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 			}
 		}
 	}
-	}
+
 }

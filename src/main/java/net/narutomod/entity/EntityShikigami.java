@@ -1,11 +1,15 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.Chakra;
 import net.narutomod.NarutomodModVariables;
+import net.narutomod.block.BlockExplosiveTag;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemNinjutsu;
+import net.narutomod.item.ItemScrollShikigami;
 import net.narutomod.potion.PotionFlight;
 import net.narutomod.procedure.ProcedureUtils;
 
@@ -33,7 +37,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelBiped;
+import net.minecraft.client.model.ModelBiped;
+
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -63,12 +68,14 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityPaperArrow.class)
 				.id(new ResourceLocation("narutomod", "shikigami_bullet"), ENTITYID_RANGED).name("shikigami_bullet").tracker(64, 3, true).build());
 	}
-	
+
+	
 	public static class EC extends EntityShieldBase {
 		protected static final String ENTITYID_KEY = "ShikigamiWingsEntityId";
-		private final int waitTime = 100;
+		private final int waitTime = 50;
 		private double chakraUsage;
 		private boolean jutsuKey2Pressed;
+		private boolean jutsuKey3Pressed;
 		private boolean isShooting;
 		private EntityPaperBind.EC bindEntity;
 		
@@ -83,7 +90,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 			this.setSummoner(userIn);
 			this.chakraUsage = chakraUsageIn;
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(Math.max(userIn.getMaxHealth() * 0.5f, 20.0f));
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(Math.max(userIn.getMaxHealth() * 15f, 20.0f));
 			this.setHealth(this.getMaxHealth());
 			userIn.getEntityData().setInteger(ENTITYID_KEY, this.getEntityId());
 		}
@@ -143,25 +150,44 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 							 .rotateYaw(-(float)Math.toRadians(user.renderYawOffset)).add(user.getPositionVector());
 							EntityPaperArrow entityarrow = new EntityPaperArrow(user);
 							entityarrow.setPosition(vec.x, vec.y, vec.z);
-							entityarrow.shoot(shootvec.x, shootvec.y, shootvec.z, 2.0f, 0.05f);
+							entityarrow.shoot(shootvec.x, shootvec.y, shootvec.z, 3.5f, 1f+0.5f*ItemJutsu.getDmgMult(user));
 							this.world.spawnEntity(entityarrow);
 						}
 					}
 					if (this.ticksExisted > this.waitTime) {
 						boolean newPressed = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
-						if (this.jutsuKey2Pressed && !newPressed && chakra.getAmount() >= this.chakraUsage) {
-							RayTraceResult targetRT = user instanceof EntityLiving && ((EntityLiving)user).getAttackTarget() != null
-							 ? new RayTraceResult(((EntityLiving)user).getAttackTarget())
-							 : ProcedureUtils.objectEntityLookingAt(user, 30d, 3d, true, true, EntityShikigami.EC.class);
-							if (targetRT != null && targetRT.entityHit != null) {
-								EntityPaperBind.EC entity1 = EntityPaperBind.EC.Jutsu.createJutsu(user, targetRT.entityHit);
-								if (entity1 != null) {
-									chakra.consume(this.chakraUsage);
-									this.bindEntity = entity1;
+						float cooldown = user.getEntityData().getFloat("paperstunCD");
+						EntityPlayer player = (EntityPlayer) user;
+						if (this.jutsuKey2Pressed && !newPressed) {
+							if (cooldown < NarutomodModVariables.world_tick) {
+								if ( chakra.getAmount() >= this.chakraUsage*4) {
+									RayTraceResult targetRT = user instanceof EntityLiving && ((EntityLiving)user).getAttackTarget() != null
+											? new RayTraceResult(((EntityLiving)user).getAttackTarget())
+											: ProcedureUtils.objectEntityLookingAt(user, 30d, 3d, true, true, EntityShikigami.EC.class);
+									if (targetRT != null && targetRT.entityHit != null) {
+										EntityPaperBind.EC entity1 = EntityPaperBind.EC.Jutsu.createJutsu(user, targetRT.entityHit);
+										if (entity1 != null) {
+											chakra.consume(this.chakraUsage*4);
+											this.bindEntity = entity1;
+											user.getEntityData().setFloat("paperstunCD", (float) (NarutomodModVariables.world_tick+20*15));
+										}
+									}
 								}
+							} else {
+								player.sendStatusMessage(new TextComponentString("cooldown: " + (cooldown-NarutomodModVariables.world_tick)/20), true);
 							}
 						}
+
 						this.jutsuKey2Pressed = newPressed;
+
+
+						boolean newPressed2 = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
+						if (this.jutsuKey3Pressed && !newPressed2 && chakra.getAmount() >= 100 ) {
+							chakra.consume(100d);
+							ItemStack scroll = new ItemStack(BlockExplosiveTag.block,1);
+							ItemHandlerHelper.giveItemToPlayer((EntityPlayer) user,scroll);
+						}
+						this.jutsuKey3Pressed = newPressed2;
 					}
 				}
 			} else if (!this.world.isRemote) {

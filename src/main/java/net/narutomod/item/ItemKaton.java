@@ -104,8 +104,8 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.fullScale = fullScale;
 			this.explosionSize = Math.max((int)fullScale - 1, 0);
 			//this.damage = fullScale * 10.0f;
-			this.mult = 1.0f + 3f*(fullScale/10);
-			this.damage = 10 + ItemJutsu.getDmgMult(shooter)*mult;
+			this.mult = 1.5f + 3.5f*(fullScale/10);
+			this.damage = 15 + ItemJutsu.getDmgMult(shooter)*mult;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter,ItemKaton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.25f;

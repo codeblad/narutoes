@@ -64,6 +64,7 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 				ItemTenseigan.helmet,
 				ItemKekkeiMora.block,
 				ItemGourd.body,
+				ItemShoton.block,
 		};
 
 		public boolean usable = true;
@@ -230,7 +231,17 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 				giveJutsu(jutsuArray[2], player);
 				giveJutsu(jutsuArray[3], player);
 				giveJutsu(jutsuArray[4], player);
-				player.getEntityData().setBoolean("kgReceived", true);
+			} else if (buttonID == 20) {
+				//Crystal
+				giveJutsu(ItemDoton.block, player);
+				int num1 = player.world.rand.nextInt(5);
+				giveJutsu(jutsuArray[num1], player);
+			} else if (buttonID == 21) {
+				//Shikigami Paper
+				int num1 = player.world.rand.nextInt(5);
+				int num2 = randNum(player, num1);
+				giveJutsu(jutsuArray[num1], player);
+				giveJutsu(jutsuArray[num2], player);
 			}
 			player.getEntityData().setInteger("KekkeiGenkai", realNum);
 
@@ -273,11 +284,13 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 			this.buttonList.add(new GuiButton(12, this.guiLeft + 100, this.guiTop + 75, 39, 20, "Uchiha"));
 			this.buttonList.add(new GuiButton(13, this.guiLeft + 150, this.guiTop + 75, 39, 20, "Medical"));
 			this.buttonList.add(new GuiButton(14, this.guiLeft + 200, this.guiTop + 75, 39, 20, "loosenedcube"));
-			this.buttonList.add(new GuiButton(15, this.guiLeft + 0, this.guiTop + 100, 39, 20, "therealwoodman"));
+			this.buttonList.add(new GuiButton(15, this.guiLeft + 0, this.guiTop + 100, 39, 20, "Flying Raijin"));
 			this.buttonList.add(new GuiButton(16, this.guiLeft + 50, this.guiTop + 100, 39, 20, "Akimichi"));
 			this.buttonList.add(new GuiButton(17, this.guiLeft + 100, this.guiTop + 100, 39, 20, "Nara"));
 			this.buttonList.add(new GuiButton(18, this.guiLeft + 200, this.guiTop + 100, 39, 20, "Aburame"));
-			this.buttonList.add(new GuiButton(19, this.guiLeft + 150, this.guiTop + 100, 39, 20, "Hiruzen"));
+			this.buttonList.add(new GuiButton(19, this.guiLeft + 0, this.guiTop + 125, 39, 20, "Hiruzen"));
+			this.buttonList.add(new GuiButton(20, this.guiLeft + 50, this.guiTop + 125, 39, 20, "Crystal"));
+			this.buttonList.add(new GuiButton(21, this.guiLeft + 100, this.guiTop + 125, 39, 20, "Paper"));
 		}
 	}
 }

@@ -202,9 +202,13 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 						this.launchAtTarget((EntityLivingBase)this.target);
 					}
 					if (this.target.getDistanceSq(this.summoner) < 25d) {
-						float damage = flag ? (float)ProcedureUtils.getMainhandItemDamage(this.summoner) * 1.2f : 25f;
+						float damage = 8+(0.8f * this.damageMultiplier())*ItemJutsu.getDmgMult(this.summoner);
+						ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
+						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+							damage*=1.25f;
+						}
 						EntityLightningArc.onStruck(this.target,
-						 ItemJutsu.causeJutsuDamage(this, this.summoner), damage * this.damageMultiplier());
+						 ItemJutsu.causeJutsuDamage(this, this.summoner), damage);
 						this.target = null;
 					}
 				}
@@ -238,7 +242,8 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 		protected float damageMultiplier() {
 			float f0 = 1.0f;
 			EntityLivingBase realUser = this.summoner;
-			if (realUser instanceof EntityKageBunshin.EC) {
+			if (realUser instanceof EntityKageBunshin.EC) 
+{
 				realUser = ((EntityKageBunshin.EC)realUser).getSummoner();
 			}
 			if (realUser instanceof EntityPlayer) {
@@ -368,13 +373,23 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 							EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 							 this.summoner.getPositionVector().addVector(0d, 1d, 0d),
 							 entity1.getPositionVector().addVector(0d, entity1.height/2, 0d), 0xc00000ff, 1, 0f);
-							entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 10f * this.damageMultiplier(), this.summoner);
+							float damage = 4f+1.8f*ItemJutsu.getDmgMult(this.summoner);
+							ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
+							if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+								damage*=1.25f;
+							}
+							entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), damage, this.summoner);
 							this.world.spawnEntity(entity2);
 						}
 					}
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world,
 					 this.summoner.getPositionVector().addVector(0d, 1d, 0d), this.rand.nextDouble() * 4d + 1d, 0d, 0d, 0d);
-					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 10f * this.damageMultiplier(), this.summoner);
+					float damage = 4f+1.8f*ItemJutsu.getDmgMult(this.summoner);
+					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
+					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+						damage*=1.25f;
+					}
+					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), damage, this.summoner);
 					this.world.spawnEntity(entity);
 				} else {
 					if (this.ticksExisted % 8 == 1) {
@@ -388,7 +403,12 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 					Vec3d vec1 = vec0.add(this.summoner.getLookVec().scale(6d));
 					vec0 = this.handPos != null ? this.handPos : vec0.subtract(0d, 0.5d, 0d);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, vec0, vec1, 0x800000FF, 1, 0f, 0.04f, 0);
-					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 10f * this.damageMultiplier(), this.summoner);
+					float damage = 6f+1.25f*ItemJutsu.getDmgMult(this.summoner);
+					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
+					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+						damage*=1.25f;
+					}
+					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), damage, this.summoner);
 					this.world.spawnEntity(entity);
 					if (this.rand.nextInt(3) == 0) {
 						this.world.spawnEntity(new EntityLightningArc.Base(this.world, vec0, vec1, 0xc00000ff, 1, 0f));
@@ -425,7 +445,8 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 				return true;
 			}
 
-			private Vec3d transform3rdPerson(Vec3d startvec, Vec3d angles, EntityLivingBase entity, EnumHandSide side, float pt) {
+
+			private Vec3d transform3rdPerson(Vec3d startvec, Vec3d angles, EntityLivingBase entity, EnumHandSide side, float pt) {
 				return new ProcedureUtils.RotationMatrix().rotateZ((float)-angles.z).rotateY((float)-angles.y).rotateX((float)-angles.x)
 				 .transform(startvec).addVector(0.0586F * (side==EnumHandSide.RIGHT?-6:6), 1.3F-(entity.isSneaking()?0.3f:0f), -0.05F)
 				 .rotateYaw(-this.interpolateRotation(entity.prevRenderYawOffset, entity.renderYawOffset, pt) * (float)(Math.PI / 180d))

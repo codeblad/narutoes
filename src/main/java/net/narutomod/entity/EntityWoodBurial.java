@@ -92,41 +92,43 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 			super.onUpdate();
 			if (this.ticksExisted == 1 && this.rand.nextFloat() < 0.05f) {
 				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodgrow")),
-				 1.0f, this.rand.nextFloat() * 0.4f + 0.6f);
+						1.0f, this.rand.nextFloat() * 0.4f + 0.6f);
 			}
 			if (this.getParent() != null && this.ticksExisted < this.lifespan) {
 				if (!this.world.isRemote && this.getIndex() == 0 && this.ticksExisted == 1 && this.hasLivingTarget()) {
 					for (int i = 0; i < (int)MathHelper.clamp(this.target.width * 5f, 6f, 22f); i++) {
 						Vec3d vec = new Vec3d((this.rand.nextDouble()-0.5d) * this.target.width * 2.5d, 0d, (this.rand.nextDouble()-0.5d) * this.target.width * 2.5d);
 						float f = ProcedureUtils.getYawFromVec(this.targetVec.subtract(this.getPositionVector().add(vec)));
-						EC segment = new EC(this, vec.x, vec.y, vec.z, f + ((this.rand.nextFloat()-0.5f) * 160f), 60f);
+						EC segment = new EC(this, vec.x, vec.y, vec.z, f + ((this.rand.nextFloat()-0.5f) * 160f), 80f);
 						segment.setLifespan(this.lifespan - this.ticksExisted * 2);
 						segment.prevSegment = segment;
+						segment.setSize(this.target.width * 0.2f + 0.38f, this.target.width * 0.2f + 0.38f);
 						this.world.spawnEntity(segment);
 					}
 				}
-				if (!this.world.isRemote && this.getIndex() == 1 && this.ticksExisted > 1 && this.ticksExisted <= 20) {
+				if (!this.world.isRemote && this.getIndex() == 1 && this.ticksExisted > 1 && this.ticksExisted <= 50) {
 					float yaw = (this.rand.nextFloat()-0.5f) * 30f;
 					int i = this.prevSegment.getIndex();
 					if (this.hasLivingTarget() && i > 1) {
 						yaw = MathHelper.wrapDegrees(ProcedureUtils.getYawFromVec(this.targetVec
-						 .subtract(this.prevSegment.getPositionVector()).scale(0.01)) - this.prevSegment.rotationYaw);
-						yaw /= this.target.width + Math.max(4.4f - (float)i * 0.075f, 1f);
-						yaw *= 5;
+								.subtract(this.prevSegment.getPositionVector())) - this.prevSegment.rotationYaw);
+						float f = this.height + 0.5f;
+						yaw *= f / (this.target.width + Math.max(4.4f - (float)i * 0.075f, f));
 					}
-					this.prevSegment = new EC(this.prevSegment, yaw, -0.1f);
+					this.prevSegment = new EC(this.prevSegment, yaw, -0.5f);
+					this.prevSegment.setSize(this.width, this.height);
 					this.prevSegment.setLifespan(this.lifespan - this.ticksExisted * 2);
 					this.world.spawnEntity(this.prevSegment);
 				}
-				if (!this.world.isRemote && this.getIndex() > 12 && this.ticksExisted < 5) {
+				if (!this.world.isRemote && this.getIndex() > 48 && this.ticksExisted < 5) {
 					BlockPos pos = new BlockPos(this);
 					for (; !this.world.isAirBlock(pos); pos = pos.offset(EnumFacing.random(this.rand), this.rand.nextInt(2)));
 					new net.narutomod.event.EventSetBlocks(this.world,
-					 ImmutableMap.of(pos, Blocks.LEAVES.getStateFromMeta(0)), 0, this.lifespan - this.ticksExisted, false, false);
+							ImmutableMap.of(pos, Blocks.LEAVES.getStateFromMeta(0)), 0, this.lifespan - this.ticksExisted, false, false);
 				}
 				if (this.targetVec != null && this.targetTargetable()) {
 					if (this.ticksExisted > 20) {
-						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, null), 10.0f+ItemJutsu.getDmgMult(this.owner)*0.5f);
+						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, null), 2.0f+ItemJutsu.getDmgMult(this.owner)*0.65f);
 					}
 					this.target.setPositionAndUpdate(this.targetVec.x, this.targetVec.y, this.targetVec.z);
 				}

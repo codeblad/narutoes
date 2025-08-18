@@ -40,7 +40,7 @@ public class ProcedureAmaterasuFlameOnPotionActiveTick extends ElementsNarutomod
 			(entity).extinguish();
 		} else {
 			amp = (double) (amplifier);
-			entity.attackEntityFrom(ProcedureUtils.AMATERASU, (float) (amp + 1));
+			entity.attackEntityFrom(ProcedureUtils.AMATERASU, (float) (amp +1));
 			w = entity.width / 2;
 			h = entity.height;
 			Particles.spawnParticle(entity.world, Particles.Types.FLAME, entity.posX, entity.posY + h / 2, entity.posZ, amplifier + 1, w * 0.5,

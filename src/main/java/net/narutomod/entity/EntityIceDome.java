@@ -48,6 +48,8 @@ import java.util.List;
 import java.util.Iterator;
 import com.google.common.collect.Lists;
 
+import static net.narutomod.item.ItemHyoton.ICEDOME;
+
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 224;
@@ -95,9 +97,9 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(400D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20);
 		}
 
 		@Override
@@ -106,14 +108,21 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot_small")),
 				 0.8f, this.rand.nextFloat() * 0.4f + 0.8f);
-				for (int i = 0; i < this.rand.nextInt(50) + 100; i++) {
-					EntityIceSpear.EC.spawnShatteredShard(this.world, this.posX + this.width * (this.rand.nextFloat()-0.5f), 
-					 this.posY + this.height * this.rand.nextFloat(), this.posZ + this.width * (this.rand.nextFloat()-0.5f),
-					 (this.rand.nextDouble()-0.5d) * 0.05d, 0d, (this.rand.nextDouble()-0.5d) * 0.05d);
-				}
 				EntityLivingBase summoner = this.getSummoner();
+				for (int i = 0; i < 50; i++) {
+					EntityIceSpear.EC shard = EntityIceSpear.EC.spawnShatteredShard(this.world, this.posX + this.width * (this.rand.nextFloat()-0.5f),
+							this.posY + this.height * this.rand.nextFloat(), this.posZ + this.width * (this.rand.nextFloat()-0.5f),
+							(this.rand.nextDouble()-0.5d) * 0.05d, 0d, (this.rand.nextDouble()-0.5d) * 0.05d);
+					shard.baseImpactDamage = 5f+((3*ItemJutsu.getDmgMult(summoner)/50));
+				}
 				if (summoner != null && summoner.isPotionActive(MobEffects.INVISIBILITY)) {
 					summoner.removePotionEffect(MobEffects.INVISIBILITY);
+				}
+				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getSummoner(), ItemHyoton.block);
+				if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
+					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
+					//(30*20)+this.ticksExisted+this.ticksExisted/2
+					item.setJutsuCooldown(stack, ICEDOME, 20*10);
 				}
 			}
 		}
@@ -175,7 +184,7 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			if (!this.world.isRemote && this.ticksExisted % 20 == 0 && summoner != null
-			 && !Chakra.pathway(summoner).consume(ItemHyoton.ICEDOME.chakraUsage * 0.05d)) {
+			 && !Chakra.pathway(summoner).consume(ICEDOME.chakraUsage * 0.05d)) {
 				this.setDead();
 			}
 			this.clearActivePotions();
@@ -334,9 +343,11 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 
 			public EC createJutsu(EntityLivingBase entity, double x, double y, double z) {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
-				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:makyohyosho")),
-				 net.minecraft.util.SoundCategory.NEUTRAL, 1f, 0.9f);
+						SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:makyohyosho")),
+						net.minecraft.util.SoundCategory.NEUTRAL, 1f, 0.9f);
 				EC entity1 = new EC(entity, x, y, z);
+				entity1.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(150D+(12*ItemJutsu.getDmgMult(entity)));
+				entity1.setHealth(entity1.getMaxHealth());
 				entity.world.spawnEntity(entity1);
 				return entity1;
 			}
@@ -446,7 +457,8 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer bone17;
 			private final ModelRenderer cube_r3;
 			private final ModelRenderer cube_r4;
-			private final ModelRenderer bottom;
+		
+	private final ModelRenderer bottom;
 			private final ModelRenderer bone;
 			private final ModelRenderer bone9;
 			private final ModelRenderer bone5;

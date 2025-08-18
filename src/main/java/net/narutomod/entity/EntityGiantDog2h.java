@@ -28,7 +28,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBase;
-import net.minecraft.network.datasync.DataParameter;
+
+import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.pathfinding.PathNavigate;
@@ -50,8 +51,10 @@ public class EntityGiantDog2h extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-		 .id(new ResourceLocation("narutomod", "giant_dog_2h"), ENTITYID).name("giant_dog_2h")
+		elements.entities
+.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
+		 .id(new ResourceLocation("narutomod", "giant_dog_2h"), ENTITYID)
+.name("giant_dog_2h")
 		 .tracker(64, 3, true).egg(-11388356, -9088173).build());
 	}
 
@@ -87,7 +90,7 @@ public class EntityGiantDog2h extends ElementsNarutomodMod.ModElement {
 		}
 
 		public EntityCustom(EntityLivingBase player) {
-			this(player, 400d);
+			this(player, 800d);
 		}
 
 		@Override
@@ -147,6 +150,7 @@ public class EntityGiantDog2h extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.7D);
 			//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1000D);
 			//this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(50.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0);
 		}
@@ -862,7 +866,8 @@ public class EntityGiantDog2h extends ElementsNarutomodMod.ModElement {
 				this.headLeft.rotateAngleY = f3 / 180F * (float) Math.PI;
 				this.headLeft.rotateAngleX = f4 / 180F * (float) Math.PI;
 				float f6 = MathHelper.cos(f * 1.0F) * f1;
-				this.leg0.rotateAngleX = -f6;
+				this.leg0.rotateAngleX = -f6
+;
 				this.leg1.rotateAngleX = f6;
 				this.leg2.rotateAngleX = f6;
 				this.leg3.rotateAngleX = -f6;

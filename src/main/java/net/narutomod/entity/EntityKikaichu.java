@@ -43,12 +43,6 @@ import java.util.List;
 public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 323;
 	public static final int ENTITYID_RANGED = 324;
-	private static final String kikaichuSlownessAmp = "kikaichuSlownessAmplitude";
-
-@ElementsNarutomodMod.ModElement.Tag
-public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
-	public static final int ENTITYID = 323;
-	public static final int ENTITYID_RANGED = 324;
 
 	public EntityKikaichu(ElementsNarutomodMod instance) {
 		super(instance, 674);
@@ -57,10 +51,10 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-		 .id(new ResourceLocation("narutomod", "kikaichu"), ENTITYID)
-.name("kikaichu").tracker(64, 3, true).build());
+				.id(new ResourceLocation("narutomod", "kikaichu"), ENTITYID)
+				.name("kikaichu").tracker(64, 3, true).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
-		 .id(new ResourceLocation("narutomod", "bugball"), ENTITYID_RANGED).name("bugball").tracker(64, 3, true).build());
+				.id(new ResourceLocation("narutomod", "bugball"), ENTITYID_RANGED).name("bugball").tracker(64, 3, true).build());
 	}
 
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
@@ -81,7 +75,7 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 			Vec3d vec = this.getUserVector();
 			this.setPosition(vec.x, vec.y, vec.z);
 			this.bugsTarget = new ItemJiton.SwarmTarget<EntityCustom>(this.world, (int)(power * 50), vec,
-			 this.getTargetVector(), new Vec3d(0.4d, 0.4d, 0.4d), 0.6f, 0.05f, false, 1f, -1) {
+					this.getTargetVector(), new Vec3d(0.4d, 0.4d, 0.4d), 0.6f, 0.05f, false, 1f, -1) {
 				@Override
 				protected EntityCustom createParticle(double x, double y, double z, double mx, double my, double mz, int c, float sc, int life) {
 					return new EntityCustom(userIn, x, y, z, mx, my, mz, c, sc, life);
@@ -90,8 +84,8 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 				protected void playFlyingSound(double x, double y, double z, float volume, float pitch) {
 					if (this.getTicks() % 2 == 0) {
 						userIn.world.playSound(null, x, y, z, net.minecraft.util.SoundEvent.REGISTRY
-						 .getObject(new ResourceLocation("narutomod:bugs")),
-						 net.minecraft.util.SoundCategory.BLOCKS, volume, pitch);
+										.getObject(new ResourceLocation("narutomod:bugs")),
+								net.minecraft.util.SoundCategory.BLOCKS, volume, pitch);
 					}
 				}
 			};
@@ -118,27 +112,22 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void setDead() {
 			super.setDead();
-			if (!this.world.isRemote) {
-				if (this.target != null) {
-					this.target.getEntityData().removeTag(kikaichuSlownessAmp);
-				}
-				if (this.bugsTarget != null && !this.bugsTarget.shouldRemove()) {
-					this.bugsTarget.forceRemove();
-				}
+			if (!this.world.isRemote && this.bugsTarget != null && !this.bugsTarget.shouldRemove()) {
+				this.bugsTarget.forceRemove();
 			}
 		}
 
 		@Override
 		public void onUpdate() {
-			if (this.user != null && this.user.isEntityAlive() 
-			 && this.bugsTarget != null && !this.bugsTarget.shouldRemove() && this.target != null) {
+			if (this.user != null && this.user.isEntityAlive()
+					&& this.bugsTarget != null && !this.bugsTarget.shouldRemove() && this.target != null) {
 				Vec3d userVec = this.getUserVector();
 				if (this.target.isEntityAlive() && this.ticksExisted < MAXTIME) {
 					if (this.bugsTarget.allParticlesReachedTarget()) {
 						this.bugsTarget.setTarget(this.getTargetVector(), 0.2f, 0.01f, false);
-						//if (this.ticksExisted % 10 == 1) {
-						//	target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 22, 2, false, false));
-						//}
+						if (this.ticksExisted % 10 == 1) {
+							target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 22, 2, false, false));
+						}
 					} else {
 						this.bugsTarget.setTarget(this.getTargetVector(), 1.5f, 0.05f, false);
 					}
@@ -170,10 +159,6 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected void playStepSound(net.minecraft.util.math.BlockPos pos, net.minecraft.block.Block blockIn) {
-		}
-
-		@Override
 		protected void readEntityFromNBT(NBTTagCompound compound) {
 		}
 
@@ -184,7 +169,7 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity, 30d, 3.0d, true);
+				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity, 30d, 1.5d, true);
 				if (result != null) {
 					if (result.entityHit instanceof EC) {
 						result.entityHit.ticksExisted = EC.MAXTIME;
@@ -202,12 +187,12 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 			public float getBasePower() {
 				return 0.0f;
 			}
-	
+
 			@Override
 			public float getPowerupDelay() {
 				return 100.0f;
 			}
-	
+
 			@Override
 			public float getMaxPower() {
 				return 10.0f;
@@ -218,20 +203,16 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 	public static class EntityCustom extends Entity implements ItemJiton.ISwarmEntity {
 		private EntityLivingBase host;
 		private int maxAge;
-		public float prevRotationRoll;
-		public float rotationRoll;
-	    public float prevLimbSwingAmount;
-	    public float limbSwingAmount;
-	    public float limbSwing;
-	    private double chakra;
+		public float prevLimbSwingAmount;
+		public float limbSwingAmount;
+		public float limbSwing;
+		private double chakra;
 		private int lastUpdateTime;
-		private float hp;
 
 		public EntityCustom(World worldIn) {
 			super(worldIn);
 			this.setSize(0.1f, 0.1f);
 			this.maxAge = 6000;
-			this.hp = 4.0f;
 		}
 
 		public EntityCustom(EntityLivingBase hostIn, double x, double y, double z, double mX, double mY, double mZ, int color, float scale, int maxAgeIn) {
@@ -260,57 +241,36 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 			return !this.isDead;
 		}
 
- 		/*@Override
-		public boolean canBePushed() {
-			return !this.isDead;
+		public void updateLimbSwing() {
+			if (this.collided) {
+				this.prevLimbSwingAmount = this.limbSwingAmount;
+				double d5 = this.posX - this.prevPosX;
+				double d7 = this.posZ - this.prevPosZ;
+				float f10 = MathHelper.sqrt(d5 * d5 + d7 * d7) * 4.0F;
+				if (f10 > 1.0F) {
+					f10 = 1.0F;
+				}
+				this.limbSwingAmount += (f10 - this.limbSwingAmount) * 0.4F;
+				this.limbSwing += this.limbSwingAmount;
+			}
 		}
 
- 		@Override
-		public void applyEntityCollision(Entity entityIn) {
-			if (!entityIn.noClip) {
-				double d0 = entityIn.posX - this.posX;
-				double d1 = entityIn.posZ - this.posZ;
-				double d2 = MathHelper.absMax(d0, d1);
-				if (d2 >= 0.01D) {
-					d2 = (double)MathHelper.sqrt(d2);
-					d0 = d0 / d2;
-					d1 = d1 / d2;
-					double d3 = 1.0D / d2;
-					if (d3 > 1.0D) d3 = 1.0D;
-					d0 *= d3 * 0.01D;
-					d1 *= d3 * 0.01D;
-					this.addVelocity(-d0, 0.0D, -d1);
-				}
-			}
-		}*/
-
-  		public void updateLimbSwing() {
-	        if (this.collided) {
-		        this.prevLimbSwingAmount = this.limbSwingAmount;
-		        double d5 = this.posX - this.prevPosX;
-		        double d7 = this.posZ - this.prevPosZ;
-		        float f10 = MathHelper.sqrt(d5 * d5 + d7 * d7) * 4.0F;
-		        if (f10 > 1.0F) {
-		            f10 = 1.0F;
-		        }
-		        this.limbSwingAmount += (f10 - this.limbSwingAmount) * 0.4F;
-		        this.limbSwing += this.limbSwingAmount;
-	        }
-	    }
-
 		private void updateInFlightRotations() {
-            double d = (double)MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-            float yaw = -(float)(MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
-            float pitch = -(float)(MathHelper.atan2(this.motionY, d) * (180D / Math.PI));
-            float deltaYaw = ProcedureUtils.subtractDegreesWrap(yaw, this.prevRotationYaw);
-            float deltaPitch = ProcedureUtils.subtractDegreesWrap(pitch, this.prevRotationPitch);
-            float roll = MathHelper.wrapDegrees(deltaYaw * 1.5f);
-            this.prevRotationYaw = yaw - deltaYaw;
-            this.prevRotationPitch = pitch - deltaPitch;
-            this.prevRotationRoll = this.rotationRoll;
-            this.rotationPitch = this.prevRotationPitch + (pitch - this.prevRotationPitch) * 0.2F;
-            this.rotationYaw = this.prevRotationYaw + (yaw - this.prevRotationYaw) * 0.2F;
-            this.rotationRoll = this.prevRotationRoll + (roll - this.prevRotationRoll) * 0.2F;
+			float f4 = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+			this.rotationYaw = -(float)(MathHelper.atan2(this.motionX, this.motionZ) * (180D / Math.PI));
+			for (this.rotationPitch = -(float)(MathHelper.atan2(this.motionY, (double)f4) * (180D / Math.PI));
+				 this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F) ;
+			while (this.rotationPitch - this.prevRotationPitch >= 180.0F) {
+				this.prevRotationPitch += 360.0F;
+			}
+			while (this.rotationYaw - this.prevRotationYaw < -180.0F) {
+				this.prevRotationYaw -= 360.0F;
+			}
+			while (this.rotationYaw - this.prevRotationYaw >= 180.0F) {
+				this.prevRotationYaw += 360.0F;
+			}
+			this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
+			this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
 		}
 
 		@Override
@@ -329,18 +289,9 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox())) {
 					if (!entity.equals(this.host)) {
-						float ampf = entity.getEntityData().getFloat(kikaichuSlownessAmp);
-						PotionEffect effect = entity.getActivePotionEffect(PotionHeaviness.potion);
-						if (effect == null) {
-							ampf = 0.0f;
-							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 60, 0, false, false));
-						} else if (effect.getAmplifier() < (int)ampf) {
-							if (effect.getAmplifier() < (int)ampf - 1) {
-								ampf = effect.getAmplifier();
-							}
-							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 60, Math.min((int)ampf, 5), false, false));
+						if (!entity.isPotionActive(PotionHeaviness.potion) || entity.getActivePotionEffect(PotionHeaviness.potion).getAmplifier() < 1) {
+							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 22, 1, false, false));
 						}
-						entity.getEntityData().setFloat(kikaichuSlownessAmp, ampf + 0.01f);
 						if (this.chakra < 100d && Chakra.pathway(entity).consume(0.02d)) {
 							this.chakra += 0.001d;
 						}
@@ -363,15 +314,12 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
 			if (source == DamageSource.IN_WALL || source == DamageSource.DROWN
-			 || source == DamageSource.FALL || source == DamageSource.FLY_INTO_WALL) {
+					|| source == DamageSource.FALL || source == DamageSource.FLY_INTO_WALL) {
 				return false;
 			}
-			if (!this.world.isRemote && this.hp > 0.0f) {
-				this.hp -= amount;
-				if (this.hp <= 0.0f) {
-					this.setDead();
-					((WorldServer)this.world).spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, this.posX, this.posY, this.posZ, 1, 0d, 0d, 0d, 0d);
-				}
+			if (!this.world.isRemote && amount >= 1.0f) {
+				this.setDead();
+				((WorldServer)this.world).spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, this.posX, this.posY, this.posZ, 1, 0d, 0d, 0d, 0d);
 				return true;
 			}
 			return false;
@@ -431,25 +379,24 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 		public class CustomRender extends Render<EntityCustom> {
 			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/beetle.png");
 			protected final ModelBeetle model;
-	
+
 			public CustomRender(RenderManager renderManager) {
 				super(renderManager);
 				this.model = new ModelBeetle();
 			}
-	
+
 			@Override
 			public void doRender(EntityCustom entity, double x, double y, double z, float entityYaw, float partialTicks) {
-	            float f5 = entity.prevLimbSwingAmount + (entity.limbSwingAmount - entity.prevLimbSwingAmount) * partialTicks;
-	            float f6 = entity.limbSwing - entity.limbSwingAmount * (1.0F - partialTicks);
-	            if (f5 > 1.0F) {
-	                f5 = 1.0F;
-	            }
+				float f5 = entity.prevLimbSwingAmount + (entity.limbSwingAmount - entity.prevLimbSwingAmount) * partialTicks;
+				float f6 = entity.limbSwing - entity.limbSwingAmount * (1.0F - partialTicks);
+				if (f5 > 1.0F) {
+					f5 = 1.0F;
+				}
 				this.bindEntityTexture(entity);
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(x, y + 0.03125d, z);
 				GlStateManager.rotate(-entity.prevRotationYaw - (entity.rotationYaw - entity.prevRotationYaw) * partialTicks, 0.0F, 1.0F, 0.0F);
 				GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks - 180.0F, 1.0F, 0.0F, 0.0F);
-				GlStateManager.rotate(entity.prevRotationRoll + (entity.rotationRoll - entity.prevRotationRoll) * partialTicks, 0.0F, 0.0F, 1.0F);
 				GlStateManager.scale(0.1F, 0.1F, 0.1F);
 				GlStateManager.enableBlend();
 				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
@@ -457,13 +404,13 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 				GlStateManager.disableBlend();
 				GlStateManager.popMatrix();
 			}
-	
+
 			@Override
 			protected ResourceLocation getEntityTexture(EntityCustom entity) {
 				return this.texture;
 			}
 		}
-	
+
 		// Made with Blockbench 3.9.3
 		// Exported for Minecraft version 1.7 - 1.12
 		// Paste this class into your mod and generate all required imports
@@ -586,7 +533,7 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 				leg6.addChild(foreleg6);
 				foreleg6.cubeList.add(new ModelBox(foreleg6, 0, 3, -0.5F, -0.25F, -0.5F, 1, 5, 1, 0.0F, true));
 			}
-	
+
 			@Override
 			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
 				this.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
@@ -599,13 +546,13 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 				leg5.render(f5);
 				leg6.render(f5);
 			}
-	
+
 			public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
 				modelRenderer.rotateAngleX = x;
 				modelRenderer.rotateAngleY = y;
 				modelRenderer.rotateAngleZ = z;
 			}
-	
+
 			@Override
 			public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity e) {
 				if (e.onGround) {
@@ -618,12 +565,12 @@ public class EntityKikaichu extends ElementsNarutomodMod.ModElement {
 					wingRight.rotateAngleX = 0.1964F + f6 * 0.0655F;
 					wingRight.rotateAngleY = -0.7854F - f6 * 0.2618F;
 				}
-		        leg1.rotateAngleX = MathHelper.cos(f * 0.6662F) * 1.4F * f1;
-		        leg2.rotateAngleX = MathHelper.cos(f * 0.6662F + (float)Math.PI) * 1.4F * f1;
-		        leg3.rotateAngleX = MathHelper.cos(f * 0.6662F + (float)Math.PI) * 1.4F * f1;
-		        leg4.rotateAngleX = MathHelper.cos(f * 0.6662F) * 1.4F * f1;
-		        leg5.rotateAngleX = MathHelper.cos(f * 0.6662F) * 1.4F * f1;
-		        leg6.rotateAngleX = MathHelper.cos(f * 0.6662F + (float)Math.PI) * 1.4F * f1;
+				leg1.rotateAngleX = MathHelper.cos(f * 0.6662F) * 1.4F * f1;
+				leg2.rotateAngleX = MathHelper.cos(f * 0.6662F + (float)Math.PI) * 1.4F * f1;
+				leg3.rotateAngleX = MathHelper.cos(f * 0.6662F + (float)Math.PI) * 1.4F * f1;
+				leg4.rotateAngleX = MathHelper.cos(f * 0.6662F) * 1.4F * f1;
+				leg5.rotateAngleX = MathHelper.cos(f * 0.6662F) * 1.4F * f1;
+				leg6.rotateAngleX = MathHelper.cos(f * 0.6662F + (float)Math.PI) * 1.4F * f1;
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 
 package net.narutomod.item;
 
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -59,6 +60,7 @@ import net.narutomod.PlayerTracker;
 import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntityBeamBase;
 import net.narutomod.entity.EntityScalableProjectile;
+import net.narutomod.potion.PotionFlight;
 import net.narutomod.procedure.ProcedureAirPunch;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureAoeCommand;
@@ -74,7 +76,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 124;
 	public static final int ENTITY2ID = 10124;
 	private static final int MIN_PLAYER_XP = 70;
-	public static final ItemJutsu.JutsuEnum BEAM = new ItemJutsu.JutsuEnum(0, "jintonbeam", 'S', MIN_PLAYER_XP*10, 600d, new EntityBeam.Jutsu());
+	public static final ItemJutsu.JutsuEnum BEAM = new ItemJutsu.JutsuEnum(0, "jintonbeam", 'S', MIN_PLAYER_XP*10, 800d, new EntityBeam.Jutsu());
 	public static final ItemJutsu.JutsuEnum CUBE = new ItemJutsu.JutsuEnum(1, "jintoncube", 'S', MIN_PLAYER_XP*10, 600d, new EntityCube.Jutsu());
 
 	public ItemJinton(ElementsNarutomodMod instance) {
@@ -89,6 +91,8 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCube.class)
 			.id(new ResourceLocation("narutomod", "jintoncube"), ENTITY2ID).name("jintoncube").tracker(64, 1, true).build());
 	}
+
+
 
 	@Override
 	@SideOnly(Side.CLIENT)
@@ -134,6 +138,20 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 				 && entity instanceof EntityPlayer && !((EntityPlayer)entity).isCreative()) {
 					((EntityPlayer)entity).getCooldownTracker().setCooldown(itemstack.getItem(), 
 					 (int)(this.getUsePercent(timeLeft) * 12000 * ProcedureUtils.getCooldownModifier(((EntityPlayer)entity))));
+				}
+			}
+		}
+
+		@Override
+		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
+			super.onUpdate(itemstack, world, entity, par4, par5);
+			if (!world.isRemote && entity instanceof EntityPlayer ) {
+				ItemStack stack = ((EntityPlayer) entity).getHeldItemMainhand();
+				ItemStack offstack = ((EntityPlayer) entity).getHeldItemOffhand();
+				Chakra.Pathway chakra = Chakra.pathway((EntityLivingBase) entity);
+				if ((stack.getItem() == ItemJinton.block || offstack.getItem() == ItemJinton.block)  && entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed)
+						&& chakra.consume(1d) ) {
+					((EntityPlayer) entity).addPotionEffect(new PotionEffect(PotionFlight.potion, 10, 1, false, false));
 				}
 			}
 		}
@@ -216,7 +234,8 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 					this.beam.execute2(this.shootingEntity, this.getBeamLength(), scale / 2);
 				}
 			}
-			if (!this.world.isRemote && this.ticksAlive > this.wait + 60) {
+			if (!this.world.isRemote && this.ticksAlive > this.wait + 60)
+ {
 				this.setDead();
 			}
 		}
@@ -230,6 +249,8 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 		}
 
 		public class AirPunch extends ProcedureAirPunch {
+			float power = 1f;
+
 			public AirPunch() {
 				this.blockDropChance = -1.0F;
 				this.blockHardnessLimit = 100f;
@@ -240,8 +261,9 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
-				double d = this.getFarRadius(0) / target.getEntityBoundingBox().getAverageEdgeLength() * 0.2d;
-				float f = target instanceof EntityLivingBase ? ((EntityLivingBase)target).getMaxHealth() * (float)d : Float.MAX_VALUE;
+				/*double d = this.getFarRadius(0) / target.getEntityBoundingBox().getAverageEdgeLength() * 0.2d;
+				float f = target instanceof EntityLivingBase ? ((EntityLivingBase)target).getMaxHealth() * (float)d : Float.MAX_VALUE;*/
+				float f = 5+( 3* (1+8*(this.power/10f)) * ItemJutsu.getDmgMult(player)/20 );
 				attackEntityWithJutsu(EntityBeam.this, player, target, f);
 			}
 
@@ -269,7 +291,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 40.0f;
 			}
 
 			@Override
@@ -293,10 +315,11 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityCube extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private final int wait = 60;
-		private final int growTime = 30;
+		private final int growTime = 20;
 		private final int idleTime = 40;
-		private final int shrinkTime = 40;
+		private final int shrinkTime = 10;
 		private float fullScale = 1f;
+		public float power = 1f;
 		
 		public EntityCube(World a) {
 			super(a);
@@ -309,7 +332,8 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			super(shooter);
 			this.setOGSize(0.5F, 0.5F);
 			this.setEntityScale(0.01F);
-			this.fullScale = scale;
+			this.fullScale = scale*2f+1.5f;
+			this.power = scale;
 			this.setWaitPosition(shooter);
 			this.isImmuneToFire = true;
 		}
@@ -344,8 +368,9 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this, bb)) {
 				double d = ProcedureUtils.BB.getVolume(bb.intersect(entity.getEntityBoundingBox()))
 				 / ProcedureUtils.BB.getVolume(entity.getEntityBoundingBox()) * 0.025d;
-				attackEntityWithJutsu(this, this.shootingEntity, entity, 
-				 entity instanceof EntityLivingBase ? ((EntityLivingBase)entity).getMaxHealth() * (float)d : Float.MAX_VALUE);
+				attackEntityWithJutsu(this, this.shootingEntity, entity,
+						5+(2*(1+8*(this.power/25f))*ItemJutsu.getDmgMult(this.shootingEntity))/20);
+				//entity instanceof EntityLivingBase ? ((EntityLivingBase)entity).getMaxHealth() * (float)d : Float.MAX_VALUE);
 			}
 		}
 
@@ -434,7 +459,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 60.0f;
 			}
 
 			@Override
@@ -612,7 +637,8 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 				return this.texture;
 			}
 		}
-		
+	
+	
 		@SideOnly(Side.CLIENT)
 		public class ModelCube extends ModelBase {
 			private final ModelRenderer cube;

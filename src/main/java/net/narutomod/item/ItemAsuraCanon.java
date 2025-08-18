@@ -168,6 +168,13 @@ public class ItemAsuraCanon extends ElementsNarutomodMod.ModElement {
 				 this.posY - this.motionY, this.posZ - this.motionZ, -this.motionX, -this.motionY, -this.motionZ);
 			}
 		}
+
+		public static void shoot(EntityLivingBase entity) {
+			EntityMissile entityarrow = new EntityMissile(entity);
+			entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvents.ENTITY_BLAZE_SHOOT,
+					SoundCategory.NEUTRAL, 1.0F, 1.0F / (entity.getRNG().nextFloat() * 0.5F + 1.0F) + 0.5F);
+			entity.world.spawnEntity(entityarrow);
+		}
 	}
 
 	@Override

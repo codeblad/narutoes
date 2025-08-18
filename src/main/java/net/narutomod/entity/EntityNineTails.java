@@ -188,9 +188,9 @@ public class EntityNineTails extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.8D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10000.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(3000.0D);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(30.0D);
 		}
 
@@ -1785,7 +1785,8 @@ public class EntityNineTails extends ElementsNarutomodMod.ModElement {
 					setRotationAngle(upperLegLeft, -0.5236F, 0.0F, -1.5708F);
 					setRotationAngle(midLegLeft, 0.0F, 0.0F, 2.3562F);
 					setRotationAngle(leftFoot, 0.0F, 3.1416F, 0.0F);
-				}*/
+				}
+*/
 				if (((EntityCustom)e).isShooting()) {
 					//bipedHead.rotateAngleX = -0.5236F;
 					//bipedHeadwear.rotateAngleX = -0.5236F;

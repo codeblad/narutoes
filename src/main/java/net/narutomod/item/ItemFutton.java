@@ -123,8 +123,8 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			this.user = userIn;
 			this.power = powerIn;
 			this.farRadius = width;
-			this.damagePerSec = (int) (0.85*ItemJutsu.getDmgMult(userIn));
-			this.duration = (int)(powerIn * powerIn * 0.5f);
+			this.damagePerSec = (int) (0.8*ItemJutsu.getDmgMult(userIn));
+			this.duration = (int)(powerIn * powerIn * 0.6f);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
 		}
 

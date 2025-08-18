@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.init.Blocks;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
@@ -101,7 +102,7 @@ public class EntityNinjaMerchant extends ElementsNarutomodMod.ModElement {
 			if (rareTrades == null) {
 				rareTrades = new MerchantRecipeList();
 			}
-			rareTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 64), ItemStack.EMPTY, new ItemStack(ItemBijuMap.block, 1), 0, 1));
+			rareTrades.add(new MerchantRecipe(new ItemStack(Blocks.EMERALD_BLOCK, 15), ItemStack.EMPTY, new ItemStack(ItemBijuMap.block, 1), 0, 1));
 			this.trades.put(TradeLevel.RARE, rareTrades);
 		}
 

@@ -23,8 +23,8 @@ public class SpawnTailedBeasts extends ElementsNarutomodMod.ModElement {
 	public SpawnTailedBeasts(ElementsNarutomodMod instance) {
 		super(instance, 835);
 	}
-	private static final int SPAWN_MAX_RADIUS = 30000;
-	private static final int SPAWN_MIN_RADIUS = 8000;
+	private static final int SPAWN_MAX_RADIUS = 15000;
+	private static final int SPAWN_MIN_RADIUS = 3000;
 	private static final int REQUIRED_DISTANCE = 50;
 	private static final int TIME_FOR_RESPAWN = 3600; // 1 hour
 	private boolean resetSpawnPos = true;

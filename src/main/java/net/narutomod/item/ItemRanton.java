@@ -156,7 +156,7 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 			 this.getPositionVector().addVector(0d, 1d, 0d), entity.getPositionVector().addVector(0d, entity.height/2, 0d),
 			 0xc00000ff, 1, 0f);
-			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 4+0.2f*ItemJutsu.getDmgMult(this.summoner)*this.damageMultiplier, this.summoner, 0);
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 6+0.4f*ItemJutsu.getDmgMult(this.summoner)*this.damageMultiplier, this.summoner, 0);
 			this.world.spawnEntity(entity2);
 		}
 

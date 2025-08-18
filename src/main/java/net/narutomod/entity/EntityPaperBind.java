@@ -61,14 +61,15 @@ public class EntityPaperBind extends ElementsNarutomodMod.ModElement {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityPaper.class)
 		 .id(new ResourceLocation("narutomod", "paper_tag"), ENTITYID_RANGED).name("paper_tag").tracker(64, 3, true).build());
 	}
-
+
+
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private static final DataParameter<Integer> TARGET_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private EntityLivingBase user;
 		private EntityLivingBase targetEntity;
 		private ItemJiton.SwarmTarget swarmTarget;
 		private ProcedureSync.PositionRotationPacket capturedPRP;
-		private static final int MAXTIME = 600;
+		private static final int MAXTIME = 120;
 
 		public EC(World world) {
 			super(world);
@@ -180,10 +181,10 @@ public class EntityPaperBind extends ElementsNarutomodMod.ModElement {
 							this.setEntityBoundingBox(this.targetEntity.getEntityBoundingBox().grow(0.05d));
 						}
 					} else {
-						this.targetEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor(), 4.0f);
+						this.targetEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor(), 4.0f+1.45f*ItemJutsu.getDmgMult(this.user));
 					}
 				} else if (swarmactive && this.targetEntity != null) {
-					this.swarmTarget.setTarget(this.targetEntity.getEntityBoundingBox(), 2.5f, 0.03f, false);
+					this.swarmTarget.setTarget(this.targetEntity.getEntityBoundingBox(), 2f, 0.03f, false);
 				}
 				if (swarmactive) {
 					this.swarmTarget.setStartBB(this.user.getEntityBoundingBox());

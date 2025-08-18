@@ -137,7 +137,8 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier("shield.health", 1024.0D, 0));
-		}*/
+		}
+*/
 
 		@Override
 		public void onDeathUpdate() {
@@ -179,7 +180,7 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 					}
 					if (ret) {
 						Chakra.pathway(summoner).consume((double)-amount, true);
-						summoner.heal(amount * 0.01F);
+						summoner.heal(amount * 0.001F);
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:charging_chakra")),
 						 0.6F, this.rand.nextFloat() * 0.6F + 0.8F);
 					}

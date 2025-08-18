@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.util.SoundCategory;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 
 import net.minecraft.world.World;
@@ -121,7 +122,7 @@ public class EntityWoodForest extends ElementsNarutomodMod.ModElement {
 			super.onUpdate();
 			if (this.ticksExisted == 1 && this.rand.nextFloat() < 0.05f) {
 				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodgrow")),
-				 1.0f, this.rand.nextFloat() * 0.4f + 0.6f);
+				 0.2f, this.rand.nextFloat() * 0.4f + 0.6f);
 			}
 			EC parent = this.getParent();
 			if (parent != null && this.ticksExisted < this.lifespan) {
@@ -194,7 +195,7 @@ public class EntityWoodForest extends ElementsNarutomodMod.ModElement {
 							this.world.spawnEntity(this.lastSegment);
 						}
 					}
-					if (index > 16 && this.ticksExisted < 5 && !this.inGround && parent.diameter > 25f && !this.hasLivingTarget()) {
+					if (index > 16 && this.ticksExisted < 5 && !this.inGround && parent.diameter > 12f && !this.hasLivingTarget()) {
 						BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
 						for (pos.setPos(this); !this.world.isAirBlock(pos); pos.move(EnumFacing.random(this.rand), this.rand.nextInt(Math.max((int)this.width+1, 2))));
 						new net.narutomod.event.EventSetBlocks(this.world,
@@ -254,10 +255,13 @@ public class EntityWoodForest extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				if (power >= 10.0f) {
+				if (power >= 20.0f) {
 					RayTraceResult res = ProcedureUtils.raytraceBlocks(entity, power * 0.5 + 20);
 					if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK) {
 						entity.world.spawnEntity(new EC(entity, res.getBlockPos(), power));
+						entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, (net.minecraft.util.SoundEvent)
+										net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:deep_forest"))),
+								SoundCategory.NEUTRAL, 3, 1f);
 						ItemJutsu.setCurrentJutsuCooldown(stack, entity, 200 + (int)(power * 12));
 						return true;
 					}
@@ -267,12 +271,12 @@ public class EntityWoodForest extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getBasePower() {
-				return 9.0f;
+				return 19.0f;
 			}
 	
 			@Override
 			public float getPowerupDelay() {
-				return 25.0f;
+				return 50.0f;
 			}
 			
 			@Override

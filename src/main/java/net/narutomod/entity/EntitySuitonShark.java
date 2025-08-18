@@ -70,7 +70,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 		private Entity target;
 		private float health;
 		public float power;
-		public float dmg = 10f;
+		public float dmg = 15f;
 		
 		public EC(World a) {
 			super(a);
@@ -212,7 +212,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 				if (result.typeOfHit == RayTraceResult.Type.BLOCK
 				 || (result.entityHit != null && result.entityHit.equals(this.target))) {
 					float size = this.getEntityScale();
-					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*2.8f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
+					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*3.5f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 						damage*=1.25f;

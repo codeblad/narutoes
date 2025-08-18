@@ -118,7 +118,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		private static final int GENJUTSU_COOLDOWN = 100; // 5 seconds
 		private boolean isReal;
 		private int lookedAtTime;
-		private final int genjutsuDuration = 200;
+		private final int genjutsuDuration = 120;
 		private int lastGenjutsuTime;
 		private final int invisCD = 200;
 		private int lastInvisTime = -invisCD;
@@ -255,7 +255,8 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		public SoundEvent getDeathSound() {
 			return SoundEvents.ENTITY_ILLAGER_DEATH;
 		}
-
+
+
 		private boolean isSusanooActive() {
 			return this.susanooEntity != null && this.susanooEntity.isEntityAlive();
 		}
@@ -278,7 +279,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 				} else if (this.isReal && this.getHealth() > 0.0f && this.getHealth() - amount <= this.getMaxHealth() * 0.3333f
 				 && !this.isRiding() && this.ticksExisted > this.lastSusanooTime + this.susanooCD && this.consumeChakra(SUSANOO_CHAKRA)) {
 					this.susanooEntity = new EntitySusanooClothed.EntityCustom(this, false);
-					this.susanooEntity.setLifeSpan(this.susanooCD);
+					this.susanooEntity.setLifeSpan(this.susanooCD+800);
 					this.world.spawnEntity(this.susanooEntity);
 					this.startRiding(this.susanooEntity, true);
 					this.lastSusanooTime = this.ticksExisted;
@@ -358,7 +359,8 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void removeTrackingPlayer(EntityPlayerMP player) {
-			super.removeTrackingPlayer(player);
+			super.removeTrackingPlayer(player);
+
 			if (this.bossInfo.getPlayers().contains(player)) {
 				this.bossInfo.removePlayer(player);
 			}
@@ -408,7 +410,8 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void register() {
-			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager -> {
+			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager ->
+ {
 				class ModelItachi extends EntityNinjaMob.ModelNinja {
 					ModelItachi() {
 						super(0.0F);

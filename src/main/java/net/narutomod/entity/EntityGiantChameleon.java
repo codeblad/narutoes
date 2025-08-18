@@ -18,7 +18,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.entity.ai.EntityAILookIdle;
+import net.minecraft.entity.ai.EntityAILookIdle;
+
 import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -134,9 +135,10 @@ public class EntityGiantChameleon extends ElementsNarutomodMod.ModElement {
 			super.applyEntityAttributes();
 			//this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.7D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(500.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1000.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
 			//this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(50.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(80.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0D);
 		}
 

@@ -66,6 +66,10 @@ public class ProcedureOnPlayerDeath extends ElementsNarutomodMod.ModElement {
 		boolean keepInventory = false;
 		ItemStack stack = ItemStack.EMPTY;
 		ItemStack stack2 = ItemStack.EMPTY;
+		entity.getEntityData().setDouble("susanoo_cd",NarutomodModVariables.world_tick);
+		entity.getEntityData().setFloat("airpalmCD", (float) NarutomodModVariables.world_tick);
+		entity.getEntityData().setFloat("bijuACD", (float) NarutomodModVariables.world_tick);
+		entity.getEntityData().setFloat("kamuiDMGCD", (float) NarutomodModVariables.world_tick);
 		if ((entity instanceof EntityPlayerMP)) {
 			keepInventory = (boolean) entity.world.getGameRules().getBoolean("keepInventory");
 			if (((entity instanceof EntityPlayer)

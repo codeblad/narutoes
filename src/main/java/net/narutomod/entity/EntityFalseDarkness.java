@@ -28,7 +28,7 @@ import net.narutomod.ElementsNarutomodMod;
 public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 241;
 	public static final int ENTITYID_RANGED = 242;
-	private static final float BASE_DAMAGE = 3f;
+	private static final float BASE_DAMAGE = 2f;
 
 	public EntityFalseDarkness(ElementsNarutomodMod instance) {
 		super(instance, 568);

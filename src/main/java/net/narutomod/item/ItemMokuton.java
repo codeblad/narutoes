@@ -62,19 +62,20 @@ import javax.annotation.Nullable;
 import java.util.List;
 import com.google.common.collect.Lists;
 import com.google.common.collect.ImmutableList;
-
+
+
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemMokuton extends ElementsNarutomodMod.ModElement {
 	@ObjectHolder("narutomod:mokuton")
 	public static final Item block = null;
-	public static final ItemJutsu.JutsuEnum WOODBURIAL = new ItemJutsu.JutsuEnum(0, "wood_burial", 'S', 100d, new EntityWoodBurial.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum WOODBURIAL = new ItemJutsu.JutsuEnum(0, "wood_burial", 'S', 350d, new EntityWoodBurial.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WOODPRISON = new ItemJutsu.JutsuEnum(1, "wood_prison", 'S', 50d, new EntityWoodPrison.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WOODHOUSE = new ItemJutsu.JutsuEnum(2, "tooltip.mokuton.rightclick2", 'S', 100d, new JutsuHouse());
-	public static final ItemJutsu.JutsuEnum GOLEM = new ItemJutsu.JutsuEnum(3, "wood_golem", 'S', 800, 1000d, new EntityWoodGolem.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum ARMATTACK = new ItemJutsu.JutsuEnum(4, "wood_arm", 'S', 400, 50d, new EntityWoodArm.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum SPIKE = new ItemJutsu.JutsuEnum(5, "wood_cutting", 'S', 400, 50d, new EntityWoodCutting.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum GOLEM = new ItemJutsu.JutsuEnum(3, "wood_golem", 'S', 800, 1800d, new EntityWoodGolem.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum ARMATTACK = new ItemJutsu.JutsuEnum(4, "wood_arm", 'S', 400, 200d, new EntityWoodArm.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SPIKE = new ItemJutsu.JutsuEnum(5, "wood_cutting", 'S', 400, 150d, new EntityWoodCutting.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum FOREST = new ItemJutsu.JutsuEnum(6, "wood_forest", 'S', 800, 20d, new EntityWoodForest.EC.Jutsu());
-	
+
 	public ItemMokuton(ElementsNarutomodMod instance) {
 		super(instance, 245);
 	}
@@ -164,6 +165,177 @@ public class ItemMokuton extends ElementsNarutomodMod.ModElement {
 				return true;
 			}
 			return false;
+		}
+	}
+
+	public static abstract class BigWoodSegment extends Entity {
+		private static final DataParameter<Integer> PARENT_ID = EntityDataManager.<Integer>createKey(WoodSegment.class, DataSerializers.VARINT);
+		private static final DataParameter<Float> OFFSET_X = EntityDataManager.<Float>createKey(WoodSegment.class, DataSerializers.FLOAT);
+		private static final DataParameter<Float> OFFSET_Y = EntityDataManager.<Float>createKey(WoodSegment.class, DataSerializers.FLOAT);
+		private static final DataParameter<Float> OFFSET_Z = EntityDataManager.<Float>createKey(WoodSegment.class, DataSerializers.FLOAT);
+		private static final DataParameter<Float> OFFSET_YAW = EntityDataManager.<Float>createKey(WoodSegment.class, DataSerializers.FLOAT);
+		private static final DataParameter<Float> OFFSET_PITCH = EntityDataManager.<Float>createKey(WoodSegment.class, DataSerializers.FLOAT);
+		private static final DataParameter<Integer> SEG_IDX = EntityDataManager.<Integer>createKey(WoodSegment.class, DataSerializers.VARINT);
+		private double lastX;
+		private double lastY;
+		private double lastZ;
+
+		@Override
+		public boolean canBeCollidedWith() {
+			return true;
+		}
+
+		@Override
+		public boolean canBePushed() {
+			return true;
+		}
+
+		@Nullable
+		@Override
+		public AxisAlignedBB getCollisionBoundingBox() {
+			return this.getEntityBoundingBox();
+		}
+
+		public BigWoodSegment(World worldIn) {
+			super(worldIn);
+			this.setSize(2.5f, 1.5f);
+		}
+
+		public BigWoodSegment(BigWoodSegment segment, float yawOffset, float pitchOffset) {
+			this(segment, 0.0d, 0.75d * segment.height*1.5d, 0.0d, yawOffset, pitchOffset);
+		}
+
+		public BigWoodSegment(BigWoodSegment segment, double offsetX, double offsetY, double offsetZ, float yawOffset, float pitchOffset) {
+			this(segment.world);
+			ProcedureUtils.Vec2f vec2f = segment.getOffsetRotation();
+			Vec3d vec = new Vec3d(offsetX, offsetY, offsetZ).rotatePitch(-vec2f.y * 0.017453292F)
+					.rotateYaw(-vec2f.x * 0.017453292F).add(segment.getOffsetPosition());
+			this.setOffset(vec.x, vec.y, vec.z, vec2f.x + yawOffset, vec2f.y + pitchOffset);
+			this.setParent(segment.getParent());
+			this.setPositionAndRotationFromParent(1f);
+			this.setIndex(segment.getIndex() + 1);
+		}
+
+		@Override
+		protected void entityInit() {
+			this.getDataManager().register(PARENT_ID, Integer.valueOf(-1));
+			this.getDataManager().register(OFFSET_X, Float.valueOf(0f));
+			this.getDataManager().register(OFFSET_Y, Float.valueOf(0f));
+			this.getDataManager().register(OFFSET_Z, Float.valueOf(0f));
+			this.getDataManager().register(OFFSET_YAW, Float.valueOf(0f));
+			this.getDataManager().register(OFFSET_PITCH, Float.valueOf(0f));
+			this.getDataManager().register(SEG_IDX, Integer.valueOf(0));
+		}
+
+		protected void setParent(Entity entity) {
+			this.getDataManager().set(PARENT_ID, Integer.valueOf(entity.getEntityId()));
+		}
+
+		@Nullable
+		protected Entity getParent() {
+			return this.world.getEntityByID(((Integer)this.getDataManager().get(PARENT_ID)).intValue());
+		}
+
+		protected void setOffset(double x, double y, double z, float yaw, float pitch) {
+			this.getDataManager().set(OFFSET_X, Float.valueOf((float)x));
+			this.getDataManager().set(OFFSET_Y, Float.valueOf((float)y));
+			this.getDataManager().set(OFFSET_Z, Float.valueOf((float)z));
+			this.getDataManager().set(OFFSET_YAW, Float.valueOf(yaw));
+			this.getDataManager().set(OFFSET_PITCH, Float.valueOf(pitch));
+		}
+
+		protected Vec3d getOffsetPosition() {
+			return new Vec3d(((Float)this.dataManager.get(OFFSET_X)).floatValue(),
+					((Float)this.dataManager.get(OFFSET_Y)).floatValue(),
+					((Float)this.dataManager.get(OFFSET_Z)).floatValue());
+		}
+
+		protected ProcedureUtils.Vec2f getOffsetRotation() {
+			return new ProcedureUtils.Vec2f(((Float)this.dataManager.get(OFFSET_YAW)).floatValue(),
+					((Float)this.dataManager.get(OFFSET_PITCH)).floatValue());
+		}
+
+		protected void setIndex(int i) {
+			this.getDataManager().set(SEG_IDX, Integer.valueOf(i));
+		}
+
+		@Nullable
+		protected int getIndex() {
+			return ((Integer)this.getDataManager().get(SEG_IDX)).intValue();
+		}
+
+		/*
+		@Override
+		public void applyEntityCollision(Entity entityIn) {
+			double d0 = entityIn.posX - this.posX;
+			double d1 = entityIn.posZ - this.posZ;
+			double d2 = MathHelper.absMax(d0, d1);
+			if (d2 >= 0.01D) {
+				d2 = (double)MathHelper.sqrt(d2);
+				d0 = d0 / d2;
+				d1 = d1 / d2;
+				double d3 = 1.0D / d2;
+				if (d3 > 1.0D) {
+					d3 = 1.0D;
+				}
+				d0 = d0 * d3;
+				d1 = d1 * d3;
+				d0 = d0 * 0.05D;
+				d1 = d1 * 0.05D;
+				//d0 = d0 * (double)(1.0F - this.entityCollisionReduction);
+				//d1 = d1 * (double)(1.0F - this.entityCollisionReduction);
+				entityIn.addVelocity(d0, 0.0D, d1);
+			}
+		}
+		 */
+
+
+		protected void setPositionAndRotationFromParent(float partialTicks) {
+			Entity parent = this.getParent();
+			if (parent != null) {
+				float yaw = parent.prevRotationYaw + MathHelper.wrapDegrees(parent.rotationYaw - parent.prevRotationYaw) * partialTicks;
+				double x = parent.lastTickPosX + (parent.posX - parent.lastTickPosX) * (double)partialTicks;
+				double y = parent.lastTickPosY + (parent.posY - parent.lastTickPosY) * (double)partialTicks;
+				double z = parent.lastTickPosZ + (parent.posZ - parent.lastTickPosZ) * (double)partialTicks;
+				Vec3d vec = this.getOffsetPosition().rotateYaw(-yaw * 0.017453292F).addVector(x, y, z);
+				ProcedureUtils.Vec2f vec2f = this.getOffsetRotation();
+				this.rotationYaw = yaw + vec2f.x;
+				this.rotationPitch = vec2f.y;
+				this.setPosition(vec.x, vec.y, vec.z);
+				if (this.world.isRemote && (this.prevPosX != this.posX || this.prevPosY != this.posY || this.prevPosZ != this.posZ
+						|| this.prevRotationYaw != this.rotationYaw || this.prevRotationPitch != this.rotationPitch)) {
+					ProcedureSync.EntityPositionAndRotation.sendToServer(this);
+					this.prevPosX = this.posX;
+					this.prevPosY = this.posY;
+					this.prevPosZ = this.posZ;
+					this.prevRotationYaw = this.rotationYaw;
+					this.prevRotationPitch = this.rotationPitch;
+				}
+			}
+		}
+
+		@Override
+		public void onUpdate() {
+			BlockPos blockpos = new BlockPos(this);
+			IBlockState blockstate = this.world.getBlockState(blockpos);
+			if (blockstate.isFullBlock() && (this.ticksExisted == 1 || this.posX != this.lastX || this.posZ != this.lastZ)) {
+				for (int i = 0; i < 6; i++) {
+					this.world.spawnParticle(EnumParticleTypes.BLOCK_DUST, this.rand.nextDouble() + blockpos.getX(),
+							this.rand.nextDouble() + blockpos.getY(), this.rand.nextDouble() + blockpos.getZ(),
+							0.15d, 0.15d, 0.15d, Block.getIdFromBlock(blockstate.getBlock()));
+				}
+			}
+			this.lastX = this.posX;
+			this.lastY = this.posY;
+			this.lastZ = this.posZ;
+		}
+
+		@Override
+		protected void readEntityFromNBT(NBTTagCompound compound) {
+		}
+
+		@Override
+		protected void writeEntityToNBT(NBTTagCompound compound) {
 		}
 	}
 

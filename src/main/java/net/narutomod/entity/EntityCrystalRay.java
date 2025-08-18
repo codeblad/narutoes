@@ -182,6 +182,7 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 					entity.world.spawnEntity(new EC(entity));
 					return true;
 				} else {
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*5);
 					return ((EC)entity1).shootRay();
 				}
 			}
@@ -199,7 +200,7 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 	public static class EntityBeam extends EntityBeamBase.Base {
 		private static final DataParameter<Float> BEAM_WIDTH = EntityDataManager.<Float>createKey(EntityBeam.class, DataSerializers.FLOAT);
 		private final int waitTime = 10;
-		private final int duration = 60;
+		private final int duration = 50;
 		private float power = 2.0f;
 		private float damageMultiplier;
 		private float prevBeamLength;
@@ -257,11 +258,11 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 					if (hitres != null) {
 						this.shoot(hitres);
 						if (this.hitTrace.typeOfHit != RayTraceResult.Type.MISS) {
-							ProcedureAoeCommand.set(this.world, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z, 0d, 3d)
+							ProcedureAoeCommand.set(this.world, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z, 0d, 2d)
 							 .exclude(this.shootingEntity).resetHurtResistanceTime()
 							 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.power * this.damageMultiplier);
 							this.world.newExplosion(this.shootingEntity, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z,
-							 5.0f + this.damageMultiplier, this.rand.nextInt(4) == 0,
+							 6+ItemJutsu.getDmgMult(this.shootingEntity)*0.25f, this.rand.nextInt(4) == 0,
 							 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 						}
 					}

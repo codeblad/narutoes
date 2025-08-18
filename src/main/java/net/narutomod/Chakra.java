@@ -224,7 +224,7 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		protected void resetMax() {
-			this.setMax(500d + 15000*(ItemJutsu.getDmgMult(this.user)/63));
+			this.setMax(500d + 20000*(ItemJutsu.getDmgMult(this.user)/63));
 		}
 
 		@Override
@@ -258,13 +258,13 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 			 || (!this.user.onGround && flight == null) || this.user.isSwingInProgress) {
 			 	this.motionlessTime = 0;
 			}
-			if (this.motionlessTime > 20 && this.user.isSneaking() && (!this.user.isAirBorne || flight != null)) {
-				this.consume(-50d);
-				this.consume((-ModConfig.CHAKRA_REGEN_RATE - 0.001f )*4);
+			if (this.motionlessTime > 10 && this.user.isSneaking() && (!this.user.isAirBorne || flight != null)) {
+				this.consume(-150d);
+				this.consume((-ModConfig.CHAKRA_REGEN_RATE - 0.001f )*6);
 				//* this.user.getFoodStats().getSaturationLevel()
 			}
 			//double d = 500d + PlayerTracker.getBattleXp(this.user) * 0.1d;
-			double d = 500d + 15000*(ItemJutsu.getDmgMult(this.user)/63);
+			double d = 500d + 20000*(ItemJutsu.getDmgMult(this.user)/63);
 			if (d != this.getMax() || this.forceSync) {
 				this.forceSync = false;
 				this.setMax(d);

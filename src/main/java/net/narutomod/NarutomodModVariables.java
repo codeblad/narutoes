@@ -27,6 +27,8 @@ public class NarutomodModVariables {
 	public static String tenseiganEvolvedTime = "TenseiganEvolvedTime";
 	public static String tempDisableAI = "temporaryDisableAI";
 	public static String JutsuKey1Pressed = "JutsuKey1Pressed";
+	public static String JutsuKey3Pressed = "JutsuKey3Pressed";
+
 	public static class MapVariables extends WorldSavedData {
 		public static final String DATA_NAME = "narutomod_mapvars";
 		public MapVariables() {

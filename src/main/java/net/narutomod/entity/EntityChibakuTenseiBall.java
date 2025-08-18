@@ -277,7 +277,7 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				} else {
-					entity.attackEntityFrom(DamageSource.FLY_INTO_WALL, 10f);
+					entity.attackEntityFrom(DamageSource.FLY_INTO_WALL, 1f);
 					if (entity instanceof EntityLivingBase) {
 						((EntityLivingBase)entity).addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 2, 3, false, false));
 					}
@@ -343,6 +343,11 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 
 		public Satellite(World world) {
 			super(world);
+		}
+
+		@Override
+		public float getCollisionDamage() {
+			return 500;
 		}
 
 		public Satellite(EntityLivingBase summonerIn, List<? extends BlockPos> list, int fallTime) {
@@ -422,7 +427,8 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			protected ResourceLocation getEntityTexture(EntityCustom entity) {
-				return entity.getEntityScale() > entity.maxScale * 0.4f ? this.blank_tex : this.texture;
+				return entity.getEntityScale() > entity.maxScale * 0.4f 
+? this.blank_tex : this.texture;
 			} // meteor2
 		}
 	

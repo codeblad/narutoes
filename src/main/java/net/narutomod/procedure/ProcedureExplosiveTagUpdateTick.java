@@ -50,7 +50,7 @@ public class ProcedureExplosiveTagUpdateTick extends ElementsNarutomodMod.ModEle
 			if (((!world.getEntitiesWithinAABB(EntityLiving.class, bb, IMob.MOB_SELECTOR).isEmpty())
 					|| world.getNearestAttackablePlayer(new BlockPos(x, y, z), 1.5, 1) != null)) {
 				world.setBlockToAir(new BlockPos((int) x, (int) y, (int) z));
-				world.createExplosion(null, x, y, z, 4f, ForgeEventFactory.getMobGriefingEvent(world, null));
+				world.createExplosion(null, x, y, z, 5f, ForgeEventFactory.getMobGriefingEvent(world, null));
 			}
 			if (((((((new Object() {
 				public EnumFacing getEnumFacing(BlockPos pos) {

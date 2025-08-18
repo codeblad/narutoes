@@ -128,7 +128,7 @@ public class EntityEnhancedStrength extends ElementsNarutomodMod.ModElement {
 					return;
 				}
 				if (this.ticksExisted % 10 == 2 && (stack.isEmpty() || stack.getItem() == ItemIryoJutsu.block)) {
-					this.user.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 12, (int) (10+ItemJutsu.getDmgMult(this.user)*2.3f), true, false));
+					this.user.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 12, (int) (10+ItemJutsu.getDmgMult(this.user)*2.75f), true, false));
 				}
 			} else if (!this.world.isRemote) {
 				this.setDead();

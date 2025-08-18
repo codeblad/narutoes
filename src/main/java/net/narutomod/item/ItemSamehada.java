@@ -36,7 +36,8 @@ import net.narutomod.PlayerTracker;
 import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
-import net.narutomod.procedure.ProcedureUtils;
+
+import net.narutomod.procedure.ProcedureUtils;
 
 import com.google.common.collect.Multimap;
 import javax.annotation.Nullable;
@@ -140,11 +141,6 @@ public class ItemSamehada extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public boolean isShield(ItemStack stack, @Nullable EntityLivingBase entity) {
-			return true;
-		}
-
-		@Override
 		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
 			if (attacker.isHandActive()) {
 				return true;
@@ -166,10 +162,6 @@ public class ItemSamehada extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		@Override
-		public EnumAction getItemUseAction(ItemStack stack) {
-			return EnumAction.BLOCK;
-		}
 
 		@Override
 		public int getMaxItemUseDuration(ItemStack stack) {

@@ -66,7 +66,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			this.setIdlePosition();
 			this.width = MathHelper.clamp(widthIn,1,15);
 			this.range = MathHelper.clamp(rangeIn,5,50);
-			float mult = 1+1.5f*(((float) powa)/25);
+			float mult = 1.25f+1.75f*(((float) powa)/25);
 			this.damage = 2+ItemJutsu.getDmgMult(shooterIn)*0.85f*mult;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter, ItemKaton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
@@ -195,7 +195,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 
 			public EC createJutsu(EntityLivingBase entity, float power, int duration, int color) {
 				EC entity1 = new EC(entity, 1.0f, power, power);
-				entity1.setDamage(0.4f);
+				entity1.setDamage(0.75f);
 				entity1.wait = 0;
 				entity1.maxLife = duration;
 				entity1.setFlameColor(color);

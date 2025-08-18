@@ -248,7 +248,7 @@ public class ItemBijuMap extends ElementsNarutomodMod.ModElement {
 				if (bm != null) {
 					final BlockPos target = bm.getPosition();
 					BlockPos newBP = new BlockPos(nbt.getInteger("posX"),nbt.getInteger("posY"),nbt.getInteger("posZ"));
-					if (target.getDistance(nbt.getInteger("posX"),nbt.getInteger("posY"),nbt.getInteger("posZ")) > 100) {
+					if (target.getDistance(nbt.getInteger("posX"),nbt.getInteger("posY"),nbt.getInteger("posZ")) > 1500) {
 						stack.shrink(1);
 					}
 				}

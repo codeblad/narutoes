@@ -80,7 +80,8 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-		 .id(new ResourceLocation("narutomod", "hidan"), ENTITYID).name("hidan").tracker(64, 3, true).egg(-16777216, -6750157).build());
+		 .id(new ResourceLocation("narutomod", "hidan"), ENTITYID)
+.name("hidan").tracker(64, 3, true).egg(-16777216, -6750157).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityJashinSymbol.class)
 		 .id(new ResourceLocation("narutomod", "hidan_symbol"), ENTITYID_RANGED).name("hidan_symbol").tracker(64, 3, true).build());
 	}
@@ -160,7 +161,7 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10D);
 		}
@@ -218,7 +219,8 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 			this.tasks.addTask(8, new EntityAIWander(this, 0.5d));
 			this.tasks.addTask(9, new EntityAILookIdle(this));
 		}
-
+
+
 		@Override
 		protected void updateAITasks() {
 			ItemStack stack = this.getHeldItemMainhand();

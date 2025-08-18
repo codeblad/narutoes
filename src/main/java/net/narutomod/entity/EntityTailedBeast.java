@@ -2,6 +2,7 @@
 package net.narutomod.entity;
 
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -151,7 +152,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		protected boolean canPassengerDismount = true;
 		protected boolean spawnedBySpawner;
 		protected final ProcedureUtils.CollisionHelper collisionData;
-		protected Entity mouthShootingJutsu;
+		public Entity mouthShootingJutsu;
 		private int meleeTime;
 
 		public Base(World world) {
@@ -269,7 +270,8 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(this.getTargetRange());
 			this.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(200.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(80.0D);
 		}
 
 		@Override
@@ -298,7 +300,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				@Override
 				public void resetTask() {
 					super.resetTask();
-					Base.this.meleeTime = 100;
+					Base.this.meleeTime = 350;
 				}
 			});
 			this.tasks.addTask(1, new AILeapAtTarget(this, 36.0d) {
@@ -314,7 +316,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				}
 				@Override
 				public boolean shouldContinueExecuting() {
-					return super.shouldContinueExecuting() && !Base.this.isMotionHalted() && Base.this.meleeTime > 0;
+					return super.shouldContinueExecuting() && !Base.this.isMotionHalted() && Base.this.meleeTime == 0;
 				}
 				@Override
 				protected double getAttackReachSqr(EntityLivingBase attackTarget) {
@@ -395,8 +397,8 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			}
 			if (this.meleeTime > 0) {
 				--this.meleeTime;
-			} else if (target != null && this.getDistance(target) <= ProcedureUtils.getReachDistance(this) * 0.6d) {
-				this.meleeTime = 80;
+			} else if (target != null && this.getDistance(target) <= ProcedureUtils.getReachDistance(this) * 0.4d) {
+				this.meleeTime = 350;
 			}
 		}
 
@@ -447,7 +449,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public int getTalkInterval() {
-			return 320 - this.angerLevel * 120;
+			return 500 - this.angerLevel * 120;
 		}
 
 		@Override
@@ -605,7 +607,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this));
 				ProcedureAoeCommand.set(entityIn, 0d, 5d).exclude(this).exclude(this.getSummoningPlayer())
 				 .exclude(this.getBijuManager().getJinchurikiPlayer()).exclude(this.getControllingPassenger())
-				 .damageEntities(this, (float)ProcedureUtils.getModifiedAttackDamage(this) * (this.rand.nextFloat() * 0.5f + 0.75f));
+				 .damageEntities(this, (float)ProcedureUtils.getModifiedAttackDamage(this) );
 				return true;
 			}
 			return false;
@@ -636,6 +638,8 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			super.move(type, x, y, z);
 		}
 
+		public float fall = 0;
+
 		@Override
 		public void travel(float ti, float tj, float tk) {
 			if (this.isBeingRidden() && this.canBeSteered()) {
@@ -649,14 +653,38 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				this.rotationYawHead = entity.rotationYaw;
 				this.stepHeight = this.height / 3.0F;
 				if (entity instanceof EntityLivingBase) {
+					float terminal = -200f;
+					if (this.onGround) {
+						this.fall = 0;
+					} else {
+						this.fall -= 1.6f;
+						if (this.fall < terminal) {
+							this.fall = terminal;
+						}
+					}
+
 					this.setAIMoveSpeed((float) this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
 					float forward = ((EntityLivingBase) entity).moveForward;
 					float strafe = ((EntityLivingBase) entity).moveStrafing;
-					super.travel(strafe, 0.0F, forward);
+					if (this instanceof EntitySevenTails.EntityCustom) {
+						this.fall = 0;
+					} else {
+						this.checkJump((EntityLivingBase) entity);
+					}
+					super.travel(strafe, this.fall, forward);
 				}
 			} else {
 				this.jumpMovementFactor = 0.02F;
 				super.travel(ti, tj, tk);
+			}
+		}
+
+		private void checkJump(EntityLivingBase entity) {
+			if (this.world.isRemote) {
+				if ((boolean) ReflectionHelper.getPrivateValue(EntityLivingBase.class, entity, 49) && this.onGround) {
+					this.fall = 20f;
+					ReflectionHelper.setPrivateValue(EntityLivingBase.class, entity, false, 49);
+				}
 			}
 		}
 
@@ -776,7 +804,8 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				float maxhp = this.getMaxHealth();
 				if (hp > maxhp * 0.1f && this.isFaceDown()) {
 					this.setFaceDown(false);
-				} else if (hp <= maxhp * 0.1f && !this.isFaceDown()) {
+				}
+ else if (hp <= maxhp * 0.1f && !this.isFaceDown()) {
 					this.setFaceDown(true);
 				}
 				if (this.isAIDisabled() && jinchuriki != null && jinchuriki.getHealth() <= 0.0F) {
@@ -817,7 +846,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				return;
 			}
 			if ((this.mouthShootingJutsu == null || this.mouthShootingJutsu.isDead) && (flag || (distanceFactor >= 1.0f && this.canShootBijudama()))) {
-				this.mouthShootingJutsu = EntityTailBeastBall.spawn(this, 14f, 1000f);
+				this.mouthShootingJutsu = EntityTailBeastBall.spawn(this, 15f, 1000f);
 				if (this.mouthShootingJutsu != null) {
 					this.setSwingingArms(true);
 					this.tailBeastBallTime = ATTACK_CD_MAX;
@@ -838,7 +867,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		}
 
 		protected boolean canShootBijudama() {
-			return this.getHealth() >= this.getMaxHealth() * 0.3f;
+			return this.getHealth() >= this.getMaxHealth() * 0.2f;
 		}
 
 		@Override
@@ -1018,7 +1047,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				float radius = MathHelper.sqrt(this.getEntityScale()) * 6f;
 				new EventSphericalExplosion(this.world, this.shootingEntity, (int) this.posX, (int) this.posY,
 				 (int) this.posZ, (int)radius, 0, 0.33f);
-				ProcedureAoeCommand.set(this, 0d, radius * 1.2).exclude(excludePlayer)
+				ProcedureAoeCommand.set(this, 0d, radius * 1.5).exclude(excludePlayer)
 				 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.maxDamage);
 				this.setDead();
 			}
@@ -1046,7 +1075,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 
 		@Nullable
 		public static EntityTailBeastBall spawn(EntityLivingBase summonerIn, float maxscale, float maxdamage) {
-			double chakraUsage = 100d * maxscale;
+			double chakraUsage = 150d * maxscale;
 			EntityLivingBase user = null;
 			if (summonerIn instanceof Base) {
 				user = ((Base)summonerIn).getBijuManager().getJinchurikiPlayer();
@@ -1103,7 +1132,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 						 new TextComponentString(String.format("%.1f", cd.power)), true);
 					}
 				} else {
-					if (spawn(entity, cd.power, cd.power * 70f) != null) {
+					if (spawn(entity, cd.power, 150+ItemJutsu.getDmgMult(entity)*(1+12*cd.power/14)) != null) {
 						cd.cooldown = entity.ticksExisted + (int)(cd.power * 7.143f);
 					}
 					cd.power = 0f;
@@ -1163,14 +1192,15 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 	            this.leaper.rotationYaw = (float)(MathHelper.atan2(d1, d0) * (180D / Math.PI)) - 90.0F;
 	            this.leaper.motionX = d0 * 0.145d;
 	            this.leaper.motionZ = d1 * 0.145d;
-	            this.leaper.motionY = 0.32d + (Math.max(d2, 0.0d) + d3 * 0.6d) * 0.1d;
+	            this.leaper.motionY = 0.25d + (Math.max(d2, 0.0d) + d3 * 0.5d) * 0.1d;
             }
 	    }
 	}
 
 	public static class NavigateGround extends PathNavigateGround {
 		private BlockPos targetPos;
-	    private int ticksAtLastPos;
+	
+    private int ticksAtLastPos;
 	    private Vec3d lastPosCheck = Vec3d.ZERO;
 
 		public NavigateGround(EntityLiving entityLivingIn, World worldIn) {

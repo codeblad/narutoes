@@ -70,14 +70,14 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 			super(world);
 			this.setSize(0.7f, 1.9f);
 			this.dieOnNoPassengers = false;
-			this.strengthModifier = new AttributeModifier(UUID.fromString("2866063d-9200-4f65-9025-1d841af84825"), "crystalarmor.damage", this.strengthAmplifier * 3, 0);
+			this.strengthModifier = new AttributeModifier(UUID.fromString("2866063d-9200-4f65-9025-1d841af84825"), "crystalarmor.damage", 10+ItemJutsu.getDmgMult(this.getSummoner())*4, 0);
 		}
 
 		public EC(EntityLivingBase userIn) {
 			this(userIn.world);
 			this.setSummoner(userIn);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(Math.max(userIn.getMaxHealth() * 0.5f, 20.0f));
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(Math.max(userIn.getMaxHealth() * 2f, 20.0f));
 			this.setHealth(this.getMaxHealth());
 			userIn.getEntityData().setInteger(ENTITYID_KEY, this.getEntityId());
 			//if (userIn.isPotionActive(MobEffects.STRENGTH)) {
@@ -93,7 +93,7 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(10.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(15.0D);
 		}
 
 		@Override
@@ -198,7 +198,8 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 					if (attacker instanceof EntityLivingBase && attacker.getEntityData().hasKey(ENTITYID_KEY)) {
 						Entity entity1 = entity.world.getEntityByID(attacker.getEntityData().getInteger(ENTITYID_KEY));
 						if (entity1 instanceof EC && ((EC)entity1).holdingWeapon((EntityLivingBase)attacker)) {
-							event.getSource().damageType = ItemJutsu.NINJUTSU_TYPE;
+							
+event.getSource().damageType = ItemJutsu.NINJUTSU_TYPE;
 						}
 					}
 				}

@@ -113,7 +113,7 @@ public class ItemKunaiExplosive extends ElementsNarutomodMod.ModElement {
 						|| slotID != -1) {
 					float power = ItemBow.getArrowVelocity(this.getMaxItemUseDuration(itemstack) - timeLeft);
 					EntityArrowCustom entityarrow = new EntityArrowCustom(world, entity);
-					entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 2, 0);
+					entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 4, 0);
 					entityarrow.setSilent(true);
 					entityarrow.setIsCritical(false);
 					entityarrow.setDamage(5);
@@ -185,7 +185,7 @@ public class ItemKunaiExplosive extends ElementsNarutomodMod.ModElement {
 			super.onHit(raytraceResultIn);
 			if (!this.world.isRemote) {
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
-				this.world.newExplosion(null, raytraceResultIn.hitVec.x, raytraceResultIn.hitVec.y, raytraceResultIn.hitVec.z, 4f, flag, flag);
+				this.world.newExplosion(null, raytraceResultIn.hitVec.x, raytraceResultIn.hitVec.y, raytraceResultIn.hitVec.z, 5f, flag, flag);
 				this.setDead();
 			}
 		}

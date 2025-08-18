@@ -71,13 +71,13 @@ public class ProcedureShinraTenseiOnKeyPressed extends ElementsNarutomodMod.ModE
 				if (!entity.getEntityData().getBoolean("was_pressed")) {
 					power = 10.0d;
 				}
-				if (power + 0.1d < ItemJutsu.getMaxPower(entity, ItemRinnegan.getShinratenseiChakraUsage(entity)) && power < 100d) {
-					power += 0.1d;
+				if (power + 0.5d < ItemJutsu.getMaxPower(entity, ItemRinnegan.getShinratenseiChakraUsage(entity)) && power < 100d) {
+					power += 0.5d;
 				}
 				if (entity instanceof EntityPlayer && !entity.world.isRemote) {
 					((EntityPlayer)entity).sendStatusMessage(new TextComponentString("Power " + (int)power), true);
 				}
-				entity.addPotionEffect(new PotionEffect(PotionFlight.potion, 200, 1, false, false));
+				entity.addPotionEffect(new PotionEffect(PotionFlight.potion, 100, 1, false, false));
 				entity.getEntityData().setBoolean("was_pressed", true);
 			} else {
 				if (entity.getEntityData().getBoolean("was_pressed")) {
@@ -128,8 +128,8 @@ public class ProcedureShinraTenseiOnKeyPressed extends ElementsNarutomodMod.ModE
 			}
 			if (entity instanceof EntityPlayer && !entity.world.isRemote) {
 				((EntityPlayer)entity).sendStatusMessage(new TextComponentString("Power " + (int)power), true);
-			}
-			ProcedureAoeCommand.set(entity, 0d, power).exclude(entity).damageEntities(ItemJutsu.causeJutsuDamage(entity, null).setDamageBypassesArmor(), (float)power * 1.8f).knockback(2f).noGravity(false);
+			}float damage = 1+25*(float)(power/100);
+			ProcedureAoeCommand.set(entity, 0d, power).exclude(entity).damageEntities(ItemJutsu.causeJutsuDamage(entity, null).setDamageBypassesArmor(),  60+damage*ItemJutsu.getDmgMult(entity)).knockback(2f).noGravity(false);
 			for (Entity entity2 : ProcedureAoeCommand.getInstance().getEntitiesList()) {
 				if (entity2 instanceof ItemJutsu.IJutsu && !(entity2 instanceof EntityLivingBase)) {
 					entity2.setDead();

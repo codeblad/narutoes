@@ -38,7 +38,7 @@ public class ProcedureExplosiveTagBlockDestroyedByExplosion extends ElementsNaru
 		World world = (World) dependencies.get("world");
 		world.setBlockToAir(new BlockPos((int) x, (int) y, (int) z));
 		if ((!(world.isRemote))) {
-			world.createExplosion(null, x, y, z, 4f, ForgeEventFactory.getMobGriefingEvent(world, null));
+			world.createExplosion(null, x, y, z, 5f, ForgeEventFactory.getMobGriefingEvent(world, null));
 		}
 	}
 }

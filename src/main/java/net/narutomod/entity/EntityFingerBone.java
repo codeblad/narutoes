@@ -110,7 +110,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				if (result.entityHit != null) {
 					result.entityHit.hurtResistantTime = 10;
-					if (result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.shootingEntity), this.damage)) {
+					if (result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.shootingEntity), this.damage+ItemJutsu.getDmgMult(shootingEntity)*1.75f)) {
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
 						 1f, 0.4f + this.rand.nextFloat() * 0.6f);
 						this.setDead();
@@ -143,6 +143,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 					  SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:bonecrack"))),
 					  SoundCategory.PLAYERS, 0.5f, entity.getRNG().nextFloat() * 0.6f + 0.6f);
 				this.createJutsu(entity);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 10);
 				return true;
 			}
 
@@ -238,6 +239,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				modelRenderer.rotateAngleY = y;
 				modelRenderer.rotateAngleZ = z;
 			}
-		}
+	
+	}
 	}
 }

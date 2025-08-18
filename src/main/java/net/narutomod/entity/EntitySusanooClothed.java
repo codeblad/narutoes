@@ -109,11 +109,11 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 				//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*10);
 				ratio = this.getHealth()/this.getMaxHealth();
 				if (this.hasLegs()) {
-					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1.85+300);
+					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2+400);
 					this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
-							.setBaseValue(40.0D+ItemJutsu.getDmgMult(entity)*2.35);
+							.setBaseValue(40.0D+ItemJutsu.getDmgMult(entity)*2.5);
 				} else {
-					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1+200);
+					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1.3+300);
 					this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
 							.setBaseValue(30.0D+ItemJutsu.getDmgMult(entity)*2);
 				}
