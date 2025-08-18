@@ -240,14 +240,14 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source) {
 			this.entityDropItem(new ItemStack(ItemKunai.block, 1), 0.0f);
 			if (this.isReal) {
-				ItemStack stack = this.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+			/*ItemStack stack = this.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 				if (stack.getItem() != ItemMangekyoSharingan.helmet) {
 					stack = this.getItemFromInventory(1);
 				}
 				if (stack.getItem() == ItemMangekyoSharingan.helmet) {
 				 	((ItemSharingan.Base)stack.getItem()).forceDamage(stack, this.rand.nextInt(stack.getMaxDamage()));
 					this.entityDropItem(stack, 0.0f);
-				}
+				}*/
 			}
 		}
 
