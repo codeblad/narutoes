@@ -92,7 +92,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			this.stepHeight = this.height / 3;
 			this.setHealth(this.getMaxHealth());
 			this.chakraBurn = chakraUsagePerSec;
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(200+ItemJutsu.getDmgMult(this.getSummoner())*45f);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(200+ItemJutsu.getDmgMult(this.getSummoner())*55f);
 		}
 
 		@Override
