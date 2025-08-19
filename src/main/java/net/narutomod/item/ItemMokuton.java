@@ -45,13 +45,7 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelRenderer;
 
-import net.narutomod.entity.EntityRendererRegister;
-import net.narutomod.entity.EntityWoodBurial;
-import net.narutomod.entity.EntityWoodPrison;
-import net.narutomod.entity.EntityWoodGolem;
-import net.narutomod.entity.EntityWoodArm;
-import net.narutomod.entity.EntityWoodCutting;
-import net.narutomod.entity.EntityWoodForest;
+import net.narutomod.entity.*;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.creativetab.TabModTab;
@@ -74,14 +68,14 @@ public class ItemMokuton extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum GOLEM = new ItemJutsu.JutsuEnum(3, "wood_golem", 'S', 800, 1800d, new EntityWoodGolem.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum ARMATTACK = new ItemJutsu.JutsuEnum(4, "wood_arm", 'S', 400, 200d, new EntityWoodArm.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SPIKE = new ItemJutsu.JutsuEnum(5, "wood_cutting", 'S', 400, 150d, new EntityWoodCutting.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum FOREST = new ItemJutsu.JutsuEnum(6, "wood_forest", 'S', 800, 20d, new EntityWoodForest.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum DEEPFOREST = new ItemJutsu.JutsuEnum(6, "wood_forest", 'S', 800, 20d, new EntityDeepForest.EC.Jutsu());
 
 	public ItemMokuton(ElementsNarutomodMod instance) {
 		super(instance, 245);
 	}
 
 	public void initElements() {
-		this.elements.items.add(() -> new ItemCustom(WOODBURIAL, WOODPRISON, WOODHOUSE, GOLEM, ARMATTACK, SPIKE, FOREST));
+		this.elements.items.add(() -> new ItemCustom(WOODBURIAL, WOODPRISON, WOODHOUSE, GOLEM, ARMATTACK, SPIKE, DEEPFOREST));
 	}
 
 	@SideOnly(Side.CLIENT)

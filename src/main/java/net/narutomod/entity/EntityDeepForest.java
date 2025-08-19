@@ -11,10 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.narutomod.ElementsNarutomodMod;
@@ -41,13 +38,18 @@ public class EntityDeepForest extends ElementsNarutomodMod.ModElement {
 	}
 
 
-	public static class EC extends ItemMokuton.BigWoodSegment implements ItemJutsu.IJutsu {
+	public static class EC extends ItemMokuton.WoodSegment implements ItemJutsu.IJutsu {
 		private int lifespan = 1200;
 		private EC prevSegment;
 		private EC firstSegment;
 		private boolean canSplit = false;
 		private Entity target;
 		private Vec3d targetVec;
+
+		@Override
+		public AxisAlignedBB getCollisionBoundingBox() {
+			return this.getEntityBoundingBox().expand(1,-1,1);
+		}
 
 		public EC(World world) {
 			super(world);
@@ -116,6 +118,7 @@ public class EntityDeepForest extends ElementsNarutomodMod.ModElement {
 						float f = ProcedureUtils.getYawFromVec(this.targetVec.subtract(this.getPositionVector().add(vec)));
 						EC segment = new EC(this, vec.x, vec.y, vec.z, f + ((this.rand.nextFloat()-0.5f) * 360f), (0.5f-this.rand.nextFloat())*12);
 						segment.canSplit = true;
+						segment.setSize(2f,2f);
 						segment.setLifespan(this.lifespan - this.ticksExisted * 2);
 						segment.prevSegment = segment;
 						//segment.setPosition(newVec.x,newVec.y,newVec.z);
@@ -142,6 +145,7 @@ public class EntityDeepForest extends ElementsNarutomodMod.ModElement {
 					}
 					this.prevSegment = new EC(this.prevSegment, (0.5f-this.rand.nextFloat())*80, (0.5f-this.rand.nextFloat())*70);
 					//this.prevSegment = new EC(this.prevSegment, 15,5);
+					this.prevSegment.setSize(2f,2f);
 					this.prevSegment.setLifespan(this.lifespan - this.ticksExisted * 2);
 					this.world.spawnEntity(this.prevSegment);
 

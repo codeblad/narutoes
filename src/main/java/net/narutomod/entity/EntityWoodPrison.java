@@ -107,7 +107,7 @@ public class EntityWoodPrison extends ElementsNarutomodMod.ModElement {
 				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class,
 				 new AxisAlignedBB(this.posX - this.radius - 1, this.posY, this.posZ - this.radius - 1, 
 				 this.posX + this.radius + 1, this.posY + this.tHeight + 1, this.posZ + this.radius + 1))) {
-				 	entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 100, 3, false, false));
+				 	entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 120, 3, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 1200, 2, false, false));
 				}
 				int bottom = Math.min(-this.tHeight, -3);
