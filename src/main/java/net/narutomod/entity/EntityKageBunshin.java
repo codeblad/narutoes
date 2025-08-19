@@ -357,7 +357,8 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 					chakra.consume(d);
 					Chakra.pathway(clone).setMax(d).consume(-d);
 					entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier(MAXHEALTH, "maxhealth.modifier", entity.getHealth() * clones.size() / (clones.size() + 1) - entity.getMaxHealth(), 0));
-				} else if (clones.size() > 0) {
+				}
+ else if (clones.size() > 0) {
 					entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier(MAXHEALTH, "maxhealth.modifier", -clone.getMaxHealth() * clones.size(), 0));
 				}
 				if (entity.getHealth() > entity.getMaxHealth()) {
@@ -404,7 +405,7 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (!(entity instanceof EntityPlayer) || !entity.isSneaking()) {
-					if (power >= 3.0f && Chakra.pathway(entity).getAmount() > 10000d) {
+					if (power >= 3.0f && Chakra.pathway(entity).getAmount() > 5000d) {
 						entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 						  .getObject(new ResourceLocation("narutomod:kagebunshin")), SoundCategory.NEUTRAL, 1.0F, 1.0F);
 						for (int i = 0, j = (int)Math.pow(2, power); i < j; i++) {
