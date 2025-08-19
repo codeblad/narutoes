@@ -92,12 +92,12 @@ public class ProcedureAmaterasu extends ElementsNarutomodMod.ModElement {
 					}
 					Chakra.pathway((EntityPlayer) entity).consume(chakraUsage);
 				}
-				cooldown = (double) (world.getTotalWorldTime() + 5*20);
+				cooldown = (double) (world.getTotalWorldTime() + 8*20);
 				entity.getEntityData().setBoolean("amaterasu_active", (true));
 				entity.getEntityData().setDouble("amaterasu_cd", (cooldown));
-				Chakra.pathway((EntityPlayer) entity).consume(chakraUsage * 0.15d);
+				Chakra.pathway((EntityPlayer) entity).consume(chakraUsage * 0.25d);
 				RayTraceResult t = ProcedureUtils.objectEntityLookingAt(entity, 30d);
-				i = (double) 4+ItemJutsu.getDmgMult(entity)*2.75;
+				i = (double) 4+ItemJutsu.getDmgMult(entity)*2.5;
 				if (t.typeOfHit == RayTraceResult.Type.ENTITY) {
 					if (t.entityHit instanceof EntityLivingBase) {
 						((EntityLivingBase) t.entityHit).setRevengeTarget((EntityLivingBase) entity);
