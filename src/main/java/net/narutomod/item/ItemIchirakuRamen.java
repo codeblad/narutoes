@@ -46,7 +46,7 @@ public class ItemIchirakuRamen extends ElementsNarutomodMod.ModElement {
 			setUnlocalizedName("ichiraku_ramen");
 			setRegistryName("ichiraku_ramen");
 			setCreativeTab(CreativeTabs.FOOD);
-			setMaxStackSize(2);
+			setMaxStackSize(64);
 		}
 
 		@Override
