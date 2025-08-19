@@ -91,6 +91,10 @@ public class ProcedureSusanoo extends ElementsNarutomodMod.ModElement {
 		if (player.isCreative()) {
 			player.getEntityData().setDouble("susanoo_cd", 0);
 		}
+		double cool = (player.getEntityData().getDouble("susanoo_cd") - NarutomodModVariables.world_tick) / 20.0D;
+		if (cool > 5000) {
+			player.getEntityData().setDouble("susanoo_cd", 0);
+		}
 		if (!player.getEntityData().getBoolean("susanoo_activated")) {
 			if (NarutomodModVariables.world_tick < player.getEntityData().getDouble("susanoo_cd")) {
 				player.sendStatusMessage(new TextComponentString(net.minecraft.client.resources.I18n.format("cooldown: ") +

@@ -120,6 +120,10 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 				int tails = EntityBijuManager.getTails((EntityPlayer) entity);
 				Chakra.Pathway cp = Chakra.pathway((EntityLivingBase) entity);
 				float cd = 20;
+				double cool = (biju.getEntityData().getFloat("bijuACD")-NarutomodModVariables.world_tick)/20;
+				if (cool > 5000) {
+					biju.getEntityData().setFloat("bijuACD", 0);
+				}
 				if (world.getTotalWorldTime() > biju.getEntityData().getFloat("bijuACD") || ((EntityPlayer) entity).isCreative()) {
 					if (tails == 9) {
 						cd = 100;

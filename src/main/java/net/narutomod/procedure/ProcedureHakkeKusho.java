@@ -87,6 +87,10 @@ public class ProcedureHakkeKusho extends ElementsNarutomodMod.ModElement {
 			return;
 		}
 		EntityPlayer player = (EntityPlayer) entity;
+		double cool = (entity.getEntityData().getFloat("airPalmcd")-NarutomodModVariables.world_tick)/20;
+		if (cool > 5000) {
+			player.getEntityData().setFloat("airPalmcd", 0);
+		}
 		if (entity.getEntityData().getFloat("airPalmcd") > NarutomodModVariables.world_tick) {
 			player.sendStatusMessage(new TextComponentString("cooldown: " + (entity.getEntityData().getFloat("airPalmcd")-NarutomodModVariables.world_tick)/20), true);
 			return;

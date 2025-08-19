@@ -1,13 +1,10 @@
 package net.narutomod.procedure;
 
+import net.narutomod.*;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.world.WorldKamuiDimension;
 import net.narutomod.item.ItemMangekyoSharinganObito;
 import net.narutomod.gui.overlay.OverlayByakuganView;
-import net.narutomod.PlayerTracker;
-import net.narutomod.Particles;
-import net.narutomod.ElementsNarutomodMod;
-import net.narutomod.Chakra;
 
 import net.minecraft.world.World;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -167,6 +164,10 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 						i = (double) (((timer) - 5) / (((distance) * (i)) * (2.01 - (PlayerTracker.getNinjaLevel((EntityPlayer) entity) / 500.1))));
 						System.out.println(i);
 						if (((!(f3)) && ((i) <= 0.99999))) {
+							double cool = (entity.getEntityData().getFloat("kamuiDMGCD")- NarutomodModVariables.world_tick)/20;
+							if (cool > 5000) {
+								entity.getEntityData().setFloat("airPalmcd", 0);
+							}
 							if (((i) > 0) && entity.getEntityData().getFloat("kamuiDMGCD") < world.getTotalWorldTime()) {
 								entity.getEntityData().setFloat("kamuiDMGCD", world.getTotalWorldTime()+20*7);
 								i = 50f;
