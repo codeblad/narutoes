@@ -201,7 +201,7 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 						this.sandTarget.setTarget(targetBB, 2.5f, 0.03f, false);
 					}
 				} else {
-					this.sandTarget.setTarget(gourdVec, 0.8f, 0.02f, true);
+					this.sandTarget.setTarget(gourdVec, 2f, 0.02f, true);
 				}
 				this.sandTarget.setStartVec(gourdVec);
 				this.sandTarget.onUpdate();

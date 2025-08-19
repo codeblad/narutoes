@@ -127,7 +127,7 @@ public class EntitySandGathering extends ElementsNarutomodMod.ModElement {
 			} else if (!this.world.isRemote && i > 0) {
 				this.setPuppetMouthOpen(true);
 				this.sandCloud = new ItemJiton.SwarmTarget(this.world, 50, this.getEntityBoundingBox(),
-			 	 this.getMouthPos(), new Vec3d(0.2d, -0.1d, 0.2d), 0.8f, 0.03f, true, 2f, ItemJiton.Type.IRON.getColor());
+			 	 this.getMouthPos(), new Vec3d(0.2d, -0.1d, 0.2d), 2f, 0.03f, true, 2f, ItemJiton.Type.IRON.getColor());
 			}
 		}
 

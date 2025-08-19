@@ -555,7 +555,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 					ep = iter.next();
 					if (ep.isEntityAlive()) {
 						Vec3d vec = this.getTargetPos().subtract(ep.getPositionVector());
-						if (this.dieOnTargetReached && vec.lengthVector() < 0.1d + this.inaccuracy) {
+						if (this.dieOnTargetReached && vec.lengthVector() < 0.5d + this.inaccuracy) {
 							ep.setDead();
 						} else {
 							vec = vec.normalize().scale(this.speed * 0.1d);

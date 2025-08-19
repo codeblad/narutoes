@@ -198,7 +198,7 @@ public class EntitySandLevitation extends ElementsNarutomodMod.ModElement {
 				}
 			} else if (this.firstRidden && !this.isSummonerControlling()) {
 				this.sandCloud = new ItemJiton.SwarmTarget(this.world, 15, this.getPositionVector(), 
-			 	 this.getGourdMouthPos(), new Vec3d(0.1d, 0.2d, 0.1d), 0.5f, 0.03f, true, 2f, this.getSandType().getColor());
+			 	 this.getGourdMouthPos(), new Vec3d(0.1d, 0.2d, 0.1d), 2f, 0.03f, true, 2f, this.getSandType().getColor());
 			 	 this.setIsDead(true);
 			}
 		}
