@@ -84,8 +84,8 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 	public static class EntityMist extends Entity implements ItemJutsu.IJutsu {
 		private static final UUID FOLLOW_MODIFIER = UUID.fromString("7c3e5536-e32d-4ef7-8cf2-e5ef57f9d48f");
 		private final float density = 1.0f;
-		private final int buildTime = 40;
-		private final int DISSIPATE = 40;
+		private final int buildTime = 20;
+		private final int DISSIPATE = 20;
 		private int idleTime;
 		private double radius;
 		private EntityLivingBase user;
@@ -129,7 +129,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			if (!this.world.isRemote) {
-				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(this.radius+20))) {
+				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(this.radius+10))) {
 					if (entity.equals(this.user) && !(this.user instanceof EntityPlayer)) {
 						continue;
 					}

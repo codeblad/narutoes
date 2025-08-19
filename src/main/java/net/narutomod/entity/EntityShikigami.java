@@ -130,7 +130,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 					}
 					if (this.ticksExisted % 20 == 2) {
 						if (Chakra.pathway(user).consume(this.chakraUsage)) {
-							user.addPotionEffect(new PotionEffect(PotionFlight.potion, 25, 1, false, false));
+							user.addPotionEffect(new PotionEffect(PotionFlight.potion, 40, 1, false, false));
 						} else {
 							this.setDead();
 						}

@@ -182,7 +182,7 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 					this.setDead();
 				} else {
 					this.setUserIntangible(true);
-					((EntityLivingBase) this.user).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 10, 15));
+					((EntityLivingBase) this.user).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 10, 10));
 					if (!flag && flag1) {
 						Chakra.pathway((EntityPlayer)this.user).consume(HIDINGINROCK.chakraUsage);
 					}
