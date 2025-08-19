@@ -291,7 +291,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 40.0f;
+				return 30.0f;
 			}
 
 			@Override
@@ -459,7 +459,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 60.0f;
+				return 40.0f;
 			}
 
 			@Override

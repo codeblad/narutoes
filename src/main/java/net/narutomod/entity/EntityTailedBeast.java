@@ -271,7 +271,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(this.getTargetRange());
 			this.getEntityAttribute(SharedMonsterAttributes.KNOCKBACK_RESISTANCE).setBaseValue(1.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(80.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(100.0D);
 		}
 
 		@Override
@@ -300,7 +300,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				@Override
 				public void resetTask() {
 					super.resetTask();
-					Base.this.meleeTime = 350;
+					Base.this.meleeTime = 200;
 				}
 			});
 			this.tasks.addTask(1, new AILeapAtTarget(this, 36.0d) {
@@ -398,7 +398,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			if (this.meleeTime > 0) {
 				--this.meleeTime;
 			} else if (target != null && this.getDistance(target) <= ProcedureUtils.getReachDistance(this) * 0.4d) {
-				this.meleeTime = 350;
+				this.meleeTime = 200;
 			}
 		}
 
@@ -811,7 +811,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				if (this.isAIDisabled() && jinchuriki != null && jinchuriki.getHealth() <= 0.0F) {
 					this.setNoAI(false);
 				}
-				if (this.ticksExisted % 100 == 0 && hp > 0.0f && hp < maxhp) {
+				if (this.ticksExisted % 40 == 0 && hp > 0.0f && hp < maxhp) {
 					this.setHealth(hp + 0.01f * Math.max(hp, maxhp * 0.1f));
 				}
 				if (this.angerLevel > 0 && this.ticksExisted - this.getRevengeTimer() > 6000) {

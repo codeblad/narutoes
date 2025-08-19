@@ -4,6 +4,7 @@ package net.narutomod.entity;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.Chakra;
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemMokuton;
 import net.narutomod.item.ItemShoton;
 import net.narutomod.procedure.ProcedureUtils;
 
@@ -46,6 +47,9 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import javax.annotation.Nullable;
 import java.util.UUID;
 
+import static net.narutomod.item.ItemMokuton.GOLEM;
+import static net.narutomod.item.ItemShoton.ARMOR;
+
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 474;
@@ -70,7 +74,7 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 			super(world);
 			this.setSize(0.7f, 1.9f);
 			this.dieOnNoPassengers = false;
-			this.strengthModifier = new AttributeModifier(UUID.fromString("2866063d-9200-4f65-9025-1d841af84825"), "crystalarmor.damage", 10+ItemJutsu.getDmgMult(this.getSummoner())*4, 0);
+			this.strengthModifier = new AttributeModifier(UUID.fromString("2866063d-9200-4f65-9025-1d841af84825"), "crystalarmor.damage", 10+ItemJutsu.getDmgMult(this.getSummoner())*5, 0);
 		}
 
 		public EC(EntityLivingBase userIn) {
@@ -125,7 +129,7 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 			if (user != null) {
 				this.setPosition(user.posX, user.posY, user.posZ);
 				if (this.ticksExisted % 20 == 19 && !this.world.isRemote) {
-					if (!Chakra.pathway(user).consume(ItemShoton.ARMOR.chakraUsage)) {
+					if (!Chakra.pathway(user).consume(ARMOR.chakraUsage)) {
 						this.setDead();
 					} else {
 						IAttributeInstance aInstance = user.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
@@ -137,6 +141,12 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 								}
 							} else {
 								aInstance.removeModifier(this.strengthModifier);
+							}
+							ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getSummoner(), ItemShoton.block);
+							if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
+								ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
+								//(30*20)+this.ticksExisted+this.ticksExisted/2
+								item.setJutsuCooldown(stack, ARMOR, 20*5);
 							}
 						}
 					}
@@ -173,6 +183,7 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 					 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot_small")),
 					 SoundCategory.PLAYERS, 0.8f, entity.getRNG().nextFloat() * 0.4f + 0.6f);
 					entity.world.spawnEntity(new EC(entity));
+
 					return true;
 				} else {
 					entity1.setDead();

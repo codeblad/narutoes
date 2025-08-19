@@ -76,7 +76,7 @@ public class EntityCrystalPrison extends ElementsNarutomodMod.ModElement {
 			this(userIn.world);
 			this.user = userIn;
 			this.maxScale = scale;
-			this.health = scale * 100.0f;
+			this.health = scale * 50.0f;
 		}
 
 		@Override
@@ -139,7 +139,7 @@ public class EntityCrystalPrison extends ElementsNarutomodMod.ModElement {
 				}
 				for (EntityLivingBase entity : this.trappedEntities.keySet()) {
 					if (!entity.equals(this.user)) {
-						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor(), this.maxScale * this.baseDamage);
+						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor(), 6+ItemJutsu.getDmgMult(this.shootingEntity)*0.25f);
 					}
 				}
 				this.trappedEntities.clear();
@@ -250,7 +250,7 @@ public class EntityCrystalPrison extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 200.0f;
+				return 100.0f;
 			}
 	
 			@Override
