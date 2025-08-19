@@ -118,7 +118,7 @@ public class EntitySandGathering extends ElementsNarutomodMod.ModElement {
 					if (i > 20) {
 						this.cleanUp();
 					} else if (i > 0) {
-						this.sandCloud.setTarget(this.getMouthPos(), 0.8f, 0.03f, true);
+						this.sandCloud.setTarget(this.getMouthPos(), 2f, 0.03f, true);
 					} else if (this.sandCloud.getTicks() > this.waitTime) {
 						this.sandCloud.forceRemove();
 					}
