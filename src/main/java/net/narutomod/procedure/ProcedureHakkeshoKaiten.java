@@ -50,7 +50,7 @@ public class ProcedureHakkeshoKaiten extends ElementsNarutomodMod.ModElement {
 		if (((helmetstack).hasTagCompound() && (helmetstack).getTagCompound().getBoolean((NarutomodModVariables.RINNESHARINGAN_ACTIVATED)))) {
 			cooldown = (double) (entity.getEntityData().getDouble("press_time"));
 			if ((is_pressed)) {
-				if (((cooldown) < 200)) {
+				if (((cooldown) < 30)) {
 					entity.getEntityData().setDouble("press_time", ((cooldown) + 1));
 					if (entity instanceof EntityPlayer && !entity.world.isRemote) {
 						((EntityPlayer) entity).sendStatusMessage(new TextComponentString((("Power: ") + "" + (((cooldown) / 2)))), (true));

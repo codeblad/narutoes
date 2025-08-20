@@ -156,7 +156,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 						 	Vec3d vec = entry.getValue();
 							entity.setPositionAndUpdate(vec.x, vec.y, vec.z);
 							if (age > this.growTime - 5) {
-								float damage = 5+1.15f*ItemJutsu.getDmgMult(this.user);
+								float damage = 5+1.5f*ItemJutsu.getDmgMult(this.user);
 								ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemDoton.block);
 								if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 									damage*=1.25f;
@@ -220,7 +220,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 60.0f;
+				return 30.0f;
 			}
 	
 			@Override

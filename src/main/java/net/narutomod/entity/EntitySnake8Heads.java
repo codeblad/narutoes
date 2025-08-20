@@ -234,7 +234,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			super(summonerIn);
 			this.postScaleFixup();
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(200d);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(20.0d+ItemJutsu.getDmgMult(summonerIn)*1.5);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(20.0d+ItemJutsu.getDmgMult(summonerIn)*1.85);
 			Entity parent = summonerIn.getRidingEntity() instanceof EC ? summonerIn.getRidingEntity() : summonerIn;
 			this.rotationYawHead = parent.rotationYaw;
 			this.setLocationAndAngles(parent.posX, parent.posY - 10d, parent.posZ, parent.rotationYaw, -45f);

@@ -208,7 +208,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 
 		public void setNextPosition(Vec3d vec) {
 			if (this.getDistance(vec.x, vec.y, vec.z) > 0.5d && this.targetTime >= 0) {
-				this.setVelocity(vec.subtract(this.getPositionVector()).normalize().scale(0.6d));
+				this.setVelocity(vec.subtract(this.getPositionVector()).normalize().scale(0.9d));
 			} else {
 				this.setVelocity(vec.subtract(this.getPositionVector()));
 				if (vec.equals(this.getIdlePosition()) && this.targetTime >= 0) {
@@ -236,11 +236,11 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 					this.setVelocity(Vec3d.ZERO);
 					float scale = this.getEntityScale();
 					if (scale < this.maxScale) {
-						this.setEntityScale(scale * 1.25f);
+						this.setEntityScale(scale * 1.35f);
 					} else {
 						this.setEntityScale(this.maxScale);
 						Vec3d vec2 = this.shootingEntity.getLookVec();
-						this.shoot(vec2.x, vec2.y, vec2.z, 0.98f, 0f);
+						this.shoot(vec2.x, vec2.y, vec2.z, 0.99f, 0f);
 					}
 				} else {
 					this.setDead();
@@ -285,7 +285,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 								--this.targetTime;
 							}
 							entity.getEntityData().setBoolean("TempData_disableKnockback", true);
-							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 1f+0.4f*ItemJutsu.getDmgMult(this.shootingEntity));
+							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 2f+0.85f*ItemJutsu.getDmgMult(this.shootingEntity));
 							this.scorchEffects(entity.posX, entity.posY+entity.height/2, entity.posZ, entity.width/2, entity.height/2);
 						}
 					}
@@ -322,7 +322,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 				new net.narutomod.event.EventSphericalExplosion(this.world, this.shootingEntity,
 				 (int)this.posX, (int)this.posY + 5, (int)this.posZ, (int)this.maxScale, 0, 0.3333f);
 				ProcedureAoeCommand.set(this, 0d, this.maxScale)
-				 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 80f+ItemJutsu.getDmgMult(this.shootingEntity)*25);
+				 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 120f+ItemJutsu.getDmgMult(this.shootingEntity)*30);
 				//this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.maxScale * 5f, flag, flag);
 				this.scorchEffects(this.posX, this.posY, this.posZ, 2.5d * this.maxScale, 1d);
 				this.setDead();
@@ -354,7 +354,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 			//private static final String ID_KEY = "JitonSandShieldEntityIdKey";
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				if (((RangedItem)block).getTotalBalls(stack) < 8) {
+				if (((RangedItem)block).getTotalBalls(stack) < 12) {
 					Entity entity1 = new EntityScorchBall(entity);
 					entity.world.spawnEntity(entity1);
 					((RangedItem)block).saveSpawnedBall(stack, entity1);

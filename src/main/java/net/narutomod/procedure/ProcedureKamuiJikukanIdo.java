@@ -165,7 +165,7 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 						System.out.println(i);
 						if (((!(f3)) && ((i) <= 0.99999))) {
 							double cool = (entity.getEntityData().getFloat("kamuiDMGCD")- NarutomodModVariables.world_tick)/20;
-							if (cool > 5000) {
+							if (cool > 30) {
 								entity.getEntityData().setFloat("airPalmcd", 0);
 							}
 							if (((i) > 0) && entity.getEntityData().getFloat("kamuiDMGCD") < world.getTotalWorldTime()) {

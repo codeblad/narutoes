@@ -56,7 +56,7 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private float fullScale = 1f;
-		private final int timeToFullscale = 10;
+		private final int timeToFullscale = 5;
 		private int explosionSize;
 		private float damage = 5;
 		private float mult = 1;
@@ -70,10 +70,10 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 			super(shooter);
 			this.setOGSize(0.3125F, 0.3125F);
 			this.setEntityScale(0.1f);
-			this.fullScale = power * 3.2f;
+			this.fullScale = power * 3.5f;
 			this.explosionSize = (int)(power * 2f);
-			this.mult = 0.5f+2.5f*(power/5);
-			this.damage = 6+mult*ItemJutsu.getDmgMult(this.shootingEntity)*2.35f;
+			this.mult = 0.5f+3f*(power/5);
+			this.damage = 6+mult*ItemJutsu.getDmgMult(this.shootingEntity)*2.5f;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter, ItemSuiton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.25f;
@@ -174,7 +174,7 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 30.0f;
 			}
 	
 			@Override
