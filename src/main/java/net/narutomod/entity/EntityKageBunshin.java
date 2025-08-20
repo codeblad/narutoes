@@ -405,7 +405,7 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (!(entity instanceof EntityPlayer) || !entity.isSneaking()) {
-					if (power >= 3.0f && Chakra.pathway(entity).getAmount() > 5000d) {
+					if (power >= 3.0f && Chakra.pathway(entity).getAmount() > 4000d) {
 						entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 						  .getObject(new ResourceLocation("narutomod:kagebunshin")), SoundCategory.NEUTRAL, 1.0F, 1.0F);
 						for (int i = 0, j = (int)Math.pow(2, power); i < j; i++) {

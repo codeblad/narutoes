@@ -244,13 +244,10 @@ public class ItemBijuMap extends ElementsNarutomodMod.ModElement {
 			//do some bullshit based on position!?
 
 			if (nbt.getBoolean("hasInitialized")) {
-				final EntityBijuManager bm = EntityBijuManager.getClosestBiju(player);
-				if (bm != null) {
-					final BlockPos target = bm.getPosition();
-					BlockPos newBP = new BlockPos(nbt.getInteger("posX"),nbt.getInteger("posY"),nbt.getInteger("posZ"));
-					if (target.getDistance(nbt.getInteger("posX"),nbt.getInteger("posY"),nbt.getInteger("posZ")) > 1500) {
-						stack.shrink(1);
-					}
+				EntityBijuManager bm = EntityBijuManager.getBijuByTail(nbt.getInteger("tails"));
+				if (bm == null) {
+					// do nothing
+					stack.shrink(1);
 				}
 				return;
 			}
@@ -268,6 +265,7 @@ public class ItemBijuMap extends ElementsNarutomodMod.ModElement {
 
 				// This way the map will find a tailed beast once one is available :P
 				nbt.setBoolean("hasInitialized", true);
+				nbt.setInteger("tails",bm.getTails());
 				nbt.setInteger("posX",target.getX());
 				nbt.setInteger("posY",target.getY());
 				nbt.setInteger("posZ",target.getZ());
