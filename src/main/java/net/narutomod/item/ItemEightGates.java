@@ -153,7 +153,10 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				entity.removePotionEffect(MobEffects.SATURATION);
 				if (entity.ticksExisted % 10 == 0) {
 					int realStrength = this.strength;
-					if (this.gate <= 6) {
+
+					if (this.gate <= 3) {
+						realStrength += (int) ItemJutsu.getDmgMult(entity)*0.5f;
+					}else if (this.gate <= 6) {
 						realStrength += (int) ItemJutsu.getDmgMult(entity);
 					}
 					if (this.gate == 7) {
@@ -162,7 +165,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					if (this.gate == 8) {
 						realStrength += (int) (ItemJutsu.getDmgMult(entity)*2.5);
 					}
-					entity.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 42, 3, false, false));
+					//entity.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 42, 3, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 12, 8, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.HASTE, 12, 3, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 12, realStrength, false, false));
@@ -172,7 +175,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						if (this.damage >= 0.0f) {
 							if (entity.ticksExisted % 80 == 0) {
 								entity.hurtResistantTime = 10;
-								entity.attackEntityFrom(ProcedureUtils.SPECIAL_DAMAGE, this.damage * 8);
+								entity.attackEntityFrom(ProcedureUtils.SPECIAL_DAMAGE, this.damage * 4);
 							}
 						} else {
 							entity.setHealth(entity.getHealth() - this.damage);
@@ -258,14 +261,15 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		private static final String SEKIZO_KEY = "sekizoPunchCount";
 		private static final String OWNER_KEY = "ownerUUID";
 		private static final String XP_KEY = "battleExperience";
+		// stats here
 		private final Properties GATE[] = {new Properties(0, "", 0, 0, 0, 0, 0, 0, 0, 0f, false),
-			new Properties(1, I18n.translateToLocal("chattext.eightgates.gate1"), 200, 0, 0, 3, 2, 0, 10, -1f, false),
-			new Properties(2, I18n.translateToLocal("chattext.eightgates.gate2"), 250, 0, 0, 4, 16, 0, 40, -5f, false),
-			new Properties(3, I18n.translateToLocal("chattext.eightgates.gate3"), 300, 20, 0x10FFFFFF, 5, 32, 1, 60, -3f, false),
-			new Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 500, 25, 0x18FFFFFF, 7, 64, 2, 60, 0.4f, false),
-			new Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 1000, 30, 0x20FFFFFF, 15, 68, 2, 60, 0.6f, false),
-			new Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 2500, 30, 0x3000FF00, 31, 72, 3, 60, 0.8f, false),
-			new Properties(7, I18n.translateToLocal("chattext.eightgates.gate7"), 5000, 30, 0x300000FF, 84, 76, 3, 60, 1.0f, false),
+			new Properties(1, I18n.translateToLocal("chattext.eightgates.gate1"), 200, 0, 0, 2, 2, 0, 10, -1f, false),
+			new Properties(2, I18n.translateToLocal("chattext.eightgates.gate2"), 250, 0, 0, 4, 10, 0, 40, -5f, false),
+			new Properties(3, I18n.translateToLocal("chattext.eightgates.gate3"), 300, 20, 0x10FFFFFF, 8, 12, 1, 60, -3f, false),
+			new Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 500, 25, 0x18FFFFFF, 20, 50, 2, 60, 0.4f, false),
+			new Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 1000, 30, 0x20FFFFFF, 30, 68, 2, 60, 0.6f, false),
+			new Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 2500, 30, 0x3000FF00, 50, 72, 3, 60, 0.8f, false),
+			new Properties(7, I18n.translateToLocal("chattext.eightgates.gate7"), 5000, 30, 0x300000FF, 100, 76, 3, 60, 1.0f, false),
 			new Properties(8, I18n.translateToLocal("chattext.eightgates.gate8"), 9001, 30, 0x30FF0000, 349, 80, 4, 60, 1.2f, true)};
 						
 		public RangedItem() {
