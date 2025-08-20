@@ -383,7 +383,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 									return;
 								}
 								result.entityHit.attackEntityFrom(DamageSource.causeFireballDamage(this, this.shootingEntity),
-										10+ItemJutsu.getDmgMult(attacker)*4);
+										15+ItemJutsu.getDmgMult(attacker)*5);
 								result.entityHit.setFire(10);
 							}
 							boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
@@ -393,7 +393,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					}
 					@Override
 					protected float getMotionFactor() {
-						return 1.2f;
+						return 1.35f;
 					}
 				};
 				bullet.setPosition(vec3d.x, vec3d.y, vec3d.z);
