@@ -78,7 +78,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		if (player instanceof EntityPlayer) {
 			this.playerXp = PlayerTracker.getBattleXp((EntityPlayer)player);
 			float health = (20+ (80*(ItemJutsu.getDmgMult(player)/63))) * PlayerTracker.getDefense(player);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1.2+100);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1.5+100);
 			//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(MathHelper.sqrt(this.playerXp));
 			//.applyModifier(new AttributeModifier("susanoo.health", 2d * ((EntityPlayer)player).experienceLevel, 0));
 			//this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)

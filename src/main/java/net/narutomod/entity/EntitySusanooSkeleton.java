@@ -72,7 +72,7 @@ public class EntitySusanooSkeleton extends ElementsNarutomodMod.ModElement {
 				this.chakraUsage = 20d;
 				ratio = player.getEntityData().getFloat("susanratio");
 				float health = (20+ (80*(ItemJutsu.getDmgMult(player)/63))) * PlayerTracker.getDefense(player);
-				this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1.5+300);
+				this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1.85+300);
 			}
 			this.setHealth(this.getMaxHealth()*ratio);
 			this.stepHeight = this.height / 3.0F;

@@ -1,5 +1,6 @@
 package net.narutomod.item;
 
+import com.google.common.collect.Maps;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
@@ -9,6 +10,8 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
+
 import net.minecraft.world.World;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.item.ItemStack;
@@ -22,6 +25,8 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.util.text.translation.I18n;
 
+import net.narutomod.entity.EntitySusanooBase;
+import net.narutomod.procedure.ProcedureSusanoo;
 import net.narutomod.world.WorldKamuiDimension;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.Chakra;
@@ -38,6 +43,7 @@ public class ItemMangekyoSharinganObito extends ElementsNarutomodMod.ModElement 
 	public ItemMangekyoSharinganObito(ElementsNarutomodMod instance) {
 		super(instance, 118);
 	}
+
 
 	public static double getIntangibleChakraUsage(EntityLivingBase entity) {
 		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
@@ -91,6 +97,28 @@ public class ItemMangekyoSharinganObito extends ElementsNarutomodMod.ModElement 
 			@Override
 			public String getItemStackDisplayName(ItemStack stack) {
 				return TextFormatting.RED + super.getItemStackDisplayName(stack) + TextFormatting.WHITE;
+			}
+
+			@Override
+			public boolean onJutsuKey2(boolean is_pressed, ItemStack stack, EntityPlayer entity) {
+				if (!is_pressed) {
+					Map<String, Object> $_dependencies = Maps.newHashMap();
+					$_dependencies.put("entity", entity);
+					$_dependencies.put("world", entity.world);
+					ProcedureSusanoo.executeProcedure($_dependencies);
+				}
+				return true;
+			}
+
+			@Override
+			public boolean onSwitchJutsuKey(boolean is_pressed, ItemStack stack, EntityPlayer entity) {
+				if (entity.getRidingEntity() instanceof EntitySusanooBase) {
+					if (!is_pressed) {
+						ProcedureSusanoo.upgrade(entity);
+					}
+					return true;
+				}
+				return false;
 			}
 		}.setUnlocalizedName("mangekyosharinganobitohelmet").setRegistryName("mangekyosharinganobitohelmet").setCreativeTab(TabModTab.tab));
 	}

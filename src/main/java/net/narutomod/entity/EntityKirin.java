@@ -56,7 +56,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
-		private final int wait = 20;
+		private final int wait = 35;
 		private Vec3d shootVec;
 		private float prevHeadYaw;
 		private float prevHeadPitch;
@@ -103,7 +103,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 		}
 
 		private void shoot(double x, double y, double z) {
-			this.shoot(x, y, z, 1.2f, 0f);
+			this.shoot(x, y, z, 1.0f, 0f);
 			this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:lightning_shoot")),
 			 100f, this.rand.nextFloat() * 0.4f + 0.8f);
 		}
@@ -213,7 +213,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, vec.x, vec.y, vec.z, size, flag, flag);
 				ProcedureAoeCommand.set(this.world, vec.x, vec.y, vec.z, 0.0D, 24.0D).exclude(this).exclude(this.shootingEntity)
-				 .setFire(15).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (45f*ItemJutsu.getDmgMult(this.shootingEntity)+100));
+				 .setFire(15).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (35f*ItemJutsu.getDmgMult(this.shootingEntity)+80));
 			}
 			//this.haltMotion();
 			this.setDead();

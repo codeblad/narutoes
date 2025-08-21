@@ -43,7 +43,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 125;
 	public static final int ENTITY2ID = 10125;
 	public static final int ENTITY3ID = 11125;
-	public static final ItemJutsu.JutsuEnum HIDINGINMIST = new ItemJutsu.JutsuEnum(0, "suitonmist", 'D', 100d, new EntityMist.Jutsu());
+	public static final ItemJutsu.JutsuEnum HIDINGINMIST = new ItemJutsu.JutsuEnum(0, "suitonmist", 'D', 150d, new EntityMist.Jutsu());
 	public static final ItemJutsu.JutsuEnum WATERBULLET = new ItemJutsu.JutsuEnum(1, "water_stream", 'C', 30d, new EntityWaterStream.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WATERDRAGON = new ItemJutsu.JutsuEnum(2, "water_dragon", 'B', 180d, new EntityWaterDragon.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WATERPRISON = new ItemJutsu.JutsuEnum(3, "water_prison", 'C', 200d, new EntityWaterPrison.EC.Jutsu());
@@ -99,7 +99,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 			this(world);
 			this.setPosition(x, y, z);
 			this.radius = r;
-			this.idleTime = this.buildTime + (world.containsAnyLiquid(new AxisAlignedBB(x-15, y-6, z-15, x+15, y+10, z+15)) ? 800 : 400);
+			this.idleTime = this.buildTime + (world.containsAnyLiquid(new AxisAlignedBB(x-15, y-6, z-15, x+15, y+10, z+15)) ? 200 : 100);
 		}
 
 		public EntityMist(EntityLivingBase userIn) {
@@ -196,7 +196,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 						SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kirigakurenojutsu")),
 						SoundCategory.PLAYERS, 5, 1f);
 				entity.world.spawnEntity(new EntityMist(entity));
-				ItemJutsu.setCurrentJutsuCooldown(stack,20*30);
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*40);
 				return true;
 			}
 		}
