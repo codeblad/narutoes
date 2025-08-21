@@ -246,14 +246,16 @@ public class EntityWhiteZetsu extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean getCanSpawnHere() {
-			return this.world.getDifficulty() != EnumDifficulty.PEACEFUL
+			return false;
+			/*return this.world.getDifficulty() != EnumDifficulty.PEACEFUL
 			 && (this.world.getVillageCollection().getNearestVillage(new BlockPos(this), 24) != null || this.isValidLightLevel())
-			 && super.getCanSpawnHere() && false;
+			 && super.getCanSpawnHere() && false;*/
 		}
 
 		@Override
 		protected boolean shouldDespawn() {
-			return this.world.getDifficulty() == EnumDifficulty.PEACEFUL || this.getHealth() <= 0.0f && true;
+			return true;
+			//return this.world.getDifficulty() == EnumDifficulty.PEACEFUL || this.getHealth() <= 0.0f && true;
 		}
 
 		@Override

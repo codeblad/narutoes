@@ -86,6 +86,9 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 			}
 		}*/
 		if (!(world.isRemote) && entity instanceof EntityPlayerMP) {
+			((EntityPlayerMP) entity).removePotionEffect(MobEffects.RESISTANCE);
+		}
+		if (!(world.isRemote) && entity instanceof EntityPlayerMP) {
 			Advancement _adv = ((MinecraftServer) ((EntityPlayerMP) entity).mcServer).getAdvancementManager()
 					.getAdvancement(new ResourceLocation("narutomod:ninjaachievement"));
 			AdvancementProgress _ap = ((EntityPlayerMP) entity).getAdvancements().getProgress(_adv);

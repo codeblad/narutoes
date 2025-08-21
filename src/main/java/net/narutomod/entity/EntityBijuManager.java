@@ -267,7 +267,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 		EntityBijuManager closest = null;
 
 		for (EntityBijuManager bm : mapByClass.values()) {
-			if ( bm.isSealed() && bm.tails != 10) {
+			if ( bm.isSealed() || bm.tails == 10) {
 				continue;
 			}
 			closest = bm;
