@@ -366,7 +366,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			this.asaCool = 10;
 			World world = attacker.world;
 			Vec3d vec3d = attacker.getPositionEyes(1.0F);
-			for (int i = 0; i < 20; i++) {
+			for (int i = 0; i < 6; i++) {
 				Entity bullet = new EntitySmallFireball(world, attacker, x, y, z) {
 					@Override
 					public void onUpdate() {
@@ -387,7 +387,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 								result.entityHit.setFire(10);
 							}
 							boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
-							this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 2, false, flag);
+							this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 3.5f, false, flag);
 							this.setDead();
 						}
 					}

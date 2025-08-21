@@ -384,7 +384,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	protected void consumeChakra() {
 		if (this.ticksExisted % 20 == 0) {
 			if (!Chakra.pathway(this.getOwnerPlayer()).consume(this.chakraUsage * this.chakraUsageModifier)) {
-				ProcedureSusanoo.handleSusanCD((EntityPlayer) this.getOwnerPlayer(), this);
+				//ProcedureSusanoo.handleSusanCD((EntityPlayer) this.getOwnerPlayer(), this);
 				this.setDead();
 			}
 		}
@@ -395,22 +395,22 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		super.setDead();
 		if (!this.world.isRemote && this.getOwnerPlayer() != null) {
 			float ratio = 1-(this.getHealth()/this.getMaxHealth());
-			double baseValue = 500;
+			double baseValue = 300;
 			EntityPlayer player = (EntityPlayer) this.getOwnerPlayer();
 			if (this instanceof EntitySusanooSkeleton.EntityCustom) {
 				boolean fullBody = ((EntitySusanooSkeleton.EntityCustom)this).isFullBody();
 				if (fullBody) {
-					baseValue = 750;
+					baseValue = 500;
 				}
 			} else if (this instanceof EntitySusanooClothed.EntityCustom) {
 				boolean hasLegs = ((EntitySusanooClothed.EntityCustom)this).hasLegs();
 				if (!hasLegs) {
-					baseValue = 1500;
+					baseValue = 1000;
 				} else {
-					baseValue = 2500;
+					baseValue = 2000;
 				}
 			} else if (this instanceof  EntitySusanooWinged.EntityCustom) {
-				baseValue = 5000;
+				baseValue = 3000;
 			}
 			if (this.deadDrain) {
 				Chakra.pathway(this.getOwnerPlayer()).consume2(baseValue*ratio);
