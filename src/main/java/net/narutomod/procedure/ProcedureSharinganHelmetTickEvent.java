@@ -185,7 +185,7 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 				}
 			}
 		} else {
-			if (entity instanceof EntityLivingBase)
+			/*if (entity instanceof EntityLivingBase)
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 40, (int) 0, (false), (false)));
 			if ((entity.getEntityData().getBoolean("susanoo_activated"))) {
 				{
@@ -194,7 +194,7 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 					$_dependencies.put("world", world);
 					ProcedureSusanoo.executeProcedure($_dependencies);
 				}
-			}
+			}*/
 		}
 	}
 }
