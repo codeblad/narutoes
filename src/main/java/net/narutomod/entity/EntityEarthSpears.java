@@ -119,7 +119,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 					float f = MathHelper.sqrt(power * 18f / 4f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EC entity1 = new EC(entity, power);
-						entity1.damage = 10+3.25f*(1+2.85f*(1/100))*ItemJutsu.getDmgMult(entity);
+						entity1.damage = 12+3.5f*(1+3.5f*(1/100))*ItemJutsu.getDmgMult(entity);
 						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 							entity1.damage*=1.25f;
 						}
@@ -142,7 +142,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 10.0f;
+				return 5.0f;
 			}
 	
 			@Override

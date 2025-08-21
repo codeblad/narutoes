@@ -43,7 +43,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITY2ID = 10132;
 	public static final ItemJutsu.JutsuEnum CHAKRAFLOW = new ItemJutsu.JutsuEnum(0, "futonchakraflow", 'D', 150d, new ChakraFlow.Jutsu());
 	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(1, "rasenshuriken", 'S', 1250d, new EntityRasenshuriken.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum VACUUMS = new ItemJutsu.JutsuEnum(2, "futon_vacuum", 'B', 20d, new EntityFutonVacuum.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum VACUUMS = new ItemJutsu.JutsuEnum(2, "futon_vacuum", 'B', 40d, new EntityFutonVacuum.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum BIGBLOW = new ItemJutsu.JutsuEnum(3, "futon_great_breakthrough", 'C', 15d, new EntityFutonGreatBreakthrough.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WINDBLADE = new ItemJutsu.JutsuEnum(4, "wind_blade", 'A', 65d, new EntityWindBlade.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum VACWAVE = new ItemJutsu.JutsuEnum(5, "vacuum_wave", 'B', 55d, new EntityVacuumWave.EC.Jutsu());

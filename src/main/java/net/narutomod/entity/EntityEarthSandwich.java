@@ -67,7 +67,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Integer> AGE = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private final float ogWidth = 0.875F;
 		private final float ogHeight = 0.375F;
-		private final int growTime = 15;
+		private final int growTime = 10;
 		private final Map<EntityLivingBase, Vec3d> caughtEntities = Maps.newHashMap();
 		private EntityLivingBase user;
 
@@ -156,7 +156,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 						 	Vec3d vec = entry.getValue();
 							entity.setPositionAndUpdate(vec.x, vec.y, vec.z);
 							if (age > this.growTime - 5) {
-								float damage = 5+1.5f*ItemJutsu.getDmgMult(this.user);
+								float damage = 5+1.8f*ItemJutsu.getDmgMult(this.user);
 								ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemDoton.block);
 								if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 									damage*=1.25f;

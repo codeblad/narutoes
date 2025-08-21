@@ -1122,8 +1122,8 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				CDTracker.cdMap.put(entity, new CDTracker());
 			}
 			CDTracker cd = CDTracker.cdMap.get(entity);
-			if (cd.cooldown > 20*10) {
-				cd.cooldown = 20*10;
+			if (cd.cooldown > 20*15) {
+				cd.cooldown = 20*15;
 			}
 			if (entity.ticksExisted >= cd.cooldown) {
 				if (is_pressed) {
@@ -1136,7 +1136,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 					}
 				} else {
 					if (spawn(entity, cd.power, 150+ItemJutsu.getDmgMult(entity)*(1+12*cd.power/14)) != null) {
-						cd.cooldown = entity.ticksExisted + (int)(cd.power * 7.143f);
+						cd.cooldown = entity.ticksExisted + (int)(cd.power * 7.143f)+20*10;
 					}
 					cd.power = 0f;
 				}

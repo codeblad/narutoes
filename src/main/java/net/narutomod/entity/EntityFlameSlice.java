@@ -52,7 +52,8 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends EntityChakraFlow.Base implements ItemJutsu.IJutsu {
 		private boolean holdingWeapon;
-		private int ticksSinceLastSwing;
+		private int ticksSinceLastSwing = 10;
+		int flamecool = 0;
 
 		public EC(World world) {
 			super(world);
@@ -78,9 +79,15 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 			super.onUpdate();
 			if (!this.world.isRemote) {
 				boolean flag = this.isUserHoldingWeapon();
-				if (flag) {
+				if (flag ) {
 					EntityLivingBase user = this.getUser();
+
+					if (this.flamecool > 0) {
+						this.flamecool--;
+						return;
+					}
 					if (user instanceof EntityPlayer && user.swingProgressInt == 1) {
+						this.flamecool = 20;
 						this.world.spawnEntity(new EntitySweepParticle(user, 8.0f));
 						double d = ProcedureUtils.getReachDistance(user)+4;
 						float damage = (float)ProcedureUtils.getModifiedAttackDamage(user) * this.getCooledAttackStrength(user, 0.5f) + (ItemJutsu.getDmgMult(user)*this.getCooledAttackStrength(user, 0.5f));
@@ -89,7 +96,7 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 							damage*=1.25f;
 						}
 						this.ticksSinceLastSwing = 0;
-						Entity directTarget = ProcedureUtils.objectEntityLookingAt(user, 4d, this).entityHit;
+						Entity directTarget = ProcedureUtils.objectEntityLookingAt(user, 3d, this).entityHit;
 						for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, user.getEntityBoundingBox().grow(d, 0.25D, d))) {
 							if (entity != user && entity != directTarget && !user.isOnSameTeam(entity) && user.getDistanceSq(entity) <= d * d) {
 								entity.knockBack(user, 0.5F, MathHelper.sin(user.rotationYaw * 0.017453292F), -MathHelper.cos(user.rotationYaw * 0.017453292F));

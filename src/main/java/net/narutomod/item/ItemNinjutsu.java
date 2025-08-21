@@ -249,7 +249,7 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 			public static class Hook {
 				@SubscribeEvent
 				public void onAttacked(LivingHurtEvent event) {
-					EntityLivingBase entity = event.getEntityLiving();
+					/*EntityLivingBase entity = event.getEntityLiving();
 					Entity attacker = event.getSource().getTrueSource();
 					if (entity instanceof EntityPlayer && !entity.world.isRemote && !entity.isPotionActive(PotionParalysis.potion)
 					 && event.getSource() != DamageSource.OUT_OF_WORLD && attacker instanceof EntityLivingBase && !attacker.equals(entity)) {
@@ -266,7 +266,7 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 								clone.attackEntityFrom(event.getSource(), event.getAmount());
 							}
 						}
-					}
+					}*/
 				}
 			}
 		}

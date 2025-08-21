@@ -174,12 +174,12 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 30.0f;
+				return 20.0f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 3.0f;
+				return 5.0f;
 			}
 		}
 	}

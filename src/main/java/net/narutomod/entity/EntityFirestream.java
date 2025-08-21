@@ -48,7 +48,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
-		private int wait = 30;
+		private int wait = 20;
 		private int maxLife = 100;
 		private EntityLivingBase shooter;
 		private double width, range;
@@ -65,7 +65,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			this.shooter = shooterIn;
 			this.setIdlePosition();
 			this.width = MathHelper.clamp(widthIn,1,15);
-			this.range = MathHelper.clamp(rangeIn,5,50);
+			this.range = MathHelper.clamp(rangeIn,10,150);
 			float mult = 1.5f+3f*(((float) powa)/25);
 			this.damage = 4+ItemJutsu.getDmgMult(shooterIn)*1.5f*mult;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter, ItemKaton.block);

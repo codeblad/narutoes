@@ -73,21 +73,21 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends EntityScalableProjectile.Base implements ProcedureSync.CPacketVec3d.IHandler, ItemJutsu.IJutsu {
 		private static final DataParameter<Integer> OWNER_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
-		private final int growTime = 30;
+		private final int growTime = 15;
 		private float fullScale;
 		private Vec3d angles;
 		private DamageSource damageSource;
 
 		public EC(World a) {
 			super(a);
-			this.setOGSize(0.35F, 0.35F);
+			this.setOGSize(1F, 1F);
 			this.isImmuneToFire = true;
 			this.damageSource = ItemJutsu.causeJutsuDamage(this, this.getOwner());
 		}
 
 		public EC(EntityLivingBase shooter, float scale) {
 			super(shooter);
-			this.setOGSize(0.35F, 0.35F);
+			this.setOGSize(1F, 1F);
 			this.setEntityScale(0.1f);
 			this.setOwner(shooter);
 			this.setLocationAndAngles(shooter.posX, shooter.posY, shooter.posZ, 0.0f, 0.0f);
@@ -224,7 +224,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 		public void applyEntityCollision(Entity entityIn) {
 			if (this.ticksAlive > this.growTime && this.shootingEntity != null
 			 && !entityIn.equals(this.shootingEntity) && !this.bunshinHasSameSummoner(entityIn)) {
-				if (entityIn.attackEntityFrom(this.damageSource, 15f + (1+2f*(this.fullScale/6))*ItemJutsu.getDmgMult(this.shootingEntity)*3.4f)) {
+				if (entityIn.attackEntityFrom(this.damageSource, 15f + (1+4f*(this.fullScale/6))*ItemJutsu.getDmgMult(this.shootingEntity)*4.5f)) {
 					this.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 1.0F, this.rand.nextFloat() * 0.5F + 0.5F);
 					Vec3d vec = ProcedureUtils.pushEntity(this.shootingEntity, entityIn, 20d, 2f);
 					Vec3d vec1 = this.shootingEntity.getLookVec().add(this.shootingEntity.getPositionEyes(1.0f));
