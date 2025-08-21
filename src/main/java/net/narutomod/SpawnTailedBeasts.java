@@ -46,7 +46,7 @@ public class SpawnTailedBeasts extends ElementsNarutomodMod.ModElement {
 			return;
 		}
 
-		if (!ModConfig.SPAWN_TAILED_BEASTS) {
+		if (!ModConfig.SPAWN_TAILED_BEASTS || true) {
 			if (this.resetSpawnPos) {
 				EntityBijuManager.resetAllSpawnPos();
 				this.resetSpawnPos = false;

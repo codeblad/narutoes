@@ -263,6 +263,20 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 		return null;
 	}
 
+	public static EntityBijuManager getAvailableBiju(EntityPlayer player) {
+		EntityBijuManager closest = null;
+
+		for (EntityBijuManager bm : mapByClass.values()) {
+			if ( bm.isSealed() && bm.tails != 10) {
+				continue;
+			}
+			closest = bm;
+		}
+		return closest;
+	}
+
+
+
 	public static EntityBijuManager getClosestBiju(EntityPlayer player) {
 		EntityBijuManager closest = null;
 

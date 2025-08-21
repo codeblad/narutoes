@@ -239,6 +239,7 @@ public class ItemBijuMap extends ElementsNarutomodMod.ModElement {
 			}
 
 			NBTTagCompound nbt = stack.getTagCompound();
+			stack.shrink(1);
 
 
 			//do some bullshit based on position!?

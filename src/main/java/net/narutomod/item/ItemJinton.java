@@ -137,7 +137,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 				if (power >= 1f && this.executeJutsu(itemstack, entity, power)
 				 && entity instanceof EntityPlayer && !((EntityPlayer)entity).isCreative()) {
 					((EntityPlayer)entity).getCooldownTracker().setCooldown(itemstack.getItem(), 
-					 (int)(this.getUsePercent(timeLeft) * 12000 * ProcedureUtils.getCooldownModifier(((EntityPlayer)entity))));
+					 (int)(this.getUsePercent(timeLeft) * 8000 * ProcedureUtils.getCooldownModifier(((EntityPlayer)entity))));
 				}
 			}
 		}

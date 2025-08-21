@@ -71,7 +71,9 @@ public class EntityWhiteZetsu extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void init(FMLInitializationEvent event) {
 		int i = MathHelper.clamp(ModConfig.SPAWN_WEIGHT_WHITEZETSU, 0, 20);
-		if (i > 0) {
+		// white zetsu spawning here
+		boolean canSpawn = false;
+		if (i > 0 && canSpawn) {
 			EntityRegistry.addSpawn(EntityCustom.class, i, 1, 1, EnumCreatureType.MONSTER, 
 				Biomes.EXTREME_HILLS, Biomes.FOREST, Biomes.TAIGA, Biomes.SWAMPLAND, Biomes.BEACH, Biomes.JUNGLE,
 				Biomes.BIRCH_FOREST, Biomes.ROOFED_FOREST, Biomes.REDWOOD_TAIGA, Biomes.SAVANNA, Biomes.MESA,
@@ -79,7 +81,8 @@ public class EntityWhiteZetsu extends ElementsNarutomodMod.ModElement {
 				Biomes.MUTATED_BIRCH_FOREST, Biomes.MUTATED_ROOFED_FOREST, Biomes.MUTATED_REDWOOD_TAIGA, Biomes.MUTATED_SAVANNA);
 		}
 	}
-
+
+
 	public static class EntityCustom extends EntityClone._Base implements IMob {
 		private final ItemStack kunaiStack = new ItemStack(ItemKunai.block, 1);
 		private ItemStack oldHeldStack = ItemStack.EMPTY;

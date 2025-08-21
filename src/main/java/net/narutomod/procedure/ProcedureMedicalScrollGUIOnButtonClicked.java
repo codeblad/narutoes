@@ -156,7 +156,7 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 				UUID owner_uuid = ProcedureUtils.getOwnerId(stack0);
 				UUID other_uuid = ProcedureUtils.getOwnerId(stack1);
 				System.out.println("-- owner_uuid=" + owner_uuid + ", other_uuid=" + other_uuid);
-				if (owner_uuid != null && other_uuid != null && !owner_uuid.equals(other_uuid)) {
+				if (owner_uuid != null && other_uuid != null) {
 					EntityLivingBase owner = ProcedureUtils.searchLivingMatchingId(owner_uuid);
 					if ((((owner instanceof EntityPlayerMP) && ((owner).world instanceof WorldServer))
 							/*? ((EntityPlayerMP) owner).getAdvancements()

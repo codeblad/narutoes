@@ -43,6 +43,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
 import net.narutomod.item.ItemBijuMap;
+import net.narutomod.item.ItemBijuSpawner;
 import net.narutomod.item.ItemWhiteZetsuFlesh;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
@@ -103,7 +104,7 @@ public class EntityNinjaMerchant extends ElementsNarutomodMod.ModElement {
 			if (rareTrades == null) {
 				rareTrades = new MerchantRecipeList();
 			}
-			rareTrades.add(new MerchantRecipe(new ItemStack(Blocks.EMERALD_BLOCK, 15), ItemStack.EMPTY, new ItemStack(ItemBijuMap.block, 1), 0, 1));
+			rareTrades.add(new MerchantRecipe(new ItemStack(Blocks.EMERALD_BLOCK, 15), ItemStack.EMPTY, new ItemStack(ItemBijuSpawner.block, 1), 0, 1));
 			rareTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 10), ItemStack.EMPTY, new ItemStack(ItemWhiteZetsuFlesh.block, 1), 0, 1));
 			this.trades.put(TradeLevel.RARE, rareTrades);
 		}
