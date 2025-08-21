@@ -46,7 +46,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 129;
 	public static final int ENTITY2ID = 10129;
 	public static final ItemJutsu.JutsuEnum CHIDORI = new ItemJutsu.JutsuEnum(0, "chidori", 'A', EntityChidori.CHAKRA_USAGE, new EntityChidori.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum CHAKRAMODE = new ItemJutsu.JutsuEnum(1, "raitonchakramode", 'B', 40d, new EntityChakraMode.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHAKRAMODE = new ItemJutsu.JutsuEnum(1, "raitonchakramode", 'B', 100d, new EntityChakraMode.Jutsu());
 	public static final ItemJutsu.JutsuEnum CHASINGDOG = new ItemJutsu.JutsuEnum(2, "lightning_beast", 'C', 40d, new EntityLightningBeast.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum GIAN = new ItemJutsu.JutsuEnum(3, "false_darkness", 'B', 150d, new EntityFalseDarkness.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum KIRIN = new ItemJutsu.JutsuEnum(4, "kirin", 'S', 1500d, new EntityKirin.EC.Jutsu());
@@ -124,7 +124,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			super.onUpdate();
 			if (this.summoner != null && this.summoner.isEntityAlive() && this.getStackFromInventory() != null) {
 				this.setPosition(this.summoner.posX, this.summoner.posY, this.summoner.posZ);
-				if (this.ticksExisted % 20 == 2) {
+				if (this.ticksExisted % 20 == 0) {
 					Chakra.Pathway chakra = Chakra.pathway(this.summoner);
 					if (!chakra.consume(this.CHAKRA_BURN)) {
 						this.setDead();
@@ -141,7 +141,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					if (!this.summoner.isSprinting()) {
 						double d0 = this.posX - this.prevPosX;
 						double d1 = this.posZ - this.prevPosZ;
-						((EntityPlayer)this.summoner).addExhaustion(0.2f * (float)MathHelper.sqrt(d0 * d0 + d1 * d1) * this.modifier);
+						((EntityPlayer)this.summoner).addExhaustion(0.05f * (float)MathHelper.sqrt(d0 * d0 + d1 * d1) * this.modifier);
 					}
 					if (((EntityPlayer)this.summoner).getFoodStats().getFoodLevel() < 1.0f) {
 						this.setDead();
@@ -185,7 +185,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 				if (cooldown > 1200) {
 					cooldown = 1200;
 				}*/
-				item.setJutsuCooldown(stack, CHAKRAMODE, 30*20);
+				item.setJutsuCooldown(stack, CHAKRAMODE, 45*20);
 			}
 		}
 
