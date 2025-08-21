@@ -1,5 +1,6 @@
 package net.narutomod.procedure;
 
+import com.google.common.collect.Maps;
 import net.narutomod.item.ItemDojutsu;
 import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.NarutomodModVariables;
@@ -10,7 +11,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
+import net.narutomod.item.ItemMangekyoSharingan;
+import net.narutomod.item.ItemMangekyoSharinganEternal;
+import net.narutomod.item.ItemMangekyoSharinganObito;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @ElementsNarutomodMod.ModElement.Tag
@@ -50,6 +55,9 @@ public class ProcedureSpecialJutsu2OnKeyPressed extends ElementsNarutomodMod.Mod
 		}
 		stack = ((entity instanceof EntityLivingBase) ? ((EntityLivingBase) entity).getHeldItemMainhand() : ItemStack.EMPTY);
 		helmet = ((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY);
+
+
+
 		if ((helmet.getItem() instanceof ItemDojutsu.Base
 				&& ((ItemDojutsu.Base) helmet.getItem()).onJutsuKey2(is_pressed, helmet, (EntityPlayer) entity))) {
 			return;

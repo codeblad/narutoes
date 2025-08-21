@@ -349,7 +349,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 						defMult+= 3.5;
 					}
 				}
-				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
+				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe && EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) < 1) {
 					ItemYoton.EntityBiggerMe PENIS = (ItemYoton.EntityBiggerMe) targetEntity.getRidingEntity();
 					defMult += 1.2*PENIS.bigRatio;
 				}

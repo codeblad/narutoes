@@ -174,7 +174,7 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 								if (t.entityHit instanceof EntityLivingBase) {
 									i = ((EntityLivingBase) t.entityHit).getMaxHealth()*0.2f;
 								}
-								t.entityHit.attackEntityFrom(DamageSource.OUT_OF_WORLD.setDamageIsAbsolute(), Math.min((float) i, 1024f));
+								t.entityHit.attackEntityFrom(DamageSource.OUT_OF_WORLD.setDamageIsAbsolute(), Math.min((float) i, 300f));
 							}
 						} else {
 							ProcedureKamuiTeleportEntity.eEntity(t.entityHit, x, z, dimid);

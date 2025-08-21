@@ -1122,6 +1122,9 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				CDTracker.cdMap.put(entity, new CDTracker());
 			}
 			CDTracker cd = CDTracker.cdMap.get(entity);
+			if (cd.cooldown > 20*10) {
+				cd.cooldown = 20*10;
+			}
 			if (entity.ticksExisted >= cd.cooldown) {
 				if (is_pressed) {
 					if (cd.power < 14.0f) {

@@ -62,7 +62,7 @@ public class EntityAdamantinePrison extends ElementsNarutomodMod.ModElement {
 
 		public EC(World world) {
 			super(world);
-			this.setSize(1.5f * ENTITY_SCALE, 1.5f * ENTITY_SCALE);
+			this.setSize(3f * ENTITY_SCALE, 3f * ENTITY_SCALE);
 			this.dieOnNoPassengers = false;
 			this.isImmuneToFire = true;
 		}

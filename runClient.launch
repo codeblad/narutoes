@@ -10,7 +10,7 @@
     <mapEntry key="MOD_CLASSES" value="examplemod%%C:\Users\Joshua\Documents\GitHub\narutoes\bin\main;examplemod%%C:\Users\Joshua\Documents\GitHub\narutoes\bin\main"/>
     <mapEntry key="mainClass" value="net.minecraft.launchwrapper.Launch"/>
     <mapEntry key="MCP_MAPPINGS" value="snapshot_20171003-1.12"/>
-    <mapEntry key="FORGE_VERSION" value="14.23.5.2855"/>
+    <mapEntry key="FORGE_VERSION" value="14.23.5.2860"/>
     <mapEntry key="assetIndex" value="1.12"/>
     <mapEntry key="assetDirectory" value="C:\Users\Joshua\.gradle\caches\forge_gradle\assets"/>
     <mapEntry key="nativesDirectory" value="C:\Users\Joshua\Documents\GitHub\narutoes\build\natives"/>
