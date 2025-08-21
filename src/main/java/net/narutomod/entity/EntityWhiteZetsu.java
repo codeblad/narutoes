@@ -73,7 +73,7 @@ public class EntityWhiteZetsu extends ElementsNarutomodMod.ModElement {
 		int i = MathHelper.clamp(ModConfig.SPAWN_WEIGHT_WHITEZETSU, 0, 20);
 		// white zetsu spawning here
 		boolean canSpawn = false;
-		if (i > 0 && canSpawn) {
+		if (false) {
 			EntityRegistry.addSpawn(EntityCustom.class, i, 1, 1, EnumCreatureType.MONSTER, 
 				Biomes.EXTREME_HILLS, Biomes.FOREST, Biomes.TAIGA, Biomes.SWAMPLAND, Biomes.BEACH, Biomes.JUNGLE,
 				Biomes.BIRCH_FOREST, Biomes.ROOFED_FOREST, Biomes.REDWOOD_TAIGA, Biomes.SAVANNA, Biomes.MESA,
@@ -248,12 +248,12 @@ public class EntityWhiteZetsu extends ElementsNarutomodMod.ModElement {
 		public boolean getCanSpawnHere() {
 			return this.world.getDifficulty() != EnumDifficulty.PEACEFUL
 			 && (this.world.getVillageCollection().getNearestVillage(new BlockPos(this), 24) != null || this.isValidLightLevel())
-			 && super.getCanSpawnHere();
+			 && super.getCanSpawnHere() && false;
 		}
 
 		@Override
 		protected boolean shouldDespawn() {
-			return this.world.getDifficulty() == EnumDifficulty.PEACEFUL || this.getHealth() <= 0.0f;
+			return this.world.getDifficulty() == EnumDifficulty.PEACEFUL || this.getHealth() <= 0.0f && true;
 		}
 
 		@Override
