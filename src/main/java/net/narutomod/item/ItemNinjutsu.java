@@ -226,7 +226,7 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				if (!stack.hasTagCompound()) {
+				/*if (!stack.hasTagCompound()) {
 					stack.setTagCompound(new NBTTagCompound());
 				}
 				boolean flag = stack.getTagCompound().hasKey(JUTSULASTUSEKEY);
@@ -237,7 +237,7 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 				}
 				if (entity instanceof EntityPlayer && !entity.world.isRemote) {
 					((EntityPlayer)entity).sendStatusMessage(new TextComponentString(flag ? "Off" : "On"), true);
-				}
+				}*/
 				return false;
 			}
 			

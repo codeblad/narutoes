@@ -48,7 +48,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
-		private int wait = 20;
+		private int wait = 0;
 		private int maxLife = 100;
 		private EntityLivingBase shooter;
 		private double width, range;

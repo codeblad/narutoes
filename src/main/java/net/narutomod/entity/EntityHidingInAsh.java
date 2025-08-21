@@ -52,6 +52,7 @@ public class EntityHidingInAsh extends ElementsNarutomodMod.ModElement {
 			this.setUser(userIn);
 			this.setRange((float)rangeIn);
 			this.setIdlePosition();
+			userIn.addPotionEffect(new PotionEffect(MobEffects.SPEED, this.maxLife, 8, false, false));
 			userIn.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, this.maxLife, 0, false, false));
 		}
 
@@ -98,7 +99,7 @@ public class EntityHidingInAsh extends ElementsNarutomodMod.ModElement {
 			if (this.world.isRemote) {
 				EntityLivingBase user = this.getUser();
 				float range = this.getRange();
-				for (int i = 0; i < (int)(range * 10); i++) {
+				for (int i = 0; i < (int)(range * 3); i++) {
 					Particles.spawnParticle(this.world, Particles.Types.BURNING_ASH, this.posX, this.posY, this.posZ, 
 					  1, 0, 0, 0, range * (this.rand.nextDouble()-0.5d) * 0.1d, (this.rand.nextDouble()-0.5d) * range * 0.1d,
 					  range * (this.rand.nextDouble()-0.5d) * 0.1d, user != null ? user.getEntityId() : -1);

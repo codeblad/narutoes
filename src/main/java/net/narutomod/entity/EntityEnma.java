@@ -244,7 +244,7 @@ public class EntityEnma extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 200.0f;
+				return 150.0f;
 			}
 	
 			@Override

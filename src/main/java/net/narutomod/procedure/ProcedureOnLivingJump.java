@@ -52,7 +52,7 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 				entity.motionZ += Math.cos(yaw) * d0 * speed * 2.5d;
 				entity.motionY = Math.max(motionY * Math.sin(pitch) * 2.0d, 0.8d);
 			}
-			entity.addExhaustion(0.1f);
+			//entity.addExhaustion(0.1f);
 		}
 	}
 

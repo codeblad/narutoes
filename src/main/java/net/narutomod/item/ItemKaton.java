@@ -86,7 +86,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityBigFireball extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private float fullScale = 1f;
-		private final int timeToFullscale = 20;
+		private final int timeToFullscale = 10;
 		private int explosionSize;
 		private float damage;
 		private boolean guided;
@@ -102,11 +102,11 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			super(shooter);
 			this.setOGSize(0.8F, 0.8F);
 			this.fullScale = fullScale;
-			this.explosionSize = Math.max((int)fullScale - 1, 0);
+			this.explosionSize = Math.max((int)fullScale - 2, 0);
 			//this.damage = fullScale * 10.0f;
 			this.mult = 2.5f + 5f*(fullScale/10);
 			this.damage = 15 + ItemJutsu.getDmgMult(shooter)*mult;
-			this.damage*= 1.65f;
+			this.damage*= 1.85f;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter,ItemKaton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.25f;
@@ -145,7 +145,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 				 || (result.entityHit instanceof EntityBigFireball && ((EntityBigFireball)result.entityHit).shootingEntity == this.shootingEntity))) {
 					return;
 				}
-				ProcedureAoeCommand.set(this, 0d, this.fullScale * 0.4f).exclude(this.shootingEntity)
+				ProcedureAoeCommand.set(this, 0d, this.fullScale * 0.25f).exclude(this.shootingEntity)
 				 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), this.damage).setFire(15);
 				boolean flag = ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosionSize, flag, false);

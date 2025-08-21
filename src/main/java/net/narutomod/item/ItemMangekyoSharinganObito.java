@@ -1,16 +1,11 @@
 package net.narutomod.item;
 
-import com.google.common.collect.Maps;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Map;
 
 import net.minecraft.world.World;
 import net.minecraft.util.text.TextFormatting;
@@ -25,42 +20,48 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.util.text.translation.I18n;
 
-import net.narutomod.entity.EntitySusanooBase;
-import net.narutomod.procedure.ProcedureSusanoo;
 import net.narutomod.world.WorldKamuiDimension;
+import net.narutomod.procedure.ProcedureGrabEntity;
+import net.narutomod.procedure.ProcedureKamuiJikukanIdo;
+import net.narutomod.procedure.ProcedureSusanoo;
+import net.narutomod.procedure.ProcedureWhenPlayerAttcked;
 import net.narutomod.creativetab.TabModTab;
+import net.narutomod.entity.EntitySusanooBase;
 import net.narutomod.Chakra;
-import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
+
+import com.google.common.collect.Maps;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemMangekyoSharinganObito extends ElementsNarutomodMod.ModElement {
 	@ObjectHolder("narutomod:mangekyosharinganobitohelmet")
 	public static final Item helmet = null;
-	private static final double INTANGIBLE_CHAKRA_USAGE = 5d; // per tick
-	private static final double TELEPORT_CHAKRA_USAGE = 20d; // per tick
-	
+	public static final double INTANGIBLE_CHAKRA_USAGE = 5d; // per tick
+	public static final double TELEPORT_CHAKRA_USAGE = 20d; // per tick
+
 	public ItemMangekyoSharinganObito(ElementsNarutomodMod instance) {
 		super(instance, 118);
 	}
 
-
 	public static double getIntangibleChakraUsage(EntityLivingBase entity) {
 		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-		return stack.getItem() == helmet || stack.getItem() == ItemMangekyoSharinganEternal.helmet 
-		 ? ((ItemDojutsu.Base)helmet).isOwner(stack, entity) ? INTANGIBLE_CHAKRA_USAGE 
-		 : INTANGIBLE_CHAKRA_USAGE * 3 : (Double.MAX_VALUE * 0.001d);
+		return stack.getItem() == helmet || stack.getItem() == ItemMangekyoSharinganEternal.helmet
+				? ((ItemDojutsu.Base)helmet).isOwner(stack, entity) ? INTANGIBLE_CHAKRA_USAGE
+				: INTANGIBLE_CHAKRA_USAGE * 3 : (Double.MAX_VALUE * 0.001d);
 	}
 
 	public static double getTeleportChakraUsage(EntityLivingBase entity) {
 		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 		return stack.getItem() == helmet || stack.getItem() == ItemMangekyoSharinganEternal.helmet
-		 ? ((ItemDojutsu.Base)helmet).isOwner(stack, entity) ? TELEPORT_CHAKRA_USAGE 
-		 : TELEPORT_CHAKRA_USAGE * 3 : (Double.MAX_VALUE * 0.001d);
+				? ((ItemDojutsu.Base)helmet).isOwner(stack, entity) ? TELEPORT_CHAKRA_USAGE
+				: TELEPORT_CHAKRA_USAGE * 3 : (Double.MAX_VALUE * 0.001d);
 	}
 
 	public void initElements() {
-		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("MANGEKYOSHARINGANOBITO", "narutomod:mangekyosharingan_obito_", 2048,
+		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("MANGEKYOSHARINGANOBITO", "narutomod:mangekyosharingan_obito_", 1024,
 				new int[]{2, 5, 6, 10}, 0, null, 1.0F);
 		this.elements.items.add(() -> new ItemSharingan.Base(enuma) {
 			@Override
@@ -77,9 +78,20 @@ public class ItemMangekyoSharinganObito extends ElementsNarutomodMod.ModElement 
 					}
 					if (entity.getEntityData().getBoolean("kamui_intangible")) {
 						Chakra.pathway(entity).consume(getIntangibleChakraUsage(entity));
-						entity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 2.0d);
+						ProcedureWhenPlayerAttcked.setInvulnerable(entity, 2);
+						//entity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 2.0d);
 					}
 				}
+			}
+
+			@Override
+			public ItemSharingan.Type getSubType() {
+				return ItemSharingan.Type.KAMUI;
+			}
+
+			@Override
+			public boolean isMangekyo() {
+				return true;
 			}
 
 			@Override
@@ -97,6 +109,23 @@ public class ItemMangekyoSharinganObito extends ElementsNarutomodMod.ModElement 
 			@Override
 			public String getItemStackDisplayName(ItemStack stack) {
 				return TextFormatting.RED + super.getItemStackDisplayName(stack) + TextFormatting.WHITE;
+			}
+
+			@Override
+			public boolean onJutsuKey1(boolean is_pressed, ItemStack stack, EntityPlayer entity) {
+				Map<String, Object> $_dependencies = Maps.newHashMap();
+				$_dependencies.put("is_pressed", is_pressed);
+				$_dependencies.put("entity", entity);
+				$_dependencies.put("world", entity.world);
+				if (entity.world.provider.getDimension() == WorldKamuiDimension.DIMID && !entity.isSneaking()) {
+					ProcedureGrabEntity.executeProcedure($_dependencies);
+				} else {
+					$_dependencies.put("x", (int)entity.posX);
+					$_dependencies.put("y", (int)entity.posY);
+					$_dependencies.put("z", (int)entity.posZ);
+					ProcedureKamuiJikukanIdo.executeProcedure($_dependencies);
+				}
+				return true;
 			}
 
 			@Override
