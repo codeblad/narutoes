@@ -60,7 +60,7 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 			this.power = powerIn*2+1;
 			this.maxDuration = (int)(powerIn * 2f);
 			this.bulletSize = 2.0f;
-			this.damage = 8+1.5f*(1+2f*(this.power/50))*ItemJutsu.getDmgMult(userIn);
+			this.damage = 8+1.25f*(0.5f+1.85f*(this.power/50))*ItemJutsu.getDmgMult(userIn);
 			ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityLivingBase) userIn, ItemFuton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				this.damage*=1.25f;

@@ -113,7 +113,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 				Vec3d vec0 = EC.this.getPositionVector();
 				Vec3d vec1 = player.getLookVec();
 				Particles.Renderer particles = new Particles.Renderer(player.world);
-				for (int i = 1, j = (int)(range * 10d); i < j; i++) {
+				for (int i = 1, j = (int)(range * 3d); i < j; i++) {
 					Vec3d vec = vec0.addVector((this.rand.nextDouble()-0.5d) * 0.2d,
 					 this.rand.nextDouble() * 0.2d, (this.rand.nextDouble()-0.5d) * 0.2d);
 					Vec3d vec3d = vec1.scale(range * (this.rand.nextDouble() * 0.5d + 0.5d) * 0.4d);

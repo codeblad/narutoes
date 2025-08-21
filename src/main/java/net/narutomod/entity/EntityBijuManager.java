@@ -19,6 +19,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 
+import net.narutomod.PlayerTracker;
 import net.narutomod.item.ItemBijuCloak;
 import net.narutomod.item.ItemSenjutsu;
 import net.narutomod.procedure.ProcedureUtils;
@@ -641,7 +642,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 		} else {
 			this.cloakLevel = 3;
 		}
-		if (this.cloakLevel == 3 && this.jinchurikiPlayer != null) {
+		if (this.cloakLevel == 3 && this.jinchurikiPlayer != null && (PlayerTracker.getBattleXp(this.jinchurikiPlayer) >= 10000)) {
 			long l = this.jinchurikiPlayer.world.getTotalWorldTime();
 			if (l < this.cloakCD && !this.jinchurikiPlayer.isCreative()) {
 				if (!this.jinchurikiPlayer.world.isRemote) {
