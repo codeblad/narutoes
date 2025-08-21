@@ -128,7 +128,7 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 				}
 				if (this.targetVec != null && this.targetTargetable()) {
 					if (this.ticksExisted > 20) {
-						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, null), 2.0f+ItemJutsu.getDmgMult(this.owner)*0.65f);
+						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, null), 2.0f+ItemJutsu.getDmgMult(this.owner)*0.85f);
 					}
 					this.target.setPositionAndUpdate(this.targetVec.x, this.targetVec.y, this.targetVec.z);
 				}

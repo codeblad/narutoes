@@ -109,13 +109,13 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 				//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*10);
 				ratio = this.getHealth()/this.getMaxHealth();
 				if (this.hasLegs()) {
-					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2+400);
+					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2.75+800);
 					this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
-							.setBaseValue(40.0D+ItemJutsu.getDmgMult(entity)*2.5);
+							.setBaseValue(40.0D+ItemJutsu.getDmgMult(entity)*4);
 				} else {
-					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1.3+300);
+					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2+500);
 					this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
-							.setBaseValue(30.0D+ItemJutsu.getDmgMult(entity)*2);
+							.setBaseValue(30.0D+ItemJutsu.getDmgMult(entity)*3);
 				}
 				ratio = entity.getEntityData().getFloat("susanratio");
 			}
@@ -322,7 +322,7 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 			this.setEntityScale(scale);
 			this.setColor(color);
 			this.explosionSize = (int)(scale * 3);
-			this.damage = scale * 20.0f;
+			this.damage = 50;
 			this.setIdlePosition();
 			this.prevRotationYaw = this.rotationYaw;
 			this.prevRotationPitch = this.rotationPitch;
@@ -359,8 +359,8 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 				}
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosionSize, flag, flag);
-				ProcedureAoeCommand.set(this, 0.0D, 3.0D).exclude(this.shootingEntity)
-				  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.damage);
+				ProcedureAoeCommand.set(this, 2.0D, 4.0D).exclude(this.shootingEntity)
+				  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 50+ItemJutsu.getDmgMult(this.shootingEntity)*6.5f);
 				this.setDead();
 			}
 		}

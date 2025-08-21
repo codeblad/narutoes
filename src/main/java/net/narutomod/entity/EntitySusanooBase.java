@@ -49,10 +49,10 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	private static final DataParameter<Integer> OWNER_ID = EntityDataManager.<Integer>createKey(EntitySusanooBase.class, DataSerializers.VARINT);
 	private static final DataParameter<Integer> FLAME_COLOR = EntityDataManager.<Integer>createKey(EntitySusanooBase.class, DataSerializers.VARINT);
 	public static final double BXP_REQUIRED_L0 = 5000.0d;
-	public static final double BXP_REQUIRED_L1 = 8000.0d;
-	public static final double BXP_REQUIRED_L2 = 10000.0d;
-	public static final double BXP_REQUIRED_L3 = 20000.0d;
-	public static final double BXP_REQUIRED_L4 = 40000.0d;
+	public static final double BXP_REQUIRED_L1 = 6000.0d;
+	public static final double BXP_REQUIRED_L2 = 7500.0d;
+	public static final double BXP_REQUIRED_L3 = 10000.0d;
+	public static final double BXP_REQUIRED_L4 = 15000.0d;
 	protected double chakraUsage = 15d; // per second
 	protected double chakraUsageModifier = 2d;
 	protected double playerXp;
@@ -78,11 +78,11 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		if (player instanceof EntityPlayer) {
 			this.playerXp = PlayerTracker.getBattleXp((EntityPlayer)player);
 			float health = (20+ (80*(ItemJutsu.getDmgMult(player)/63))) * PlayerTracker.getDefense(player);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*0.3+100);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1.2+100);
 			//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(MathHelper.sqrt(this.playerXp));
-			 //.applyModifier(new AttributeModifier("susanoo.health", 2d * ((EntityPlayer)player).experienceLevel, 0));
+			//.applyModifier(new AttributeModifier("susanoo.health", 2d * ((EntityPlayer)player).experienceLevel, 0));
 			//this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
-			 //.applyModifier(new AttributeModifier("susanoo.damage", ((EntityPlayer)player).experienceLevel, 0));
+			//.applyModifier(new AttributeModifier("susanoo.damage", ((EntityPlayer)player).experienceLevel, 0));
 		}
 		ItemStack helmetstack = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 		if (helmetstack.getItem() instanceof ItemSharingan.Base) {
@@ -127,7 +127,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 
 	public abstract boolean shouldShowSword();
 
-    public abstract void setShowSword(boolean show);
+	public abstract void setShowSword(boolean show);
 
 	@Override
 	public EnumCreatureAttribute getCreatureAttribute() {
@@ -208,7 +208,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 			ItemStack stack = this.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND);
 			DamageSource ds = ItemJutsu.causeJutsuDamage(this, this.getOwnerPlayer());
 			if (stack.getItem() == ItemTotsukaSword.block && entityIn instanceof EntityLivingBase
-			 && Chakra.pathway((EntityLivingBase)entityIn).getAmount() < 5d) {
+					&& Chakra.pathway((EntityLivingBase)entityIn).getAmount() < 5d) {
 				ds = ds.setDamageIsAbsolute().setDamageBypassesArmor();
 				f *= 2.0f + this.rand.nextFloat();
 			}
@@ -300,7 +300,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		if (passenger.getRidingEntity() != this) {
 			throw new IllegalStateException("Use x.startRiding(y), not y.addPassenger(x)");
 		} else {
-			Object obj = ReflectionHelper.getPrivateValue(Entity.class, this, "riddenByEntities", "field_70725_aQ");
+			Object obj = ReflectionHelper.getPrivateValue(Entity.class, this, 7);
 			if (!(obj instanceof List)) {
 				obj = null;
 				try {
@@ -350,25 +350,25 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	@Override
 	public void applyEntityCollision(Entity entityIn) {
 		if (!this.isRidingSameEntity(entityIn) && !entityIn.noClip && !entityIn.isBeingRidden()) {
-            double d0 = entityIn.posX - this.posX;
-            double d1 = entityIn.posZ - this.posZ;
-            double d2 = MathHelper.absMax(d0, d1);
-            if (d2 >= 0.01D) {
-                d2 = (double)MathHelper.sqrt(d2);
-                d0 = d0 / d2;
-                d1 = d1 / d2;
-                double d3 = 1.0D / d2;
-                if (d3 > 1.0D) {
-                    d3 = 1.0D;
-                }
-                d0 = d0 * d3;
-                d1 = d1 * d3;
-                d0 = d0 * 0.05D;
-                d1 = d1 * 0.05D;
-                d0 = d0 * (double)(1.0F - this.entityCollisionReduction);
-                d1 = d1 * (double)(1.0F - this.entityCollisionReduction);
-                entityIn.addVelocity(d0, 0.0D, d1);
-            }
+			double d0 = entityIn.posX - this.posX;
+			double d1 = entityIn.posZ - this.posZ;
+			double d2 = MathHelper.absMax(d0, d1);
+			if (d2 >= 0.01D) {
+				d2 = (double)MathHelper.sqrt(d2);
+				d0 = d0 / d2;
+				d1 = d1 / d2;
+				double d3 = 1.0D / d2;
+				if (d3 > 1.0D) {
+					d3 = 1.0D;
+				}
+				d0 = d0 * d3;
+				d1 = d1 * d3;
+				d0 = d0 * 0.05D;
+				d1 = d1 * 0.05D;
+				d0 = d0 * (double)(1.0F - this.entityCollisionReduction);
+				d1 = d1 * (double)(1.0F - this.entityCollisionReduction);
+				entityIn.addVelocity(d0, 0.0D, d1);
+			}
 		}
 	}
 
@@ -384,7 +384,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	protected void consumeChakra() {
 		if (this.ticksExisted % 20 == 0) {
 			if (!Chakra.pathway(this.getOwnerPlayer()).consume(this.chakraUsage * this.chakraUsageModifier)) {
-				//ProcedureSusanoo.handleSusanCD((EntityPlayer) this.getOwnerPlayer(), this);
+				ProcedureSusanoo.handleSusanCD((EntityPlayer) this.getOwnerPlayer(), this);
 				this.setDead();
 			}
 		}
@@ -410,9 +410,10 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 					baseValue = 2000;
 				}
 			} else if (this instanceof  EntitySusanooWinged.EntityCustom) {
-				baseValue = 3000;
+				baseValue = 3500;
 			}
 			if (this.deadDrain) {
+				ProcedureSusanoo.handleSusanCD((EntityPlayer) this.getOwnerPlayer(), this);
 				Chakra.pathway(this.getOwnerPlayer()).consume2(baseValue*ratio);
 			}
 			//this.getOwnerPlayer().setHealth(this.getOwnerPlayer().getMaxHealth());
@@ -423,9 +424,9 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	public void onLivingUpdate() {
 		EntityLivingBase ownerPlayer = this.getOwnerPlayer();
 		boolean flag = ownerPlayer instanceof EntityPlayer;
-		if (!this.world.isRemote && (ownerPlayer == null || !ownerPlayer.isEntityAlive() || 
-		 (ownerPlayer instanceof EntityPlayerMP && ((EntityPlayerMP)ownerPlayer).hasDisconnected()) ||
-		 (!flag && !this.isBeingRidden()))) {
+		if (!this.world.isRemote && (ownerPlayer == null || !ownerPlayer.isEntityAlive() ||
+				(ownerPlayer instanceof EntityPlayerMP && ((EntityPlayerMP)ownerPlayer).hasDisconnected()) ||
+				(!flag && !this.isBeingRidden()))) {
 			this.setDead();
 		}
 		if (flag) {
@@ -441,20 +442,20 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 			}
 			ownerPlayer.getEntityData().setFloat("susanratio", this.getHealth()/this.getMaxHealth());
 			if (!this.world.isRemote && this.ticksExisted % 20 == 1) {
-				ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 22, 6, false, false));
+				//ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 22, 6, false, false));
 			}
 		}
 
 		this.updateArmSwingProgress();
 		super.onLivingUpdate();
-		
+
 		this.clampMotion(0.05D);
 
 		if (this.ticksExisted % 30 == 0)
- {
+		{
 			this.playSound(net.minecraft.util.SoundEvent.REGISTRY
-			 .getObject(new ResourceLocation("block.fire.ambient")),
- 1.0F, this.rand.nextFloat() * 0.7F + 0.3F);
+							.getObject(new ResourceLocation("block.fire.ambient")),
+					1.0F, this.rand.nextFloat() * 0.7F + 0.3F);
 		}
 		for (int i = 0; i < (int) this.height; i++) {
 			double d0 = this.posX + (this.rand.nextFloat() - 0.5D) * this.width;
@@ -471,23 +472,23 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 	}
 
 	@Override
-    public void setSwingingArms(boolean swingingArms) {
-    }
+	public void setSwingingArms(boolean swingingArms) {
+	}
 
-    @Override
-    public void attackEntityWithRangedAttack(EntityLivingBase target, float distanceFactor) {
-    }
+	@Override
+	public void attackEntityWithRangedAttack(EntityLivingBase target, float distanceFactor) {
+	}
 
-    public void attackEntityRanged(double x, double y, double z) {
-    }
+	public void attackEntityRanged(double x, double y, double z) {
+	}
 
-    public void createBullet(float size) {
-    }
+	public void createBullet(float size) {
+	}
 
-    public void killBullet() {
-    }
+	public void killBullet() {
+	}
 
-    protected void showHeldWeapons() {
+	protected void showHeldWeapons() {
 		EntityLivingBase owner = this.getOwnerPlayer();
 		if (!this.world.isRemote && owner != null) {
 			this.setShowSword(owner.getHeldItemMainhand().getItem() == ItemChokuto.block);
@@ -497,144 +498,144 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 				this.killBullet();
 			}
 		}
-    }
+	}
 
 	public static class AIAttackRangedAndMoveTowardsTarget extends EntityAIBase {
-	    private final EntitySusanooBase entityHost;
-	    private final IRangedAttackMob rangedAttackEntityHost;
-	    private EntityLivingBase attackTarget;
-	    private int rangedAttackTime;
-	    private final double entityMoveSpeed;
-	    private final int maxRangedAttackTime;
-	    private final float minAttackRadius;
-	    private int navigateDelay;
-		
-	    public AIAttackRangedAndMoveTowardsTarget(IRangedAttackMob attacker, double movespeed, int maxAttackTime, float minAttackDistanceIn) {
-	        if (!(attacker instanceof EntitySusanooBase)) {
-	            throw new IllegalArgumentException("AIAttackRangedAndMoveTowardsTarget requires Mob implements EntitySusanooBase");
-	        } else {
-	            this.rangedAttackEntityHost = attacker;
-	            this.entityHost = (EntitySusanooBase)attacker;
-	            this.entityMoveSpeed = movespeed;
-	            this.maxRangedAttackTime = maxAttackTime;
-	    		this.rangedAttackTime = maxAttackTime;
-	            this.minAttackRadius = (float)ProcedureUtils.getReachDistance(this.entityHost) + minAttackDistanceIn;
-	            this.setMutexBits(3);
-	        }
-	    }
+		private final EntitySusanooBase entityHost;
+		private final IRangedAttackMob rangedAttackEntityHost;
+		private EntityLivingBase attackTarget;
+		private int rangedAttackTime;
+		private final double entityMoveSpeed;
+		private final int maxRangedAttackTime;
+		private final float minAttackRadius;
+		private int navigateDelay;
 
-	    @Override
-	    public boolean shouldExecute() {
-	        EntityLivingBase entitylivingbase = this.entityHost.getAttackTarget();
-	        if (entitylivingbase == null || !entitylivingbase.isEntityAlive()) {
-	        	return false;
-	        } else if (entitylivingbase.getDistance(this.entityHost) < this.minAttackRadius) {
-	        	return false;
-	        } else {
-	        	this.attackTarget = entitylivingbase;
-	            return true;
-	        }
-	    }
-		
-	    @Override
-	    public boolean shouldContinueExecuting() {
-	        return this.shouldExecute() || !this.entityHost.getNavigator().noPath();
-	    }
-		
+		public AIAttackRangedAndMoveTowardsTarget(IRangedAttackMob attacker, double movespeed, int maxAttackTime, float minAttackDistanceIn) {
+			if (!(attacker instanceof EntitySusanooBase)) {
+				throw new IllegalArgumentException("AIAttackRangedAndMoveTowardsTarget requires Mob implements EntitySusanooBase");
+			} else {
+				this.rangedAttackEntityHost = attacker;
+				this.entityHost = (EntitySusanooBase)attacker;
+				this.entityMoveSpeed = movespeed;
+				this.maxRangedAttackTime = maxAttackTime;
+				this.rangedAttackTime = maxAttackTime;
+				this.minAttackRadius = (float)ProcedureUtils.getReachDistance(this.entityHost) + minAttackDistanceIn;
+				this.setMutexBits(3);
+			}
+		}
+
+		@Override
+		public boolean shouldExecute() {
+			EntityLivingBase entitylivingbase = this.entityHost.getAttackTarget();
+			if (entitylivingbase == null || !entitylivingbase.isEntityAlive()) {
+				return false;
+			} else if (entitylivingbase.getDistance(this.entityHost) < this.minAttackRadius) {
+				return false;
+			} else {
+				this.attackTarget = entitylivingbase;
+				return true;
+			}
+		}
+
+		@Override
+		public boolean shouldContinueExecuting() {
+			return this.shouldExecute() || !this.entityHost.getNavigator().noPath();
+		}
+
 		@Override
 		public void resetTask() {
-		    this.attackTarget = null;
-		    //this.rangedAttackTime = this.maxRangedAttackTime;
+			this.attackTarget = null;
+			//this.rangedAttackTime = this.maxRangedAttackTime;
 		}
-		
+
 		@Override
 		public void updateTask() {
-		    --this.navigateDelay;
-		    double d0 = this.entityHost.getDistance(this.attackTarget.posX, this.attackTarget.getEntityBoundingBox().minY, this.attackTarget.posZ);
-		    if (d0 < this.minAttackRadius) {
-		        this.entityHost.getNavigator().clearPath();
-		    } else if (this.navigateDelay <= 0) {
-		        this.entityHost.getNavigator().tryMoveToEntityLiving(this.attackTarget, this.entityMoveSpeed);
-		        this.navigateDelay = 15;
-		    }
-		    this.entityHost.getLookHelper().setLookPositionWithEntity(this.attackTarget, 30.0F, 30.0F);
-		    if (--this.rangedAttackTime <= 0) {
-		        this.rangedAttackEntityHost.attackEntityWithRangedAttack(this.attackTarget, 1.0F);
-		        this.rangedAttackTime = this.maxRangedAttackTime;
-		    }
+			--this.navigateDelay;
+			double d0 = this.entityHost.getDistance(this.attackTarget.posX, this.attackTarget.getEntityBoundingBox().minY, this.attackTarget.posZ);
+			if (d0 < this.minAttackRadius) {
+				this.entityHost.getNavigator().clearPath();
+			} else if (this.navigateDelay <= 0) {
+				this.entityHost.getNavigator().tryMoveToEntityLiving(this.attackTarget, this.entityMoveSpeed);
+				this.navigateDelay = 15;
+			}
+			this.entityHost.getLookHelper().setLookPositionWithEntity(this.attackTarget, 30.0F, 30.0F);
+			if (--this.rangedAttackTime <= 0) {
+				this.rangedAttackEntityHost.attackEntityWithRangedAttack(this.attackTarget, 1.0F);
+				this.rangedAttackTime = this.maxRangedAttackTime;
+			}
 		}
 	}
 
 	public static class AIAttackMelee extends EntityAIBase {
-	    protected EntitySusanooBase attacker;
-	    protected int attackTick;
-	    double speedTowardsTarget;
-	    protected final int attackInterval = 20;
-	    private final double attackReachSqr;
-	    private int navigateDelay;
-	
-	    public AIAttackMelee(EntitySusanooBase creature, double speedIn) {
-	        this.attacker = creature;
-	        this.speedTowardsTarget = speedIn;
-	        this.attackReachSqr = ProcedureUtils.getReachDistanceSq(creature);
-	        this.setMutexBits(3);
-	    }
-	
-	    @Override
-	    public boolean shouldExecute() {
-	        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
-	        if (entitylivingbase == null || !entitylivingbase.isEntityAlive()) {
-	            return false;
-	        } else if (this.attacker.getDistanceSq(entitylivingbase) > this.attackReachSqr) {
-	            return this.attacker.getNavigator().getPathToEntityLiving(entitylivingbase) != null;
-	        }
-	        return true;
-	    }
-	
-	    @Override
-	    public boolean shouldContinueExecuting() {
-	        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
-	        if (entitylivingbase == null || !entitylivingbase.isEntityAlive()) {
-	            return false;
-	        } else if (!this.attacker.isWithinHomeDistanceFromPosition(entitylivingbase.getPosition())) {
-	            return false;
-	        } else {
-	            return !(entitylivingbase instanceof EntityPlayer) || !((EntityPlayer)entitylivingbase).isSpectator() && !((EntityPlayer)entitylivingbase).isCreative();
-	        }
-	    }
+		protected EntitySusanooBase attacker;
+		protected int attackTick;
+		double speedTowardsTarget;
+		protected final int attackInterval = 20;
+		private final double attackReachSqr;
+		private int navigateDelay;
 
-	    @Override
-	    public void startExecuting() {
-	    	this.navigateDelay = 0;
-	    }
-	
-	    @Override
-	    public void resetTask() {
-	        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
-	        if (entitylivingbase instanceof EntityPlayer && (((EntityPlayer)entitylivingbase).isSpectator() || ((EntityPlayer)entitylivingbase).isCreative())) {
-	            this.attacker.setAttackTarget(null);
-	        }
-	        this.attacker.getNavigator().clearPath();
-	    }
-	
-	    @Override
-	    public void updateTask() {
-	        EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
-	        this.attacker.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
-	        double d0 = this.attacker.getDistanceSq(entitylivingbase);
-	        this.attackTick = Math.max(this.attackTick - 1, 0);
-	        --this.navigateDelay;
-	        if (d0 <= this.attackReachSqr) {
-	        	this.attacker.getNavigator().clearPath();
-	        	if (this.attackTick <= 0) {
-		            this.attackTick = this.attackInterval;
-		            this.attacker.swingArm(EnumHand.MAIN_HAND);
-		            this.attacker.attackEntityAsMob(entitylivingbase);
-	        	}
-	        } else if (this.navigateDelay <= 0) {
-	            this.attacker.getNavigator().tryMoveToEntityLiving(entitylivingbase, this.speedTowardsTarget);
-	            this.navigateDelay = 20;
-	        }
-	    }
+		public AIAttackMelee(EntitySusanooBase creature, double speedIn) {
+			this.attacker = creature;
+			this.speedTowardsTarget = speedIn;
+			this.attackReachSqr = ProcedureUtils.getReachDistanceSq(creature);
+			this.setMutexBits(3);
+		}
+
+		@Override
+		public boolean shouldExecute() {
+			EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+			if (entitylivingbase == null || !entitylivingbase.isEntityAlive()) {
+				return false;
+			} else if (this.attacker.getDistanceSq(entitylivingbase) > this.attackReachSqr) {
+				return this.attacker.getNavigator().getPathToEntityLiving(entitylivingbase) != null;
+			}
+			return true;
+		}
+
+		@Override
+		public boolean shouldContinueExecuting() {
+			EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+			if (entitylivingbase == null || !entitylivingbase.isEntityAlive()) {
+				return false;
+			} else if (!this.attacker.isWithinHomeDistanceFromPosition(entitylivingbase.getPosition())) {
+				return false;
+			} else {
+				return !(entitylivingbase instanceof EntityPlayer) || !((EntityPlayer)entitylivingbase).isSpectator() && !((EntityPlayer)entitylivingbase).isCreative();
+			}
+		}
+
+		@Override
+		public void startExecuting() {
+			this.navigateDelay = 0;
+		}
+
+		@Override
+		public void resetTask() {
+			EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+			if (entitylivingbase instanceof EntityPlayer && (((EntityPlayer)entitylivingbase).isSpectator() || ((EntityPlayer)entitylivingbase).isCreative())) {
+				this.attacker.setAttackTarget(null);
+			}
+			this.attacker.getNavigator().clearPath();
+		}
+
+		@Override
+		public void updateTask() {
+			EntityLivingBase entitylivingbase = this.attacker.getAttackTarget();
+			this.attacker.getLookHelper().setLookPositionWithEntity(entitylivingbase, 30.0F, 30.0F);
+			double d0 = this.attacker.getDistanceSq(entitylivingbase);
+			this.attackTick = Math.max(this.attackTick - 1, 0);
+			--this.navigateDelay;
+			if (d0 <= this.attackReachSqr) {
+				this.attacker.getNavigator().clearPath();
+				if (this.attackTick <= 0) {
+					this.attackTick = this.attackInterval;
+					this.attacker.swingArm(EnumHand.MAIN_HAND);
+					this.attacker.attackEntityAsMob(entitylivingbase);
+				}
+			} else if (this.navigateDelay <= 0) {
+				this.attacker.getNavigator().tryMoveToEntityLiving(entitylivingbase, this.speedTowardsTarget);
+				this.navigateDelay = 20;
+			}
+		}
 	}
 }

@@ -206,7 +206,7 @@ public class EntityFourTails extends ElementsNarutomodMod.ModElement {
 			 && distanceFactor < 1.0f && distanceFactor > (float)(ProcedureUtils.getReachDistance(this) * 0.6d / this.getBijudamaMinRange())) {
 				this.setSwingingArms(true);
 				this.mouthShootingJutsu = new EntityFirestream.EC.Jutsu2().createJutsu(this, (float)this.getBijudamaMinRange(), 80, 0xff00ff80);
-				((EntityFirestream.EC)this.mouthShootingJutsu).setDamage(100.0f);
+				((EntityFirestream.EC)this.mouthShootingJutsu).setDamage(20.0f);
 			} else {
 				super.attackEntityWithRangedAttack(target, distanceFactor);
 			}

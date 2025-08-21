@@ -42,7 +42,7 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 					}
 				}
 			}
-			entity.getEntityData().setLong("jumpCool",entity.world.getTotalWorldTime()+10);
+			entity.getEntityData().setLong("jumpCool",entity.world.getTotalWorldTime()+2);
 			if (!leapt) {
 				speed += 0.8d;
 				float yaw = entity.rotationYaw * 0.017453292F;
@@ -52,7 +52,7 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 				entity.motionZ += Math.cos(yaw) * d0 * speed * 2.5d;
 				entity.motionY = Math.max(motionY * Math.sin(pitch) * 2.0d, 0.8d);
 			}
-			entity.addExhaustion(0.2f);
+			entity.addExhaustion(0.1f);
 		}
 	}
 

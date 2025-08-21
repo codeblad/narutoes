@@ -96,9 +96,9 @@ public class ItemKagutsuchiSwordRanged extends ElementsNarutomodMod.ModElement {
 			Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(slot);
 			if (slot == EntityEquipmentSlot.MAINHAND) {
 				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
-						new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "kagutsuchi.damage", 1.5D, 1));
+						new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "kagutsuchi.damage", 0.5D, 1));
 				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
-						new AttributeModifier(ATTACK_SPEED_MODIFIER, "kagutsuchi.speed", -2.4D, 0));
+						new AttributeModifier(ATTACK_SPEED_MODIFIER, "kagutsuchi.speed", -1.75D, 0));
 			}
 			return multimap;
 		}
@@ -286,7 +286,7 @@ public class ItemKagutsuchiSwordRanged extends ElementsNarutomodMod.ModElement {
 								: null;
 				ProcedureAoeCommand.set(this.world, this.posX, this.posY, this.posZ, 0.0D, 4.0D)
 						.effect(PotionAmaterasuFlame.potion, 60, ((player != null) ? player.experienceLevel : 0) / 30 + 1, false)
-						.damageEntities(this.shootingEntity, 20.0F+ItemJutsu.getDmgMult(player)*2.5f);
+						.damageEntities(this.shootingEntity, 50.0F+ItemJutsu.getDmgMult(player)*5.5f);
 				this.setDead();
 			}
 		}

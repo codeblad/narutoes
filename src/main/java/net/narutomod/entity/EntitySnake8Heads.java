@@ -91,7 +91,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			this.setSize(0.8f * MODELSCALE, 2.0f * MODELSCALE);
 			this.stepHeight = this.height / 3;
 			this.chakraBurn = chakraUsagePerSec;
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(200+ItemJutsu.getDmgMult(this.getSummoner())*55f);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(500+ItemJutsu.getDmgMult(this.getSummoner())*80f);
 			this.setHealth(this.getMaxHealth());
 		}
 
@@ -191,7 +191,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 				ItemStack stack = ProcedureUtils.getMatchingItemStack(summoner, ItemSenjutsu.block);
 				if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
-					item.setJutsuCooldown(stack, SNAKE8H, 20*25);
+					item.setJutsuCooldown(stack, SNAKE8H, 20*50);
 				}
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:poof")), 2.0F, 1.0F);
 				Particles.spawnParticle(this.world, Particles.Types.SMOKE, this.posX, this.posY+this.height/2, this.posZ, 300,
