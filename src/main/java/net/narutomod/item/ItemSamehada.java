@@ -66,7 +66,7 @@ public class ItemSamehada extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static void applyEffects(EntityLivingBase target, EntityLivingBase attacker) {
-		applyEffects(target, attacker, 1.0f);
+		applyEffects(target, attacker, 0.1f);
 	}
 
 	public static void applyEffects(EntityLivingBase target, EntityLivingBase attacker, float multiplier) {

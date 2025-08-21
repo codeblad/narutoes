@@ -263,7 +263,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				/*double d = this.getFarRadius(0) / target.getEntityBoundingBox().getAverageEdgeLength() * 0.2d;
 				float f = target instanceof EntityLivingBase ? ((EntityLivingBase)target).getMaxHealth() * (float)d : Float.MAX_VALUE;*/
-				float f = 5+( 3.25f* (2.5f+6.5f*(this.power/10f)) * ItemJutsu.getDmgMult(player)/20 );
+				float f = 5+( 3.25f* (2.5f+7.5f*(this.power/10f)) * ItemJutsu.getDmgMult(player)/20 );
 				attackEntityWithJutsu(EntityBeam.this, player, target, f);
 			}
 
@@ -284,6 +284,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 					EntityBeam entitybeam = new EntityBeam(entity, power);
 					entitybeam.shoot(vec3d.x, vec3d.y, vec3d.z);
 					entity.world.spawnEntity(entitybeam);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*30);
 					return true;
 				}
 				return false;
@@ -291,7 +292,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 30.0f;
+				return 20.0f;
 			}
 
 			@Override
@@ -369,7 +370,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 				double d = ProcedureUtils.BB.getVolume(bb.intersect(entity.getEntityBoundingBox()))
 				 / ProcedureUtils.BB.getVolume(entity.getEntityBoundingBox()) * 0.025d;
 				attackEntityWithJutsu(this, this.shootingEntity, entity,
-						5+(2.25f*(2.5f+6.5f*(this.power/25f))*ItemJutsu.getDmgMult(this.shootingEntity))/20);
+						5+(2.25f*(2.5f+7.5f*(this.power/25f))*ItemJutsu.getDmgMult(this.shootingEntity))/20);
 				//entity instanceof EntityLivingBase ? ((EntityLivingBase)entity).getMaxHealth() * (float)d : Float.MAX_VALUE);
 			}
 		}
@@ -454,12 +455,13 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 				  .getObject(new ResourceLocation("narutomod:genkaihakurinojutsu")), SoundCategory.PLAYERS, 1, 1f);
 				entity.world.spawnEntity(new EntityCube(entity, power * 2f));
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*30);
 				return true;
 			}
 
 			@Override
 			public float getPowerupDelay() {
-				return 40.0f;
+				return 30.0f;
 			}
 
 			@Override
