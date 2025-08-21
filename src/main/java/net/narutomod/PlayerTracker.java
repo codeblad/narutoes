@@ -96,7 +96,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static float getDefense(Entity entity) {
-		return 1.5f+19*ItemJutsu.getDmgMult(entity)/63;
+		return 1.5f+17*ItemJutsu.getDmgMult(entity)/63;
 	}
 
 	private static void logBattleExp(EntityPlayer entity, double xp) {
@@ -321,16 +321,16 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult+= 0.25f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.3f;
+					defMult+= 0.25f;
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.2f;
+					defMult+= 0.15f;
 				}
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
-					defMult+=.2f;
+					defMult+=.15f;
 				}
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
-					defMult+=.5f;
+					defMult+=.3f;
 				}
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
@@ -351,7 +351,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe && EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) < 1) {
 					ItemYoton.EntityBiggerMe PENIS = (ItemYoton.EntityBiggerMe) targetEntity.getRidingEntity();
-					defMult += 0.95f*PENIS.bigRatio;
+					defMult += 0.85f*PENIS.bigRatio;
 				}
 				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
 				float newAmount = amount/defense;

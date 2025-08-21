@@ -137,7 +137,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 					}
 					Chakra.Pathway chakra = Chakra.pathway(user);
 					this.isShooting = this.ticksExisted > this.waitTime
-					 && user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed) && chakra.consume(this.chakraUsage * 0.05d);
+					 && user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed) && chakra.consume(this.chakraUsage * 0.1d);
 					if (this.isShooting) {
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:paperflip")), 0.5f, this.rand.nextFloat() * 0.4f + 0.9f);
 						Vec3d shootvec = user.getLookVec();
@@ -157,9 +157,9 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 					if (this.ticksExisted > this.waitTime) {
 						boolean newPressed = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
 						float cooldown = user.getEntityData().getFloat("paperstunCD");
-						float ball = (float) (NarutomodModVariables.world_tick+20*15);
-						if (ball >= 20) {
-							user.getEntityData().setFloat("paperstunCD", (float) (NarutomodModVariables.world_tick+20*15));
+						float ball = (float) (NarutomodModVariables.world_tick+20*25);
+						if (ball >= 30) {
+							user.getEntityData().setFloat("paperstunCD", (float) (NarutomodModVariables.world_tick+20*25));
 						}
 						EntityPlayer player = (EntityPlayer) user;
 						if (this.jutsuKey2Pressed && !newPressed) {

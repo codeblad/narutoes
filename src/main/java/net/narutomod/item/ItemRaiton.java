@@ -181,11 +181,11 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			ItemStack stack = this.getStackFromInventory();
 			if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 				ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
-				long cooldown = (long)((float)this.ticksExisted * item.getModifier(stack, this.summoner)) + 40;
+				/*long cooldown = (long)((float)this.ticksExisted * item.getModifier(stack, this.summoner)) + 40;
 				if (cooldown > 1200) {
 					cooldown = 1200;
-				}
-				item.setJutsuCooldown(stack, CHAKRAMODE, cooldown);
+				}*/
+				item.setJutsuCooldown(stack, CHAKRAMODE, 30*20);
 			}
 		}
 
