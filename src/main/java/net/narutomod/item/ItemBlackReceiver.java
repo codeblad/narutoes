@@ -195,6 +195,7 @@ public class ItemBlackReceiver extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void arrowHit(EntityLivingBase entity) {
 			super.arrowHit(entity);
+			this.setDead();
 			entity.setArrowCountInEntity(entity.getArrowCountInEntity() - 1);
 			onHitEntity(entity);
 		}

@@ -110,7 +110,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				if (result.entityHit != null) {
 					result.entityHit.hurtResistantTime = 10;
-					if (result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.shootingEntity), this.damage+ItemJutsu.getDmgMult(shootingEntity)*1.75f)) {
+					if (result.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.shootingEntity), this.damage+ItemJutsu.getDmgMult(shootingEntity)*2f)) {
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
 						 1f, 0.4f + this.rand.nextFloat() * 0.6f);
 						this.setDead();

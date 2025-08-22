@@ -142,7 +142,7 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, 
 				 user.getEntityBoundingBox().grow(6d))) {
 				 	if (!entity.equals(user)) {
-						entity.attackEntityFrom(DamageSource.LAVA, 4.0F+ItemJutsu.getDmgMult(user)*0.16f);
+						entity.attackEntityFrom(DamageSource.LAVA, 4.0F+ItemJutsu.getDmgMult(user)*0.5f);
 						entity.setFire(15);
 				 	}
 				}

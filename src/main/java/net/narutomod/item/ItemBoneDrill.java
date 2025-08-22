@@ -60,14 +60,14 @@ public class ItemBoneDrill extends ElementsNarutomodMod.ModElement {
 			Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(equipmentSlot);
 			if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
 				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", this.damage, 0));
-				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", -3.5, 0));
+				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", -2.75, 0));
 			}
 			return multimap;
 		}
 
 		@Override
 		public void onUpdate(ItemStack p_77663_1_, World p_77663_2_, Entity entity, int p_77663_4_, boolean p_77663_5_) {
-			this.damage = 15 + ItemJutsu.getDmgMult(entity)*2.5f;
+			this.damage = 15 + ItemJutsu.getDmgMult(entity)*3.5f;
 			super.onUpdate(p_77663_1_, p_77663_2_, entity, p_77663_4_, p_77663_5_);
 		}
 

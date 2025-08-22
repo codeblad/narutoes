@@ -64,7 +64,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> LSA = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> LS = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> MOUTHOPENAMOUNT = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
-		private final int wait = 30;
+		private final int wait = 20;
 		private final int mouthOpenTime = 20;
 		private float fullScale;
 		private Entity target;
@@ -86,7 +86,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 			this.setEntityScale(0.2f);
 			this.fullScale = power;
 			this.health = power * 20f;
-			this.power = (1+1*(power/5));
+			this.power = (1+2*(power/5));
 			this.setWaterSlowdown(1.0f);
 			this.isImmuneToFire = true;
 		}
@@ -212,7 +212,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 				if (result.typeOfHit == RayTraceResult.Type.BLOCK
 				 || (result.entityHit != null && result.entityHit.equals(this.target))) {
 					float size = this.getEntityScale();
-					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*3.5f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
+					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*4.2f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 						damage*=1.35f;
@@ -287,7 +287,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 50.0f;
 			}
 	
 			@Override

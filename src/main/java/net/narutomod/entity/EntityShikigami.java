@@ -157,7 +157,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 					if (this.ticksExisted > this.waitTime) {
 						boolean newPressed = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
 						float cooldown = user.getEntityData().getFloat("paperstunCD");
-						float ball = (float) (NarutomodModVariables.world_tick+20*25);
+						double ball = (cooldown-NarutomodModVariables.world_tick)/20;
 						if (ball >= 30) {
 							user.getEntityData().setFloat("paperstunCD", (float) (NarutomodModVariables.world_tick+20*25));
 						}

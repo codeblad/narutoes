@@ -90,7 +90,7 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 					return;
 				}
 				chakraUsage = (double) ItemMangekyoSharinganObito.getIntangibleChakraUsage((EntityLivingBase) entity);;
-				f2 = (boolean) (((is_pressed) && ((timer) <= 100)) && ((chakraAmount) > (chakraUsage)));
+				f2 = (boolean) (((is_pressed) && ((timer) <= 20*10)) && ((chakraAmount) > (chakraUsage)));
 				if ((f2)) {
 					ProcedureUtils.purgeHarmfulEffects((EntityLivingBase) entity);
 					ProcedureOnLivingUpdate.setUntargetable(entity, 3);

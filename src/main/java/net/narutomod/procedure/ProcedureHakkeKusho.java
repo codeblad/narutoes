@@ -50,8 +50,8 @@ public class ProcedureHakkeKusho extends ElementsNarutomodMod.ModElement {
 			super.attackEntityFrom(player, target);
 			if (target instanceof EntityLivingBase && player instanceof EntityPlayer) {
 				float ratio = (float) ProcedureAirPunch.getPressDuration(player)/50;
-				float strength = 1.5f+(3.5f*ratio);
-				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(player, null), 10+(2.65f*ItemJutsu.getDmgMult(player)) * strength);
+				float strength = 1.75f+(4f*ratio);
+				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(player, null), 10+(2.85f*ItemJutsu.getDmgMult(player)) * strength);
 			}
 		}
 

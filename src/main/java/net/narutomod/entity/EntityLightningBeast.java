@@ -140,7 +140,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
-			float damage = 5+(1+1*this.power/5)*0.75f*ItemJutsu.getDmgMult(this.getOwner());
+			float damage = 8+(1+2*this.power/5)*1.5f*ItemJutsu.getDmgMult(this.getOwner());
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getOwner(), ItemRaiton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.35f;

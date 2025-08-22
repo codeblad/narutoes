@@ -154,7 +154,7 @@ public class ItemAsuraCanon extends ElementsNarutomodMod.ModElement {
 		protected void onImpact(RayTraceResult result) {
 			if (!this.world.isRemote && (result.entityHit == null || !result.entityHit.equals(this.shootingEntity))) {
 				ProcedureAoeCommand.set(this.world, this.posX,  this.posY, this.posZ, 0d, this.explosivePower).exclude(this.shootingEntity)
-						.damageEntities(ItemJutsu.causeJutsuDamage(this,this.shootingEntity),35+ItemJutsu.getDmgMult(this.shootingEntity)*2f);
+						.damageEntities(ItemJutsu.causeJutsuDamage(this,this.shootingEntity),35+ItemJutsu.getDmgMult(this.shootingEntity)*3f);
 				this.world.createExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosivePower,
 				 ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 				this.setDead();

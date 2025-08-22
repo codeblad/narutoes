@@ -52,7 +52,7 @@ public class EntityCrystalThorns extends ElementsNarutomodMod.ModElement {
 	public static class EC extends Entity {
 		protected static final String ENTITYID_KEY = "CrystalThornsEntityId";
 		private final float speed = 1.5f;
-		private int maxLife = 5;
+		private int maxLife = 2;
 		private EntityLivingBase shooter;
 		private EntityCrystalSpike lastSpike;
 		private EntityLivingBase target;
@@ -177,7 +177,7 @@ public class EntityCrystalThorns extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EntityCrystalSpike extends EntitySpike.Base implements ItemJutsu.IJutsu {
-		private final int growTime = 10;
+		private final int growTime = 5;
 		private float maxScale;
 		private final float damage = 8.0f;
 		private EntityLivingBase user;
@@ -214,7 +214,7 @@ public class EntityCrystalThorns extends ElementsNarutomodMod.ModElement {
 						entity.hurtResistantTime = 10;
 						//entity.getEntityData().setBoolean("TempData_disableKnockback", true);
 						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),
-						 10+ ItemJutsu.getDmgMult(this.shootingEntity)*2 * (1f - (float)(this.ticksAlive - 1) / this.growTime));
+						 10+ ItemJutsu.getDmgMult(this.shootingEntity)*3.5f * (1f - (float)(this.ticksAlive - 1) / this.growTime));
 					}
 				}
 			}

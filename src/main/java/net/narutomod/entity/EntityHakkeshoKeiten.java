@@ -166,7 +166,7 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 		protected void collideWithNearbyEntities() {
 			if (!this.world.isRemote && this.getMaturity() >= 0.9f) {
 				EntityLivingBase summoner = this.getSummoner();
-				float damage = summoner instanceof EntityPlayer ? 10f+ItemJutsu.getDmgMult(summoner)*2.5f : 10F;
+				float damage = summoner instanceof EntityPlayer ? 10f+ItemJutsu.getDmgMult(summoner)*3f : 10F;
 				ProcedureAoeCommand.set(this.world, this.getEntityBoundingBox()).exclude(this).exclude(summoner)
 				 .damageEntities(ItemJutsu.causeJutsuDamage(this, summoner), damage);
 				for (Entity entity : ProcedureAoeCommand.getInstance().getEntitiesList()) {

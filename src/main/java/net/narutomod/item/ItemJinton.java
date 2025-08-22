@@ -150,7 +150,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 				ItemStack offstack = ((EntityPlayer) entity).getHeldItemOffhand();
 				Chakra.Pathway chakra = Chakra.pathway((EntityLivingBase) entity);
 				if ((stack.getItem() == ItemJinton.block || offstack.getItem() == ItemJinton.block)  && entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed)
-						&& chakra.consume(2d) ) {
+						&& chakra.consume(4d) ) {
 					((EntityPlayer) entity).addPotionEffect(new PotionEffect(PotionFlight.potion, 10, 1, false, false));
 				}
 			}

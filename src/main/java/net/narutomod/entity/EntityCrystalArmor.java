@@ -74,14 +74,14 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 			super(world);
 			this.setSize(0.7f, 1.9f);
 			this.dieOnNoPassengers = false;
-			this.strengthModifier = new AttributeModifier(UUID.fromString("2866063d-9200-4f65-9025-1d841af84825"), "crystalarmor.damage", 10+ItemJutsu.getDmgMult(this.getSummoner())*5, 0);
+			this.strengthModifier = new AttributeModifier(UUID.fromString("2866063d-9200-4f65-9025-1d841af84825"), "crystalarmor.damage", 10+ItemJutsu.getDmgMult(this.getSummoner())*7, 0);
 		}
 
 		public EC(EntityLivingBase userIn) {
 			this(userIn.world);
 			this.setSummoner(userIn);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(Math.max(userIn.getMaxHealth() * 2f, 20.0f));
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(Math.max(userIn.getMaxHealth() * 3f, 20.0f));
 			this.setHealth(this.getMaxHealth());
 			userIn.getEntityData().setInteger(ENTITYID_KEY, this.getEntityId());
 			//if (userIn.isPotionActive(MobEffects.STRENGTH)) {

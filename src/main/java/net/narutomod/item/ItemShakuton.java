@@ -285,7 +285,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 								--this.targetTime;
 							}
 							entity.getEntityData().setBoolean("TempData_disableKnockback", true);
-							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 2f+0.85f*ItemJutsu.getDmgMult(this.shootingEntity));
+							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 2f+1.25f*ItemJutsu.getDmgMult(this.shootingEntity));
 							this.scorchEffects(entity.posX, entity.posY+entity.height/2, entity.posZ, entity.width/2, entity.height/2);
 						}
 					}

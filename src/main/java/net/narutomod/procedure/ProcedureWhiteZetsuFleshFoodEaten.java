@@ -78,6 +78,7 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 					ItemStack _setstack = (rinneganstack);
 					_setstack.setCount(1);
 					ItemHandlerHelper.giveItemToPlayer(((EntityPlayer) entity), _setstack);
+					((EntityPlayer) entity).inventory.clearMatchingItems(ItemMangekyoSharinganEternal.helmet, -1, (int) 1, null);
 				}
 				if (entity instanceof EntityPlayerMP) {
 					Advancement _adv = ((MinecraftServer) ((EntityPlayerMP) entity).mcServer).getAdvancementManager()

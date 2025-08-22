@@ -234,7 +234,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			super(summonerIn);
 			this.postScaleFixup();
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(200d);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(20.0d+ItemJutsu.getDmgMult(summonerIn)*1.85);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(20.0d+ItemJutsu.getDmgMult(summonerIn)*2.85);
 			Entity parent = summonerIn.getRidingEntity() instanceof EC ? summonerIn.getRidingEntity() : summonerIn;
 			this.rotationYawHead = parent.rotationYaw;
 			this.setLocationAndAngles(parent.posX, parent.posY - 10d, parent.posZ, parent.rotationYaw, -45f);
@@ -258,7 +258,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			int age = this.getAge();
 			if (age < 20) {
 				this.getPhaseManager().setPhase(EntitySnake.Phase.ROAMING);
-				this.setAIMoveSpeed(2.0f);
+				this.setAIMoveSpeed(2.5f);
 				Vec3d vec = Vec3d.fromPitchYaw(0.0f, this.rotationYaw).scale(0.1d);
 				this.motionX += vec.x;
 				this.motionZ += vec.z;
@@ -267,7 +267,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 				}
 			} else if (this.target != null && this.target.isEntityAlive()) {
 				this.setAttackTarget(this.target);
-				this.setAIMoveSpeed(1.8f);
+				this.setAIMoveSpeed(2.2f);
 				Vec3d vec = Vec3d.fromPitchYaw(0.0f, this.rotationYaw).scale(0.1d);
 				this.motionX += vec.x;
 				this.motionZ += vec.z;

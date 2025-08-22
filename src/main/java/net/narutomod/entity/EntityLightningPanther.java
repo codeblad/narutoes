@@ -173,7 +173,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
-			float damage = 10+(1+1*this.getPower()/5)*1.65f*ItemJutsu.getDmgMult(this.getOwner());
+			float damage = 10+(1+1.5f*this.getPower()/5)*2.2f*ItemJutsu.getDmgMult(this.getOwner());
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getOwner(), ItemRaiton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.35f;

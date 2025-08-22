@@ -104,7 +104,7 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(500.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(700.0D);
 		}
 
 		@Override
@@ -260,7 +260,7 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 						if (this.hitTrace.typeOfHit != RayTraceResult.Type.MISS) {
 							ProcedureAoeCommand.set(this.world, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z, 0d, 2d)
 							 .exclude(this.shootingEntity).resetHurtResistanceTime()
-							 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 6+ItemJutsu.getDmgMult(this.shootingEntity)*0.3f);
+							 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 8+ItemJutsu.getDmgMult(this.shootingEntity)*0.65f);
 							this.world.newExplosion(this.shootingEntity, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z,
 							 3, this.rand.nextInt(4) == 0,
 							 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
