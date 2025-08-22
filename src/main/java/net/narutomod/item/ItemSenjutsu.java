@@ -177,9 +177,9 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 					if (living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868")) == null) {
 						living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868"), "sagemode.damage", d, 0));
 					}
-					/*if (living.getHealth() < living.getMaxHealth()) {
-						living.heal(0.1f);
-					}*/
+					if (this.getSageType(itemstack) == Type.SLUG && living.getHealth() < living.getMaxHealth() && living.ticksExisted%20 == 0) {
+						living.heal(0.25f);
+					}
 					/*if (entity instanceof EntityPlayer) {
 
 						int foodlevel = ((EntityPlayer)entity).getFoodStats().getFoodLevel();
