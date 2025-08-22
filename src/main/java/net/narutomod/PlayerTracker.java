@@ -305,10 +305,10 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				ItemStack cheststack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 				ItemStack headstack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 				if (headstack.getItem() == ItemRinnegan.helmet ||headstack.getItem() == ItemTenseigan.helmet  ) {
-					defMult += .7f;
+					defMult += .6f;
 				}
 				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
-					defMult += 0.7f;
+					defMult += 0.8f;
 				}
 				if (cheststack.getItem() == ItemRinnegan.body) {
 					defMult += 1.5f;
@@ -319,7 +319,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				if (cheststack.getItem() == ItemTenseigan.body) {
-					defMult += .9f;
+					defMult += .65f;
 				}
 				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
 				if (stackwood != null) {
