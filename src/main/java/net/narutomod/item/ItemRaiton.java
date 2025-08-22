@@ -212,6 +212,10 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			private static final String ID_KEY = "EntityChakraModeIdKey";
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemRaiton.block);
+				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+					return false;
+				}
 				Entity entity1 = entity.world.getEntityByID(stack.getTagCompound().getInteger(ID_KEY));
 				if (entity1 instanceof EntityChakraMode && entity instanceof EntityPlayer) {
 					entity1.setDead();

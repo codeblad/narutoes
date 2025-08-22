@@ -4,6 +4,7 @@ package net.narutomod.entity;
 import net.minecraft.item.Item;
 import net.narutomod.item.ItemFuton;
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemRaiton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -127,6 +128,10 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0F) {
+					ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemFuton.block);
+					if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+						return false;
+					}
 					entity.world.spawnEntity(new EC(entity, power * 2f + 6f, 0));
 					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (20 + 20*power/3));
 					return true;

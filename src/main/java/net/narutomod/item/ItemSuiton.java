@@ -33,6 +33,7 @@ import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.procedure.ProcedureUtils;
 
 import java.util.UUID;
 
@@ -192,6 +193,10 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemSuiton.block);
+				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+					return false;
+				}
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 						SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kirigakurenojutsu")),
 						SoundCategory.PLAYERS, 5, 1f);

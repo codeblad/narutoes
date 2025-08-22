@@ -32,6 +32,8 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 
+import net.narutomod.item.ItemDoton;
+import net.narutomod.item.ItemRaiton;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
@@ -231,6 +233,10 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemRaiton.block);
+				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+					return false;
+				}
 				if (power >= 1.0f) {
 				 	entity.world.spawnEntity(new EC(entity));
 				 	if (entity instanceof EntityPlayer && !((EntityPlayer)entity).isCreative()) {

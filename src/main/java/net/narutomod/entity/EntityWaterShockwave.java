@@ -26,6 +26,8 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
 import net.narutomod.block.BlockWaterStill;
+import net.narutomod.item.ItemRaiton;
+import net.narutomod.item.ItemSuiton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
@@ -243,6 +245,10 @@ public class EntityWaterShockwave extends ElementsNarutomodMod.ModElement {
 			private static final String ID_KEY = "WaterShockwaveEntityIdKey";
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemSuiton.block);
+				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+					return false;
+				}
 				Entity entity1 = entity.world.getEntityByID(entity.getEntityData().getInteger(ID_KEY));
 				if (entity1 instanceof EC) {
 					((EC)entity1).shouldDie = true;

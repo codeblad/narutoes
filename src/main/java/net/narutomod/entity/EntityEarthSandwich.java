@@ -195,6 +195,10 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemDoton.block);
+				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+					return false;
+				}
 				if (power >= 2f) {
 					RayTraceResult rt = ProcedureUtils.raytraceBlocks(entity, 45d);
 					if (rt != null && rt.typeOfHit == RayTraceResult.Type.BLOCK) {

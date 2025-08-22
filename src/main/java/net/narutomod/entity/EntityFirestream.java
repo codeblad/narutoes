@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.narutomod.item.ItemDoton;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemKaton;
 import net.narutomod.procedure.ProcedureUtils;
@@ -160,6 +161,10 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu1 implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemKaton.block);
+				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+					return false;
+				}
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 				  SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:katon_gokamekeku")),
 				  SoundCategory.NEUTRAL, 5, 1f);
