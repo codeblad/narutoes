@@ -276,7 +276,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				if (entity instanceof EntityPlayer) {
+				if (entity instanceof EntityPlayer && (power >= 0.3)) {
 					//power = Math.min(power / 2 + 0.5f, 10f);
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 					  .getObject(new ResourceLocation("narutomod:genkaihakurinojutsu")), SoundCategory.PLAYERS, 1, 1f);
@@ -452,11 +452,14 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
-				  .getObject(new ResourceLocation("narutomod:genkaihakurinojutsu")), SoundCategory.PLAYERS, 1, 1f);
-				entity.world.spawnEntity(new EntityCube(entity, power * 2f));
-				ItemJutsu.setCurrentJutsuCooldown(stack,20*30);
-				return true;
+				if (power >= 0.3) {
+					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
+							.getObject(new ResourceLocation("narutomod:genkaihakurinojutsu")), SoundCategory.PLAYERS, 1, 1f);
+					entity.world.spawnEntity(new EntityCube(entity, power * 2f));
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*30);
+					return true;
+				}
+				return false;
 			}
 
 			@Override

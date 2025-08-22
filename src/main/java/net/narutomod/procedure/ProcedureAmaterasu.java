@@ -92,12 +92,12 @@ public class ProcedureAmaterasu extends ElementsNarutomodMod.ModElement {
 					}
 					Chakra.pathway((EntityPlayer) entity).consume(chakraUsage);
 				}
-				cooldown = (double) (world.getTotalWorldTime() + 12*20);
+				cooldown = (double) (world.getTotalWorldTime() + 10*20);
 				entity.getEntityData().setBoolean("amaterasu_active", (true));
 				entity.getEntityData().setDouble("amaterasu_cd", (cooldown));
 				Chakra.pathway((EntityPlayer) entity).consume(chakraUsage * 0.25d);
 				RayTraceResult t = ProcedureUtils.objectEntityLookingAt(entity, 30d);
-				i = (double) 4+ItemJutsu.getDmgMult(entity)*1.85;
+				i = (double) 4+ItemJutsu.getDmgMult(entity)*2;
 				if (t.typeOfHit == RayTraceResult.Type.ENTITY) {
 					if (t.entityHit instanceof EntityLivingBase) {
 						((EntityLivingBase) t.entityHit).setRevengeTarget((EntityLivingBase) entity);
@@ -105,7 +105,7 @@ public class ProcedureAmaterasu extends ElementsNarutomodMod.ModElement {
 					entity = t.entityHit;
 					if (entity instanceof EntityLivingBase)
 						((EntityLivingBase) entity)
-								.addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, (int) 60, (int) (i), (false), (false)));
+								.addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, (int) 20*7, (int) (i), (false), (false)));
 				} else {
 					x = (int) t.getBlockPos().getX() + t.sideHit.getDirectionVec().getX();
 					y = (int) t.getBlockPos().getY() + t.sideHit.getDirectionVec().getY();
