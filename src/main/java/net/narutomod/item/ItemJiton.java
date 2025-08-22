@@ -156,7 +156,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 				EntityPlayer player = (EntityPlayer)entity;
 				if (!ProcedureUtils.hasItemInInventory(player, ItemGourd.body)) {
 					if (!player.getCooldownTracker().hasCooldown(block)) {
-						player.getCooldownTracker().setCooldown(block, (int)this.getModifiedCD(2400, player));
+						player.getCooldownTracker().setCooldown(block, (int)this.getModifiedCD(20, player));
 					} else if (player.getCooldownTracker().getCooldown(block, 1f) <= 0.1f) {
 						ItemStack stack = new ItemStack(ItemGourd.body);
 						ItemGourd.setMaterial(stack, getSandType(itemstack));
