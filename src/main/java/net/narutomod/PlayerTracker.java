@@ -305,10 +305,10 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				ItemStack cheststack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 				ItemStack headstack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 				if (headstack.getItem() == ItemRinnegan.helmet ||headstack.getItem() == ItemTenseigan.helmet  ) {
-					defMult += .25f;
+					defMult += .3f;
 				}
 				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
-					defMult += 0.3f;
+					defMult += 0.45f;
 				}
 				if (cheststack.getItem() == ItemRinnegan.body) {
 					defMult += 1f;
@@ -326,10 +326,10 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult+= 0.5f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.15f;
+					defMult+= 0.1f;
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.25f;
+					defMult+= 0.2f;
 				}
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
 					defMult+=.15f;
@@ -339,7 +339,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
-						defMult+= 0.1f;
+						defMult+= 0.25f;
 					} else {
 						defMult+= 0.65f;
 					}
