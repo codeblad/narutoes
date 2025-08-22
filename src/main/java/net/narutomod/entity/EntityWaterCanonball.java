@@ -76,7 +76,7 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 			this.damage = 6+mult*ItemJutsu.getDmgMult(this.shootingEntity)*2.5f;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter, ItemSuiton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-				damage*=1.25f;
+				damage*=1.35f;
 			}
 			Vec3d vec = shooter.getPositionEyes(1f).add(shooter.getLookVec().scale(shooter.width * 0.5f)).subtract(0d, 0.2d, 0d);
 			this.setLocationAndAngles(vec.x, vec.y, vec.z, shooter.rotationYawHead, shooter.rotationPitch);

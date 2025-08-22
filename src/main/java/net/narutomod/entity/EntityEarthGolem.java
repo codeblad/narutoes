@@ -1,7 +1,6 @@
 
 package net.narutomod.entity;
 
-import net.narutomod.item.ItemDoton;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -33,8 +32,6 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.block.Block;
-import net.narutomod.item.ItemRaiton;
-import net.narutomod.procedure.ProcedureUtils;
 
 import javax.vecmath.Vector3f;
 import javax.annotation.Nullable;
@@ -220,10 +217,6 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemDoton.block);
-				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-					return false;
-				}
 				if (power >= 1.0f) {
 					entity.world.spawnEntity(new EC(entity, power));
 					ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);

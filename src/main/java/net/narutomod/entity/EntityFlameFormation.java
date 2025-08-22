@@ -1,10 +1,8 @@
 
 package net.narutomod.entity;
 
-import net.narutomod.item.ItemDoton;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.Particles;
-import net.narutomod.item.ItemKaton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -217,10 +215,6 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemKaton.block);
-				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-					return false;
-				}
 				if (entity.onGround) {
 					entity.world.spawnEntity(new EC(entity, power));
 					return true;

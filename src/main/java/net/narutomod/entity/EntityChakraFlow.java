@@ -113,7 +113,7 @@ public class EntityChakraFlow extends ElementsNarutomodMod.ModElement {
 						float damage = (float) (this.damageModifier+ 2*ItemJutsu.getDmgMult(user));
 						ItemStack stack = ProcedureUtils.getMatchingItemStack(user, ItemFuton.block);
 						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-							damage*=1.25f;
+							damage*=1.35f;
 						}
 						aInstance.applyModifier(new AttributeModifier(DAMAGE_MODIFIER, "chakraflow.damage", damage, 0));
 					}

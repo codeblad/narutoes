@@ -205,7 +205,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 						float damage = 8+(1.15f * this.damageMultiplier())*ItemJutsu.getDmgMult(this.summoner);
 						ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
 						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-							damage*=1.25f;
+							damage*=1.35f;
 						}
 						EntityLightningArc.onStruck(this.target,
 						 ItemJutsu.causeJutsuDamage(this, this.summoner), damage);
@@ -376,7 +376,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 							float damage = 10f+2.85f*ItemJutsu.getDmgMult(this.summoner);
 							ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
 							if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-								damage*=1.25f;
+								damage*=1.35f;
 							}
 							entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), damage, this.summoner);
 							this.world.spawnEntity(entity2);
@@ -387,7 +387,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 					float damage = 10f+2.85f*ItemJutsu.getDmgMult(this.summoner);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-						damage*=1.25f;
+						damage*=1.35f;
 					}
 					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), damage, this.summoner);
 					this.world.spawnEntity(entity);
@@ -406,7 +406,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 					float damage = 12f+2.65f*ItemJutsu.getDmgMult(this.summoner);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-						damage*=1.25f;
+						damage*=1.35f;
 					}
 					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), damage, this.summoner);
 					this.world.spawnEntity(entity);

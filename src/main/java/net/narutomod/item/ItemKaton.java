@@ -109,7 +109,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.damage*= 1.85f;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter,ItemKaton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-				damage*=1.25f;
+				damage*=1.35f;
 			}
 			//this.guided = isGuided;
 			this.guided = false;

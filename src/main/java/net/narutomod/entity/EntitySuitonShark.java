@@ -215,7 +215,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*3.5f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-						damage*=1.25f;
+						damage*=1.35f;
 					}
 					ProcedureAoeCommand.set(this, 0.0D, size).exclude(this.shootingEntity)
 					  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);

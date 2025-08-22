@@ -122,7 +122,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 						EC entity1 = new EC(entity, power);
 						entity1.damage = 12+3.5f*(1+3.5f*(1/100))*ItemJutsu.getDmgMult(entity);
 						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-							entity1.damage*=1.25f;
+							entity1.damage*=1.35f;
 						}
 						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));

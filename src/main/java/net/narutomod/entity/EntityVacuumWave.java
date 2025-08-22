@@ -114,7 +114,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 								 float damage = 5+0.8f*(1+0.4f*(this.power/10))* ItemJutsu.getDmgMult(this.shootingEntity);
 								ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemFuton.block);
 								if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-									damage*=1.25f;
+									damage*=1.35f;
 								}
 								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);
 				            }
@@ -128,10 +128,6 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0F) {
-					ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemFuton.block);
-					if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-						return false;
-					}
 					entity.world.spawnEntity(new EC(entity, power * 2f + 6f, 0));
 					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (20 + 20*power/3));
 					return true;

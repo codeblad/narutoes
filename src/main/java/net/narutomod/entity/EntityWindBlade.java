@@ -110,7 +110,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 						float damage = 5+2.5f*(1+1.5f*(this.power/5))*ItemJutsu.getDmgMult(this.shootingEntity);
 						ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemFuton.block);
 						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-							damage*=1.25f;
+							damage*=1.35f;
 						}
 						result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);
 						this.setDead();

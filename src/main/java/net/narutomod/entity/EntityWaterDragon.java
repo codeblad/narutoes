@@ -203,7 +203,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 				float damage = 20+(7.5f*this.mult)*ItemJutsu.getDmgMult(this.shootingEntity);
 				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);
 				if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-					damage*=1.25f;
+					damage*=1.35f;
 				}
 				ProcedureAoeCommand.set(this, 1.0D, 5.0D).exclude(this.shootingEntity)
 				  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);

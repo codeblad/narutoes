@@ -159,7 +159,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 								float damage = 5+1.6f*ItemJutsu.getDmgMult(this.user);
 								ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemDoton.block);
 								if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-									damage*=1.25f;
+									damage*=1.35f;
 								}
 								entity.attackEntityFrom(DamageSource.IN_WALL, damage);
 							}
@@ -195,10 +195,6 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemDoton.block);
-				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-					return false;
-				}
 				if (power >= 2f) {
 					RayTraceResult rt = ProcedureUtils.raytraceBlocks(entity, 45d);
 					if (rt != null && rt.typeOfHit == RayTraceResult.Type.BLOCK) {

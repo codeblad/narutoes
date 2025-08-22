@@ -143,7 +143,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			float damage = 5+(1+1*this.power/5)*0.75f*ItemJutsu.getDmgMult(this.getOwner());
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getOwner(), ItemRaiton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-				damage*=1.25f;
+				damage*=1.35f;
 			}
 			return EntityLightningArc.onStruck(entityIn, ItemJutsu.causeJutsuDamage(this, this.getOwner()), damage);
 		}

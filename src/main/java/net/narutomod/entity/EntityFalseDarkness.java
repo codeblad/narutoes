@@ -95,7 +95,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 					float damage = 10+(BASE_DAMAGE * (1+1*(this.power/20))) *ItemJutsu.getDmgMult(this.user);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemRaiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-						damage*=1.25f;
+						damage*=1.35f;
 					}
 					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.user), damage, this.user);
 					this.world.spawnEntity(entity);

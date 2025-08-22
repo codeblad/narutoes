@@ -129,7 +129,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 				float damage = 6 + ((1.55f+2.5f*(EC.this.power/30)) * EC.this.damageModifier)*ItemJutsu.getDmgMult(player)*1.75f;
 				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityLivingBase) player, ItemSuiton.block);
 				if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-					damage*=1.25f;
+					damage*=1.35f;
 				}
 				target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player),
 						damage);
