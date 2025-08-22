@@ -156,7 +156,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 						 	Vec3d vec = entry.getValue();
 							entity.setPositionAndUpdate(vec.x, vec.y, vec.z);
 							if (age > this.growTime - 5) {
-								float damage = 5+1.8f*ItemJutsu.getDmgMult(this.user);
+								float damage = 5+1.6f*ItemJutsu.getDmgMult(this.user);
 								ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemDoton.block);
 								if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 									damage*=1.25f;

@@ -52,7 +52,7 @@ public class EntityHidingInAsh extends ElementsNarutomodMod.ModElement {
 			this.setUser(userIn);
 			this.setRange((float)rangeIn);
 			this.setIdlePosition();
-			userIn.addPotionEffect(new PotionEffect(MobEffects.SPEED, this.maxLife, 8, false, false));
+			userIn.addPotionEffect(new PotionEffect(MobEffects.SPEED, this.maxLife, 12, false, false));
 			userIn.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, this.maxLife, 0, false, false));
 		}
 

@@ -93,8 +93,8 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 			this.stepHeight = this.height / 3;
 			Chakra.Pathway cp = Chakra.pathway(summonerIn);
 			float health = (20+ (80*(ItemJutsu.getDmgMult(summonerIn)/63))) * PlayerTracker.getDefense(summonerIn);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2.7+800);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(50.0D+ItemJutsu.getDmgMult(summonerIn)*2.6);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2.8+800);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(50.0D+ItemJutsu.getDmgMult(summonerIn)*2.8);
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50D);
 			//float ratio = summonerIn.getHealth()/summonerIn.getMaxHealth();
 			this.setHealth(this.getMaxHealth());

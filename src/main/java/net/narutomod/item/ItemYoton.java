@@ -49,7 +49,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:yoton")
 	public static final Item block = null;
 	public static final int ENTITYID = 149;
-	public static final ItemJutsu.JutsuEnum MULTISIZE = new ItemJutsu.JutsuEnum(0, "biggerme", 'B', 50d, new EntityBiggerMe.Jutsu());
+	public static final ItemJutsu.JutsuEnum MULTISIZE = new ItemJutsu.JutsuEnum(0, "biggerme", 'B', 100d, new EntityBiggerMe.Jutsu());
 	public static final ItemJutsu.JutsuEnum FUUIN = new ItemJutsu.JutsuEnum(1, "sealing", 'S', 100d, new EntitySealing.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SEALINGCHAIN = new ItemJutsu.JutsuEnum(2, "sealing_chains", 'A', 50d, new EntitySealingChains.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SEALING9D = new ItemJutsu.JutsuEnum(3, "tooltip.phantom9sealing.name", 'S', 1500d, new EntityGedoStatue.Sealing9Jutsu());
@@ -106,7 +106,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 			float ratio = 1+2f*(scaleIn/20);
 			double d = MathHelper.sqrt((4d * scaleIn * scaleIn) + (this.height * this.height));
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("biggerme.reach", d, 0));
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("biggerme.damage", (10+ItemJutsu.getDmgMult(user)*1.2)*ratio, 0));
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("biggerme.damage", (10+ItemJutsu.getDmgMult(user)*1.1)*ratio, 0));
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(user.getHealth() * scaleIn);
 			this.setHealth(this.getMaxHealth());
 

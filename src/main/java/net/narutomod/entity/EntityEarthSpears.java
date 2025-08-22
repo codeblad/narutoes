@@ -78,6 +78,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 			//this.damage = Math.min(damageIn, 20f);
 		}
 
+
 		@Override
 		public ItemJutsu.JutsuEnum.Type getJutsuType() {
 			return ItemJutsu.JutsuEnum.Type.DOTON;

@@ -133,7 +133,7 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 
 		// returns true if evaded, false if otherwise
 		public boolean onAttackEvent(LivingAttackEvent event, EntityLivingBase entity, EntityLivingBase attacker) {
-		 	if (entity.getRNG().nextFloat() <= 0.6f) {
+		 	/*if (entity.getRNG().nextFloat() <= 0.6f) {
 		 		Entity immediateSource = event.getSource().getImmediateSource();
 		    	List<BlockPos> list = ProcedureUtils.getAllAirBlocks(entity.world, entity.getEntityBoundingBox().grow(2.5d));
 		    	for (int i = 0; i < list.size(); i++) {
@@ -146,7 +146,7 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 			 			return true;
 		    		}
 		    	}
-		 	}
+		 	}*/
 		 	return false;
 		}
 

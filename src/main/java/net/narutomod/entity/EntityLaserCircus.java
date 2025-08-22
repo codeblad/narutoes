@@ -96,7 +96,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 					this.playSound(SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:electricity")), 1.0f, this.rand.nextFloat() * 0.6f + 0.6f);
 				}
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 35d);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 55d);
 				if (res != null) {
 					this.setLightningAt(res.hitVec);
 				}
@@ -114,7 +114,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 		private void setLightningAt(Vec3d targetVec) {
 			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 			 this.getPositionVector(), targetVec, 0xc00000ff, 10, 0.1f);
-			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 20+2.6f*ItemJutsu.getDmgMult(this.summoner), this.summoner);
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 40+3.4f*ItemJutsu.getDmgMult(this.summoner), this.summoner);
 			this.world.spawnEntity(entity2);
 		}
 
@@ -135,7 +135,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power, stack));
-				ItemJutsu.setCurrentJutsuCooldown(stack,20*3);
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*9);
 				return true;
 			}
 
@@ -247,7 +247,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 				float scale = (1f - (ageInTicks % 5f) / 5f) * 3.0F;
 				GlStateManager.translate(x, y + 0.5d, z);
 				GlStateManager.enableRescaleNormal();
-				GlStateManager.scale(scale, scale, scale);
+				GlStateManager.scale(scale*.1, scale*.1, scale*.1);
 				Tessellator tessellator = Tessellator.getInstance();
 				BufferBuilder bufferbuilder = tessellator.getBuffer();
 				GlStateManager.rotate(-entity.rotationYaw, 0.0F, 1.0F, 0.0F);

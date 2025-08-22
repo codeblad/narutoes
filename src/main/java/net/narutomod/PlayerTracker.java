@@ -235,7 +235,8 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 		public void onTick(TickEvent.PlayerTickEvent event) {
 			if (event.phase == TickEvent.Phase.START && event.player instanceof EntityPlayerMP) {
 				//double d = getBattleXp(event.player) * 0.0008d;
-				double d = 130*(ItemJutsu.getDmgMult(event.player)/63);
+				// ninja hp!
+				double d = 10+160*(ItemJutsu.getDmgMult(event.player)/63);
 				if (d > 0d) {
 					IAttributeInstance maxHealthAttr = event.player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
 					AttributeModifier attr = maxHealthAttr.getModifier(HP_UUID);
@@ -322,13 +323,13 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
 				if (stackwood != null) {
-					defMult+= 0.3f;
+					defMult+= 0.35f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.2f;
+					defMult+= 0.15f;
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.15f;
+					defMult+= 0.25f;
 				}
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
 					defMult+=.15f;
@@ -357,7 +358,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe && EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) < 1) {
 					ItemYoton.EntityBiggerMe PENIS = (ItemYoton.EntityBiggerMe) targetEntity.getRidingEntity();
-					defMult += 0.85f*PENIS.bigRatio;
+					defMult += 0.7f*PENIS.bigRatio;
 				}
 				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
 				float newAmount = amount/defense;

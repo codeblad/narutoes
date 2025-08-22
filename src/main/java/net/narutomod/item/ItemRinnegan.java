@@ -129,7 +129,7 @@ public class ItemRinnegan extends ElementsNarutomodMod.ModElement {
 	}
 
 	public void initElements() {
-		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("RINNEGAN", "narutomod:rinnegan_", 25, new int[]{2, 5, 6, 15}, 0,
+		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("RINNEGAN", "narutomod:rinnegan_", 25, new int[]{2, 5, 6, 10}, 0,
 		 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:dojutsu")), 2.0F);
 
 		this.elements.items.add(() -> new Base(enuma).setUnlocalizedName("rinneganhelmet")

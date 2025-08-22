@@ -84,7 +84,7 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			//}
 			//PlayerInput.Hook.haltTargetInput(targetIn, true);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
-			this.chakraBurn = chakraUsagePerSec + Math.max(ProcedureUtils.getPunchDamage(targetIn) * 40d, 200d);
+			this.chakraBurn = chakraUsagePerSec + Math.max(ProcedureUtils.getPunchDamage(targetIn) * 40d, 150d);
 		}
 
 		@Override
@@ -153,8 +153,8 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				if (user != null && user.isEntityAlive() && ItemJutsu.canTarget(target) && this.canTargetBeSeen()) {
 					this.setPosition(user.posX, user.posY, user.posZ);
-					if (user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed)
-					 || (this.ticksExisted >= 20*5 || this.ticksExisted % 20 == 1 && !Chakra.pathway(user).consume(this.chakraBurn))) {
+					if (user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed)
+					 || (this.ticksExisted >= 20*7 || this.ticksExisted % 20 == 1 && !Chakra.pathway(user).consume(this.chakraBurn))) {
 						this.setDead();
 					} else {
 						if (this.ticksExisted == 1) {

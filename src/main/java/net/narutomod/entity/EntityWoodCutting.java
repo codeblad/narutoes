@@ -147,7 +147,7 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 		protected void onImpact(RayTraceResult result) {
 			if (!this.world.isRemote 
 			 && result.entityHit instanceof EntityLivingBase && !result.entityHit.equals(this.shootingEntity)) {
-				if (result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setProjectile(), this.baseImpactDamage+0.8f* ItemJutsu.getDmgMult(this.shootingEntity))) {
+				if (result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setProjectile(), this.baseImpactDamage+1.1f* ItemJutsu.getDmgMult(this.shootingEntity))) {
 					Vec3d vec = this.getPositionVector().addVector(this.motionX, this.motionY, this.motionZ).subtract(result.entityHit.getPositionVector());
 					float relYaw = ((EntityLivingBase)result.entityHit).renderYawOffset;
 					float yaw = MathHelper.wrapDegrees(this.rotationYaw - relYaw);
@@ -183,7 +183,7 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 						entity.setEntityScale(0.4f + this.rand.nextFloat() * 0.4f);
 						this.world.spawnEntity(entity);
 					}
-					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setDamageBypassesArmor(), this.baseSkewerDamage +4f* ItemJutsu.getDmgMult(this.shootingEntity));
+					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setDamageBypassesArmor(), this.baseSkewerDamage +4.2f* ItemJutsu.getDmgMult(this.shootingEntity));
 				}
 				this.setDead();
 			}
