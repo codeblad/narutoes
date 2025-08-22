@@ -69,7 +69,7 @@ public class EntityPaperBind extends ElementsNarutomodMod.ModElement {
 		private EntityLivingBase targetEntity;
 		private ItemJiton.SwarmTarget swarmTarget;
 		private ProcedureSync.PositionRotationPacket capturedPRP;
-		private static final int MAXTIME = 120;
+		private static final int MAXTIME = 20*8;
 
 		public EC(World world) {
 			super(world);
@@ -184,7 +184,7 @@ public class EntityPaperBind extends ElementsNarutomodMod.ModElement {
 						this.targetEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor(), 4.0f+1.45f*ItemJutsu.getDmgMult(this.user));
 					}
 				} else if (swarmactive && this.targetEntity != null) {
-					this.swarmTarget.setTarget(this.targetEntity.getEntityBoundingBox(), 1.25f, 0.03f, false);
+					this.swarmTarget.setTarget(this.targetEntity.getEntityBoundingBox(), 1.45f, 0.03f, false);
 				}
 				if (swarmactive) {
 					this.swarmTarget.setStartBB(this.user.getEntityBoundingBox());
