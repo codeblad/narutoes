@@ -277,7 +277,7 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ting")), 0.5f, this.rand.nextFloat() * 0.6f + 0.8f);
 					ret = false;
 				} else if (this.isReal && this.getHealth() > 0.0f && this.getHealth() - amount <= this.getMaxHealth() * 0.3333f
-				 && !this.isRiding() && this.ticksExisted > this.lastSusanooTime + this.susanooCD && this.consumeChakra(SUSANOO_CHAKRA)) {
+				 && !this.isRiding() && this.ticksExisted > this.lastSusanooTime + this.susanooCD && this.consumeChakra(SUSANOO_CHAKRA) && false) {
 					this.susanooEntity = new EntitySusanooClothed.EntityCustom(this, false);
 					this.susanooEntity.setLifeSpan(this.susanooCD+800);
 					this.world.spawnEntity(this.susanooEntity);
