@@ -42,7 +42,7 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 					}
 				}
 			}
-			entity.getEntityData().setLong("jumpCool",entity.world.getTotalWorldTime()+2);
+			entity.getEntityData().setLong("jumpCool",entity.world.getTotalWorldTime()+1);
 			if (!leapt) {
 				speed += 0.8d;
 				float yaw = entity.rotationYaw * 0.017453292F;

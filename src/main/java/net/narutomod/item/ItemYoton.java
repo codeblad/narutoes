@@ -104,7 +104,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 			this.stepHeight = scaleIn * this.height / 3.0F;
 			this.setNoAI(true);
 			float ratio = 1+2f*(scaleIn/20);
-			double d = MathHelper.sqrt((4d * scaleIn * scaleIn) + (this.height * this.height));
+			double d = MathHelper.sqrt((3d * scaleIn * scaleIn) + (this.height * this.height));
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("biggerme.reach", d, 0));
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("biggerme.damage", (10+ItemJutsu.getDmgMult(user)*1.1)*ratio, 0));
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(user.getHealth() * scaleIn);

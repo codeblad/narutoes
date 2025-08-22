@@ -62,12 +62,12 @@ import com.google.common.collect.ImmutableList;
 public class ItemMokuton extends ElementsNarutomodMod.ModElement {
 	@ObjectHolder("narutomod:mokuton")
 	public static final Item block = null;
-	public static final ItemJutsu.JutsuEnum WOODBURIAL = new ItemJutsu.JutsuEnum(0, "wood_burial", 'S', 350d, new EntityWoodBurial.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum WOODBURIAL = new ItemJutsu.JutsuEnum(0, "wood_burial", 'S', 300d, new EntityWoodBurial.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WOODPRISON = new ItemJutsu.JutsuEnum(1, "wood_prison", 'S', 50d, new EntityWoodPrison.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WOODHOUSE = new ItemJutsu.JutsuEnum(2, "tooltip.mokuton.rightclick2", 'S', 100d, new JutsuHouse());
 	public static final ItemJutsu.JutsuEnum GOLEM = new ItemJutsu.JutsuEnum(3, "wood_golem", 'S', 800, 1800d, new EntityWoodGolem.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum ARMATTACK = new ItemJutsu.JutsuEnum(4, "wood_arm", 'S', 400, 200d, new EntityWoodArm.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum SPIKE = new ItemJutsu.JutsuEnum(5, "wood_cutting", 'S', 400, 150d, new EntityWoodCutting.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum ARMATTACK = new ItemJutsu.JutsuEnum(4, "wood_arm", 'S', 400, 150d, new EntityWoodArm.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SPIKE = new ItemJutsu.JutsuEnum(5, "wood_cutting", 'S', 400, 100d, new EntityWoodCutting.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum DEEPFOREST = new ItemJutsu.JutsuEnum(6, "wood_forest", 'S', 800, 20d, new EntityDeepForest.EC.Jutsu());
 
 	public ItemMokuton(ElementsNarutomodMod instance) {
@@ -106,6 +106,7 @@ public class ItemMokuton extends ElementsNarutomodMod.ModElement {
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (entity instanceof EntityPlayer && !world.isRemote && entity.ticksExisted % 20 == 6) {
 				((EntityPlayer)entity).getFoodStats().addStats(20, 0.02f);
+				((EntityPlayer)entity).heal(1f);
 			}
 		}
 	}

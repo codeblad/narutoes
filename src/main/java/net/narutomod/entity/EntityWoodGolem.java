@@ -4,6 +4,7 @@ package net.narutomod.entity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -35,6 +36,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 
+import net.narutomod.NarutomodModVariables;
 import net.narutomod.PlayerTracker;
 import net.narutomod.item.ItemSenjutsu;
 import net.narutomod.procedure.ProcedureUtils;
@@ -44,6 +46,8 @@ import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
 
 import com.google.common.collect.Lists;
+
+import java.lang.reflect.Field;
 import java.util.List;
 
 import static net.narutomod.item.ItemMokuton.GOLEM;
@@ -149,6 +153,48 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
+
+		@Override
+		public void travel(float ti, float tj, float tk) {
+			if (this.isBeingRidden() && this.canPassengerSteer()) {
+				Entity entity = this.getControllingPassenger();
+				this.rotationYaw = entity.rotationYaw;
+				this.prevRotationYaw = this.rotationYaw;
+				this.rotationPitch = entity.rotationPitch;
+				this.setRotation(this.rotationYaw, this.rotationPitch);
+				this.jumpMovementFactor = this.getAIMoveSpeed() * 0.5F;
+				this.renderYawOffset = entity.rotationYaw;
+				this.rotationYawHead = entity.rotationYaw;
+				this.stepHeight = this.height / 3.0F;
+				if (entity instanceof EntityLivingBase) {
+					this.checkJump((EntityLivingBase)entity);
+					this.setAIMoveSpeed((float) ProcedureUtils.getModifiedSpeed(this) * 0.5F);
+					float forward = ((EntityLivingBase) entity).moveForward;
+					float strafe = ((EntityLivingBase) entity).moveStrafing;
+					super.travel(strafe, this.jumpMovementFactor, forward);
+				}
+			} else {
+				this.jumpMovementFactor = 0.02F;
+				super.travel(ti, tj, tk);
+			}
+		}
+
+		private void checkJump(EntityLivingBase entity) {
+			if (this.world.isRemote && this.onGround) {
+				Field isJumpingField = ReflectionHelper.findField(EntityLivingBase.class, "isJumping", "field_70703_bu");
+				try {
+					if (isJumpingField.getBoolean(entity)) {
+						//if ((boolean)ReflectionHelper.getPrivateValue(EntityLivingBase.class, entity, 49) && this.onGround) {
+						this.jump();
+						//ReflectionHelper.setPrivateValue(EntityLivingBase.class, entity, false, 49);
+						isJumpingField.setBoolean(entity, false);
+					}
+				} catch (IllegalAccessException e) {
+					System.err.println("What environment is this? "+e);
+				}
+			}
+		}
+
 
 		@Override
 		public void onUpdate() {
