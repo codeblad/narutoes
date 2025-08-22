@@ -308,7 +308,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult += .25f;
 				}
 				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
-					defMult += 0.35f;
+					defMult += 0.3f;
 				}
 				if (cheststack.getItem() == ItemRinnegan.body) {
 					defMult += 1f;
@@ -323,7 +323,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
 				if (stackwood != null) {
-					defMult+= 0.45f;
+					defMult+= 0.5f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
 					defMult+= 0.15f;
