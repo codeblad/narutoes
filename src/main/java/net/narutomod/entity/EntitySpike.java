@@ -44,7 +44,7 @@ public class EntitySpike extends ElementsNarutomodMod.ModElement {
 		public Base(World worldIn) {
 			super(worldIn);
 			this.setOGSize(0.5f, 1.825f);
-			this.maxInGroundTime = 400;
+			this.maxInGroundTime = 20*1;
 			//this.setNoGravity(true);
 		}
 

@@ -173,7 +173,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
-			float damage = 10+(1+1.5f*this.getPower()/5)*2.2f*ItemJutsu.getDmgMult(this.getOwner());
+			float damage = 10+(1+1.5f*this.getPower()/5)*2f*ItemJutsu.getDmgMult(this.getOwner());
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getOwner(), ItemRaiton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.35f;
@@ -228,7 +228,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			super.onUpdate();
 			EntityLivingBase owner = this.getOwner();
 			float f = this.getPower();
-			if (!this.world.isRemote && (owner == null || !owner.isEntityAlive() || this.ticksExisted > 20 + (int)(f * 20))) {
+			if (!this.world.isRemote && (owner == null || !owner.isEntityAlive() || this.ticksExisted > 20 + (int)(f * 10))) {
 				this.setDead();
 			} else {
 				if (this.isInWater()) {
@@ -291,7 +291,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity instanceof EntityPlayer && power >= 1.0f) {
 					entity.world.spawnEntity(new EC((EntityPlayer)entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20*5);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*8);
 					return true;
 				}
 				return false;

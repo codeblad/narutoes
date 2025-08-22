@@ -61,7 +61,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
-		private final int wait = 15;
+		private final int wait = 20;
 		private Vec3d shootVec;
 		private float prevHeadYaw;
 		private float prevHeadPitch;
@@ -88,7 +88,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 			this.setOGSize(1.0F, 1.0F);
 			this.setEntityScale(power);
 			this.power = power;
-			this.mult = 1f+2.5f*(power/5);
+			this.mult = 0.5f+2f*(power/5);
 			this.setLocationAndAngles(shooter.posX, shooter.posY, shooter.posZ, shooter.rotationYaw, shooter.rotationPitch);
 			this.yOrigin = shooter.posY;
 		}
@@ -200,7 +200,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 				float size = this.getEntityScale();
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 6.0F * size, false,
 				  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
-				float damage = 20+(7.5f*this.mult)*ItemJutsu.getDmgMult(this.shootingEntity);
+				float damage = 20+(6.25f*this.mult)*ItemJutsu.getDmgMult(this.shootingEntity);
 				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);
 				if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 					damage*=1.35f;
@@ -231,7 +231,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 				if (power >= 1.0f //&& entity.onGround
 				 && (entity.isOverWater() || Chakra.pathway(entity).consume(ItemSuiton.WATERDRAGON.chakraUsage * 2))) {
 				 	this.createJutsu(entity, power);
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20*5);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*15);
 					return true;
 				}
 				return false;

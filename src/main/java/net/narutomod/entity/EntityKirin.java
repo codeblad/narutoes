@@ -58,7 +58,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
-		private final int wait = 35;
+		private final int wait = 45;
 		private Vec3d shootVec;
 		private float prevHeadYaw;
 		private float prevHeadPitch;
@@ -215,7 +215,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, vec.x, vec.y, vec.z, size, flag, flag);
 				ProcedureAoeCommand.set(this.world, vec.x, vec.y, vec.z, 0.0D, 24.0D).exclude(this).exclude(this.shootingEntity)
-				 .setFire(15).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (35f*ItemJutsu.getDmgMult(this.shootingEntity)+80));
+				 .setFire(15).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (25f*ItemJutsu.getDmgMult(this.shootingEntity)+60));
 			}
 			//this.haltMotion();
 			this.setDead();

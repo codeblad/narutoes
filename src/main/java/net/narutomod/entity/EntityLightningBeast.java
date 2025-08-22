@@ -208,7 +208,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 				EntityLightningArc.spawnAsParticle(this.world, this.posX + this.rand.nextGaussian() * this.width * 0.5d,
 				 this.posY + this.rand.nextDouble() * this.height, this.posZ + this.rand.nextGaussian() * this.width * 0.5d);
 			}
-			if (!this.world.isRemote && (this.ticksExisted > 80 + (int)(this.power * 2.5) || owner == null || !owner.isEntityAlive())) {
+			if (!this.world.isRemote && (this.ticksExisted > 40 + (int)(this.power) || owner == null || !owner.isEntityAlive())) {
 				this.setDead();
 			}
 		}

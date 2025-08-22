@@ -104,7 +104,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.fullScale = fullScale;
 			this.explosionSize = Math.max((int)fullScale - 2, 0);
 			//this.damage = fullScale * 10.0f;
-			this.mult = 2.5f + 5f*(fullScale/10);
+			this.mult = 2f + 4f*(fullScale/10);
 			this.damage = 15 + ItemJutsu.getDmgMult(shooter)*mult;
 			this.damage*= 1.3f;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter,ItemKaton.block);
@@ -204,7 +204,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					this.createJutsu(entity, entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power,
 					 stack.getItem() instanceof RangedItem && ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) <= 0.5f);
 					//if (entity instanceof EntityPlayer)
-					ItemJutsu.setCurrentJutsuCooldown(stack,20);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*4);
 					return true;
 				}
 				return false;
@@ -216,7 +216,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 
 			public void createJutsu(EntityLivingBase entity, double x, double y, double z, float power, boolean isGuided) {
 				EntityBigFireball entityarrow = new EntityBigFireball(entity, power, isGuided);
-				entityarrow.shootPrecise(x, y, z, 0.99f);
+				entityarrow.shootPrecise(x, y, z, 0.97f);
 				entity.world.spawnEntity(entityarrow);
 			}
 
@@ -227,7 +227,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 10.0f;
+				return 30.0f;
 			}
 	
 			@Override

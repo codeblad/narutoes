@@ -134,7 +134,7 @@ public class EntityCrystalPrison extends ElementsNarutomodMod.ModElement {
 					entity.motionX = (this.rand.nextDouble()-0.5d) * 0.05d;
 					entity.motionY = 0.0d;
 					entity.motionZ = (this.rand.nextDouble()-0.5d) * 0.05d;
-					entity.maxInGroundTime = 100;
+					entity.maxInGroundTime = 80;
 					this.world.spawnEntity(entity);
 				}
 				for (EntityLivingBase entity : this.trappedEntities.keySet()) {

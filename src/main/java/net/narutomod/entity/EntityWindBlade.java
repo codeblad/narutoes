@@ -107,7 +107,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 				if (result.entityHit != null) {
 					if (!result.entityHit.equals(this.shootingEntity) && !(result.entityHit instanceof EC)) {
 						result.entityHit.hurtResistantTime = 10;
-						float damage = 5+2.5f*(1+1.5f*(this.power/5))*ItemJutsu.getDmgMult(this.shootingEntity);
+						float damage = 5+2.8f*(1+1.75f*(this.power/5))*ItemJutsu.getDmgMult(this.shootingEntity);
 						ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemFuton.block);
 						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 							damage*=1.35f;
@@ -139,7 +139,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0F) {
 					this.createJutsu(entity, power);
-					ItemJutsu.setCurrentJutsuCooldown(stack,20);
+					ItemJutsu.setCurrentJutsuCooldown(stack,40);
 					return true;
 				}
 				return false;
@@ -158,7 +158,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 40.0f;
 			}
 	
 			@Override

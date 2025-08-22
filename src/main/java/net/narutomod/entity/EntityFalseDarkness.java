@@ -73,7 +73,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY + this.user.getEyeHeight() - 0.2d, this.user.posZ);
-				int buildtime = (int)(20* (1+2*(this.power/20)));
+				int buildtime = (int)(20* (1+1*(this.power/20)));
 				if (this.ticksExisted <= buildtime) {
 					float f = Math.min((float)this.ticksExisted / buildtime, 1.0f);
 					if (this.rand.nextFloat() <= f * 0.2f) {
@@ -136,7 +136,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 60.0f;
+				return 40.0f;
 			}
 
 

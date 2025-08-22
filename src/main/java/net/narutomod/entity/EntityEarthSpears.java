@@ -63,7 +63,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends EntitySpike.Base implements ItemJutsu.IJutsu {
-		private final int growTime = 8;
+		private final int growTime = 4;
 		private final float maxScale = 5.0f;
 		public float damage = 4f;
 

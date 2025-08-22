@@ -68,7 +68,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			this.width = MathHelper.clamp(widthIn,1,15);
 			this.range = MathHelper.clamp(rangeIn,10,120);
 			float mult = 1f+2f*(((float) powa)/25);
-			this.damage = 4+ItemJutsu.getDmgMult(shooterIn)*1.3f*mult;
+			this.damage = 4+ItemJutsu.getDmgMult(shooterIn)*1.65f*mult;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter, ItemKaton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.35f;
@@ -188,7 +188,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu2 implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				this.createJutsu(entity, power, (int)(power * 4f));
+				this.createJutsu(entity, power, (int)(power * 3f));
 				ItemJutsu.setCurrentJutsuCooldown(stack, 120);
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
 				return true;
@@ -200,7 +200,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 
 			public EC createJutsu(EntityLivingBase entity, float power, int duration, int color) {
 				EC entity1 = new EC(entity, 1.0f, power, power);
-				entity1.setDamage(0.75f);
+				entity1.setDamage(0.6f);
 				entity1.wait = 0;
 				entity1.maxLife = duration;
 				entity1.setFlameColor(color);
