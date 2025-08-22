@@ -60,13 +60,13 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 		
 		public EC(World world) {
 			super(world);
-			this.setOGSize(0.25f, 1.825f);
+			this.setOGSize(1f, 1.5f);
 			this.maxInGroundTime = 200;
 		}
 
 		public EC(EntityLivingBase userIn) {
 			super(userIn);
-			this.setOGSize(0.25f, 1.825f);
+			this.setOGSize(1f, 1.5f);
 			this.maxInGroundTime = 200;
 			this.setNoGravity(false);
 		}
@@ -147,7 +147,7 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 		protected void onImpact(RayTraceResult result) {
 			if (!this.world.isRemote 
 			 && result.entityHit instanceof EntityLivingBase && !result.entityHit.equals(this.shootingEntity)) {
-				if (result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setProjectile(), this.baseImpactDamage+1.1f* ItemJutsu.getDmgMult(this.shootingEntity))) {
+				if (result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setProjectile(), this.baseImpactDamage+1.8f* ItemJutsu.getDmgMult(this.shootingEntity))) {
 					Vec3d vec = this.getPositionVector().addVector(this.motionX, this.motionY, this.motionZ).subtract(result.entityHit.getPositionVector());
 					float relYaw = ((EntityLivingBase)result.entityHit).renderYawOffset;
 					float yaw = MathHelper.wrapDegrees(this.rotationYaw - relYaw);
@@ -183,7 +183,7 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 						entity.setEntityScale(0.4f + this.rand.nextFloat() * 0.4f);
 						this.world.spawnEntity(entity);
 					}
-					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setDamageBypassesArmor(), this.baseSkewerDamage +4.2f* ItemJutsu.getDmgMult(this.shootingEntity));
+					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setDamageBypassesArmor(), this.baseSkewerDamage +5f* ItemJutsu.getDmgMult(this.shootingEntity));
 				}
 				this.setDead();
 			}
@@ -206,7 +206,7 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 				Vec3d vec1 = vec.add(attacker.getLookVec());
 				Vec3d vec2 = target.getPositionVector().addVector(0, target.height * 0.5, 0).subtract(vec);
 				vec2 = vec2.addVector(0, MathHelper.sqrt(vec2.x * vec2.x + vec2.z * vec2.z) * 0.1d, 0).add(vec1);
-				createJutsu(attacker.world, attacker, vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z, 2.0f, 0.0f);
+				createJutsu(attacker.world, attacker, vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z, 3.0f, 0.0f);
 			}
 
 			public static void createJutsu(World world, @Nullable EntityLivingBase shooter,

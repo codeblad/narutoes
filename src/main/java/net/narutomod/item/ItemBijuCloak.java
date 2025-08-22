@@ -330,7 +330,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 			entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 5, false, false));
 			entity.addPotionEffect(new PotionEffect(PotionReach.potion, 22, level - 1, false, false));
 			if (entity.getHealth() < entity.getMaxHealth() && entity.getHealth() > 0.0f) {
-				entity.heal((float)level * 0.25f);
+				entity.heal((float)level * 0.1f);
 			}
 			if (entity instanceof  EntityPlayer) {
 				((EntityPlayer) entity).getFoodStats().addStats(1,0);

@@ -97,9 +97,9 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 			this.stepHeight = this.height / 3;
 			Chakra.Pathway cp = Chakra.pathway(summonerIn);
 			float health = (20+ (80*(ItemJutsu.getDmgMult(summonerIn)/63))) * PlayerTracker.getDefense(summonerIn);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2.9+800);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(50.0D+ItemJutsu.getDmgMult(summonerIn)*2.8);
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*3+800);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(50.0D+ItemJutsu.getDmgMult(summonerIn)*3.35f);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
 			//float ratio = summonerIn.getHealth()/summonerIn.getMaxHealth();
 			this.setHealth(this.getMaxHealth());
 			this.chakraBurn = chakraUsagePerSec;
@@ -116,7 +116,8 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(20.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D);
+			this.getEntityAttribute(EntityLivingBase.SWIM_SPEED).setBaseValue(0.6D);
 		}
 
 		@Override
@@ -148,7 +149,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 					if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 						ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
 						//(30*20)+this.ticksExisted+this.ticksExisted/2
-						item.setJutsuCooldown(stack, GOLEM, 20*35);
+						item.setJutsuCooldown(stack, GOLEM, 20*20);
 					}
 				}
 			}

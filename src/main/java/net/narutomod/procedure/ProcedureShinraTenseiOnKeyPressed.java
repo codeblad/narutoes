@@ -128,8 +128,8 @@ public class ProcedureShinraTenseiOnKeyPressed extends ElementsNarutomodMod.ModE
 			}
 			if (entity instanceof EntityPlayer && !entity.world.isRemote) {
 				((EntityPlayer)entity).sendStatusMessage(new TextComponentString("Power " + (int)power), true);
-			}float damage = 4+25*(float)(power/100);
-			ProcedureAoeCommand.set(entity, 0d, power).exclude(entity).damageEntities(ItemJutsu.causeJutsuDamage(entity, null).setDamageBypassesArmor(),  60+damage*ItemJutsu.getDmgMult(entity)).knockback(2f).noGravity(false);
+			}float damage = 2+20*(float)(power/100);
+			ProcedureAoeCommand.set(entity, 0d, power*0.75).exclude(entity).damageEntities(ItemJutsu.causeJutsuDamage(entity, null).setDamageBypassesArmor(),  30+damage*ItemJutsu.getDmgMult(entity)).knockback(2f).noGravity(false);
 			for (Entity entity2 : ProcedureAoeCommand.getInstance().getEntitiesList()) {
 				if (entity2 instanceof ItemJutsu.IJutsu && !(entity2 instanceof EntityLivingBase)) {
 					entity2.setDead();

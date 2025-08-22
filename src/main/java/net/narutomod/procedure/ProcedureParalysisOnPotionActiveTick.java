@@ -58,7 +58,7 @@ public class ProcedureParalysisOnPotionActiveTick extends ElementsNarutomodMod.M
 			UUID uuid = UUID.fromString("c69af92a-b96d-49b7-a396-9b3b0d77edd5");
 			IAttributeInstance iattributeinstance = ((EntityLivingBase) entity).getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
 			iattributeinstance.removeModifier(uuid);
-			iattributeinstance.applyModifier(new AttributeModifier(uuid, "Paralysis", -Math.min((double) remainingTicks / 100d, 1d), 2));
+			iattributeinstance.applyModifier(new AttributeModifier(uuid, "Paralysis", -Math.min((double) remainingTicks / 150d, 1d), 2));
 			if (entity instanceof EntityLivingBase && ((EntityLivingBase) entity).isPotionActive(MobEffects.JUMP_BOOST)) {
 				((EntityLivingBase) entity).removePotionEffect(MobEffects.JUMP_BOOST);
 			}

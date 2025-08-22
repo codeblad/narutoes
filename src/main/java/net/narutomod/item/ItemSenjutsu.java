@@ -178,7 +178,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 						living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868"), "sagemode.damage", d, 0));
 					}
 					if (this.getSageType(itemstack) == Type.SLUG && living.getHealth() < living.getMaxHealth() && living.ticksExisted%20 == 0) {
-						living.heal(0.25f);
+						living.heal(0.2f);
 					}
 					/*if (entity instanceof EntityPlayer) {
 
@@ -425,7 +425,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 				stack.getTagCompound().setDouble(SAGECHAKRADEPLETIONAMOUNT, cp.getAmount());
 				float f = stack.getItem() == block && ((RangedItem)stack.getItem()).getCurrentJutsu(stack) == SAGEMODE
 				 ? ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) : 1.0f;
-				cp.consume(-0.6f / f, true);
+				cp.consume(-0.7f / f, true);
 				//stack.getTagCompound().setBoolean(SAGEMODEACTIVATEDKEY, true);
 				if (entity instanceof EntityPlayerMP) {
 					OverlayChakraDisplay.ShowFlamesMessage.send((EntityPlayerMP)entity, true);
@@ -447,7 +447,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 	
 		@Override
 		public float getPowerupDelay() {
-			return 5.0f;
+			return 3.0f;
 		}
 	
 		@Override

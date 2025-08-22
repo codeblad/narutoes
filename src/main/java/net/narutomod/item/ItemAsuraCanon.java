@@ -71,7 +71,7 @@ public class ItemAsuraCanon extends ElementsNarutomodMod.ModElement {
 
 	public static class RangedItem extends Item {
 		public RangedItem() {
-			this.setMaxDamage(50);
+			this.setMaxDamage(20);
 			this.setFull3D();
 			this.setUnlocalizedName("asuracanon");
 			this.setRegistryName("asuracanon");
@@ -109,7 +109,7 @@ public class ItemAsuraCanon extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EntityMissile extends EntityScalableProjectile.Base {
-		public static float explosivePower = 6.0F;
+		public static float explosivePower = 5.0F;
 		private Entity target;
 
 		public EntityMissile(World worldIn) {
@@ -145,7 +145,7 @@ public class ItemAsuraCanon extends ElementsNarutomodMod.ModElement {
 					}
 				}).entityHit;
 			}
-			if (!this.world.isRemote && this.ticksInAir > 50) {
+			if (!this.world.isRemote && this.ticksInAir > 30) {
 				this.setDead();
 			}
 		}
@@ -154,7 +154,7 @@ public class ItemAsuraCanon extends ElementsNarutomodMod.ModElement {
 		protected void onImpact(RayTraceResult result) {
 			if (!this.world.isRemote && (result.entityHit == null || !result.entityHit.equals(this.shootingEntity))) {
 				ProcedureAoeCommand.set(this.world, this.posX,  this.posY, this.posZ, 0d, this.explosivePower).exclude(this.shootingEntity)
-						.damageEntities(ItemJutsu.causeJutsuDamage(this,this.shootingEntity),35+ItemJutsu.getDmgMult(this.shootingEntity)*3f);
+						.damageEntities(ItemJutsu.causeJutsuDamage(this,this.shootingEntity),20+ItemJutsu.getDmgMult(this.shootingEntity)*1.95f);
 				this.world.createExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosivePower,
 				 ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 				this.setDead();

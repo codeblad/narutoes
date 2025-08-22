@@ -107,8 +107,10 @@ public class EntityWoodPrison extends ElementsNarutomodMod.ModElement {
 				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class,
 				 new AxisAlignedBB(this.posX - this.radius - 1, this.posY, this.posZ - this.radius - 1, 
 				 this.posX + this.radius + 1, this.posY + this.tHeight + 1, this.posZ + this.radius + 1))) {
-				 	entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 120, 3, false, false));
-					entity.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 1200, 2, false, false));
+					if (entity != this.owner) {
+						entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 150, 3, false, false));
+						entity.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 1200, 2, false, false));
+					}
 				}
 				int bottom = Math.min(-this.tHeight, -3);
 				Map<BlockPos, IBlockState> map = Maps.newHashMap();
@@ -160,12 +162,12 @@ public class EntityWoodPrison extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 20.0f;
+				return 5.0f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 40.0f;
+				return 50.0f;
 			}
 		}
 

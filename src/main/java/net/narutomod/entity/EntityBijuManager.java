@@ -662,6 +662,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 				biju.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(150.0D);
 				biju.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(800+67* ItemJutsu.getDmgMult(this.jinchurikiPlayer));
 				biju.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.65);
+				biju.setHealth(biju.getMaxHealth());
 				biju.setLifeSpan(Math.min(this.cloakXp[2],1800) + 2400);
 			}
 			this.cloakCD = l+120*20;

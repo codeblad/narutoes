@@ -305,13 +305,13 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				ItemStack cheststack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 				ItemStack headstack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 				if (headstack.getItem() == ItemRinnegan.helmet ||headstack.getItem() == ItemTenseigan.helmet  ) {
-					defMult += .6f;
+					defMult += .25f;
 				}
 				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
-					defMult += 0.8f;
+					defMult += 0.35f;
 				}
 				if (cheststack.getItem() == ItemRinnegan.body) {
-					defMult += 1.5f;
+					defMult += 1f;
 				}
 				if (cheststack.getItem() == ItemBoneArmor.body) {
 					if (ItemBoneArmor.isLarchActive(cheststack)) {
@@ -319,11 +319,11 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				if (cheststack.getItem() == ItemTenseigan.body) {
-					defMult += .65f;
+					defMult += .5f;
 				}
 				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
 				if (stackwood != null) {
-					defMult+= 0.35f;
+					defMult+= 0.45f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
 					defMult+= 0.15f;
@@ -341,7 +341,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
 						defMult+= 0.1f;
 					} else {
-						defMult+= 0.6f;
+						defMult+= 0.65f;
 					}
 				}
 				if (ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity) > 0) {
@@ -358,7 +358,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe && EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) < 1) {
 					ItemYoton.EntityBiggerMe PENIS = (ItemYoton.EntityBiggerMe) targetEntity.getRidingEntity();
-					defMult += 0.25f+1.25f*(PENIS.bigRatio/3);
+					defMult += 0.2f+0.75f*(PENIS.bigRatio/3);
 				}
 				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
 				float newAmount = amount/defense;
