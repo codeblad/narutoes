@@ -214,7 +214,7 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 30.0f;
 			}
 
 			@Override
@@ -272,7 +272,7 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 30.0f;
 			}
 
 			@Override
