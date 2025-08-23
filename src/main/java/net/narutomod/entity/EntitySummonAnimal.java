@@ -30,7 +30,8 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.play.server.SPacketSetPassengers;
 import net.minecraft.item.Item;
-import net.minecraft.block.material.Material;
+
+import net.minecraft.block.material.Material;
 import net.minecraft.pathfinding.Path;
 import net.minecraft.pathfinding.PathNavigateGround;
 import net.minecraft.pathfinding.PathFinder;
@@ -64,7 +65,7 @@ public class EntitySummonAnimal extends ElementsNarutomodMod.ModElement {
 		protected static final DataParameter<Integer> AGE = EntityDataManager.<Integer>createKey(Base.class, DataSerializers.VARINT);
 		protected static final DataParameter<Optional<UUID>> OWNER_UNIQUE_ID = EntityDataManager.<Optional<UUID>>createKey(Base.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 		protected int ageTicks;
-		protected int lifeSpan = 1200;
+		protected int lifeSpan = 3600;
 		protected float ogWidth;
 		protected float ogHeight;
 
@@ -72,7 +73,8 @@ public class EntitySummonAnimal extends ElementsNarutomodMod.ModElement {
 			super(w);
 			this.enablePersistence();
 		}
-
+
+
 		public Base(EntityLivingBase summonerIn) {
 			this(summonerIn.world);
 			//this.postScaleFixup();

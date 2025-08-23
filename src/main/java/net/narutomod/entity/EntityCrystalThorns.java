@@ -211,10 +211,10 @@ public class EntityCrystalThorns extends ElementsNarutomodMod.ModElement {
 				for (EntityLivingBase entity : 
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
 					if (!entity.equals(this.user)) {
-						entity.hurtResistantTime = 10;
+						entity.hurtResistantTime = 5;
 						//entity.getEntityData().setBoolean("TempData_disableKnockback", true);
 						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),
-						 10+ ItemJutsu.getDmgMult(this.shootingEntity)*3.7f * (1f - (float)(this.ticksAlive - 1) / this.growTime));
+						 15+ ItemJutsu.getDmgMult(this.shootingEntity)*19f);
 					}
 				}
 			}

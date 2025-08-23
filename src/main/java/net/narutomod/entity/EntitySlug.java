@@ -304,7 +304,7 @@ public class EntitySlug extends ElementsNarutomodMod.ModElement {
 	
 		@Override
 		public float getPowerupDelay() {
-			return 80.0f;
+			return 50.0f;
 		}
 	}
 

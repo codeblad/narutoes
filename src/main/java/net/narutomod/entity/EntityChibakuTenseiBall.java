@@ -277,7 +277,7 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				} else {
-					entity.attackEntityFrom(DamageSource.FLY_INTO_WALL, 1f);
+					entity.attackEntityFrom(DamageSource.FLY_INTO_WALL, 2f);
 					if (entity instanceof EntityLivingBase) {
 						((EntityLivingBase)entity).addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 2, 3, false, false));
 					}
@@ -347,7 +347,7 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public float getCollisionDamage() {
-			return 500;
+			return 900;
 		}
 
 		public Satellite(EntityLivingBase summonerIn, List<? extends BlockPos> list, int fallTime) {

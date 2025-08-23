@@ -259,8 +259,8 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 						this.shoot(hitres);
 						if (this.hitTrace.typeOfHit != RayTraceResult.Type.MISS) {
 							ProcedureAoeCommand.set(this.world, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z, 0d, 2d)
-							 .exclude(this.shootingEntity).resetHurtResistanceTime()
-							 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 8+ItemJutsu.getDmgMult(this.shootingEntity)*0.65f);
+							 .exclude(this.shootingEntity)//.resetHurtResistanceTime()
+							 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 8+ItemJutsu.getDmgMult(this.shootingEntity)*4f);
 							this.world.newExplosion(this.shootingEntity, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z,
 							 3, this.rand.nextInt(4) == 0,
 							 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));

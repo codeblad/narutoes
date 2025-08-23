@@ -308,7 +308,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult += .3f;
 				}
 				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
-					defMult += 0.5f;
+					defMult += 0.3f;
 				}
 				if (cheststack.getItem() == ItemRinnegan.body) {
 					defMult += 1.2f;

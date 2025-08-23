@@ -82,7 +82,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("BIJU_CLOAK", "narutomod:sasuke_",
-		 1024, new int[]{10, 10, 10, 10}, 0, null, 2f);
+		 1024, new int[]{10, 10, 10, 10}, 0, null, 1f);
 
 		elements.items.add(() -> new ItemArmor(enuma, 0, EntityEquipmentSlot.HEAD) {
 			@Override

@@ -110,7 +110,7 @@ public class ItemBlackReceiver extends ElementsNarutomodMod.ModElement {
 				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 5, 0);
 				entityarrow.setSilent(true);
 				entityarrow.setIsCritical(true);
-				entityarrow.setDamage(40+ItemJutsu.getDmgMult(entityLivingBase)*1.9);
+				entityarrow.setDamage(30+ItemJutsu.getDmgMult(entityLivingBase)*1.2);
 				entityarrow.setKnockbackStrength(0);
 				itemstack.damageItem(1, entity);
 				world.playSound(null, entity.posX, entity.posY, entity.posZ,
@@ -118,7 +118,7 @@ public class ItemBlackReceiver extends ElementsNarutomodMod.ModElement {
 				 SoundCategory.NEUTRAL, 1, 1f / (itemRand.nextFloat() * 0.5f + 1f) + (power / 2));
 				entityarrow.pickupStatus = EntityArrow.PickupStatus.DISALLOWED;
 				world.spawnEntity(entityarrow);
-				entity.getCooldownTracker().setCooldown(itemstack.getItem(), 20*7);
+				entity.getCooldownTracker().setCooldown(itemstack.getItem(), 20*12);
 			}
 		}
 
