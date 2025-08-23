@@ -54,6 +54,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private EntityLivingBase summoner;
 		private int duration;
+		private float power;
 		private ItemStack rantonstack;
 
 		public EC(World a) {
@@ -66,6 +67,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			this.setSize(0.01f, 0.01f);
 			this.summoner = summonerIn;
 			this.duration = 45;
+			this.power = powerIn;
 			this.rantonstack = stack;
 			this.setIdlePosition();
 		}
@@ -114,7 +116,8 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 		private void setLightningAt(Vec3d targetVec) {
 			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 			 this.getPositionVector(), targetVec, 0xc00000ff, 10, 0.1f);
-			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 40+8.65f*ItemJutsu.getDmgMult(this.summoner), this.summoner);
+			float dmgMult = 0.25f+0.75f*1/10*this.power;
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 40+8.25f*dmgMult*ItemJutsu.getDmgMult(this.summoner), this.summoner);
 			this.world.spawnEntity(entity2);
 		}
 

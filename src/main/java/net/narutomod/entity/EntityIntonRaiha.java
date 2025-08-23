@@ -94,7 +94,7 @@ public class EntityIntonRaiha extends ElementsNarutomodMod.ModElement {
 					 .rotatePitch((this.rand.nextFloat()-0.5f) * 1.0472f).add(this.shooter.getPositionEyes(1.0f));
 					float f = 5.0f + this.power * 5.0f + 1.0f / ((float)this.ticksExisted - duration - 0.4f);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, vec1, vec2, 0x80FF00FF, (int)f, 0.4f, 0.04f);
-					float damage = 3+ItemJutsu.getDmgMult(this.shooter)*0.03f*(1+2*(this.power/6));
+					float damage = 3+ItemJutsu.getDmgMult(this.shooter)*0.05f*(1.5f+3*(this.power/6));
 					entity.setDamage(ItemJutsu.causeSenjutsuDamage(this, this.shooter), damage, true, this.shooter);
 					this.world.spawnEntity(entity);
 				}

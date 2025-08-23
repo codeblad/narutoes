@@ -67,7 +67,7 @@ public class EntityRantonKoga extends ElementsNarutomodMod.ModElement {
 				Vec3d vec1 = vec.add(this.shooter.getPositionEyes(1f).subtract(0d, 0.15d, 0d));
 				Vec3d vec2 = vec.scale(this.power * 4f).add(this.shooter.getPositionEyes(1.0f));
 				EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, vec1, vec2, 0x80FF00FF, 1, 0f, 0f, 0);
-				entity.setDamage(ItemJutsu.causeSenjutsuDamage(this, this.shooter), 15f + ItemJutsu.getDmgMult(this.shooter)*(1+1*(this.power/10)), true, this.shooter);
+				entity.setDamage(ItemJutsu.causeSenjutsuDamage(this, this.shooter), 15f + ItemJutsu.getDmgMult(this.shooter)*(0.5f+1*(this.power/10)), true, this.shooter);
 				this.world.spawnEntity(entity);
 				if (this.ticksExisted > 20) {
 					this.setDead();
