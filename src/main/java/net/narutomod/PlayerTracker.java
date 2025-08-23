@@ -341,7 +341,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
 						defMult+= 0.25f;
 					} else {
-						defMult+= 0.65f;
+						defMult+= 0.85f;
 					}
 				}
 				if (ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity) > 0) {
