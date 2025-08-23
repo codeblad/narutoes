@@ -343,7 +343,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			if (punchnum >= 0) {
 				EntitySekizo bullet = new EntitySekizo(attacker);
 				float mult = 1+5*((float) punchnum /4);
-				float damage = 800+(ItemJutsu.getDmgMult(attacker)*21F)*mult;
+				float damage = 800+(ItemJutsu.getDmgMult(attacker)*20F)*mult;
 				bullet.shoot(30, damage);
 				world.playSound(null, attacker.posX, attacker.posY, attacker.posZ,
 				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:sekizo")),
@@ -836,7 +836,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && this.shootingEntity != null) {
 				ProcedureAoeCommand.set(this, 0.0D, 0.5d * this.getEntityScale()).exclude(this.shootingEntity)
 						.damageEntities(DamageSource.causeIndirectDamage(this, this.shootingEntity).setDamageBypassesArmor(),
-								500+ItemJutsu.getDmgMult(this.shootingEntity)*24);
+								200+ItemJutsu.getDmgMult(this.shootingEntity)*15);
 				this.shootingEntity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 40d);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 70.0F, false,
 						ForgeEventFactory.getMobGriefingEvent(this.world, (EntityLivingBase) this.shootingEntity));

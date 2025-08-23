@@ -208,7 +208,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 						if (entity instanceof EntityPlayer)
 							((EntityPlayer) entity).getFoodStats().addStats(2,0);
 						//living.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 22, 0, false, false));
-						cp.consume(50d);
+						cp.consume(25d);
 					}
 				}
 				if (entity.ticksExisted % 40 == 5 && entity instanceof EntityPlayer) {
@@ -425,7 +425,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 				stack.getTagCompound().setDouble(SAGECHAKRADEPLETIONAMOUNT, cp.getAmount());
 				float f = stack.getItem() == block && ((RangedItem)stack.getItem()).getCurrentJutsu(stack) == SAGEMODE
 				 ? ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) : 1.0f;
-				cp.consume(-0.7f / f, true);
+				cp.consume(-0.8f / f, true);
 				//stack.getTagCompound().setBoolean(SAGEMODEACTIVATEDKEY, true);
 				if (entity instanceof EntityPlayerMP) {
 					OverlayChakraDisplay.ShowFlamesMessage.send((EntityPlayerMP)entity, true);

@@ -236,7 +236,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			if (event.phase == TickEvent.Phase.START && event.player instanceof EntityPlayerMP) {
 				//double d = getBattleXp(event.player) * 0.0008d;
 				// ninja hp!
-				double d = 15+165*(ItemJutsu.getDmgMult(event.player)/63);
+				double d = 25+185*(ItemJutsu.getDmgMult(event.player)/63);
 				if (d > 0d) {
 					IAttributeInstance maxHealthAttr = event.player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
 					AttributeModifier attr = maxHealthAttr.getModifier(HP_UUID);

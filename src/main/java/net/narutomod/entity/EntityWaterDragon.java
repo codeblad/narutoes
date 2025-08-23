@@ -88,7 +88,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 			this.setOGSize(1.0F, 1.0F);
 			this.setEntityScale(power);
 			this.power = power;
-			this.mult = 0.5f+2f*(power/5);
+			this.mult = 0.5f+1.75f*(power/5);
 			this.setLocationAndAngles(shooter.posX, shooter.posY, shooter.posZ, shooter.rotationYaw, shooter.rotationPitch);
 			this.yOrigin = shooter.posY;
 		}
@@ -200,7 +200,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 				float size = this.getEntityScale();
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 6.0F * size, false,
 				  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
-				float damage = 20+(6.25f*this.mult)*ItemJutsu.getDmgMult(this.shootingEntity);
+				float damage = 20+(6f*this.mult)*ItemJutsu.getDmgMult(this.shootingEntity);
 				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);
 				if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 					damage*=1.35f;
