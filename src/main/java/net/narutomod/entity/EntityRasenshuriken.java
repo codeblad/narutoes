@@ -191,7 +191,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 		protected void doImpactDamage() {
 			ProcedureAoeCommand.set(this.world, this.impactVec.x, this.impactVec.y, this.impactVec.z, 0d, this.width/2)
 			  .exclude(this.shootingEntity).exclude(EntityTruthSeekerBall.EntityCustom.class).resetHurtResistanceTime()
-			  .damageEntities(this.damageSource, (10+ (1+3f*(this.fullScale/5)) * ItemJutsu.getDmgMult(this.shootingEntity)*0.095f) * this.impactDamageMultiplier )
+			  .damageEntities(this.damageSource, (10+ (1+4.5f*(this.fullScale/5)) * ItemJutsu.getDmgMult(this.shootingEntity)*0.095f) * this.impactDamageMultiplier )
 			  .motion(0d, 0d, 0d);
 		}
 

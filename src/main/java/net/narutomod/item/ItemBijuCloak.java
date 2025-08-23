@@ -321,16 +321,16 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 		}
 		if (!entity.world.isRemote && entity.ticksExisted % 20 == 4) {
 			//entity.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 5, 0, false, false));
-			int d = (int) (10+ItemJutsu.getDmgMult(entity)*0.85);
+			int d = (int) (10+ItemJutsu.getDmgMult(entity)*0.75);
 			if (level == 2) {
-				d = (int) (15+ItemJutsu.getDmgMult(entity)*2.15);
+				d = (int) (15+ItemJutsu.getDmgMult(entity)*2);
 			}
 			entity.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 22, d, false, false));
-			entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, level * 8, false, false));
+			entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, level * 7, false, false));
 			entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 5, false, false));
 			entity.addPotionEffect(new PotionEffect(PotionReach.potion, 22, level - 1, false, false));
 			if (entity.getHealth() < entity.getMaxHealth() && entity.getHealth() > 0.0f) {
-				entity.heal((float)level * 0.1f);
+				entity.heal((float)level * 0.08f);
 			}
 			if (entity instanceof  EntityPlayer) {
 				((EntityPlayer) entity).getFoodStats().addStats(1,0);
@@ -344,7 +344,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 			int attackTime = compound.getInteger("attackTime");
 			Entity target = compound.hasKey("targetId") ? entity.world.getEntityByID(compound.getInteger("targetId")) : null;
 			if (entity.swingProgressInt == 1) {
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 15d, 3d);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 20d, 3d);
 				if (res != null && res.entityHit instanceof EntityLivingBase && res.entityHit.isEntityAlive()) {
 					target = res.entityHit;
 					compound.setInteger("targetId", target.getEntityId());
@@ -358,7 +358,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 					ProcedureUtils.setVelocity(entity, d0 * 0.5, d1 * 0.5 + d3 * 0.025d, d2 * 0.5);
 				}
 			}
-			if (attackTime < 12 && target != null && target.getDistanceSq(entity) < 25d) {
+			if (attackTime < 40 && target != null && target.getDistanceSq(entity) < 20d) {
 				((EntityPlayer)entity).attackTargetEntityWithCurrentItem(target);
 				compound.removeTag("targetId");
 			}

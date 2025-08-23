@@ -168,11 +168,8 @@ public class ItemBlackReceiver extends ElementsNarutomodMod.ModElement {
 	}
 
 	protected static void onHitEntity(EntityLivingBase entity) {
-		int amplifier = 1;
-		if (entity.isPotionActive(PotionHeaviness.potion)) {
-			amplifier += entity.getActivePotionEffect(PotionHeaviness.potion).getAmplifier();
-		}
-		entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 300, amplifier, false, false));
+		int amplifier = 3;
+		entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20, amplifier, false, false));
 		//if (entity.isPotionActive(MobEffects.JUMP_BOOST) && entity.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() > -5) {
 		//	entity.removePotionEffect(MobEffects.JUMP_BOOST);
 		//}

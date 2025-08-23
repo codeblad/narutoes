@@ -59,7 +59,7 @@ public class ItemRinnegan extends ElementsNarutomodMod.ModElement {
 	public static final Item legs = null;
 	private static final String RINNESHARINGAN_KEY = NarutomodModVariables.RINNESHARINGAN_ACTIVATED;
 	protected static final UUID RINNESHARINGAN_MODIFIER = UUID.fromString("135da083-a632-483e-85bd-2281f15ca7e0");
-	public static final double SHINRATENSEI_CHAKRA_USAGE = 10d;
+	public static final double SHINRATENSEI_CHAKRA_USAGE = 15d;
 	public static final double BANSHOTENIN_CHAKRA_USAGE = 0.5d; // per tick
 	public static final double CHIBAKUTENSEI_CHAKRA_USAGE = 1500d;
 	public static final double NARAKAPATH_CHAKRA_USAGE = 100d;

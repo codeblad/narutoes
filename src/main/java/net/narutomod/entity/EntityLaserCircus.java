@@ -65,7 +65,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			this(summonerIn.world);
 			this.setSize(0.01f, 0.01f);
 			this.summoner = summonerIn;
-			this.duration = 20;
+			this.duration = 45;
 			this.rantonstack = stack;
 			this.setIdlePosition();
 		}
@@ -96,7 +96,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 					this.playSound(SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:electricity")), 1.0f, this.rand.nextFloat() * 0.6f + 0.6f);
 				}
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 55d);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 60d);
 				if (res != null) {
 					this.setLightningAt(res.hitVec);
 				}
@@ -114,7 +114,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 		private void setLightningAt(Vec3d targetVec) {
 			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 			 this.getPositionVector(), targetVec, 0xc00000ff, 10, 0.1f);
-			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 40+7f*ItemJutsu.getDmgMult(this.summoner), this.summoner);
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 40+8.65f*ItemJutsu.getDmgMult(this.summoner), this.summoner);
 			this.world.spawnEntity(entity2);
 		}
 

@@ -600,7 +600,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			return flag;
 		}
 
-		@Override
+		/*@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
 			if (super.attackEntityAsMob(entityIn)) {
 				this.world.createExplosion(this, entityIn.posX, entityIn.posY, entityIn.posZ, 10f,
@@ -611,7 +611,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				return true;
 			}
 			return false;
-		}
+		}*/
 
 		public boolean couldBreakBlocks() {
 			return this.world.getGameRules().getBoolean("mobGriefing");

@@ -206,6 +206,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 						deactivateSageMode(itemstack, living);
 					} else if (living.ticksExisted % 20 == 10) {
 						if (entity instanceof EntityPlayer)
+							((EntityPlayer) entity).addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 4, false, false));
 							((EntityPlayer) entity).getFoodStats().addStats(2,0);
 						//living.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 22, 0, false, false));
 						cp.consume(25d);

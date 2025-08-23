@@ -96,7 +96,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static float getDefense(Entity entity) {
-		return 1.5f+16*ItemJutsu.getDmgMult(entity)/63;
+		return 1.5f+15*ItemJutsu.getDmgMult(entity)/63;
 	}
 
 	private static void logBattleExp(EntityPlayer entity, double xp) {
@@ -236,7 +236,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			if (event.phase == TickEvent.Phase.START && event.player instanceof EntityPlayerMP) {
 				//double d = getBattleXp(event.player) * 0.0008d;
 				// ninja hp!
-				double d = 25+185*(ItemJutsu.getDmgMult(event.player)/63);
+				double d = 30+190*(ItemJutsu.getDmgMult(event.player)/63);
 				if (d > 0d) {
 					IAttributeInstance maxHealthAttr = event.player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
 					AttributeModifier attr = maxHealthAttr.getModifier(HP_UUID);
@@ -308,10 +308,10 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult += .3f;
 				}
 				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
-					defMult += 0.45f;
+					defMult += 0.5f;
 				}
 				if (cheststack.getItem() == ItemRinnegan.body) {
-					defMult += 1f;
+					defMult += 1.2f;
 				}
 				if (cheststack.getItem() == ItemBoneArmor.body) {
 					if (ItemBoneArmor.isLarchActive(cheststack)) {
@@ -319,29 +319,29 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				if (cheststack.getItem() == ItemTenseigan.body) {
-					defMult += .5f;
+					defMult += .65f;
 				}
 				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
 				if (stackwood != null) {
 					defMult+= 0.5f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.1f;
+					defMult+= 0.15f;
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.2f;
+					defMult+= 0.35f;
 				}
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
-					defMult+=.15f;
+					defMult+=.2f;
 				}
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
 					defMult+=.3f;
 				}
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
-						defMult+= 0.25f;
+						defMult+= 0.3f;
 					} else {
-						defMult+= 0.85f;
+						defMult+= 1.2f;
 					}
 				}
 				if (ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity) > 0) {
@@ -356,9 +356,9 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 						defMult+= 3.5;
 					}
 				}
-				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe && EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) < 1) {
+				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
 					ItemYoton.EntityBiggerMe PENIS = (ItemYoton.EntityBiggerMe) targetEntity.getRidingEntity();
-					defMult += 0.2f+0.75f*(PENIS.bigRatio/3);
+					defMult += 0.4f+0.9f*(PENIS.bigRatio/3);
 				}
 				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
 				float newAmount = amount/defense;

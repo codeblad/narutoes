@@ -162,16 +162,25 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 			if (event.getSource().getImmediateSource() instanceof EntityLivingBase && !event.getSource().isExplosion()
 			 && event.getSource() instanceof EntityDamageSource && !((EntityDamageSource)event.getSource()).getIsThornsDamage()) {
 				EntityLivingBase attacker = (EntityLivingBase)event.getSource().getImmediateSource();
-				if (attacker.isPotionActive(potion)) {
-					int amplifier = attacker.getActivePotionEffect(potion).getAmplifier();
-					if (Chakra.pathway(attacker).consume((double)amplifier*0.95)) {
-						EntityLivingBase target = event.getEntityLiving();
-						target.world.playSound(null, target.posX, target.posY, target.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE,
-						  SoundCategory.BLOCKS, 1.0F, (1.0F + (target.getRNG().nextFloat() - target.getRNG().nextFloat()) * 0.2F) * 0.7F);
-						new Punch(attacker.world).execute(attacker, MathHelper.clamp((double)amplifier * 0.4d,0.0d,6d), MathHelper.clamp(0.1d * amplifier,0.0d,12d));
-						event.setAmount(event.getAmount() + amplifier);
-					}
+				float cool = attacker.getEntityData().getFloat("lastpunch");
+				if (cool-attacker.world.getTotalWorldTime() > 15) {
+					attacker.getEntityData().setFloat("lastpunch",attacker.world.getTotalWorldTime()+15);
+					return;
 				}
+				if (cool-attacker.world.getTotalWorldTime() > 0) {
+					return;
+				}
+					if (attacker.isPotionActive(potion)) {
+						attacker.getEntityData().setFloat("lastpunch",attacker.world.getTotalWorldTime()+15);
+						int amplifier = attacker.getActivePotionEffect(potion).getAmplifier();
+						if (Chakra.pathway(attacker).consume((double)amplifier*1.25)) {
+							EntityLivingBase target = event.getEntityLiving();
+							target.world.playSound(null, target.posX, target.posY, target.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE,
+									SoundCategory.BLOCKS, 1.0F, (1.0F + (target.getRNG().nextFloat() - target.getRNG().nextFloat()) * 0.2F) * 0.7F);
+							new Punch(attacker.world).execute(attacker, MathHelper.clamp((double)amplifier * 0.4d,0.0d,6d), MathHelper.clamp(0.1d * amplifier,0.0d,12d));
+							event.setAmount(event.getAmount() + amplifier);
+						}
+					}
 			}
 		}
 
