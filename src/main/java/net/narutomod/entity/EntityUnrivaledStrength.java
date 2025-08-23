@@ -70,10 +70,10 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 			this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kairikimuso")), 1f, 1f);
 			PotionEffect effect = userIn.getActivePotionEffect(MobEffects.STRENGTH);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, this.duration, 
-			 (int) ((1+0.1*(power/20))*(ItemJutsu.getDmgMult(userIn)*0.25)), false, false));
+			 (int) ((1+0.15*(power/20))*(ItemJutsu.getDmgMult(userIn)*0.25)), false, false));
 			effect = userIn.getActivePotionEffect(MobEffects.SPEED);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.SPEED, this.duration, 
-			 (int)(power * 0.3f), false, false));
+			 (int)(power * 0.5f), false, false));
 			effect = userIn.getActivePotionEffect(MobEffects.JUMP_BOOST);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, this.duration, 
 			 (int)(power * 0.2f), false, false));
@@ -87,7 +87,7 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void entityInit() {
 		}
-
+		float tpCool = 0;
 		@Override
 		public void onUpdate() {
 			if (this.user != null) {
@@ -120,13 +120,17 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 					 0d, 0d, 0d, (this.rand.nextDouble() - 0.5d) * 0.1d, 0.0d, (this.rand.nextDouble() - 0.5d) * 0.1d,
 					 0x20FFFFFF, 10 + this.rand.nextInt(11), 0, 0, this.user.getEntityId());
 				}
+				if (this.tpCool > 0) {
+					--this.tpCool;
+				}
 				if (this.user.swingProgressInt == 1 && this.user instanceof EntityPlayer) {
 					RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.user, 3d, this);
 					if (res != null && res.entityHit instanceof EntityLivingBase) {
 						ProcedureUtils.pushEntity(this.user, res.entityHit, 15d, 1.5f);
 					} else {
 						res = ProcedureUtils.objectEntityLookingAt(this.user, 12d, 3d, this);
-						if (res != null && res.entityHit instanceof EntityLivingBase) {
+						if (res != null && res.entityHit instanceof EntityLivingBase && this.tpCool == 0) {
+							this.tpCool = 60;
 							this.target = res.entityHit;
 							this.attackTime = 0;
 							this.user.rotationYaw = ProcedureUtils.getYawFromVec(this.target.getPositionVector()

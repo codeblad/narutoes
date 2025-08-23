@@ -119,6 +119,8 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			this.setNewCooldown();
 		}
 
+		float tpCool;
+
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
@@ -156,22 +158,28 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 				  0.5d, 0d, 0.15d, 0d);
 				Particles.spawnParticle(world, Particles.Types.SMOKE, this.posX, this.posY, this.posZ,
 				  20, 0.3d, 0.0d, 0.3d, 0d, 0.5d, 0d, 0x2080D0FF, 50, 5, 0xF0, this.summoner.getEntityId());
-				if (this.summoner.swingProgressInt == 1 && this.summoner instanceof EntityPlayer) {
-					RayTraceResult result = ProcedureUtils.objectEntityLookingAt(this.summoner, 3d, this);
-					if (result == null || result.entityHit == null) {
-						result = ProcedureUtils.objectEntityLookingAt(this.summoner, 15d, 3d, this);
+				if (this.tpCool == 0) {
+					if (this.summoner.swingProgressInt == 1 && this.summoner instanceof EntityPlayer) {
+						RayTraceResult result = ProcedureUtils.objectEntityLookingAt(this.summoner, 3d, this);
+						if (result == null || result.entityHit == null) {
+							this.tpCool = 60;
+							result = ProcedureUtils.objectEntityLookingAt(this.summoner, 15d, 3d, this);
+							if (result != null && result.entityHit instanceof EntityLivingBase) {
+								Vec3d vec = result.entityHit.getPositionEyes(1f).subtract(this.summoner.getPositionEyes(1f)).normalize();
+								this.summoner.rotationYaw = ProcedureUtils.getYawFromVec(vec);
+								this.summoner.rotationPitch = ProcedureUtils.getPitchFromVec(vec);
+								this.summoner.setPositionAndUpdate(result.entityHit.posX - vec.x, result.entityHit.posY - vec.y + 0.5d, result.entityHit.posZ - vec.z);
+								((EntityPlayer)this.summoner).attackTargetEntityWithCurrentItem(result.entityHit);
+							}
+						}
 						if (result != null && result.entityHit instanceof EntityLivingBase) {
-							Vec3d vec = result.entityHit.getPositionEyes(1f).subtract(this.summoner.getPositionEyes(1f)).normalize();
-							this.summoner.rotationYaw = ProcedureUtils.getYawFromVec(vec);
-							this.summoner.rotationPitch = ProcedureUtils.getPitchFromVec(vec);
-							this.summoner.setPositionAndUpdate(result.entityHit.posX - vec.x, result.entityHit.posY - vec.y + 0.5d, result.entityHit.posZ - vec.z);
-							((EntityPlayer)this.summoner).attackTargetEntityWithCurrentItem(result.entityHit);
+							ProcedureUtils.pushEntity(this.summoner, result.entityHit, 12d, 1.5f);
 						}
 					}
-					if (result != null && result.entityHit instanceof EntityLivingBase) {
-						ProcedureUtils.pushEntity(this.summoner, result.entityHit, 12d, 1.5f);
-					}
+				} else {
+					--this.tpCool;
 				}
+
 			} else if (!this.world.isRemote) {
 				this.setDead();
 			}

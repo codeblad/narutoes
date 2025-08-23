@@ -343,7 +343,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 			NBTTagCompound compound = entity.getEntityData().hasKey("lungeAttackData") ? entity.getEntityData().getCompoundTag("lungeAttackData") : new NBTTagCompound();
 			int attackTime = compound.getInteger("attackTime");
 			Entity target = compound.hasKey("targetId") ? entity.world.getEntityByID(compound.getInteger("targetId")) : null;
-			if (entity.swingProgressInt == 1) {
+			if (entity.swingProgressInt == 1 && attackTime == 0) {
 				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 20d, 3d);
 				if (res != null && res.entityHit instanceof EntityLivingBase && res.entityHit.isEntityAlive()) {
 					target = res.entityHit;

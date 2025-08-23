@@ -421,7 +421,8 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					case 7:
 						if (attacker.equals(target)) {
 							target = ProcedureUtils.objectEntityLookingAt(attacker, 18d + 5d * (gateOpened - 7), 3d).entityHit;
-							if (target instanceof EntityLivingBase) {
+							if (target instanceof EntityLivingBase && this.tpCool == 0) {
+								this.tpCool = 60;
 								Vec3d vec = target.getPositionVector().subtract(attacker.getPositionVector()).normalize();
 								attacker.rotationYaw = ProcedureUtils.getYawFromVec(vec);
 								attacker.rotationPitch = ProcedureUtils.getPitchFromVec(vec);
@@ -540,6 +541,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		}
 
 		float asaCool = 0;
+		float tpCool = 0;
 
 		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
@@ -612,6 +614,9 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			if (this.asaCool > 0) {
 				--this.asaCool;
+			}
+			if (this.tpCool > 0) {
+				--this.tpCool;
 			}
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (/* !world.isRemote && */ entity instanceof EntityLivingBase) {
