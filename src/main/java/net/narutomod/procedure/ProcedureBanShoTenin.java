@@ -149,7 +149,7 @@ public class ProcedureBanShoTenin extends ElementsNarutomodMod.ModElement {
 				cp.consume(chakraUsage);
 			}
 		} else if (procedure.getGrabbedEntity() != null) {
-			cooldown = entity.world.getTotalWorldTime() + 100;
+			cooldown = entity.world.getTotalWorldTime() + 50;
 		}
 		procedure.execute(is_pressed, entity, grabbedEntity);
 		return cooldown;

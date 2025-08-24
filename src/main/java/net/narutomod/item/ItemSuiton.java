@@ -45,7 +45,7 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITY2ID = 10125;
 	public static final int ENTITY3ID = 11125;
 	public static final ItemJutsu.JutsuEnum HIDINGINMIST = new ItemJutsu.JutsuEnum(0, "suitonmist", 'D', 150d, new EntityMist.Jutsu());
-	public static final ItemJutsu.JutsuEnum WATERBULLET = new ItemJutsu.JutsuEnum(1, "water_stream", 'C', 30d, new EntityWaterStream.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum WATERBULLET = new ItemJutsu.JutsuEnum(1, "water_stream", 'C', 20d, new EntityWaterStream.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WATERDRAGON = new ItemJutsu.JutsuEnum(2, "water_dragon", 'B', 180d, new EntityWaterDragon.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WATERPRISON = new ItemJutsu.JutsuEnum(3, "water_prison", 'C', 200d, new EntityWaterPrison.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum WATERSHARK = new ItemJutsu.JutsuEnum(4, "suiton_shark", 'B', 100d, new EntitySuitonShark.EC.Jutsu());

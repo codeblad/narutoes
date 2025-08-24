@@ -55,7 +55,7 @@ public class ProcedureAsuraPathArmorBodyTickEvent extends ElementsNarutomodMod.M
 		}
 		if (((!(world.isRemote)) && (((ticks_used) % 40) == 1))) {
 			if (entity instanceof EntityLivingBase)
-				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.STRENGTH, (int) 41, (int) (10+45*(ItemJutsu.getDmgMult(entity)/63)), (false), (false)));
+				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.STRENGTH, (int) 41, (int) (10+65*(ItemJutsu.getDmgMult(entity)/63)), (false), (false)));
 			if (entity instanceof EntityLivingBase)
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.SPEED, (int) 41, (int) 10, (false), (false)));
 			if (entity instanceof EntityLivingBase)

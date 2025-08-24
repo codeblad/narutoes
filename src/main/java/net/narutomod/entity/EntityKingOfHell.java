@@ -234,7 +234,7 @@ public class EntityKingOfHell extends ElementsNarutomodMod.ModElement {
 						if (summoner.getHealth() <= 0.0F)
  {
 							this.setHealth(0.0F);
-						} else if (summoner.getHealth() < 15.0F)
+						} else if (summoner.getHealth() <= summoner.getMaxHealth()*0.15)
  {
 							this.rejuvenateSummoningPlayer();
 						}

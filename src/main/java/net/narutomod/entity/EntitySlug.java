@@ -130,10 +130,10 @@ public class EntitySlug extends ElementsNarutomodMod.ModElement {
 
 		protected void postScaleFixup() {
 			float f = this.getScale();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5D * f);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10D * f * f);
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25D + f * 0.05);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(5D * f);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0.5D * f);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(5D * f * f);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.2D + f * 0.04);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1D * f);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(13D + 3D * f);
 			super.postScaleFixup();
 			//this.setSize(this.ogWidth * f, this.ogHeight * f);
@@ -280,6 +280,7 @@ public class EntitySlug extends ElementsNarutomodMod.ModElement {
 	public static class Jutsu implements ItemJutsu.IJutsuCallback {
 		@Override
 		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+			ItemJutsu.setCurrentJutsuCooldown(stack, 20*8);
 			Particles.spawnParticle(entity.world, Particles.Types.SEAL_FORMULA,
 			 entity.posX, entity.posY + 0.015d, entity.posZ, 1, 0d, 0d, 0d, 0d, 0d, 0d, (int)(power * 40), 0, 60);
 			for (int i = 0; i < 500; i++) {
@@ -305,6 +306,12 @@ public class EntitySlug extends ElementsNarutomodMod.ModElement {
 		@Override
 		public float getPowerupDelay() {
 			return 30.0f;
+		}
+
+
+		@Override
+		public float getMaxPower() {
+			return 16.1f;
 		}
 	}
 

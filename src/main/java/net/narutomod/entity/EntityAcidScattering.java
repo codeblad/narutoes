@@ -140,7 +140,7 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 				this.world.spawnEntity(new EntityAcidParticle(this, vec.x, vec.y, vec.z));
 			}
 			Particles.Renderer particles = new Particles.Renderer(this.world);
-			for (int i = 0; i < 40; i++) {
+			for (int i = 0; i < 30; i++) {
 				Vec3d vec = Vec3d.fromPitchYaw(directionPitch + (float)((this.rand.nextDouble()-0.5d) * angle * 3.0d),
 				 directionYaw + (float)((this.rand.nextDouble()-0.5d) * angle * 3.0d)).scale(range * 0.1d);
 				particles.spawnParticles(Particles.Types.SPIT, this.posX, this.posY, this.posZ, 1, 0, 0, 0,

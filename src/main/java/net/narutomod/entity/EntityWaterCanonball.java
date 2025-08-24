@@ -101,7 +101,7 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 					return;
 				}
 				float size = this.fullScale / 3.2f;
-				ProcedureAoeCommand.set(this.world, result.hitVec.x, result.hitVec.y, result.hitVec.z, 0.0D, size)
+				ProcedureAoeCommand.set(this.world, result.hitVec.x, result.hitVec.y, result.hitVec.z, 0.0D, size*1.35)
 				 .exclude(this.shootingEntity).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.damage);
 				this.world.newExplosion(this.shootingEntity, result.hitVec.x, result.hitVec.y, result.hitVec.z, this.explosionSize,
 				 false, ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));

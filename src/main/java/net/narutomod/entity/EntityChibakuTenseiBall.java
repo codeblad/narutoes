@@ -299,7 +299,7 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
 			if (!this.world.isRemote && source.getTrueSource() instanceof EntityLivingBase && this.health > 0.0f) {
-				this.health -= amount;
+				this.health -= amount/5;
 				if (this.health <= 0.0f) {
 					this.convertBlocks2Satellite(10);
 				}
@@ -347,7 +347,7 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public float getCollisionDamage() {
-			return 900;
+			return 700;
 		}
 
 		public Satellite(EntityLivingBase summonerIn, List<? extends BlockPos> list, int fallTime) {
@@ -368,7 +368,7 @@ public class EntityChibakuTenseiBall extends ElementsNarutomodMod.ModElement {
 					new EventSphericalExplosion(this.world, this.summoner, (int)this.posX, (int)this.posY, (int)this.posZ, 60, 0, 0.3f) {
 						protected void doOnTick(int currentTick) {
 							ProcedureAoeCommand.set(getWorld(), getX0(), getY0(), getZ0(), 0d, getRadius())
-							 .exclude(getEntity()).damageEntities(DamageSource.FALLING_BLOCK.setExplosion(), (float)getRadius());
+							 .exclude(getEntity()).damageEntities(DamageSource.FALLING_BLOCK.setExplosion(), 50);
 						}
 					};
 					this.explosionSet = true;

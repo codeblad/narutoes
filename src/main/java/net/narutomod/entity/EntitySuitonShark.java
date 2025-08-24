@@ -153,18 +153,18 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 					this.setEntityScale(this.fullScale * MathHelper.clamp((float)this.ticksAlive / this.wait, 0.2F, 1.0F));
 					if (this.world instanceof WorldServer) {
 						((WorldServer)this.world).spawnParticle(EnumParticleTypes.WATER_WAKE, this.posX, this.posY + this.height/2, this.posZ, 
-						  10, this.width/2, this.height/2, this.width/2, 0);
+						  2, this.width/2, this.height/2, this.width/2, 0);
 					}
 				} else {
 					if (this.target != null) {
 						Vec3d vec = this.target.getPositionEyes(1f).subtract(this.getPositionVector()).subtract(0,this.target.getEyeHeight()/2,0);
-						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.98f : 0.95f, 0f);
+						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.99f : 0.975f, 0f);
 					} else {
 						this.target = this.shootingEntity instanceof EntityLiving ? ((EntityLiving)this.shootingEntity).getAttackTarget()
 						 : ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 50d, 3d, this).entityHit;
 						Vec3d vec = this.target != null ? this.target.getPositionEyes(1f).subtract(this.getPositionVector())
 						 : this.shootingEntity.getLookVec();
-						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.98f : 0.95f, 0f);
+						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.99f : 0.975f, 0f);
 					}
 					if (this.ticksAlive <= this.wait + this.mouthOpenTime) {
 						this.setMOA((float)(this.ticksAlive - this.wait) / this.mouthOpenTime);
@@ -212,7 +212,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 				if (result.typeOfHit == RayTraceResult.Type.BLOCK
 				 || (result.entityHit != null && result.entityHit.equals(this.target))) {
 					float size = this.getEntityScale();
-					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*4.5f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
+					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*3.5f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 						damage*=1.35f;
