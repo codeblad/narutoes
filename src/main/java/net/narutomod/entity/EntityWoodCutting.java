@@ -60,13 +60,13 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 		
 		public EC(World world) {
 			super(world);
-			this.setOGSize(1f, 1.5f);
+			this.setOGSize(1f, 1f);
 			this.maxInGroundTime = 200;
 		}
 
 		public EC(EntityLivingBase userIn) {
 			super(userIn);
-			this.setOGSize(1f, 1.5f);
+			this.setOGSize(1f, 1f);
 			this.maxInGroundTime = 200;
 			this.setNoGravity(false);
 		}
@@ -196,7 +196,7 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 				Vec3d vec1 = entity.getPositionEyes(1f).add(vec);
 				Vec3d vec2 = vec1.add(vec);
 		 		entity.swingArm(EnumHand.MAIN_HAND);
-				this.createJutsu(entity.world, entity, vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z, 3f, 0.0f);
+				this.createJutsu(entity.world, entity, vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z, 5f, 0.0f);
 				ItemJutsu.setCurrentJutsuCooldown(stack, 5);
 				return true;
 			}
@@ -206,7 +206,7 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 				Vec3d vec1 = vec.add(attacker.getLookVec());
 				Vec3d vec2 = target.getPositionVector().addVector(0, target.height * 0.5, 0).subtract(vec);
 				vec2 = vec2.addVector(0, MathHelper.sqrt(vec2.x * vec2.x + vec2.z * vec2.z) * 0.1d, 0).add(vec1);
-				createJutsu(attacker.world, attacker, vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z, 3.0f, 0.0f);
+				createJutsu(attacker.world, attacker, vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z, 5.0f, 0.0f);
 			}
 
 			public static void createJutsu(World world, @Nullable EntityLivingBase shooter,
