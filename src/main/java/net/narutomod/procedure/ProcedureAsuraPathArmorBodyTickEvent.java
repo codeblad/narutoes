@@ -63,7 +63,7 @@ public class ProcedureAsuraPathArmorBodyTickEvent extends ElementsNarutomodMod.M
 			if (entity instanceof EntityLivingBase)
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, (int) 41, (int) 5, (false), (false)));
 			if (entity instanceof EntityLivingBase)
-				((EntityLivingBase) entity).heal(1f);
+				((EntityLivingBase) entity).heal(2f);
 			if (entity instanceof EntityPlayer)
 				((EntityPlayer) entity).getFoodStats().addStats(2,0);
 		}
