@@ -150,7 +150,7 @@ public class EntityGiantDog2h extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.7D);
 			//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(1000D);
 			//this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(40.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(180.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0);
 		}

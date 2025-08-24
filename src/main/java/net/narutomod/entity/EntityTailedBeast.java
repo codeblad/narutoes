@@ -164,7 +164,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			this.setNoAI(false);
 			this.enablePersistence();
 			this.setHealth(this.getMaxHealth());
-			this.deathTotalTicks = 200;
+			this.deathTotalTicks = 100;
 			if (!this.world.isRemote && this.getBijuManager().hasSpawnPos()) {
 				this.setHomePosAndDistance(this.getBijuManager().getSpawnPos(), 128);
 			}

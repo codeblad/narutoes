@@ -120,7 +120,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.55D);
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50D);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(30.0D);
 			//this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3D);
 		}
