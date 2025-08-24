@@ -155,15 +155,15 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					int realStrength = this.strength;
 
 					if (this.gate <= 3) {
-						realStrength += (int) (ItemJutsu.getDmgMult(entity)*0.75);
+						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*0.75);
 					}else if (this.gate <= 6) {
-						realStrength += (int) (ItemJutsu.getDmgMult(entity)*1.35);
+						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*1.35);
 					}
 					if (this.gate == 7) {
-						realStrength += (int) (ItemJutsu.getDmgMult(entity)*1.4f);
+						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*1.4f);
 					}
 					if (this.gate == 8) {
-						realStrength += (int) (ItemJutsu.getDmgMult(entity)*2f);
+						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*2f);
 					}
 					//entity.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 42, 3, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 12, 8, false, false));
@@ -264,8 +264,8 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		// stats here
 		private final Properties GATE[] = {new Properties(0, "", 0, 0, 0, 0, 0, 0, 0, 0f, false),
 			new Properties(1, I18n.translateToLocal("chattext.eightgates.gate1"), 200, 0, 0, 2, 2, 0, 10, -0.5f, false),
-			new Properties(2, I18n.translateToLocal("chattext.eightgates.gate2"), 250, 0, 0, 4, 12, 0, 40, -1f, false),
-			new Properties(3, I18n.translateToLocal("chattext.eightgates.gate3"), 300, 20, 0x10FFFFFF, 10, 20, 1, 60, -1.5f, false),
+			new Properties(2, I18n.translateToLocal("chattext.eightgates.gate2"), 250, 0, 0, 4, 12, 0, 40, -1.5f, false),
+			new Properties(3, I18n.translateToLocal("chattext.eightgates.gate3"), 300, 20, 0x10FFFFFF, 10, 20, 1, 60, -.75f, false),
 			new Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 500, 25, 0x18FFFFFF, 20, 50, 2, 60, 0.1f, false),
 			new Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 1000, 30, 0x20FFFFFF, 30, 68, 2, 60, 0.3f, false),
 			new Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 2500, 30, 0x3000FF00, 50, 72, 3, 60, 0.4f, false),
@@ -343,7 +343,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			if (punchnum >= 0) {
 				EntitySekizo bullet = new EntitySekizo(attacker);
 				float mult = 1+5*((float) punchnum /4);
-				float damage = 800+(ItemJutsu.getDmgMult(attacker)*20F)*mult;
+				float damage = 800+(ItemJutsu.getNinjaMult(attacker)*20F)*mult;
 				bullet.shoot(30, damage);
 				world.playSound(null, attacker.posX, attacker.posY, attacker.posZ,
 				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:sekizo")),
@@ -383,7 +383,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 									return;
 								}
 								result.entityHit.attackEntityFrom(DamageSource.causeFireballDamage(this, this.shootingEntity),
-										15+ItemJutsu.getDmgMult(attacker)*5);
+										15+ItemJutsu.getNinjaMult(attacker)*5);
 								result.entityHit.setFire(10);
 							}
 							boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
@@ -841,7 +841,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && this.shootingEntity != null) {
 				ProcedureAoeCommand.set(this, 0.0D, 0.5d * this.getEntityScale()).exclude(this.shootingEntity)
 						.damageEntities(DamageSource.causeIndirectDamage(this, this.shootingEntity).setDamageBypassesArmor(),
-								200+ItemJutsu.getDmgMult(this.shootingEntity)*15);
+								200+ItemJutsu.getNinjaMult(this.shootingEntity)*15);
 				this.shootingEntity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 40d);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 70.0F, false,
 						ForgeEventFactory.getMobGriefingEvent(this.world, (EntityLivingBase) this.shootingEntity));
@@ -942,7 +942,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						ProcedureUtils.pushEntity(new Vec3d(this.posX, this.posY, this.posZ), result.entityHit, 30.0D, 2.0F);
 					}
 					ProcedureAoeCommand.set(this, 0.0D, 5.0D).exclude(this.shootingEntity)
-							.damageEntities(ds, 2000+ItemJutsu.getDmgMult(this.shootingEntity)*250);
+							.damageEntities(ds, 2000+ItemJutsu.getNinjaMult(this.shootingEntity)*250);
 				}
 				this.world.newExplosion(this, this.posX, this.posY, this.posZ, 10.0F, false,
 				 ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));

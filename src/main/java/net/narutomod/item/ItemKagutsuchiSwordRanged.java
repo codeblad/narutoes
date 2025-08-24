@@ -286,7 +286,7 @@ public class ItemKagutsuchiSwordRanged extends ElementsNarutomodMod.ModElement {
 								: null;
 				ProcedureAoeCommand.set(this.world, this.posX, this.posY, this.posZ, 0.0D, 4.0D)
 						.effect(PotionAmaterasuFlame.potion, 60, ((player != null) ? player.experienceLevel : 0) / 30 + 1, false)
-						.damageEntities(this.shootingEntity, 50.0F+ItemJutsu.getDmgMult(player)*5.5f);
+						.damageEntities(this.shootingEntity, 50.0F+ItemJutsu.getNinjaMult(player)*5.5f);
 				this.setDead();
 			}
 		}

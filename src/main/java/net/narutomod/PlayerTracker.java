@@ -339,7 +339,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
-						defMult+= 0.3f;
+						defMult+= 0.5f;
 					} else {
 						defMult+= 1.2f;
 					}

@@ -177,7 +177,7 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 					EntityPlayer thrower = (EntityPlayer) this.thrower;
 					if (result.entityHit instanceof EntityLivingBase) {
 						EntityLivingBase elb = (EntityLivingBase) result.entityHit;
-						elb.attackEntityFrom(ItemJutsu.causeJutsuDamage(this,this.thrower), 80+ItemJutsu.getDmgMult(this.thrower)*8.5f);
+						elb.attackEntityFrom(ItemJutsu.causeJutsuDamage(this,this.thrower), 80+ItemJutsu.getNinjaMult(this.thrower)*8.5f);
 					} else {
 						result.entityHit.onKillCommand();
 					}

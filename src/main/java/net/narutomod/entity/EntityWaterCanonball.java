@@ -116,7 +116,7 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void renderParticles() {
-			for (int i = 0; i < (int)(this.fullScale * 2f); i++) {
+			for (int i = 0; i < (int)(this.fullScale * 0.25f); i++) {
 				this.world.spawnParticle(EnumParticleTypes.WATER_WAKE, this.posX, this.posY + 0.5d * this.height, this.posZ, (this.rand.nextDouble()-0.5d) * 0.6d * this.fullScale, (this.rand.nextDouble()-0.5d) * 0.6d * this.fullScale, (this.rand.nextDouble()-0.5d) * 0.6d * this.fullScale);
 			}
 		}

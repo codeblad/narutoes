@@ -91,7 +91,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			this.setSize(0.8f * MODELSCALE, 2.0f * MODELSCALE);
 			this.stepHeight = this.height / 3;
 			this.chakraBurn = chakraUsagePerSec;
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(500+ItemJutsu.getDmgMult(this.getSummoner())*80f);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(500+ItemJutsu.getNinjaMult(this.getSummoner())*80f);
 			this.setHealth(this.getMaxHealth());
 		}
 
@@ -234,7 +234,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			super(summonerIn);
 			this.postScaleFixup();
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(200d);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(20.0d+ItemJutsu.getDmgMult(summonerIn)*2.85);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(20.0d+ItemJutsu.getNinjaMult(summonerIn)*2.85);
 			Entity parent = summonerIn.getRidingEntity() instanceof EC ? summonerIn.getRidingEntity() : summonerIn;
 			this.rotationYawHead = parent.rotationYaw;
 			this.setLocationAndAngles(parent.posX, parent.posY - 10d, parent.posZ, parent.rotationYaw, -45f);

@@ -74,7 +74,7 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 			super(world);
 			this.setSize(0.7f, 1.9f);
 			this.dieOnNoPassengers = false;
-			this.strengthModifier = new AttributeModifier(UUID.fromString("2866063d-9200-4f65-9025-1d841af84825"), "crystalarmor.damage", 10+ItemJutsu.getDmgMult(this.getSummoner())*7, 0);
+			this.strengthModifier = new AttributeModifier(UUID.fromString("2866063d-9200-4f65-9025-1d841af84825"), "crystalarmor.damage", 10+ItemJutsu.getNinjaMult(this.getSummoner())*7, 0);
 		}
 
 		public EC(EntityLivingBase userIn) {

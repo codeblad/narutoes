@@ -64,7 +64,7 @@ public class ItemRinnegan extends ElementsNarutomodMod.ModElement {
 	public static final double CHIBAKUTENSEI_CHAKRA_USAGE = 1500d;
 	public static final double NARAKAPATH_CHAKRA_USAGE = 100d;
 	public static final double PRETAPATH_CHAKRA_USAGE = 500d;
-	public static final double ANIMALPATH_CHAKRA_USAGE = 500d;
+	public static final double ANIMALPATH_CHAKRA_USAGE = 1000d;
 	public static final double OUTERPATH_CHAKRA_USAGE = 2000d;
 	public static final double TENGAISHINSEI_CHAKRA_USAGE = 3000d;
 	

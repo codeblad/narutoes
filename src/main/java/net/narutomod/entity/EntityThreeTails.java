@@ -158,7 +158,7 @@ public class EntityThreeTails extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D);
 			this.getEntityAttribute(EntityLivingBase.SWIM_SPEED).setBaseValue(0.8D);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(3000.0D);

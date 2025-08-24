@@ -110,7 +110,7 @@ public class ItemBlackReceiver extends ElementsNarutomodMod.ModElement {
 				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 5, 0);
 				entityarrow.setSilent(true);
 				entityarrow.setIsCritical(true);
-				entityarrow.setDamage(30+ItemJutsu.getDmgMult(entityLivingBase)*1.2);
+				entityarrow.setDamage(30+ItemJutsu.getNinjaMult(entityLivingBase)*1.2);
 				entityarrow.setKnockbackStrength(0);
 				itemstack.damageItem(1, entity);
 				world.playSound(null, entity.posX, entity.posY, entity.posZ,

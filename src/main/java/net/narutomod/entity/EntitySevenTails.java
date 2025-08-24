@@ -161,7 +161,7 @@ public class EntitySevenTails extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100.0D);
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.FLYING_SPEED);
 			this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(0.8D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D);

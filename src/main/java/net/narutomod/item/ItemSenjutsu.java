@@ -168,10 +168,10 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 							attr.applyModifier(entry.getValue());
 						}
 					}
-					double d = 15.0d+ItemJutsu.getDmgMult(living)*2.5f;
+					double d = 15.0d+ItemJutsu.getNinjaMult(living)*2.5f;
 					if (living instanceof  EntityPlayer) {
 						if (EntityBijuManager.cloakLevel((EntityPlayer) living) > 0) {
-							d = 7.0d+ItemJutsu.getDmgMult(living)*0.6;
+							d = 7.0d+ItemJutsu.getNinjaMult(living)*0.8;
 						}
 					}
 					if (living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868")) == null) {
