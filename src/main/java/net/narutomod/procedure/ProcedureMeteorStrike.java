@@ -1,5 +1,6 @@
 package net.narutomod.procedure;
 
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -60,6 +61,15 @@ public class ProcedureMeteorStrike extends ElementsNarutomodMod.ModElement {
 		Entity entity = (Entity) dependencies.get("entity");
 		World world = (World) dependencies.get("world");
 		if (!world.isRemote && entity instanceof EntityLivingBase) {
+			if (entity.getEntityData().getFloat("meteorcd") > ProcedureUpdateworldtick.getTotalWorldTime()+20*10) {
+				entity.getEntityData().setFloat("meteorcd", ProcedureUpdateworldtick.getTotalWorldTime()+20*10);
+			}
+			if (ProcedureUpdateworldtick.getTotalWorldTime() < entity.getEntityData().getFloat("meteorcd")) {
+				((EntityPlayer)entity).sendStatusMessage(new TextComponentTranslation("chattext.cooldown.formatted",
+						(entity.getEntityData().getFloat("meteorcd") - ProcedureUpdateworldtick.getTotalWorldTime()) / 20), true);
+				return;
+			}
+			entity.getEntityData().setFloat("meteorcd", ProcedureUpdateworldtick.getTotalWorldTime()+20*10);
 			((EntityLivingBase)entity).addPotionEffect(new PotionEffect(PotionFlight.potion, 300));
 			double chakraUsage = ItemRinnegan.getTengaishinseiChakraUsage((EntityLivingBase)entity);
 			Entity entity1 = world.findNearestEntityWithinAABB(
@@ -89,7 +99,8 @@ public class ProcedureMeteorStrike extends ElementsNarutomodMod.ModElement {
 					  .setChunk(null).setReplacedBlock(null).setIgnoreStructureBlock(true).setIgnoreEntities(false));
 					entity1 = new EntityChibakuTenseiBall.Satellite((EntityLivingBase)entity, 
 					 ProcedureUtils.getNonAirBlocks(world, new AxisAlignedBB(spawnTo).expand(20d, 20d, 20d)), 5);
-					world.spawnEntity(entity1);
+					world.spawnEntity(entity1);
+
 					entity1.setNoGravity(false);
 				}
 			}
