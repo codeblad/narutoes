@@ -126,7 +126,7 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 						if (amod != null) {
 							user.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(amod);
 						}
-						user.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier(LAVA_DAMAGE,"lavaCloak", 5+ItemJutsu.getDmgMult(user), 0));
+						user.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier(LAVA_DAMAGE,"lavaCloak", 5+ItemJutsu.getNinjaMult(user), 0));
 						//user.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 21, this.strengthAmplifier, false, false));
 						user.addPotionEffect(new PotionEffect(MobEffects.SPEED, 21, 16, false, false));
 					}
@@ -142,7 +142,7 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 				for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, 
 				 user.getEntityBoundingBox().grow(6d))) {
 				 	if (!entity.equals(user)) {
-						entity.attackEntityFrom(DamageSource.LAVA, 4.0F+ItemJutsu.getDmgMult(user)*0.5f);
+						entity.attackEntityFrom(DamageSource.LAVA, 4.0F+ItemJutsu.getNinjaMult(user)*0.5f);
 						entity.setFire(15);
 				 	}
 				}

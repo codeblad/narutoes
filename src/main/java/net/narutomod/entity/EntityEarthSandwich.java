@@ -206,7 +206,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 							 .getObject(new ResourceLocation("narutomod:jutsu")), SoundCategory.NEUTRAL, 1, 1f);
 						}
 						entity.world.spawnEntity(new EC(entity, rt.hitVec, power));
-						ItemJutsu.setCurrentJutsuCooldown(stack, 20*10);
+						ItemJutsu.setCurrentJutsuCooldown(stack, 20*14);
 						return true;
 					}
 				}
@@ -220,12 +220,12 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 30.0f;
+				return 50.0f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 20.0f;
+				return 15.0f;
 			}
 		}
 	}

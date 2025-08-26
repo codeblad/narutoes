@@ -34,6 +34,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.Minecraft;
 
 import net.narutomod.*;
+import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureUpdateworldtick;
@@ -66,6 +67,27 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static float getDmgMult(Entity entity) {
+		if (entity instanceof EntityPlayer) {
+			float boost = 1;
+			if (ItemSenjutsu.isSageModeActivated((EntityPlayer) entity)) {
+				boost = 1.3f;
+			}
+			if (EntityBijuManager.cloakLevel((EntityPlayer) entity) == 1) {
+				boost = 1.075f;
+			}
+			if (EntityBijuManager.cloakLevel((EntityPlayer) entity) == 2) {
+				boost = 1.15f;
+			}
+			ItemStack cheststack = ((EntityPlayer) entity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+			if (cheststack.getItem() == ItemRinnegan.body) {
+				boost = 2;
+			}
+			return MathHelper.clamp((float)PlayerTracker.getNinjaLevel((EntityPlayer)entity) / 5f,1.0f,10000000f)*boost;
+		}
+		return 1.0f;
+	}
+
+	public static float getNinjaMult(Entity entity) {
 		if (entity instanceof EntityPlayer) {
 			return MathHelper.clamp((float)PlayerTracker.getNinjaLevel((EntityPlayer)entity) / 5f,1.0f,10000000f);
 		}

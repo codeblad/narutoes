@@ -36,7 +36,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends ItemMokuton.WoodSegment implements ItemJutsu.IJutsu {
-		private int lifespan = 100;
+		private int lifespan = 140;
 		private EC prevSegment;
 		private Entity target;
 		private double targetDistance;
@@ -50,7 +50,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 
 		public EC(EntityLivingBase user, Entity targetIn) {
 			this(user.world);
-			this.setSize(0.6f, 1.25f);
+			this.setSize(0.6f, 2f);
 			this.setParent(user);
 			this.setOffset(-0.5d, 1.2d, 0.65d, 0f, 90f);
 			this.setPositionAndRotationFromParent(1f);
@@ -60,7 +60,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 
 		public EC(EC segment, float yawOffset, float pitchOffset) {
 			super(segment, yawOffset, pitchOffset);
-			this.setSize(0.6f, 1.25f);
+			this.setSize(0.6f, 2f);
 			this.target = segment.target;
 		}
 
@@ -110,7 +110,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 								this.targetYawOffset = MathHelper.wrapDegrees(ProcedureUtils.getYawFromVec(vec.x, vec.z) - parent.rotationYaw);
 							}
  else if (this.target instanceof EntityLivingBase) {
-								((EntityLivingBase)this.target).addPotionEffect(new PotionEffect(PotionHeaviness.potion, 3, (int)((float)this.reachedCount * 6 / captureCount), false, false));
+								((EntityLivingBase)this.target).addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20, (int)((float)this.reachedCount * 6 / captureCount), false, false));
 							}
 						}
 					}
@@ -123,7 +123,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 				 	this.target.getEntityData().setBoolean("TempData_disableKnockback", true);
 
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this,
-							parent instanceof EntityLivingBase ? (EntityLivingBase)parent : null), 2+3f* ItemJutsu.getDmgMult(parent));
+							parent instanceof EntityLivingBase ? (EntityLivingBase)parent : null), 10+4f* ItemJutsu.getDmgMult(parent));
 				}
 				if (this.targetDistance != 0d && this.targetTargetable() && this.ticksExisted < this.lifespan - 40) {
 					Vec3d vec = new Vec3d(0d, 0d, this.targetDistance)
@@ -131,7 +131,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 					 .addVector(parent.posX, this.targetYOffset + parent.posY, parent.posZ);
 					this.target.setPositionAndUpdate(vec.x, vec.y, vec.z);
 					if (this.target instanceof EntityLivingBase) {
-						Chakra.pathway((EntityLivingBase)this.target).consume(20d);
+						Chakra.pathway((EntityLivingBase)this.target).consume(40d);
 					}
 				}
 			} else if (!this.world.isRemote) {
@@ -150,9 +150,10 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 30d, 3d, ItemMokuton.WoodSegment.class);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 100d, 5d, ItemMokuton.WoodSegment.class);
 				if (res != null && res.entityHit != null) {
 					entity.world.spawnEntity(new EC(entity, res.entityHit));
+					((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 20*2);
 					return true;
 				}
 				return false;

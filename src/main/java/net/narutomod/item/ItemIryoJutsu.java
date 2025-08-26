@@ -87,7 +87,8 @@ public class ItemIryoJutsu extends ElementsNarutomodMod.ModElement {
 			 * (player instanceof EntityPlayer && ((EntityPlayer)player).isCreative() 
 			  ? 1f : (float)this.getCurrentJutsuXp(stack) / (float)this.getCurrentJutsuRequiredXp(stack));
 		}
-	}
+
+	}
 
 	public static class HealingJutsu implements ItemJutsu.IJutsuCallback {
 		@Override
@@ -118,7 +119,7 @@ public class ItemIryoJutsu extends ElementsNarutomodMod.ModElement {
 			Particles.spawnParticle(entity.world, Particles.Types.SMOKE, target.posX, target.posY+target.height/2,
 			 target.posZ, 10, 0d, 0d, 0d, 0d, 0d, 0d, 0x0000fff6|((0x20+target.getRNG().nextInt(0x20))<<24),
 			 10 + target.getRNG().nextInt(25), 0, 0xF0, -1, 0);
-			target.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 80, 6, false, false));
+			//target.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 80, 6, false, false));
 			target.heal(power * 0.02f);
 		}
 

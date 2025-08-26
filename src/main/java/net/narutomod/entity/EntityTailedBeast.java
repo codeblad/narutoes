@@ -164,7 +164,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			this.setNoAI(false);
 			this.enablePersistence();
 			this.setHealth(this.getMaxHealth());
-			this.deathTotalTicks = 200;
+			this.deathTotalTicks = 100;
 			if (!this.world.isRemote && this.getBijuManager().hasSpawnPos()) {
 				this.setHomePosAndDistance(this.getBijuManager().getSpawnPos(), 128);
 			}
@@ -1135,7 +1135,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 						 new TextComponentString(String.format("%.1f", cd.power)), true);
 					}
 				} else {
-					if (spawn(entity, cd.power, 150+ItemJutsu.getDmgMult(entity)*(1+12*cd.power/14)) != null) {
+					if (spawn(entity, cd.power, 150+ItemJutsu.getNinjaMult(entity)*(1+12*cd.power/14)) != null) {
 						cd.cooldown = entity.ticksExisted + (int)(cd.power * 7.143f)+20*10;
 					}
 					cd.power = 0f;

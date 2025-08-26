@@ -80,7 +80,7 @@ public class ProcedureRinneganHelmetTickEvent extends ElementsNarutomodMod.ModEl
 				if (((((entity instanceof EntityLivingBase) ? ((EntityLivingBase) entity).getHealth() : -1) < ((entity instanceof EntityLivingBase)
 						? ((EntityLivingBase) entity).getMaxHealth()
 						: -1)) && (((entity instanceof EntityLivingBase) ? ((EntityLivingBase) entity).getHealth() : -1) > 0))) {
-					((EntityLivingBase) entity).heal(0.005f);
+					((EntityLivingBase) entity).heal(0.1f);
 				}
 				if ((!(((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(2) : ItemStack.EMPTY)
 						.getItem() == new ItemStack(ItemRinnegan.body, (int) (1)).getItem()))) {

@@ -166,10 +166,10 @@ public class EntityTwoTails extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(40.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(3000.0D);
-			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(30.0D);
+			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(20.0D);
 		}
 
 		@Override

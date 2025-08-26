@@ -77,7 +77,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		this.setOwnerPlayer(player);
 		if (player instanceof EntityPlayer) {
 			this.playerXp = PlayerTracker.getBattleXp((EntityPlayer)player);
-			float health = (20+ (80*(ItemJutsu.getDmgMult(player)/63))) * PlayerTracker.getDefense(player);
+			float health = (20+ (80*(ItemJutsu.getNinjaMult(player)/63))) * PlayerTracker.getDefense(player);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*1.5+100);
 			//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(MathHelper.sqrt(this.playerXp));
 			//.applyModifier(new AttributeModifier("susanoo.health", 2d * ((EntityPlayer)player).experienceLevel, 0));
@@ -150,7 +150,7 @@ public abstract class EntitySusanooBase extends EntityCreature implements IRange
 		this.getAttributeMap().registerAttribute(ProcedureUtils.MAXHEALTH);
 		this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
 		this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
-		this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50D);
+		this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
 		this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.5D);
 		this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(100.0D);
 		this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D);

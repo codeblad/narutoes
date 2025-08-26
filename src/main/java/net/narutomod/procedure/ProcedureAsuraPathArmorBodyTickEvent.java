@@ -55,7 +55,7 @@ public class ProcedureAsuraPathArmorBodyTickEvent extends ElementsNarutomodMod.M
 		}
 		if (((!(world.isRemote)) && (((ticks_used) % 40) == 1))) {
 			if (entity instanceof EntityLivingBase)
-				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.STRENGTH, (int) 41, (int) (10+45*(ItemJutsu.getDmgMult(entity)/63)), (false), (false)));
+				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.STRENGTH, (int) 41, (int) (10+65*(ItemJutsu.getDmgMult(entity)/63)), (false), (false)));
 			if (entity instanceof EntityLivingBase)
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.SPEED, (int) 41, (int) 10, (false), (false)));
 			if (entity instanceof EntityLivingBase)
@@ -63,7 +63,7 @@ public class ProcedureAsuraPathArmorBodyTickEvent extends ElementsNarutomodMod.M
 			if (entity instanceof EntityLivingBase)
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, (int) 41, (int) 5, (false), (false)));
 			if (entity instanceof EntityLivingBase)
-				((EntityLivingBase) entity).heal(1f);
+				((EntityLivingBase) entity).heal(2f);
 			if (entity instanceof EntityPlayer)
 				((EntityPlayer) entity).getFoodStats().addStats(2,0);
 		}

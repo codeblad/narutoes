@@ -151,7 +151,7 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 					//((EntityPlayer)this.ownerPlayer).sendStatusMessage(new TextComponentString(I18n.translateToLocal("tooltip.byakugan.jutsu2")), true);
 					if (this.ticksExisted % 40 == 4) {
 						this.ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 
-						 50, (int) (( 2 + ((ItemJutsu.getDmgMult(this.ownerPlayer)*1.2f) * (1+3.5f*((float) this.ticksExisted /120)))/3 ))));
+						 50, (int) (( 2 + ((ItemJutsu.getNinjaMult(this.ownerPlayer)*1.2f) * (1+3.5f*((float) this.ticksExisted /120)))/3 ))));
 						this.ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.HASTE, 50, 3));
 					}
 				}

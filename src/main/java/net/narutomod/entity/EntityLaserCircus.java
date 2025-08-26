@@ -117,7 +117,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 			 this.getPositionVector(), targetVec, 0xc00000ff, 10, 0.1f);
 			float dmgMult = 0.25f+0.75f*1/10*this.power;
-			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 40+8.25f*dmgMult*ItemJutsu.getDmgMult(this.summoner), this.summoner);
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 40+7.35f*dmgMult*ItemJutsu.getDmgMult(this.summoner), this.summoner);
 			this.world.spawnEntity(entity2);
 		}
 
@@ -138,7 +138,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power, stack));
-				ItemJutsu.setCurrentJutsuCooldown(stack,20*7);
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*8);
 				return true;
 			}
 
@@ -247,7 +247,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 				this.bindEntityTexture(entity);
 				GlStateManager.pushMatrix();
 				float ageInTicks = (float)entity.ticksExisted + partialTicks;
-				float scale = (1f - (ageInTicks % 5f) / 5f) * 3.0F;
+				float scale = (1f - (ageInTicks % 5f) / 5f) * 2.0F;
 				GlStateManager.translate(x, y + 0.5d, z);
 				GlStateManager.enableRescaleNormal();
 				GlStateManager.scale(scale*.1, scale*.1, scale*.1);

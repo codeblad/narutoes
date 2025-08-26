@@ -120,7 +120,7 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 			if (ItemJutsu.isDamageSourceNinjutsu(source)) {
 				EntityLivingBase summoner = this.getSummoner();
 				if (summoner != null) {
-					Chakra.pathway(summoner).consume((double)-amount * 5, true);
+					Chakra.pathway(summoner).consume((double)-amount * 0.05, true);
 					if (source instanceof ProcedureUtils.JutsuEffectDamageSource) {
 						this.removePotionEffect(((ProcedureUtils.JutsuEffectDamageSource)source).getPotion());
 					}
@@ -192,7 +192,7 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void collideWithEntity(Entity entity) {
 			EntityLivingBase summoner = this.getSummoner();
-			if (!entity.equals(summoner) && this.absorbEntityChakra(entity, 10f)) {
+			if (!entity.equals(summoner) && this.absorbEntityChakra(entity, 5f)) {
 				if (entity instanceof EntityLivingBase && ItemSenjutsu.isSageModeActivated((EntityLivingBase)entity)
 				 && !ItemSenjutsu.canUseSageMode(summoner)) {
 					this.absorbedSageChakra += 10.0d;

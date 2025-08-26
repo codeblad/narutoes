@@ -105,17 +105,17 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 			} else {
 				//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
 				 //.applyModifier(new AttributeModifier("susanoo.maxhealth", this.hasLegs() ? 10d : 3d, 2));
-				float health = (20+ (80*(ItemJutsu.getDmgMult(entity)/63))) * PlayerTracker.getDefense(entity);
+				float health = (20+ (80*(ItemJutsu.getNinjaMult(entity)/63))) * PlayerTracker.getDefense(entity);
 				//this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*10);
 				ratio = this.getHealth()/this.getMaxHealth();
 				if (this.hasLegs()) {
 					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*3.1+800);
 					this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
-							.setBaseValue(40.0D+ItemJutsu.getDmgMult(entity)*4);
+							.setBaseValue(40.0D+ItemJutsu.getNinjaMult(entity)*4);
 				} else {
 					this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*2.2+500);
 					this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE)
-							.setBaseValue(30.0D+ItemJutsu.getDmgMult(entity)*3);
+							.setBaseValue(30.0D+ItemJutsu.getNinjaMult(entity)*3);
 				}
 				ratio = entity.getEntityData().getFloat("susanratio");
 			}
@@ -360,7 +360,7 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosionSize, flag, flag);
 				ProcedureAoeCommand.set(this, 2.0D, 4.0D).exclude(this.shootingEntity)
-				  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 50+ItemJutsu.getDmgMult(this.shootingEntity)*6.5f);
+				  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 50+ItemJutsu.getNinjaMult(this.shootingEntity)*6.5f);
 				this.setDead();
 			}
 		}

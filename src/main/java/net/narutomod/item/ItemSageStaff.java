@@ -78,7 +78,7 @@ public class ItemSageStaff extends ElementsNarutomodMod.ModElement {
 				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 2, 0);
 				entityarrow.setSilent(true);
 				entityarrow.setIsCritical(true);
-				entityarrow.setDamage(40+ItemJutsu.getDmgMult(entityLivingBase)*3);
+				entityarrow.setDamage(40+ItemJutsu.getNinjaMult(entityLivingBase)*3);
 				entityarrow.setKnockbackStrength(0);
 				world.playSound(null, entity.posX, entity.posY, entity.posZ,
 				 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:hand_shoot")),

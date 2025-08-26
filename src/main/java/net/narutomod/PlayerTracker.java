@@ -304,6 +304,12 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				float defMult = 1;
 				ItemStack cheststack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 				ItemStack headstack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+				if (headstack.getItem() == ItemSharingan.helmet ||headstack.getItem() == ItemSharingan.helmet  ) {
+					defMult += .1f;
+				}
+				if (headstack.getItem() == ItemMangekyoSharinganEternal.helmet ||headstack.getItem() == ItemMangekyoSharinganObito.helmet||headstack.getItem() == ItemMangekyoSharingan.helmet   ) {
+					defMult += .2f;
+				}
 				if (headstack.getItem() == ItemRinnegan.helmet ||headstack.getItem() == ItemTenseigan.helmet  ) {
 					defMult += .3f;
 				}
@@ -311,7 +317,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult += 0.3f;
 				}
 				if (cheststack.getItem() == ItemRinnegan.body) {
-					defMult += 1.2f;
+					defMult += 4f;
 				}
 				if (cheststack.getItem() == ItemBoneArmor.body) {
 					if (ItemBoneArmor.isLarchActive(cheststack)) {
@@ -339,9 +345,13 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
-						defMult+= 0.3f;
+						defMult+= 0.5f;
 					} else {
-						defMult+= 1.2f;
+						if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
+							defMult+= 0.4f;
+						} else {
+							defMult+= 1.2f;
+						}
 					}
 				}
 				if (ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity) > 0) {
