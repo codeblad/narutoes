@@ -28,6 +28,7 @@ import net.minecraft.entity.ai.EntityAIHurtByTarget;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityLiving;
@@ -48,11 +49,13 @@ import net.narutomod.entity.EntityC3;
 import net.narutomod.entity.EntityC4;
 import net.narutomod.entity.EntityClone;
 import net.narutomod.entity.EntityExplosiveClone;
+import net.narutomod.entity.EntitySpecialEffect;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureOnLeftClickEmpty;
 import net.narutomod.potion.PotionChakraEnhancedStrength;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.Particles;
+import net.narutomod.PlayerRender;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.List;
@@ -348,7 +351,7 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 	    public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float powerIn) {
-				Entity ec;
+				Entity ec = null;
 				Vec3d vec = entity.getLookVec();
 				vec = entity.getPositionVector().addVector(vec.x, 1d, vec.z);
 				if (powerIn < 1f) {
@@ -360,20 +363,58 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 					ec = new EntityC2.EC(entity);
 					ProcedureUtils.poofWithSmoke(entity.world, vec.x, vec.y, vec.z, ec.width, ec.height);
 					ItemJutsu.setCurrentJutsuCooldown(stack,40);
-				} else if (powerIn < 4f) {
+				} else if (powerIn < 5f) {
 					ec = new EntityC3.EC(entity);
 					ItemJutsu.setCurrentJutsuCooldown(stack,140);
-				} else if (powerIn <= this.getMaxPower()) {
+				} else if (powerIn < 10f) {
 					ec = new EntityC4.EC(entity);
 					float f = ((RangedItem)stack.getItem()).getXpRatio(stack, CLAY);
 					((EntityC4.EC)ec).setExplosionDamage(100, (int)(0.5f + ItemJutsu.getDmgMult(entity)*0.32));
 					ItemJutsu.setCurrentJutsuCooldown(stack,280);
+				} else if (powerIn <= this.getMaxPower()) {
+					// if (entity instanceof EntityPlayer) {
+					// 	PlayerRender.setTransparent((EntityPlayer) entity, true);
+					// }
+					if (!entity.world.isRemote && entity instanceof EntityPlayer) {
+						PlayerRender.setColorMultiplier((EntityPlayer)entity, 0);
+						PlayerRender.setTransparent((EntityPlayer) entity, true);
+					}
+					entity.world.playSound(
+						null,
+						entity.posX, entity.posY, entity.posZ,
+						SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:c0")),
+						SoundCategory.NEUTRAL,
+						1f, 1f
+					);
+		
+					ProcedureUtils.setDeathAnimations(entity, 2, 200);
+			
+					//entity.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 400, 2, false, false));
+					entity.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 8 * 600, (8 - 2) * 2));
+					entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 8 * 600, 8 - 2));
+			
+						// EntityPlayer player = (EntityPlayer) entity;
+						// player.capabilities.allowFlying = false;
+						// player.capabilities.isFlying = false;
+						// player.sendPlayerAbilities();
+			
+					EntitySpecialEffect.EntityCustom effectEntity = EntitySpecialEffect.spawn(
+						entity.world,
+						EntitySpecialEffect.Type.ROTATING_LINES_COLOR_END,
+						0xE4F1F7,
+						10f,
+						300,
+						entity.posX, entity.posY, entity.posZ
+					);
+					ItemJutsu.setCurrentJutsuCooldown(stack,280);
 				} else {
 					return false;
 				}
-				ec.setLocationAndAngles(vec.x, vec.y, vec.z, entity.rotationYaw, 0f);
-				ec.setRotationYawHead(entity.rotationYaw);
-				entity.world.spawnEntity(ec);
+				if (ec != null) {
+					ec.setLocationAndAngles(vec.x, vec.y, vec.z, entity.rotationYaw, 0f);
+					ec.setRotationYawHead(entity.rotationYaw);
+					entity.world.spawnEntity(ec);
+				}
 				return true;
 			}
 
@@ -389,7 +430,7 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getMaxPower() {
-				return 4.1f;
+				return 10.1f;
 			}
 
 			@Override
