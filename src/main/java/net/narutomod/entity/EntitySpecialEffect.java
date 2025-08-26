@@ -50,8 +50,7 @@ public class EntitySpecialEffect extends ElementsNarutomodMod.ModElement {
 
 	public enum Type {
 		ROTATING_LINES_COLOR_END(0),
-		EXPANDING_SPHERES_FADE_TO_BLACK(1),
-		LINES_COLOR_END(2);
+		EXPANDING_SPHERES_FADE_TO_BLACK(1);
 
 		private final int id;
 		private static final Map<Integer, Type> TYPES = Maps.newHashMap();
@@ -272,9 +271,6 @@ public class EntitySpecialEffect extends ElementsNarutomodMod.ModElement {
 					case EXPANDING_SPHERES_FADE_TO_BLACK:
 						this.renderExpandingSphere(entity, x, y, z, entityYaw, partialTicks);
 						break;
-					case LINES_COLOR_END:
-						this.renderLines(entity, x, y, z, entityYaw, partialTicks);
-						break;
 				}
 				super.doRender(entity, x, y, z, entityYaw, partialTicks);
 			}
@@ -320,64 +316,6 @@ public class EntitySpecialEffect extends ElementsNarutomodMod.ModElement {
 					bufferbuilder.pos(0.0D, f2, (1.0F * f3)).color(red, green, blue, 0).endVertex();
 					bufferbuilder.pos(-0.866D * f3, f2, (-0.5F * f3)).color(red, green, blue, 0).endVertex();
 					tessellator.draw();
-				}
-				GlStateManager.depthMask(true);
-				GlStateManager.disableCull();//GlStateManager.enableCull();
-				GlStateManager.disableBlend();
-				GlStateManager.shadeModel(7424);
-				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-				GlStateManager.enableTexture2D();
-				GlStateManager.enableAlpha();
-				RenderHelper.enableStandardItemLighting();
-				GlStateManager.popMatrix();
-			}
-
-			private void renderLines(EntityCustom entity, double x, double y, double z, float entityYaw, float partialTicks) {
-				GlStateManager.pushMatrix();
-				GlStateManager.translate(x, y + entity.height / 2, z);
-				GlStateManager.rotate(entityYaw, 0.0F, 1.0F, 0.0F);
-				Tessellator tessellator = Tessellator.getInstance();
-				BufferBuilder bufferbuilder = tessellator.getBuffer();
-				RenderHelper.disableStandardItemLighting();
-				float f1 = ((float)entity.getAge() + partialTicks) / entity.getLifespan();
-				// if (f > 0.5F)
-				// f1 = (f - 0.5F) / 0.5F;
-				GlStateManager.disableTexture2D();
-				GlStateManager.shadeModel(7425);
-				GlStateManager.enableBlend();
-				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-				GlStateManager.disableAlpha();
-				GlStateManager.enableCull();//GlStateManager.disableCull();
-				GlStateManager.depthMask(false);
-				float r = entity.getRadius();
-				int j = entity.getColor();
-				int alpha = j >> 24 & 0xFF;
-				int red = j >> 16 & 0xFF;
-				int green = j >> 8 & 0xFF;
-				int blue = j & 0xFF;
-				for (int i = 0; i < 60; i++) {
-				double angle = (360.0 / 60.0) * i; // evenly spaced around a circle
-				double rad = Math.toRadians(angle);
-
-				float expand = f1 * r; // expand over lifetime
-				float lineLength = expand; // how far it shoots outward
-				float lineThickness = 0.1f * r; // controls thickness
-
-				double dx = Math.cos(rad) * lineLength;
-				double dz = Math.sin(rad) * lineLength;
-
-				bufferbuilder.begin(6, DefaultVertexFormats.POSITION_COLOR);
-				bufferbuilder.pos(0.0D, 0.0D, 0.0D)
-					.color(255, 255, 255, (int)((float)alpha * (1.0F - f1))).endVertex();
-				bufferbuilder.pos(dx - lineThickness, expand, dz - lineThickness)
-					.color(red, green, blue, 0).endVertex();
-				bufferbuilder.pos(dx + lineThickness, expand, dz - lineThickness)
-					.color(red, green, blue, 0).endVertex();
-				bufferbuilder.pos(dx, expand, dz + lineThickness)
-					.color(red, green, blue, 0).endVertex();
-				bufferbuilder.pos(dx - lineThickness, expand, dz - lineThickness)
-					.color(red, green, blue, 0).endVertex();
-				tessellator.draw();
 				}
 				GlStateManager.depthMask(true);
 				GlStateManager.disableCull();//GlStateManager.enableCull();
