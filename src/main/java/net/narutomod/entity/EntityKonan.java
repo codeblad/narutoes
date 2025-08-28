@@ -247,10 +247,11 @@ public class EntityKonan extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean getCanSpawnHere() {
-			return super.getCanSpawnHere() && (int)this.posY >= this.world.getSeaLevel() && this.world.canSeeSky(this.getPosition())
+			return false;
+			/*return super.getCanSpawnHere() && (int)this.posY >= this.world.getSeaLevel() && this.world.canSeeSky(this.getPosition())
 			 && this.world.getEntities(EntityCustom.class, EntitySelectors.IS_ALIVE).isEmpty()
 			 && !EntityNinjaMob.SpawnData.spawnedRecentlyHere(this, 36000)
-			 && this.world.isRaining();
+			 && this.world.isRaining();*/
 		}
 
 		@Override

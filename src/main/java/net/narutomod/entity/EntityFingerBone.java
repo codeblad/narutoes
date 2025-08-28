@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
 public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 319;
 	public static final int ENTITYID_RANGED = 320;
-
+	
 	public EntityFingerBone(ElementsNarutomodMod instance) {
 		super(instance, 667);
 	}
@@ -82,7 +82,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (this.ticksAlive > 100) {
+			if (this.ticksAlive > 150) {
 				this.setDead();
 			}
 		}
@@ -149,13 +149,13 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 
 			public void createJutsu(EntityLivingBase entity) {
 				Vec3d vec = entity.getLookVec();
-				Vec3d vec1 = entity.getPositionVector().add(vec).addVector(0.0d, 1.4d, 0.0d);
+				Vec3d vec1 = entity.getPositionVector().add(vec).addVector(0.0d, 1.5d, 0.0d);
 				EC bullet = new EC(entity);
 				bullet.setPosition(vec1.x, vec1.y, vec1.z);
-				bullet.motionX = vec.x * 0.1d;
-				bullet.motionY = vec.y * 0.1d;
-				bullet.motionZ = vec.z * 0.1d;
-				bullet.shoot(vec.x, vec.y, vec.z, 1.2f, 0.05f);
+				bullet.motionX = vec.x * 0.0d;
+				bullet.motionY = vec.y * 0.0d;
+				bullet.motionZ = vec.z * 0.0d;
+				bullet.shoot(vec.x, vec.y, vec.z, 1.5f, 0.0f);
 				entity.world.spawnEntity(bullet);
 			}
 		}
@@ -190,9 +190,9 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				float scale = entity.getEntityScale();
 				GlStateManager.pushMatrix();
 				GlStateManager.translate(x, y, z);
-				GlStateManager.rotate(-entity.prevRotationYaw - (entity.rotationYaw - entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
-				GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * pt - 180.0F, 1.0F, 0.0F, 0.0F);
-				GlStateManager.rotate(((float)entity.ticksExisted + pt) * 30, 0.0F, 1.0F, 0.0F);
+				//GlStateManager.rotate(-entity.prevRotationYaw - (entity.rotationYaw - entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
+				//GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * pt - 180.0F, 1.0F, 0.0F, 0.0F);
+				//GlStateManager.rotate(((float)entity.ticksExisted + pt) * 30, 0.0F, 1.0F, 0.0F);
 				GlStateManager.scale(scale, scale, scale);
 				this.model.render(entity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
 				GlStateManager.popMatrix();
@@ -221,8 +221,8 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				bone2.cubeList.add(new ModelBox(bone2, 0, 8, -1.5F, -2.0F, -1.5F, 3, 4, 3, -0.3F, false));
 				bone2.cubeList.add(new ModelBox(bone2, 0, 0, -1.5F, -2.5F, -1.5F, 3, 5, 3, -0.5F, false));
 				bone = new ModelRenderer(this);
-				bone.setRotationPoint(0.0F, 3.5F, 0.0F);
-				setRotationAngle(bone, 0.0F, 0.5236F, 0.0F);
+				//bone.setRotationPoint(0.0F, 3.5F, 0.0F);
+				//setRotationAngle(bone, 0.0F, 0.5236F, 0.0F);
 				bone.cubeList.add(new ModelBox(bone, 8, 17, -1.0F, -1.0F, -1.0F, 2, 2, 2, 0.1F, false));
 				bone.cubeList.add(new ModelBox(bone, 0, 15, -1.0F, -1.5F, -1.0F, 2, 3, 2, -0.1F, false));
 				bone.cubeList.add(new ModelBox(bone, 12, 11, -1.0F, -2.0F, -1.0F, 2, 4, 2, -0.3F, false));

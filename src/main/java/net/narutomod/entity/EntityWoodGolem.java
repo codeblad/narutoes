@@ -2,6 +2,8 @@
 package net.narutomod.entity;
 
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.event.entity.EntityMountEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
@@ -118,6 +120,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(20.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D);
 			this.getEntityAttribute(EntityLivingBase.SWIM_SPEED).setBaseValue(0.6D);
+			this.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 9999999, 20, false, false));
 		}
 
 		@Override

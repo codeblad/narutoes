@@ -143,12 +143,12 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 5.0f;
+				return 3.0f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 100.0f;
+				return 50.0f;
 			}
 		}
 	}
