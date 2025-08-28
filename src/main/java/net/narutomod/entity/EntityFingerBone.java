@@ -75,14 +75,14 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void shoot(double x, double y, double z, float speed, float inaccuracy) {
 			super.shoot(x, y, z, speed, inaccuracy);
-			this.rotationPitch = MathHelper.wrapDegrees(this.rotationPitch + 90f);
-			this.prevRotationPitch = this.rotationPitch;
+			//this.rotationPitch = MathHelper.wrapDegrees(this.rotationPitch + 90f);
+			//this.prevRotationPitch = this.rotationPitch;
 		}
 
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (this.ticksAlive > 150) {
+			if (this.ticksAlive > 100) {
 				this.setDead();
 			}
 		}
@@ -149,7 +149,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 
 			public void createJutsu(EntityLivingBase entity) {
 				Vec3d vec = entity.getLookVec();
-				Vec3d vec1 = entity.getPositionVector().add(vec).addVector(0.0d, 1.5d, 0.0d);
+				Vec3d vec1 = entity.getPositionVector().add(vec).addVector(0.0d, 1.6d, 0.0d);
 				EC bullet = new EC(entity);
 				bullet.setPosition(vec1.x, vec1.y, vec1.z);
 				bullet.motionX = vec.x * 0.0d;

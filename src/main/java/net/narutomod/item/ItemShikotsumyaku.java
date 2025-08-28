@@ -28,9 +28,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.client.Minecraft;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.init.MobEffects;
 
 import net.narutomod.entity.EntitySpike;
 import net.narutomod.entity.EntityFingerBone;
+import net.narutomod.potion.PotionHeaviness;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.creativetab.TabModTab;
@@ -210,8 +214,8 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EntityBrackenDance extends EntitySpike.Base implements ItemJutsu.IJutsu {
-		private final int growTime = 8;
-		private final float maxScale = 4.0f;
+		private final int growTime = 2;
+		private final float maxScale = 2.0f;
 		private float damage = 6.0f;
 
 		public EntityBrackenDance(World worldIn) {
@@ -240,6 +244,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 						if (ticksAlive < 5) {
 							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
 									this.damage);
+							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 25, 1, false, false));
 						}
 					}
 				}
@@ -251,10 +256,10 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				World world = entity.world;
 				Vec3d vec3d = entity.getPositionEyes(1f);
-				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(30d));
+				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(200d));
 				RayTraceResult res = world.rayTraceBlocks(vec3d, vec3d2, false, true, true);
 				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK && res.sideHit == EnumFacing.UP) {
-					float f = MathHelper.sqrt(power * 9f / 5f);
+					float f = MathHelper.sqrt(power * 26f / 5f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EntityBrackenDance entity1 = new EntityBrackenDance(entity, power);
 						entity1.damage = 13+5f*(1+3f*(1/100))*ItemJutsu.getDmgMult(entity);
@@ -267,7 +272,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 						 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")),
 						 SoundCategory.NEUTRAL, 5f, entity.getRNG().nextFloat() * 0.4f + 0.4f);
 					}
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*3);
 					return true;
 				}
 				return false;
