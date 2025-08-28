@@ -143,7 +143,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					if (!this.summoner.isSprinting()) {
 						double d0 = this.posX - this.prevPosX;
 						double d1 = this.posZ - this.prevPosZ;
-						((EntityPlayer)this.summoner).addExhaustion(0.05f * (float)MathHelper.sqrt(d0 * d0 + d1 * d1) * this.modifier);
+						((EntityPlayer)this.summoner).addExhaustion(0.02f * (float)MathHelper.sqrt(d0 * d0 + d1 * d1) * this.modifier);
 					}
 					if (((EntityPlayer)this.summoner).getFoodStats().getFoodLevel() < 1.0f) {
 						this.setDead();
