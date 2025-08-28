@@ -211,7 +211,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityBrackenDance extends EntitySpike.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 8;
-		private final float maxScale = 2.0f;
+		private final float maxScale = 4.0f;
 		private float damage = 6.0f;
 
 		public EntityBrackenDance(World worldIn) {
@@ -280,12 +280,12 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 5.0f;
+				return 2.5f;
 			}
 
 			@Override
 			public float getMaxPower() {
-				return 100.0f;
+				return 20.0f;
 			}
 		}
 	}
