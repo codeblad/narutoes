@@ -115,7 +115,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		private static final Map<IAttribute, AttributeModifier> buffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
 			.put(EntityPlayer.REACH_DISTANCE, new AttributeModifier(UUID.fromString("c3ee1250-8b80-4668-b58a-33af5ea73ee6"), "sagemode.reach", 2.0d, 0))
 			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(UUID.fromString("33b7fa14-828a-4964-b014-b61863526589"), "sagemode.damagespeed", 2.0d, 1))
-			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.5d, 1))
+			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.25d, 1))
 			.build();
 
 		@SideOnly(Side.CLIENT)
