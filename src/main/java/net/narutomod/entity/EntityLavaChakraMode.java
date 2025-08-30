@@ -128,7 +128,7 @@ public class EntityLavaChakraMode extends ElementsNarutomodMod.ModElement {
 						}
 						user.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier(LAVA_DAMAGE,"lavaCloak", 5+ItemJutsu.getNinjaMult(user), 0));
 						//user.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 21, this.strengthAmplifier, false, false));
-						user.addPotionEffect(new PotionEffect(MobEffects.SPEED, 21, 16, false, false));
+						user.addPotionEffect(new PotionEffect(MobEffects.SPEED, 21, 14, false, false));
 					}
 				}
 				if (this.rand.nextInt(20) == 0) {
