@@ -268,9 +268,9 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			new Properties(3, I18n.translateToLocal("chattext.eightgates.gate3"), 300, 20, 0x10FFFFFF, 10, 16, 1, 60, -.75f, false),
 			new Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 500, 25, 0x18FFFFFF, 20, 24, 2, 60, 0.1f, false),
 			new Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 1000, 30, 0x20FFFFFF, 30, 28, 2, 60, 0.3f, false),
-			new Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 2500, 30, 0x3000FF00, 50, 32, 3, 60, 0.4f, false),
+			new Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 2500, 30, 0x3000FF00, 50, 32, 3, 60, 0.5f, false),
 			new Properties(7, I18n.translateToLocal("chattext.eightgates.gate7"), 5000, 30, 0x300000FF, 65, 36, 3, 60, 1.0f, false),
-			new Properties(8, I18n.translateToLocal("chattext.eightgates.gate8"), 9001, 30, 0x30FF0000, 150, 50, 4, 60, 1.25f, true)};
+			new Properties(8, I18n.translateToLocal("chattext.eightgates.gate8"), 9001, 30, 0x30FF0000, 150, 60, 4, 60, 2.0f, true)};
 						
 		public RangedItem() {
 			this.setMaxDamage(0);
