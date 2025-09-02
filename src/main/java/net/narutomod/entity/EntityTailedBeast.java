@@ -102,6 +102,7 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Lists;
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 import java.util.UUID;
 import java.util.Map;
 import java.util.Iterator;
@@ -653,23 +654,32 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				this.rotationYawHead = entity.rotationYaw;
 				this.stepHeight = this.height / 3.0F;
 				if (entity instanceof EntityLivingBase) {
-					float terminal = -200f;
-					if (this.onGround) {
-						this.fall = 0;
-					} else {
-						this.fall -= 1.6f;
-						if (this.fall < terminal) {
-							this.fall = terminal;
-						}
-					}
-
 					this.setAIMoveSpeed((float) this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getAttributeValue());
 					float forward = ((EntityLivingBase) entity).moveForward;
 					float strafe = ((EntityLivingBase) entity).moveStrafing;
+
+					float terminal = -5000f;
 					if (this instanceof EntitySevenTails.EntityCustom) {
+						terminal = 0;
+					}
+
+					if (this.onGround) {
 						this.fall = 0;
-					} else {
+					}
+
+
+					if (terminal != 0) {
 						this.checkJump((EntityLivingBase) entity);
+					}
+					if (!this.onGround) {
+
+						this.fall -= 200f;
+					}
+					if (this.fall < terminal) {
+						this.fall = terminal;
+					}
+					if (this.fall > 0) {
+						forward = 5000;
 					}
 					super.travel(strafe, this.fall, forward);
 				}
@@ -680,9 +690,9 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		}
 
 		private void checkJump(EntityLivingBase entity) {
-			if (this.world.isRemote) {
-				if ((boolean) ReflectionHelper.getPrivateValue(EntityLivingBase.class, entity, 49) && this.onGround) {
-					this.fall = 20f;
+			if (this.world.isRemote && this.onGround) {
+				if ((boolean)ReflectionHelper.getPrivateValue(EntityLivingBase.class, entity, 49) && this.onGround) {
+					this.fall = 7500f;
 					ReflectionHelper.setPrivateValue(EntityLivingBase.class, entity, false, 49);
 				}
 			}
@@ -819,7 +829,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			if (this.isBeingRidden()) {
-				this.clampMotion(0.05D);
+				//this.clampMotion(0.05D);
 			}
 			if (this.tailBeastBallTime > 0) {
 				--this.tailBeastBallTime;
@@ -1030,6 +1040,8 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				this.setDead();
 			}
 		}
+
+
 
 		@Override
 		protected void onImpact(RayTraceResult result) {

@@ -131,7 +131,7 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 					 .getObject(new ResourceLocation("narutomod:electricity")), 0.1f, this.rand.nextFloat() * 0.6f + 0.3f);
 				}
 				if (this.ticksExisted%20 == 2) {
-					this.summoner.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 18, false, false));
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 13, false, false));
 				}
 				EntityLightningArc.spawnAsParticle(this.world, this.posX + (this.rand.nextDouble()-0.5d) * 2.0d,
 				  this.posY + this.rand.nextDouble() * 1.6d, this.posZ + (this.rand.nextDouble()-0.5d) * 2.0d, 1.2d, 0d, 0d, 0d);
