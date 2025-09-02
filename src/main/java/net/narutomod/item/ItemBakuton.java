@@ -66,15 +66,15 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 230;
 	public static final ItemJutsu.JutsuEnum JIRAIKEN = new ItemJutsu.JutsuEnum(0, "tooltip.bakuton.jiraiken", 'S', 150, 30d, new Jiraiken());
 	public static final ItemJutsu.JutsuEnum CLAY = new ItemJutsu.JutsuEnum(1, "c_1", 'S', 200, 180d, new ExplosiveClay.Jutsu());
-	public static final ItemJutsu.JutsuEnum CLONE = new ItemJutsu.JutsuEnum(2, "explosive_clone", 'S', 200, 250d, new EntityExplosiveClone.EC.Jutsu());
-
+	public static final ItemJutsu.JutsuEnum CLONE = new ItemJutsu.JutsuEnum(2, "explosive_clone", 'S', 200, 250d, new EntityExplosiveClone.EC.Jutsu()); 
+public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3, "c0", 'S', 200, 980d, new C0());
 	public ItemBakuton(ElementsNarutomodMod instance) {
 		super(instance, 543);
 	}
 
 	@Override
 	public void initElements() {
-		elements.items.add(() -> new RangedItem(JIRAIKEN, CLAY, CLONE));
+		elements.items.add(() -> new RangedItem(JIRAIKEN, CLAY, CLONE, ARTEXPLOSION));
 		//elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityArrowCustom.class)
 		// .id(new ResourceLocation("narutomod", "entitybulletbakuton"), ENTITYID).name("entitybulletbakuton").tracker(64, 1, true).build());
 	}
@@ -103,6 +103,7 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 			this.defaultCooldownMap[JIRAIKEN.index] = 0;
 			this.defaultCooldownMap[CLAY.index] = 0;
 			this.defaultCooldownMap[CLONE.index] = 0;
+			this.defaultCooldownMap[ARTEXPLOSION.index] = 0;
 		}
 
 		@Override
@@ -182,6 +183,69 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 		public float getMaxPower() {
 			return 10.0f;
 		}
+	}
+
+	public static class C0 implements ItemJutsu.IJutsuCallback {
+		//private boolean activated = false;
+		//protected float power;
+		
+
+
+
+			@Override
+			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float powerIn) {
+				if (powerIn >= this.getMaxPower()) {
+				Entity ec  = new EntityC0.EC(entity);
+				Vec3d vec = entity.getLookVec();
+				vec = entity.getPositionVector().addVector(vec.x, 1d, vec.z);
+				ProcedureUtils.setDeathAnimations(entity, 2, 225);
+					if (!entity.world.isRemote && entity instanceof EntityPlayer) {
+						//PlayerRender.setColorMultiplier((EntityPlayer)entity, 0);
+						PlayerRender.setTransparent((EntityPlayer) entity, true);
+					}
+					//entity.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 400, 2, false, false));
+					entity.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 8 * 600, (8 - 2) * 2));
+					entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 8 * 600, 8 - 2));
+			
+					EntityPlayer player = (EntityPlayer) entity;
+					player.capabilities.allowFlying = false;
+					player.capabilities.isFlying = false;
+					player.sendPlayerAbilities();
+			
+					// EntitySpecialEffect.EntityCustom effectEntity = EntitySpecialEffect.spawn(
+					// 	entity.world,
+					// 	EntitySpecialEffect.Type.LINES_COLOR_END,
+					// 	0x92dbff,
+					// 	6f,
+					// 	300,
+					// 	entity.posX, entity.posY + entity.height * 0.4, entity.posZ
+					// );
+					ItemJutsu.setCurrentJutsuCooldown(stack,1728000);
+				
+				//if (ec != null) {
+					ec.setLocationAndAngles(vec.x, vec.y, vec.z, entity.rotationYaw, 0f);
+					ec.setRotationYawHead(entity.rotationYaw);
+					entity.world.spawnEntity(ec);
+				//}
+				return true;
+				}
+				else {
+					return false;				
+				}
+			}
+
+			@Override
+			public float getPowerupDelay() {
+				return 10.0f;
+			}
+
+			@Override
+			public float getMaxPower() {
+				return 10.0f;
+			}
+
+			
+		
 	}
 
 	public abstract static class ExplosiveClay extends EntityCreature implements ItemJutsu.IJutsu {
@@ -367,40 +431,11 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 				} else if (powerIn < 4f) {
 					ec = new EntityC3.EC(entity);
 					ItemJutsu.setCurrentJutsuCooldown(stack,140);
-				} else if (powerIn < 5f) {
+				} else if (powerIn <= this.getMaxPower()) {
 					ec = new EntityC4.EC(entity);
 					float f = ((RangedItem)stack.getItem()).getXpRatio(stack, CLAY);
 					((EntityC4.EC)ec).setExplosionDamage(100, (int)(0.5f + ItemJutsu.getDmgMult(entity)*0.32));
 					ItemJutsu.setCurrentJutsuCooldown(stack,280);
-				} else if (powerIn <= this.getMaxPower()) {
-					// if (entity instanceof EntityPlayer) {
-					// 	PlayerRender.setTransparent((EntityPlayer) entity, true);
-					// }
-					ec = new EntityC0.EC(entity);
-					
-					ProcedureUtils.setDeathAnimations(entity, 2, 225);
-					if (!entity.world.isRemote && entity instanceof EntityPlayer) {
-						//PlayerRender.setColorMultiplier((EntityPlayer)entity, 0);
-						PlayerRender.setTransparent((EntityPlayer) entity, true);
-					}
-					//entity.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 400, 2, false, false));
-					entity.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 8 * 600, (8 - 2) * 2));
-					entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 8 * 600, 8 - 2));
-			
-					EntityPlayer player = (EntityPlayer) entity;
-					player.capabilities.allowFlying = false;
-					player.capabilities.isFlying = false;
-					player.sendPlayerAbilities();
-			
-					// EntitySpecialEffect.EntityCustom effectEntity = EntitySpecialEffect.spawn(
-					// 	entity.world,
-					// 	EntitySpecialEffect.Type.LINES_COLOR_END,
-					// 	0x92dbff,
-					// 	6f,
-					// 	300,
-					// 	entity.posX, entity.posY + entity.height * 0.4, entity.posZ
-					// );
-					ItemJutsu.setCurrentJutsuCooldown(stack,560);
 				} else {
 					return false;
 				}
