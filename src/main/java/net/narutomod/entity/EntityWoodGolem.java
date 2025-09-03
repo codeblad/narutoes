@@ -152,7 +152,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 					if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 						ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
 						//(30*20)+this.ticksExisted+this.ticksExisted/2
-						item.setJutsuCooldown(stack, GOLEM, 20*20);
+						item.setJutsuCooldown(stack, GOLEM, 20*30);
 					}
 				}
 			}

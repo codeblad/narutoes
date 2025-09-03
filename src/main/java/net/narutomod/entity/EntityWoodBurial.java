@@ -159,7 +159,7 @@ public class EntityWoodBurial extends ElementsNarutomodMod.ModElement {
 				});
 				if (res != null && res.entityHit != null) {
 					entity.world.spawnEntity(new EC(res.entityHit,entity));
-					((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 200);
+					((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 20*15);
 					return true;
 				}
 				return false;

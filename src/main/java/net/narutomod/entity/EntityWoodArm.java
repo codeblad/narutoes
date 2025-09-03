@@ -123,7 +123,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 				 	this.target.getEntityData().setBoolean("TempData_disableKnockback", true);
 
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this,
-							parent instanceof EntityLivingBase ? (EntityLivingBase)parent : null), 10+4f* ItemJutsu.getDmgMult(parent));
+							parent instanceof EntityLivingBase ? (EntityLivingBase)parent : null), 10+2.8f* ItemJutsu.getDmgMult(parent));
 				}
 				if (this.targetDistance != 0d && this.targetTargetable() && this.ticksExisted < this.lifespan - 40) {
 					Vec3d vec = new Vec3d(0d, 0d, this.targetDistance)
@@ -131,7 +131,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 					 .addVector(parent.posX, this.targetYOffset + parent.posY, parent.posZ);
 					this.target.setPositionAndUpdate(vec.x, vec.y, vec.z);
 					if (this.target instanceof EntityLivingBase) {
-						Chakra.pathway((EntityLivingBase)this.target).consume(40d);
+						Chakra.pathway((EntityLivingBase)this.target).consume(10d);
 					}
 				}
 			} else if (!this.world.isRemote) {
@@ -153,7 +153,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 100d, 5d, ItemMokuton.WoodSegment.class);
 				if (res != null && res.entityHit != null) {
 					entity.world.spawnEntity(new EC(entity, res.entityHit));
-					((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 20*2);
+					((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 20*5);
 					return true;
 				}
 				return false;

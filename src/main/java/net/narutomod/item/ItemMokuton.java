@@ -109,7 +109,7 @@ public class ItemMokuton extends ElementsNarutomodMod.ModElement {
 					((EntityPlayer)entity).getFoodStats().addStats(20, 0.02f);
 				}
 				if (entity.ticksExisted % 7 == 0 && ((EntityPlayer) entity).getHealth() < ((EntityPlayer) entity).getMaxHealth()) {
-					((EntityPlayer)entity).heal(0.75f);
+					((EntityPlayer)entity).heal(0.1f);
 				}
 			}
 		}

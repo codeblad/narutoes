@@ -195,7 +195,7 @@ public class EntityDeepForest extends ElementsNarutomodMod.ModElement {
 								net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:deep_forest"))),
 						SoundCategory.NEUTRAL, 3, 1f);
 				entity.world.spawnEntity(new EC(entity));
-				((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 20*10);
+				((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 20*20);
 				return true;
 			}
 		}

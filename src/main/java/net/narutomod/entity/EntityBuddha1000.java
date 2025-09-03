@@ -105,9 +105,9 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 			this.stepHeight = this.height / 3;
 
 			float health = (20+ (80*(ItemJutsu.getDmgMult(summonerIn)/63))) * PlayerTracker.getDefense(summonerIn);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*5+5000);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*4+2000);
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(100.0D+ItemJutsu.getDmgMult(summonerIn)*6);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(80.0D+ItemJutsu.getDmgMult(summonerIn)*4);
 			this.setHealth(this.getMaxHealth());
 			this.chakraBurn = chakraUsagePerSec;
 		}
@@ -296,7 +296,7 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 							 .rotateYaw(-this.renderYawOffset * (float)Math.PI / 180f)
 							 .scale((this.rand.nextDouble() * 3d + 1.5d) * this.width)
 							 .addVector(this.posX, this.posY + 0.625d * this.height, this.posZ);
-							EntityArm entity = new EntityArm(this, vec1.x, vec1.y, vec1.z, 30.0f+ItemJutsu.getDmgMult(summoner)*0.8f);
+							EntityArm entity = new EntityArm(this, vec1.x, vec1.y, vec1.z, 30.0f+ItemJutsu.getDmgMult(summoner)*0.2f);
 							entity.shoot(vec.x, vec.y, vec.z, 1.2f, 0f);
 							this.world.spawnEntity(entity);
 						}
@@ -305,7 +305,7 @@ public class EntityBuddha1000 extends ElementsNarutomodMod.ModElement {
 						Vec3d vec1 = this.getLookVec().scale(this.width)
 						 .addVector(this.posX, this.posY + 0.625d * this.height, this.posZ);
 						Vec3d vec = res.hitVec.subtract(vec1);
-						EntityArm entity = new EntityArm(this, vec1.x, vec1.y, vec1.z, 130.0f+ItemJutsu.getDmgMult(summoner)*6f);
+						EntityArm entity = new EntityArm(this, vec1.x, vec1.y, vec1.z, 100.0f+ItemJutsu.getDmgMult(summoner)*4f);
 						entity.shoot(vec.x, vec.y, vec.z, 1.65f, 0f);
 						this.world.spawnEntity(entity);
 						//entity.setGrow(false);

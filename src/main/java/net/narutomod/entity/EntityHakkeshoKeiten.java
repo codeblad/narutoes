@@ -77,7 +77,7 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 			this.setScale(0.1f);
 			this.setOwnerCanSteer(true, 0.5F);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-			  .applyModifier(new AttributeModifier("shield.health", d + player.getMaxHealth(), 0));
+			  .applyModifier(new AttributeModifier("shield.health", d + player.getMaxHealth()*2, 0));
 			this.setHealth(this.getMaxHealth());
 		}
 

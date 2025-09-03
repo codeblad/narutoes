@@ -329,7 +329,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
 				if (stackwood != null) {
-					defMult+= 0.5f;
+					defMult+= 0.2f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
 					defMult+= 0.15f;
