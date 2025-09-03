@@ -24,6 +24,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.ActionResult;
 
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.procedure.ProcedureUtils;
 
 import java.util.Set;
 import java.util.HashMap;
@@ -50,6 +51,7 @@ public class ItemBoneSword extends ElementsNarutomodMod.ModElement {
 							new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double) this.getAttackDamage(), 0));
 					multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
 							new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -3, 0));
+					multimap.put(EntityPlayer.REACH_DISTANCE.getName(), new AttributeModifier(ProcedureUtils.REACH_MODIFIER, "Tool modifier", 3, 0));
 				}
 				return multimap;
 			}

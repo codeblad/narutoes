@@ -53,7 +53,7 @@ public class ItemBoneDrill extends ElementsNarutomodMod.ModElement {
 			setMaxStackSize(1);
 		}
 
-		float damage = 10f;
+		float damage = 14f;
 
 		@Override
 		public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
