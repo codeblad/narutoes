@@ -35,6 +35,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
 
 import net.narutomod.entity.EntityUnrivaledStrength;
@@ -193,6 +194,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				if (target instanceof EntityLivingBase) {
 					target.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1f, this.rand.nextFloat() + 0.5f);
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 20, 2));
 					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, 100, EntityBoilingMist.this.damagePerSec));
 				}
 			}
