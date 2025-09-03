@@ -8587,6 +8587,14 @@
       "subtitle": ""
     },
     {
+      "name": "c0",
+      "files": [
+        "c0"
+      ],
+      "category": "master",
+      "subtitle": ""
+    },
+    {
       "name": "woodgrow",
       "files": [
         "woodgrow"
@@ -9133,7 +9141,7 @@
       "tooltip.6psenjutsu.shield": "Truth Seeking Ball: Shield",
       "entity.susanooclothed.name": "Susanoo",
       "entity.lightning_arc.name": "Lightning Arc",
-      "advancements.eternalmangekyoachieved.descr": "The Eternal Mangeky¨­ Sharingan is proof an Uchiha has continued to push forward despite experiencing great losses.",
+      "advancements.eternalmangekyoachieved.descr": "The Eternal Mangekyï¿½ï¿½ Sharingan is proof an Uchiha has continued to push forward despite experiencing great losses.",
       "item.ninja_armor_otoboots.name": "",
       "advancements.bakuton_acquired.title": "Explosion Release Acquired",
       "advancements.ranton_acquired.title": "Storm Release Acquired",
@@ -9250,6 +9258,7 @@
       "entity.sand_bullet.name": "Sand Bullet Barrage",
       "item.ninja_armor_konohaboots.name": "",
       "subtitles.c3": "",
+      "subtitles.c0": "Sound of Art",
       "item.nuibari_sword.name": "Nuibari Sword",
       "item.scroll_swamp_pit.name": "Earth Release: Hell Swamp",
       "entity.ice_prison.name": "Ice Prison",
@@ -9532,7 +9541,7 @@
       "item.sound_gaunlet.name": "Sound Reflecting Gauntlet",
       "item.mangekyosharinganobitohelmet.name": "Mangekyo Sharingan - Kamui",
       "advancements.sharinganopened.title": "Sharingan activated",
-      "advancements.kekkei_tota_awakened.descr": "Kekkei T¨­ta is an advanced branch of jutsu that is more advanced than kekkei genkai. The only known example is Dust Release, a combination of three different nature transformations ¡ª earth, wind, and fire.",
+      "advancements.kekkei_tota_awakened.descr": "Kekkei Tï¿½ï¿½ta is an advanced branch of jutsu that is more advanced than kekkei genkai. The only known example is Dust Release, a combination of three different nature transformations ï¿½ï¿½ earth, wind, and fire.",
       "item.inton.name": "Yin Release",
       "entity.water_prison.name": "Water Prison jutsu",
       "item.ninja_armor_obito_warhelmet.name": "Ninja Armor Obito War Helmet",
@@ -9678,7 +9687,7 @@
       "tooltip.jinton.musthave": "Must have Earth, Wind \u0026 Fire release \u0026 4900 NXP",
       "item.mask_obito_warbody.name": "Mask Obito War Body",
       "item.shikotsumyaku.name": "Skeletal Control",
-      "advancements.byakuganopened.descr": "Byakugan is regarded as one of the \"Three Great D¨­jutsu\", the others being the Sharingan and the Rinnegan.",
+      "advancements.byakuganopened.descr": "Byakugan is regarded as one of the \"Three Great Dï¿½ï¿½jutsu\", the others being the Sharingan and the Rinnegan.",
       "subtitles.dingding": "",
       "item.scroll_earth_golem.name": "Earth Release: Golem Jutsu",
       "item.robe_jiraiyahelmet.name": "Robe Jiraiya Helmet",

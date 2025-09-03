@@ -117,6 +117,11 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(UUID.fromString("33b7fa14-828a-4964-b014-b61863526589"), "sagemode.damagespeed", 2.0d, 1))
 			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.25d, 1))
 			.build();
+			private static final Map<IAttribute, AttributeModifier> snakebuffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
+			.put(EntityPlayer.REACH_DISTANCE, new AttributeModifier(UUID.fromString("c3ee1250-8b80-4668-b58a-33af5ea73ee6"), "sagemode.reach", 2.0d, 0))
+			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(UUID.fromString("33b7fa14-828a-4964-b014-b61863526589"), "sagemode.damagespeed", 2.2d, 1))
+			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.35d, 1))
+			.build();
 
 		@SideOnly(Side.CLIENT)
 		private ModelBiped armorModel;
@@ -162,12 +167,23 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 				boolean flag = isSageModeActivated(itemstack);
 				//boolean flag1 = living.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).hasModifier(buffMap.get(SharedMonsterAttributes.MAX_HEALTH));
 				if (flag) {
-					for (Map.Entry<IAttribute, AttributeModifier> entry : buffMap.entrySet()) {
-						IAttributeInstance attr = living.getEntityAttribute(entry.getKey());
-						if (attr != null && !attr.hasModifier(entry.getValue())) {
-							attr.applyModifier(entry.getValue());
+					if (this.getSageType(itemstack) == Type.SNAKE) {
+						for (Map.Entry<IAttribute, AttributeModifier> entry : snakebuffMap.entrySet()) {
+							IAttributeInstance attr = living.getEntityAttribute(entry.getKey());
+								if (attr != null && !attr.hasModifier(entry.getValue())) {
+									attr.applyModifier(entry.getValue());
+								}
 						}
 					}
+					else {
+						for (Map.Entry<IAttribute, AttributeModifier> entry : buffMap.entrySet()) {
+							IAttributeInstance attr = living.getEntityAttribute(entry.getKey());
+								if (attr != null && !attr.hasModifier(entry.getValue())) {
+									attr.applyModifier(entry.getValue());
+								}
+						}
+					}
+					
 					double d = 15.0d+ItemJutsu.getNinjaMult(living)*2.5f;
 					if (living instanceof  EntityPlayer) {
 						if (EntityBijuManager.cloakLevel((EntityPlayer) living) > 0) {

@@ -476,6 +476,15 @@
       }
     ]
   },
+   "c0": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:c0",
+        "stream": false
+      }
+    ]
+  },
   "katsu": {
     "category": "master",
     "sounds": [
