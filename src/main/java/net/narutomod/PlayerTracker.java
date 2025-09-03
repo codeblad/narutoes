@@ -96,7 +96,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static float getDefense(Entity entity) {
-		return 1.5f+15*ItemJutsu.getDmgMult(entity)/63;
+		return 1.5f+19*ItemJutsu.getDmgMult(entity)/63;
 	}
 
 	private static void logBattleExp(EntityPlayer entity, double xp) {
@@ -345,12 +345,12 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
-						defMult+= 0.5f;
+						defMult+= 0.4f;
 					} else {
 						if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
 							defMult+= 0.4f;
 						} else {
-							defMult+= 1.2f;
+							defMult+= 0.9f;
 						}
 					}
 				}
