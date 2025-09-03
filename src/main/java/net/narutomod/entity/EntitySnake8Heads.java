@@ -139,7 +139,8 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			if (super.attackEntityAsMob(entityIn)) {
 				if (this.attackCD <= 0) {
 					this.attackCD = 60;
-					world.spawnEntity(new EntitySnakeHead(this.getSummoner(), (EntityLivingBase)entityIn));
+					
+					//world.spawnEntity(new EntitySnakeHead(this.getSummoner(), (EntityLivingBase)entityIn));
 					return true;
 				}
 			}

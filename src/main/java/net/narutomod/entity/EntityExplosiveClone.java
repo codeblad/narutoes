@@ -176,7 +176,7 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 				this.world.createExplosion(summoner, this.posX, this.posY, this.posZ, 8f,
 		    	 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, summoner));
 		    	ProcedureAoeCommand.set(this, 0d, 8d)
-		    	 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, summoner), 5f+1.45f*ItemJutsu.getDmgMult(summoner));
+		    	 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, summoner), 7f+1.6f*ItemJutsu.getDmgMult(summoner));
 	    		this.setDead();
 	    	}
 		}

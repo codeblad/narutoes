@@ -175,7 +175,9 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						if (this.damage >= 0.0f) {
 							if (entity.ticksExisted % 80 == 0) {
 								entity.hurtResistantTime = 10;
-								entity.attackEntityFrom(ProcedureUtils.SPECIAL_DAMAGE, this.damage * 4);
+								//entity.getMaxHealth() * this.damage()
+								//this.damage * 4
+								entity.attackEntityFrom(ProcedureUtils.SPECIAL_DAMAGE, entity.getMaxHealth() * this.damage);
 							}
 						} else {
 							entity.setHealth(entity.getHealth() - this.damage);
@@ -263,14 +265,14 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		private static final String XP_KEY = "battleExperience";
 		// stats here
 		private final Properties GATE[] = {new Properties(0, "", 0, 0, 0, 0, 0, 0, 0, 0f, false),
-			new Properties(1, I18n.translateToLocal("chattext.eightgates.gate1"), 200, 0, 0, 2, 2, 0, 10, -0.5f, false),
+			new Properties(1, I18n.translateToLocal("chattext.eightgates.gate1"), 200, 0, 0, 2, 2, 0, 10, -1.0f, false),
 			new Properties(2, I18n.translateToLocal("chattext.eightgates.gate2"), 250, 0, 0, 4, 12, 0, 40, -1.5f, false),
 			new Properties(3, I18n.translateToLocal("chattext.eightgates.gate3"), 300, 20, 0x10FFFFFF, 10, 16, 1, 60, -.75f, false),
-			new Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 500, 25, 0x18FFFFFF, 20, 24, 2, 60, 0.1f, false),
-			new Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 1000, 30, 0x20FFFFFF, 30, 28, 2, 60, 0.3f, false),
-			new Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 2500, 30, 0x3000FF00, 50, 32, 3, 60, 0.5f, false),
-			new Properties(7, I18n.translateToLocal("chattext.eightgates.gate7"), 5000, 30, 0x300000FF, 65, 36, 3, 60, 1.0f, false),
-			new Properties(8, I18n.translateToLocal("chattext.eightgates.gate8"), 9001, 30, 0x30FF0000, 150, 60, 4, 60, 2.0f, true)};
+			new Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 500, 25, 0x18FFFFFF, 20, 24, 2, 60, .015f, false),
+			new Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 1000, 30, 0x20FFFFFF, 30, 28, 2, 60, .02f, false),
+			new Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 2500, 30, 0x3000FF00, 50, 32, 3, 60, .025f, false),
+			new Properties(7, I18n.translateToLocal("chattext.eightgates.gate7"), 5000, 30, 0x300000FF, 65, 36, 3, 60, .035f, false),
+			new Properties(8, I18n.translateToLocal("chattext.eightgates.gate8"), 9001, 30, 0x30FF0000, 150, 60, 4, 60, .05f, true)};
 						
 		public RangedItem() {
 			this.setMaxDamage(0);
