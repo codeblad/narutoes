@@ -58,7 +58,7 @@ public class ItemBoneArmor extends ElementsNarutomodMod.ModElement {
 	public void initElements() {
 		UUID damageUuid = UUID.fromString("5b347d9c-9d09-4e9a-96bd-992364981042");
 		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("BONE_ARMOR", "narutomod:sasuke_", 10000,
-		 new int[]{3, 5, 12, 3}, 0, net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")), 2f);
+		 new int[]{3, 5, 16, 3}, 2, net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")), 2f);
 		elements.items.add(() -> new ItemArmor(enuma, 0, EntityEquipmentSlot.CHEST) {
 			private double willowDamage = 15d;
 			@SideOnly(Side.CLIENT)
