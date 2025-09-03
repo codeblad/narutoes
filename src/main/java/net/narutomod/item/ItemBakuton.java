@@ -55,6 +55,7 @@ import net.narutomod.potion.PotionChakraEnhancedStrength;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.Particles;
 import net.narutomod.PlayerRender;
+import net.narutomod.PlayerTracker;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.List;
@@ -194,7 +195,7 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float powerIn) {
-				if (powerIn >= this.getMaxPower()) {
+				if (powerIn >= this.getMaxPower() && PlayerTracker.getBattleXp((EntityPlayer) entity) >= 10000) {
 				Entity ec  = new EntityC0.EC(entity);
 				Vec3d vec = entity.getLookVec();
 				vec = entity.getPositionVector().addVector(vec.x, 1d, vec.z);

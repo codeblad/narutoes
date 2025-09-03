@@ -120,6 +120,7 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				if (target instanceof EntityLivingBase) {
 					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, (int) (80+80*(power/20)), (int) (8+ItemJutsu.getDmgMult(player)*0.5)));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.POISON, (int) (40+100*(power/20)), 4));
 					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) (40+100*(power/20)), 2));
 				}
 			}
