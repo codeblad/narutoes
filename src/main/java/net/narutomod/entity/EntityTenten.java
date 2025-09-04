@@ -31,7 +31,8 @@ import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.village.MerchantRecipeList;
-import net.minecraft.village.MerchantRecipe;
+import net.minecraft.village.MerchantRecipe;
+
 import net.minecraft.village.Village;
 import net.minecraft.inventory.EntityEquipmentSlot;
 
@@ -79,6 +80,7 @@ public class EntityTenten extends ElementsNarutomodMod.ModElement {
 			Arrays.fill(this.inventoryHandsDropChances, 0.0F);
 		}
 
+		
 		@Override
 		public Map<EntityNinjaMerchant.TradeLevel, MerchantRecipeList> getTrades() {
 			Map<EntityNinjaMerchant.TradeLevel, MerchantRecipeList> trades = Maps.newHashMap();
@@ -92,8 +94,19 @@ public class EntityTenten extends ElementsNarutomodMod.ModElement {
 			uncommonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 2), ItemStack.EMPTY, new ItemStack(ItemKunaiExplosive.block, 2), 0, 1));
 			uncommonTrades.add(new MerchantRecipe(new ItemStack(Items.EMERALD, 15), ItemStack.EMPTY, new ItemStack(ItemChokuto.block, 1), 0, 1));
 
+			MerchantRecipeList rareTrades = new MerchantRecipeList();
+
+			commonTrades.add(new MerchantRecipe(new ItemStack(ItemZabuzaSword.block, 1), ItemStack.EMPTY, new ItemStack(ItemShibukiSword.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(ItemZabuzaSword.block, 1), ItemStack.EMPTY, new ItemStack(ItemNuibariSword.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(ItemZabuzaSword.block, 1), ItemStack.EMPTY, new ItemStack(ItemKibaBlades.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(ItemSamehada.block, 1), ItemStack.EMPTY, new ItemStack(ItemHiramekareiSword.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(ItemSamehada.block, 1), ItemStack.EMPTY, new ItemStack(ItemGunbai.block, 1), 0, 1));
+			commonTrades.add(new MerchantRecipe(new ItemStack(ItemSamehada.block, 1), ItemStack.EMPTY, new ItemStack(ItemScytheMadara.block, 1), 0, 1));
+
+
 			trades.put(EntityNinjaMerchant.TradeLevel.COMMON, commonTrades);
 			trades.put(EntityNinjaMerchant.TradeLevel.UNCOMMON, uncommonTrades);
+			trades.put(EntityNinjaMerchant.TradeLevel.RARE, rareTrades);
 			return trades;
 		}
 
