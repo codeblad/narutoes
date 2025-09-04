@@ -51,7 +51,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
-		private final float damage = 8.0f;
+		private final float damage = 10.0f;
 
 		public EC(World worldIn) {
 			super(worldIn);
