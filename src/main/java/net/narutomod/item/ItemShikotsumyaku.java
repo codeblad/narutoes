@@ -240,7 +240,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 				this.setEntityScale(MathHelper.clamp(this.maxScale * (float)this.ticksAlive / this.growTime, 0.0f, this.maxScale));
 				for (EntityLivingBase entity : 
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
-					if (!entity.equals(this.shootingEntity)) {
+					if (!entity.equals(this.shootingEntity) && entity != this.shootingEntity) {
 						if (ticksAlive < 5) {
 							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
 									this.damage);
