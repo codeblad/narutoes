@@ -59,6 +59,9 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 	@SubscribeEvent
 	public void lunge(LivingEvent.LivingJumpEvent event) {
 		if (event != null && event.getEntityLiving() instanceof EntityPlayer) {
+			if (event.getEntityLiving().getEntityData().getInteger("KekkeiGenkai") == 69) {
+				return;
+			}
 			lunge((EntityPlayer)event.getEntityLiving());
 		}
 	}

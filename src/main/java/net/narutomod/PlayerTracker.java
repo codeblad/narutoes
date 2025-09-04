@@ -83,7 +83,11 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	private static void addBattleXp(EntityPlayer entity, double xp, boolean sendMessage) {
 
 		if (xp != 0.0d) {
-			entity.getEntityData().setDouble(BATTLEXP, Math.min(getBattleXp(entity) + xp, ModConfig.MAX_NINJAXP));
+			double max = ModConfig.MAX_NINJAXP;
+			if (entity.getEntityData().getInteger("KekkeiGenkai") == 69) {
+				max = 1;
+			}
+			entity.getEntityData().setDouble(BATTLEXP, Math.min(getBattleXp(entity) + xp, max));
 			if (entity instanceof EntityPlayerMP) {
 				sendBattleXPToTracking((EntityPlayerMP)entity);
 				if (sendMessage) {

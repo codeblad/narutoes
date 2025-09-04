@@ -240,7 +240,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 				this.setEntityScale(MathHelper.clamp(this.maxScale * (float)this.ticksAlive / this.growTime, 0.0f, this.maxScale));
 				for (EntityLivingBase entity : 
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
-					if (!entity.equals(this.shootingEntity)) {
+					if (!entity.equals(this.shootingEntity) && entity != this.shootingEntity) {
 						if (ticksAlive < 5) {
 							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
 									this.damage);
@@ -259,10 +259,10 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(200d));
 				RayTraceResult res = world.rayTraceBlocks(vec3d, vec3d2, false, true, true);
 				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK && res.sideHit == EnumFacing.UP) {
-					float f = MathHelper.sqrt(power * 26f / 5f);
+					float f = MathHelper.sqrt(power * 35f / 5f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EntityBrackenDance entity1 = new EntityBrackenDance(entity, power);
-						entity1.damage = 13+5f*(1+3f*(1/100))*ItemJutsu.getDmgMult(entity);
+						entity1.damage = 15+5f*(1+3f*(1/100))*ItemJutsu.getDmgMult(entity);
 						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
 						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
