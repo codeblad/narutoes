@@ -380,16 +380,15 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					@Override
 					public void onImpact(RayTraceResult result) {
 						if (!this.world.isRemote) {
-							if (result.entityHit != null) {
-								if (result.entityHit.equals(this.shootingEntity) || result.entityHit instanceof EntitySmallFireball) {
-									return;
-								}
-								result.entityHit.attackEntityFrom(DamageSource.causeFireballDamage(this, this.shootingEntity),
-										15+ItemJutsu.getNinjaMult(attacker)*5);
-								result.entityHit.setFire(10);
+
+							ProcedureAoeCommand bruh = ProcedureAoeCommand.set(this,0,4);
+							for (Entity entity : bruh.getList()) {
+								entity.hurtResistantTime = 5;
+								entity.setFire(10);
+								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 15+4f*ItemJutsu.getDmgMult(this.shootingEntity));
 							}
 							boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
-							this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 3.5f, false, flag);
+							this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 2f, false, flag);
 							this.setDead();
 						}
 					}
