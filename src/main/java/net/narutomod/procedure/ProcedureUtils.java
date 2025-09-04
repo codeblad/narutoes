@@ -50,7 +50,8 @@ import net.minecraft.block.Block;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.init.Items;
-import net.minecraft.potion.Potion;
+
+import net.minecraft.potion.Potion;
 
 import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.item.ItemJutsu;

@@ -1,7 +1,6 @@
 
 package net.narutomod.entity;
 
-import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
@@ -38,19 +37,18 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 
-import net.narutomod.*;
-import net.narutomod.item.ItemMokuton;
 import net.narutomod.potion.PotionFeatherFalling;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemSenjutsu;
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.Chakra;
+import net.narutomod.Particles;
+import net.narutomod.NarutomodMod;
+import net.narutomod.ElementsNarutomodMod;
 
 import javax.vecmath.Vector4f;
 import java.util.Random;
 import io.netty.buffer.ByteBuf;
-
-import static net.narutomod.item.ItemMokuton.GOLEM;
-import static net.narutomod.item.ItemSenjutsu.SNAKE8H;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
@@ -65,8 +63,8 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
-				.id(new ResourceLocation("narutomod", "snake_8_heads"), ENTITYID)
-				.name("snake_8_heads").tracker(128, 3, true).build());
+		 .id(new ResourceLocation("narutomod", "snake_8_heads"), ENTITYID)
+		 .name("snake_8_heads").tracker(128, 3, true).build());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntitySnakeHead.class)
 		 .id(new ResourceLocation("narutomod", "snake_8_head1"), ENTITYID_RANGED)
 		 .name("snake_8_head1").tracker(128, 3, true).build());
@@ -77,7 +75,6 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 		private final int upTime = 40;
 		private final int waitTime = 20;
 		private double chakraBurn;
-		int attackCD;
 
 		public EC(World world) {
 			super(world);
@@ -90,9 +87,9 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			super(summonerIn);
 			this.setSize(0.8f * MODELSCALE, 2.0f * MODELSCALE);
 			this.stepHeight = this.height / 3;
-			this.chakraBurn = chakraUsagePerSec;
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(500+ItemJutsu.getNinjaMult(this.getSummoner())*80f);
 			this.setHealth(this.getMaxHealth());
+			this.chakraBurn = chakraUsagePerSec;
 		}
 
 		@Override
@@ -117,7 +114,6 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.55D);
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50D);
@@ -135,22 +131,8 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public boolean attackEntityAsMob(Entity entityIn) {
-			if (super.attackEntityAsMob(entityIn)) {
-				if (this.attackCD <= 0) {
-					this.attackCD = 60;
-					
-					//world.spawnEntity(new EntitySnakeHead(this.getSummoner(), (EntityLivingBase)entityIn));
-					return true;
-				}
-			}
-			return false;
-		}
-
-		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			this.attackCD--;
 			if (this.ticksExisted == 1) {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:woodspawn")), 5f, 1f);
 			} else if (this.ticksExisted == this.upTime) {
@@ -189,14 +171,9 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 				if (summoner != null) {
 					summoner.addPotionEffect(new PotionEffect(PotionFeatherFalling.potion, 60, 5));
 				}
-				ItemStack stack = ProcedureUtils.getMatchingItemStack(summoner, ItemSenjutsu.block);
-				if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
-					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
-					item.setJutsuCooldown(stack, SNAKE8H, 20*50);
-				}
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:poof")), 2.0F, 1.0F);
 				Particles.spawnParticle(this.world, Particles.Types.SMOKE, this.posX, this.posY+this.height/2, this.posZ, 300,
-						this.width * 0.5d, this.height * 0.3d, this.width * 0.5d, 0d, 0d, 0d, 0xD0FFFFFF, 20 + (int)(MODELSCALE * 5));
+				 this.width * 0.5d, this.height * 0.3d, this.width * 0.5d, 0d, 0d, 0d, 0xD0FFFFFF, 20 + (int)(MODELSCALE * 5));
 			}
 		}
 
@@ -214,8 +191,8 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (!(entity.getRidingEntity() instanceof EC)) {
-					entity.world.spawnEntity(new EC(entity, SNAKE8H.chakraUsage * 0.02d *
-							((ItemSenjutsu.RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity)));
+					entity.world.spawnEntity(new EC(entity, ItemSenjutsu.SNAKE8H.chakraUsage * 0.02d *
+					 ((ItemSenjutsu.RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity)));
 					return true;
 				}
 				return false;
@@ -234,8 +211,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 		public EntitySnakeHead(EntityLivingBase summonerIn, EntityLivingBase targetIn) {
 			super(summonerIn);
 			this.postScaleFixup();
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(200d);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(20.0d+ItemJutsu.getNinjaMult(summonerIn)*2.85);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(100.0d);
 			Entity parent = summonerIn.getRidingEntity() instanceof EC ? summonerIn.getRidingEntity() : summonerIn;
 			this.rotationYawHead = parent.rotationYaw;
 			this.setLocationAndAngles(parent.posX, parent.posY - 10d, parent.posZ, parent.rotationYaw, -45f);
@@ -252,15 +228,14 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			return MODELSCALE;
 		}
 
-
 		@Override
 		protected void updateAITasks() {
 			super.updateAITasks();
 			int age = this.getAge();
 			if (age < 20) {
 				this.getPhaseManager().setPhase(EntitySnake.Phase.ROAMING);
-				this.setAIMoveSpeed(2.5f);
-				Vec3d vec = Vec3d.fromPitchYaw(0.0f, this.rotationYaw).scale(0.1d);
+				//this.setAIMoveSpeed(1.0f);
+				Vec3d vec = Vec3d.fromPitchYaw(0.0f, this.rotationYaw).scale(0.08d);
 				this.motionX += vec.x;
 				this.motionZ += vec.z;
 				if (age == 1) {
@@ -268,14 +243,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 				}
 			} else if (this.target != null && this.target.isEntityAlive()) {
 				this.setAttackTarget(this.target);
-				this.setAIMoveSpeed(2.2f);
-				Vec3d vec = Vec3d.fromPitchYaw(0.0f, this.rotationYaw).scale(0.1d);
-				this.motionX += vec.x;
-				this.motionZ += vec.z;
 			} else {
-				this.onDeathUpdate();
-			}
-			if (age > 150) {
 				this.onDeathUpdate();
 			}
 		}
@@ -290,7 +258,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	/*public static class PlayerHook {
+	public static class PlayerHook {
 		@SideOnly(Side.CLIENT)
 		@SubscribeEvent
 		public void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
@@ -310,7 +278,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			public Message(int i) {
 				this.id = i;
 			}
-
+	
 			public static class Handler implements IMessageHandler<Message, IMessage> {
 				@Override
 				public IMessage onMessage(Message message, MessageContext context) {
@@ -318,33 +286,33 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 					player.getServerWorld().addScheduledTask(() -> {
 						Entity entity = player.world.getEntityByID(message.id);
 						if (entity instanceof EntityLivingBase) {
-							player.world.spawnEntity(new EntitySnakeHead(player, (EntityLivingBase)entity));
+							//player.world.spawnEntity(new EntitySnakeHead(player, (EntityLivingBase)entity));
 						}
 					});
 					return null;
 				}
 			}
-
+	
 			public void toBytes(ByteBuf buf) {
 				buf.writeInt(this.id);
 			}
-
+	
 			public void fromBytes(ByteBuf buf) {
 				this.id = buf.readInt();
 			}
 		}
-	}*/
+	}
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		new Renderer().register();
-		//elements.addNetworkMessage(PlayerHook.Message.Handler.class, PlayerHook.Message.class, Side.SERVER);
+		elements.addNetworkMessage(PlayerHook.Message.Handler.class, PlayerHook.Message.class, Side.SERVER);
 	}
 
-	/*@Override
+	@Override
 	public void init(FMLInitializationEvent event) {
 		MinecraftForge.EVENT_BUS.register(new PlayerHook());
-	}*/
+	}
 
 	public class Renderer extends EntityRendererRegister {
 		@SideOnly(Side.CLIENT)
@@ -595,48 +563,48 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			private final ModelRenderer bone46;
 			private final ModelRenderer bone83;
 			private final Vector4f[][] neckRotation = {
-					{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.0436F, -0.0436F, 0.0F, 0.0F),
-							new Vector4f(-0.2618F, -0.0436F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.0436F, 0.0F, 0.0F),
-							new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
-							new Vector4f(0.5236F, 0.0F, -0.0436F, 0.0F), new Vector4f(0.5236F, 0.0F, 0.0F, 0.0F),
-							new Vector4f(0.4363F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
-					{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.0436F, 0.0436F, 0.0F, 0.0F),
-							new Vector4f(-0.2618F, 0.0436F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0436F, 0.0F, 0.0F),
-							new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
-							new Vector4f(0.5236F, 0.0F, 0.0436F, 0.0F), new Vector4f(0.5236F, 0.0F, 0.0F, 0.0F),
-							new Vector4f(0.4363F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
-					{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.0873F, 0.1309F, 0.0F, 0.0F),
-							new Vector4f(-0.2618F, 0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.1309F, 0.0F, 0.0F),
-							new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
-							new Vector4f(0.3927F, 0.0F, 0.0873F, 0.0F), new Vector4f(0.3927F, 0.0F, 0.0F, 0.0F),
-							new Vector4f(0.3927F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
-					{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.0873F, -0.1309F, 0.0F, 0.0F),
-							new Vector4f(-0.2618F, -0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.1309F, 0.0F, 0.0F),
-							new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
-							new Vector4f(0.3927F, 0.0F, -0.0873F, 0.0F), new Vector4f(0.3927F, 0.0F, 0.0F, 0.0F),
-							new Vector4f(0.3927F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
-					{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.2618F, 0.2618F, 0.0F, 0.0F),
-							new Vector4f(-0.2618F, 0.2618F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.2618F, 0.0F, 0.0F),
-							new Vector4f(0.2618F, 0.2618F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.2618F, 0.1745F, 0.0F),
-							new Vector4f(0.4363F, -0.2618F, 0.0873F, 0.0F), new Vector4f(0.4363F, 0.0F, 0.0873F, 0.0F),
-							new Vector4f(0.5236F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
-					{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.2618F, -0.2618F, 0.0F, 0.0F),
-							new Vector4f(-0.2618F, -0.2618F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.2618F, 0.0F, 0.0F),
-							new Vector4f(0.2618F, -0.2618F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.2618F, -0.1745F, 0.0F),
-							new Vector4f(0.4363F, 0.2618F, -0.1745F, 0.0F), new Vector4f(0.4363F, 0.0F, 0.0F, 0.0F),
-							new Vector4f(0.5236F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
-					{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.2618F, 0.1309F, 0.0F, 0.0F),
-							new Vector4f(-0.2618F, 0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.1309F, 0.0F, 0.0F),
-							new Vector4f(0.2618F, -0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.0873F, 0.0F, 0.0F),
-							new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
-							new Vector4f(0.3491F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
-					{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.2618F, -0.1309F, 0.0F, 0.0F),
-							new Vector4f(-0.2618F, -0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.1309F, 0.0F, 0.0F),
-							new Vector4f(0.2618F, 0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.1309F, 0.0F, 0.0F),
-							new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
-							new Vector4f(0.3491F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) }
+				{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.0436F, -0.0436F, 0.0F, 0.0F),
+				  new Vector4f(-0.2618F, -0.0436F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.0436F, 0.0F, 0.0F),
+				  new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
+				  new Vector4f(0.5236F, 0.0F, -0.0436F, 0.0F), new Vector4f(0.5236F, 0.0F, 0.0F, 0.0F),
+				  new Vector4f(0.4363F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
+				{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.0436F, 0.0436F, 0.0F, 0.0F),
+				  new Vector4f(-0.2618F, 0.0436F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0436F, 0.0F, 0.0F),
+				  new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
+				  new Vector4f(0.5236F, 0.0F, 0.0436F, 0.0F), new Vector4f(0.5236F, 0.0F, 0.0F, 0.0F),
+				  new Vector4f(0.4363F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
+				{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.0873F, 0.1309F, 0.0F, 0.0F),
+				  new Vector4f(-0.2618F, 0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.1309F, 0.0F, 0.0F),
+				  new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
+				  new Vector4f(0.3927F, 0.0F, 0.0873F, 0.0F), new Vector4f(0.3927F, 0.0F, 0.0F, 0.0F),
+				  new Vector4f(0.3927F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
+				{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.0873F, -0.1309F, 0.0F, 0.0F),
+				  new Vector4f(-0.2618F, -0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.1309F, 0.0F, 0.0F),
+				  new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
+				  new Vector4f(0.3927F, 0.0F, -0.0873F, 0.0F), new Vector4f(0.3927F, 0.0F, 0.0F, 0.0F),
+				  new Vector4f(0.3927F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
+				{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.2618F, 0.2618F, 0.0F, 0.0F),
+				  new Vector4f(-0.2618F, 0.2618F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.2618F, 0.0F, 0.0F),
+				  new Vector4f(0.2618F, 0.2618F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.2618F, 0.1745F, 0.0F),
+				  new Vector4f(0.4363F, -0.2618F, 0.0873F, 0.0F), new Vector4f(0.4363F, 0.0F, 0.0873F, 0.0F),
+				  new Vector4f(0.5236F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
+				{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.2618F, -0.2618F, 0.0F, 0.0F),
+				  new Vector4f(-0.2618F, -0.2618F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.2618F, 0.0F, 0.0F),
+				  new Vector4f(0.2618F, -0.2618F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.2618F, -0.1745F, 0.0F),
+				  new Vector4f(0.4363F, 0.2618F, -0.1745F, 0.0F), new Vector4f(0.4363F, 0.0F, 0.0F, 0.0F),
+				  new Vector4f(0.5236F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
+				{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.2618F, 0.1309F, 0.0F, 0.0F),
+				  new Vector4f(-0.2618F, 0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.1309F, 0.0F, 0.0F),
+				  new Vector4f(0.2618F, -0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.0873F, 0.0F, 0.0F),
+				  new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
+				  new Vector4f(0.3491F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) },
+				{ new Vector4f(-1.5708F, 0.0F, 0.0F, 0.0F), new Vector4f(-0.2618F, -0.1309F, 0.0F, 0.0F),
+				  new Vector4f(-0.2618F, -0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, -0.1309F, 0.0F, 0.0F),
+				  new Vector4f(0.2618F, 0.1309F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.1309F, 0.0F, 0.0F),
+				  new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F),
+				  new Vector4f(0.3491F, 0.0F, 0.0F, 0.0F), new Vector4f(0.2618F, 0.0F, 0.0F, 0.0F) }
 			};
-
+			
 			public ModelSnake8h() {
 				textureWidth = 64;
 				textureHeight = 64;
@@ -2170,25 +2138,25 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 				bone83.setRotationPoint(0.0F, 0.0F, 9.0F);
 				bone46.addChild(bone83);
 				bone83.cubeList.add(new ModelBox(bone83, 0, 26, -2.5F, -1.0F, 0.0F, 5, 2, 12, 0.0F, false));
-
+	
 				for (int i = 0; i < 8; i++) {
 					for (int j = 1; j < 10; j++) {
 						this.neckRotation[i][j].w = (RAND.nextFloat()-0.5F) * 2.0F;
 					}
 				}
 			}
-
+	
 			@Override
 			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
 				tails.render(f5);
 			}
-
+	
 			public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
 				modelRenderer.rotateAngleX = x;
 				modelRenderer.rotateAngleY = y;
 				modelRenderer.rotateAngleZ = z;
 			}
-
+	
 			@Override
 			public void setRotationAngles(float f, float f1, float ageInTicks, float f3, float f4, float f5, Entity entityIn) {
 				super.setRotationAngles(f, f1, ageInTicks, f3, f4, f5, entityIn);

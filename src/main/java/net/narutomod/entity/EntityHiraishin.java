@@ -1,10 +1,16 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraftforge.client.event.MouseEvent;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
+
 import net.narutomod.item.ItemKunaiHiraishin;
 import net.narutomod.item.ItemKunai3prong;
 import net.narutomod.item.ItemNinjutsu;
 import net.narutomod.item.ItemJutsu;
+
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
@@ -62,6 +68,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.NBTTagCompound;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import javax.annotation.Nullable;
@@ -77,8 +84,8 @@ import io.netty.buffer.ByteBuf;
 public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 419;
 	public static final int ENTITYID_RANGED = 420;
-	private static final Map<UUID, Map<UUID, Vector4d>> serverMarkerMap = Maps.newHashMap();
-	private static final Map<UUID, Vector4d> clientMarkerList = Maps.newHashMap();
+	private static final Map<UUID, Map<UUID, MarkerData>> serverMarkerMap = Maps.newHashMap();
+	private static final Map<UUID, MarkerData> clientMarkerList = Maps.newHashMap();
 
 	public EntityHiraishin(ElementsNarutomodMod instance) {
 		super(instance, 841);
@@ -90,25 +97,27 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 		 .id(new ResourceLocation("narutomod", "hiraishin"), ENTITYID).name("hiraishin").tracker(64, 3, true).build());
 	}
 
-	public static void updateServerMarkerMap(UUID ownerUuid, UUID kunaiUuid, @Nullable Vector4d vec4d) {
-		if (vec4d == null) {
+	public static void updateServerMarkerMap(UUID ownerUuid, UUID kunaiUuid, MarkerData data) {
+		if (data == null) {
 			if (serverMarkerMap.containsKey(ownerUuid)) {
-				Map<UUID, Vector4d> map = serverMarkerMap.get(ownerUuid);
+				Map<UUID, MarkerData> map = serverMarkerMap.get(ownerUuid);
 				map.remove(kunaiUuid);
-				if (map.isEmpty()) {
+				if (map.isEmpty()) 
 					serverMarkerMap.remove(ownerUuid);
-				}
 			}
 		} else if (!serverMarkerMap.containsKey(ownerUuid)) {
-			Map<UUID, Vector4d> map = Maps.newHashMap();
-			map.put(kunaiUuid, vec4d);
+			Map<UUID, MarkerData> map = Maps.newHashMap();
+			map.put(kunaiUuid, data);
 			serverMarkerMap.put(ownerUuid, map);
 		} else {
-			serverMarkerMap.get(ownerUuid).put(kunaiUuid, vec4d);
+			serverMarkerMap.get(ownerUuid).put(kunaiUuid, data);
 		}
 		EntityPlayerMP owner = ProcedureUtils.getPlayerMatchingUuid(ownerUuid);
 		if (owner != null) {
-			UpdateMarkerMessage.sendToPlayer(owner, kunaiUuid, vec4d);
+			if (data == null)
+				data = new MarkerData();
+			data.uuid = kunaiUuid;
+			UpdateMarkerMessage.sendToPlayer(owner, data);
 		}
 	}
 
@@ -125,6 +134,28 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 		 .canActivateJutsu(stack, ItemNinjutsu.HIRAISHIN, player) == EnumActionResult.SUCCESS;
 	}
 
+	public static class MarkerData {
+		public UUID uuid; //target UUID
+		public int targetId = -1; //target entity ID (for client retrieval)
+		public String name;
+		public Vector4d vec;
+
+		public MarkerData() {
+		}
+
+		public MarkerData(Vector4d vec) {
+			this.vec = vec;
+		}
+
+		public MarkerData(EC entity) {
+			this.vec = new Vector4d(entity.posX, entity.posY, entity.posZ, entity.dimension);
+			this.name = entity.markerName;
+
+			if (entity.getTarget() != null)
+				this.targetId = entity.getTarget().getEntityId();
+		}
+	}
+
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private static final DataParameter<Optional<UUID>> TARGET_UUID = EntityDataManager.<Optional<UUID>>createKey(EC.class, DataSerializers.OPTIONAL_UNIQUE_ID);
 		private static final DataParameter<Float> OFFSET_X = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
@@ -133,7 +164,8 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> OFFSET_YAW = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> OFFSET_PITCH = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private UUID userUuid;
-
+		private String markerName;
+		
 		public EC(World world) {
 			super(world);
 			this.setSize(0.6f, 0.05f);
@@ -189,6 +221,24 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 			return uuid != null ? ProcedureUtils.getEntityFromUUID(this.world, uuid) : null;
 		}
 
+		@Nullable
+		public UUID getOwnerUuid() {
+			return userUuid;
+		}
+
+		@Nullable
+		public Entity getOwner() {
+			return userUuid != null ? ProcedureUtils.getEntityFromUUID(this.world, userUuid) : null;
+		}
+		
+		public void setMarkerName(String markerName) {
+			this.markerName = markerName;
+		}
+
+		public MarkerData getMarkerData() {
+			return new MarkerData(this);
+		}
+
 		private void setOffsets(double x, double y, double z, float yaw, float pitch) {
 			this.dataManager.set(OFFSET_X, Float.valueOf((float)x));
 			this.dataManager.set(OFFSET_Y, Float.valueOf((float)y));
@@ -220,8 +270,12 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			if (!this.world.isRemote && this.userUuid != null) {
-				if (((WorldServer)this.world).getEntityFromUuid(this.userUuid) != null) {
+				Entity owner = ((WorldServer) this.world).getEntityFromUuid(this.userUuid);
+				if (owner != null) {
 					boolean update = false;
+					if (owner.ticksExisted == 1)
+						update = true;
+					
 					UUID targetUuid = this.getTargetUuid();
 					if (targetUuid == null) {
 						if (this.ticksExisted == 1) {
@@ -239,7 +293,7 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 						}
 					}
 					if (update) {
-						updateServerMarkerMap(this.userUuid, this.getUniqueID(), new Vector4d(this.posX, this.posY, this.posZ, this.dimension));
+						updateServerMarkerMap(this.userUuid, this.getUniqueID(), getMarkerData());
 					}
 				}
 			}
@@ -255,6 +309,10 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 				this.setOffsets(compound.getFloat("offsetX"), compound.getFloat("offsetY"), compound.getFloat("offsetZ"),
 				 compound.getFloat("offsetYaw"), compound.getFloat("offsetPitch"));
 			}
+
+			if (compound.hasKey("markerName"))
+				this.markerName = compound.getString("markerName");
+			
 		}
 
 		@Override
@@ -273,12 +331,15 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 				compound.setFloat("offsetYaw", vec2.x);
 				compound.setFloat("offsetPitch", vec2.y);
 			}
+
+			if (markerName != null)
+				compound.setString("markerName", markerName);
 		}
 
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 4d, true);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 4d, 1.5f, true);
 				if (res != null && res.typeOfHit != RayTraceResult.Type.MISS) {
 					if (res.entityHit instanceof EC) {
 						res.entityHit.setDead();
@@ -304,18 +365,19 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class UpdateMarkerMessage implements IMessage {
-		String uuid;
-		Vector4d vec;
+		MarkerData data;
+		boolean clear;
 
-		public UpdateMarkerMessage() {}
-
-		public UpdateMarkerMessage(UUID id, @Nullable Vector4d v4d) {
-			this.uuid = id.toString();
-			this.vec = v4d;
+		public UpdateMarkerMessage() {
+			clear = true;
 		}
 
-		public static void sendToPlayer(EntityPlayerMP entity, UUID id, @Nullable Vector4d v4d) {
-			NarutomodMod.PACKET_HANDLER.sendTo(new UpdateMarkerMessage(id, v4d), entity);
+		public UpdateMarkerMessage(MarkerData data) {
+			this.data = data;
+		}
+
+		public static void sendToPlayer(EntityPlayerMP entity, MarkerData data) {
+			NarutomodMod.PACKET_HANDLER.sendTo(new UpdateMarkerMessage(data), entity);
 		}
 
 		public static void clearClientMarkers(EntityPlayerMP entity) {
@@ -327,14 +389,13 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 			@Override
 			public IMessage onMessage(UpdateMarkerMessage message, MessageContext context) {
 				Minecraft.getMinecraft().addScheduledTask(() -> {
-					if (message.uuid == null) {
+					if (message.clear) {
 						clientMarkerList.clear();
 					} else {
-						UUID uuid = UUID.fromString(message.uuid);
-						if (message.vec != null) {
-							clientMarkerList.put(uuid, message.vec);
+						if (message.data.vec != null) {
+							clientMarkerList.put(message.data.uuid, message.data);
 						} else {
-							clientMarkerList.remove(uuid);
+							clientMarkerList.remove(message.data.uuid);
 						}
 					}
 				});
@@ -343,26 +404,54 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 		}
 	
 		public void toBytes(ByteBuf buf) {
-			if (this.uuid != null) {
+			buf.writeBoolean(clear);
+			if (clear)
+				return;
+
+			if (data.uuid != null) {
 				buf.writeBoolean(true);
-				ProcedureSync.writeString(buf, this.uuid);
+				ByteBufUtils.writeUTF8String(buf, data.uuid.toString());
+			} else 
+				buf.writeBoolean(false);
+
+			if (data.vec != null) {
+				buf.writeBoolean(true);
+				buf.writeDouble(data.vec.x);
+				buf.writeDouble(data.vec.y);
+				buf.writeDouble(data.vec.z);
+				buf.writeDouble(data.vec.w);
 			} else {
 				buf.writeBoolean(false);
 			}
-			if (this.vec != null) {
+
+			if (data.name != null) {
 				buf.writeBoolean(true);
-				buf.writeDouble(this.vec.x);
-				buf.writeDouble(this.vec.y);
-				buf.writeDouble(this.vec.z);
-				buf.writeDouble(this.vec.w);
+				ByteBufUtils.writeUTF8String(buf, data.name);
+			} else {
+				buf.writeBoolean(false);
+			}
+
+			if (data.targetId != -1) {
+				buf.writeBoolean(true);
+				buf.writeInt(data.targetId);
 			} else {
 				buf.writeBoolean(false);
 			}
 		}
 	
 		public void fromBytes(ByteBuf buf) {
-			this.uuid = buf.readBoolean() ? ProcedureSync.readString(buf) : null;
-			this.vec = buf.readBoolean() ? new Vector4d(buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble()) : null;
+			clear = buf.readBoolean();
+			if (clear)
+				return;
+
+			if (data == null)
+				data = new MarkerData();
+
+			data.uuid = buf.readBoolean() ? UUID.fromString(ByteBufUtils.readUTF8String(buf)) : null;
+			data.vec = buf.readBoolean() ? new Vector4d(buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble()) : null;
+			data.name = buf.readBoolean() ? ByteBufUtils.readUTF8String(buf) : "";
+			data.targetId = buf.readBoolean() ? buf.readInt() : -1;
+
 		}
 	}
 
@@ -454,7 +543,7 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 				return this.texture;
 			}
 
-			protected void renderMarker(double x, double y, double z, float ageInTicks) {
+			protected void renderMarker(double x, double y, double z, float ageInTicks, MarkerData markerData) {
 				double d = MathHelper.sqrt(x * x + y * y + z * z);
 				if (d > 2.0D) {
 					x = x / d;
@@ -472,14 +561,17 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 					this.itemRenderer.renderItem(new ItemStack(this.item), ItemCameraTransforms.TransformType.GROUND);
             		GlStateManager.enableLighting();
 					GlStateManager.popMatrix();
-					this.renderText(""+(int)d, x, y, z);
+
+					String name = markerData.name != null && !markerData.name.isEmpty() ? markerData.name : "";
+					String markerTag = !name.isEmpty() ? String.format("%s (%s)", name, (int) d) : (int) d + "";
+					this.renderText(markerTag, x, y, z);
 				}
 			}
 
 		    private void renderText(String str, double x, double y, double z) {
 		    	FontRenderer fontRenderer = this.getFontRendererFromRenderManager();
             	GlStateManager.pushMatrix();
-            	GlStateManager.translate(x, y + 0.1D, z);
+				GlStateManager.translate(x, y + 0.085D, z);
             	GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
             	GlStateManager.rotate((float)(this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
             	GlStateManager.scale(-0.0025F, -0.0025F, 0.0025F);
@@ -489,22 +581,22 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
             	GlStateManager.disableDepth();
             	GlStateManager.enableBlend();
             	GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-            	int i = fontRenderer.getStringWidth(str) / 2;
+				int centered = fontRenderer.getStringWidth(str) / 2;
             	GlStateManager.disableTexture2D();
             	Tessellator tessellator = Tessellator.getInstance();
             	BufferBuilder bufferbuilder = tessellator.getBuffer();
             	bufferbuilder.begin(7, DefaultVertexFormats.POSITION_COLOR);
-            	bufferbuilder.pos((double)(-i - 1), -1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.3F).endVertex();
-            	bufferbuilder.pos((double)(-i - 1), 8.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.3F).endVertex();
-            	bufferbuilder.pos((double)(i + 1), 8.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.3F).endVertex();
-            	bufferbuilder.pos((double)(i + 1), -1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.3F).endVertex();
+				bufferbuilder.pos(-centered - 1, -1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.3F).endVertex();
+				bufferbuilder.pos(-centered - 1, 8.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.3F).endVertex();
+				bufferbuilder.pos(centered + 1, 8.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.3F).endVertex();
+				bufferbuilder.pos(centered + 1, -1.0D, 0.0D).color(0.0F, 0.0F, 0.0F, 0.3F).endVertex();
             	tessellator.draw();
             	GlStateManager.enableTexture2D();
-            	fontRenderer.drawString(str, -fontRenderer.getStringWidth(str) / 2, 0, 0x20FFFFFF);
+				fontRenderer.drawString(str, -centered, 0, 0x20FFFFFF);
             	GlStateManager.enableDepth();
             	
             	GlStateManager.depthMask(true);
-            	fontRenderer.drawString(str, -fontRenderer.getStringWidth(str) / 2, 0, 0xFF00FF00);
+				fontRenderer.drawString(str, -centered, 0, 0xFF00FF00);
             	GlStateManager.enableLighting();
             	GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             	GlStateManager.popMatrix();
@@ -538,11 +630,12 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 			if (mc.player != null && PlayerTracker.isNinja(mc.player) && !clientMarkerList.isEmpty()) {
 				RenderManager renderManager = mc.getRenderManager();
 				if (renderManager != null && renderManager.options != null && renderManager.options.thirdPersonView == 0) {
-					for (Vector4d vec : clientMarkerList.values()) {
+					for (MarkerData data : clientMarkerList.values()) {
+						Vector4d vec = data.vec;
 						Vec3d vec1 = new Vec3d(vec.x, vec.y, vec.z).subtract(renderManager.viewerPosX, renderManager.viewerPosY, renderManager.viewerPosZ);
 						float f = MathHelper.abs(MathHelper.wrapDegrees(ProcedureUtils.getYawFromVec(vec1) - mc.player.rotationYawHead));
 						if ((int)vec.w == mc.world.provider.getDimension() && f < 90.0f) {
-							this.renderCustom.renderMarker(vec1.x, vec1.y, vec1.z, (float)mc.world.getTotalWorldTime() + event.getPartialTicks());
+							this.renderCustom.renderMarker(vec1.x, vec1.y, vec1.z, (float) mc.world.getTotalWorldTime() + event.getPartialTicks(), data);
 						}
 					}
 				}
@@ -551,42 +644,70 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 
 		@SideOnly(Side.CLIENT)
 		@SubscribeEvent
+		public void onClientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
+			clientMarkerList.clear();
+		}
+
+		@SideOnly(Side.CLIENT)
+		@SubscribeEvent
 		public void onLeftClickEmpty(PlayerInteractEvent.LeftClickEmpty event) {
+			if (event.getEntityPlayer().isSneaking())
+				executeTeleport(event.getEntityPlayer());
+		}
+
+		@SideOnly(Side.CLIENT)
+		@SubscribeEvent
+		public void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+			if (event.getEntityPlayer().isSneaking())
+				executeTeleport(event.getEntityPlayer());
+		}
+
+		@SideOnly(Side.CLIENT)
+		private static void executeTeleport(EntityPlayer player) {
 			Minecraft mc = Minecraft.getMinecraft();
-			EntityPlayer player = event.getEntityPlayer();
 			if (PlayerTracker.isNinja(player) && !clientMarkerList.isEmpty() && mc.gameSettings.thirdPersonView == 0 && canUseJutsu(player)) {
 				Vec3d vec1 = player.getPositionEyes(1f);
-				for (Vector4d vec4d : clientMarkerList.values()) {
-					if ((int)vec4d.w == mc.world.provider.getDimension()) {
-						Vec3d vec = new Vec3d(vec4d.x, vec4d.y, vec4d.z);
-						double d = vec.subtract(vec1).lengthVector();
-						Vec3d vec2 = vec1.add(player.getLookVec().scale(d + 10d));
-						AxisAlignedBB aabb = new AxisAlignedBB(vec.x-0.5d, vec.y, vec.z-0.5d, vec.x+0.5d, vec.y+1.0d, vec.z+0.5d);
-						if (aabb.grow(d * 0.05d).calculateIntercept(vec1, vec2) != null) {
-							Chakra.Pathway chakra = Chakra.pathway(player);
-							double chakraUsage = MathHelper.sqrt(d) * 10d;
-							if (chakra.getAmount() > chakraUsage) {
-								ProcedureOnLivingUpdate.setUntargetable(player, 5);
-								ProcedureSync.SoundEffectMessage.sendToServer(player.posX, player.posY, player.posZ,
-								 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:swoosh")),
-								 net.minecraft.util.SoundCategory.NEUTRAL, 0.8f, player.getRNG().nextFloat() * 0.4f + 0.8f);
-								ProcedureSync.SoundEffectMessage.sendToServer(vec.x, vec.y, vec.z,
-								 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:swoosh")),
-								 net.minecraft.util.SoundCategory.NEUTRAL, 0.8f, player.getRNG().nextFloat() * 0.4f + 0.8f);
-								EntityLivingBase entity = mc.world.findNearestEntityWithinAABB(EntityLivingBase.class, player.getEntityBoundingBox().grow(1d), player);
-								player.setPosition(vec.x, vec.y, vec.z);
-								ProcedureSync.EntityPositionAndRotation.sendToServer(player);
+				for (MarkerData data : clientMarkerList.values()) {
+					Vector4d vec4d = data.vec;
+					if ((int) vec4d.w != mc.world.provider.getDimension())
+						continue;
+
+					Vec3d vec = new Vec3d(vec4d.x, vec4d.y, vec4d.z);
+					double d = vec.subtract(vec1).lengthVector();
+					Vec3d vec2 = vec1.add(player.getLookVec().scale(d + 10d));
+					AxisAlignedBB aabb = new AxisAlignedBB(vec.x - 0.5d, vec.y, vec.z - 0.5d, vec.x + 0.5d, vec.y + 1.0d, vec.z + 0.5d);
+					if (aabb.grow(d * 0.05d).calculateIntercept(vec1, vec2) == null)
+						continue;
+
+					Chakra.Pathway chakra = Chakra.pathway(player);
+					double chakraUsage = MathHelper.sqrt(d) * 10d;
+					if (chakra.getAmount() > chakraUsage) {
+						ProcedureOnLivingUpdate.setUntargetable(player, 5);
+						AxisAlignedBB oldPlayerBox = player.getEntityBoundingBox();
+						player.setPosition(vec.x, vec.y, vec.z);
+						ProcedureSync.EntityPositionAndRotation.sendToServer(player);
+						ProcedureSync.SoundEffectMessage.sendToServer(player.posX, player.posY, player.posZ, net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:swoosh")), net.minecraft.util.SoundCategory.NEUTRAL, 0.8f, player.getRNG().nextFloat() * 0.4f + 0.8f);
+						ProcedureSync.SoundEffectMessage.sendToServer(vec.x, vec.y, vec.z, net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:swoosh")), net.minecraft.util.SoundCategory.NEUTRAL, 0.8f, player.getRNG().nextFloat() * 0.4f + 0.8f);
+
+						if (GuiScreen.isCtrlKeyDown()) {
+							int chakraUsageMulti = 0;
+							List<EntityLivingBase> entities = mc.world.getEntitiesWithinAABB(EntityLivingBase.class, oldPlayerBox.grow(1.0d));
+							for (EntityLivingBase entity : entities) {
+								System.out.println(entity);
 								if (entity != null) {
 									ProcedureOnLivingUpdate.setUntargetable(entity, 5);
 									entity.setPosition(vec.x, vec.y, vec.z);
 									ProcedureSync.EntityPositionAndRotation.sendToServer(entity);
-									chakraUsage *= 2;
+									chakraUsage += 2;
 								}
-								Chakra.PathwayPlayer.ConsumeMessage.sendToServer(chakraUsage);
-							} else {
-								chakra.warningDisplay();
 							}
+							if (chakraUsageMulti > 0)
+								chakraUsage *= chakraUsageMulti;
 						}
+
+						Chakra.PathwayPlayer.ConsumeMessage.sendToServer(chakraUsage);
+					} else {
+						chakra.warningDisplay();
 					}
 				}
 			}
