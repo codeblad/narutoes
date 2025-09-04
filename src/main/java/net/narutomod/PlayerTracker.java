@@ -354,20 +354,20 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 						if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
 							defMult+= 0.4f;
 						} else {
-							defMult+= 0.9f;
+							defMult+= 0.8f;
 						}
 					}
 				}
 				if (ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity) > 0) {
 					int gates = ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity);
 					if (gates <= 3) {
-						defMult+= 1.5*((float) gates /6);
+						defMult+= 1.25*((float) gates /6);
 					}else if (gates < 7) {
-						defMult+= 1.75*((float) gates /6);
+						defMult+= 1.35*((float) gates /6);
 					} else if (gates == 7) {
-						defMult+= 2.5;
+						defMult+= 1.75;
 					} else if (gates == 8) {
-						defMult+= 3.5;
+						defMult+= 2.5;
 					}
 				}
 				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {

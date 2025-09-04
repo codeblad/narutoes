@@ -45,7 +45,7 @@ public class ItemGourd extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("GOURD", "narutomod:sasuke_",
-		 20, new int[]{2, 5, 20, 2}, 0, null, 2f);
+		 20, new int[]{2, 5, 14, 2}, 0, null, 2f);
 		elements.items.add(() -> new ItemArmor(enuma, 0, EntityEquipmentSlot.CHEST) {
 			@SideOnly(Side.CLIENT)
 			private ModelBiped armorModel;

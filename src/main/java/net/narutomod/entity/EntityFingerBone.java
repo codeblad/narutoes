@@ -143,7 +143,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 					  SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:bonecrack"))),
 					  SoundCategory.PLAYERS, 0.5f, entity.getRNG().nextFloat() * 0.6f + 0.6f);
 				this.createJutsu(entity);
-				ItemJutsu.setCurrentJutsuCooldown(stack, 10);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 5);
 				return true;
 			}
 
@@ -155,7 +155,7 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				bullet.motionX = vec.x * 0.0d;
 				bullet.motionY = vec.y * 0.0d;
 				bullet.motionZ = vec.z * 0.0d;
-				bullet.shoot(vec.x, vec.y, vec.z, 1.5f, 0.0f);
+				bullet.shoot(vec.x, vec.y, vec.z, 2.0f, 0.0f);
 				entity.world.spawnEntity(bullet);
 			}
 		}

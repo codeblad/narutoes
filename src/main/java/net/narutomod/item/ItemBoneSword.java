@@ -49,7 +49,7 @@ public class ItemBoneSword extends ElementsNarutomodMod.ModElement {
 				Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(slot);
 				if (slot == EntityEquipmentSlot.MAINHAND) {
 					multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
-							new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double) this.getAttackDamage() * 1.5, 0));
+							new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double) this.getAttackDamage() * 2.0f, 0));
 					multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
 							new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -3, 0));
 					multimap.put(EntityPlayer.REACH_DISTANCE.getName(), new AttributeModifier(ProcedureUtils.REACH_MODIFIER, "Tool modifier", 6, 0));

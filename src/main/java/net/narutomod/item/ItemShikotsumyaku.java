@@ -48,7 +48,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum LARCH = new ItemJutsu.JutsuEnum(0, "tooltip.shikotsumyaku.dancelarch", 'S', 150, 100d, new LarchDance());
 	public static final ItemJutsu.JutsuEnum WILLOW = new ItemJutsu.JutsuEnum(1, "tooltip.shikotsumyaku.dancewillow", 'S', 150, 100d, new WillowDance());
 	public static final ItemJutsu.JutsuEnum CAMELLIA = new ItemJutsu.JutsuEnum(2, "tooltip.shikotsumyaku.dancecamellia", 'S', 150, 100d, new CamelliaDance());
-	public static final ItemJutsu.JutsuEnum BULLETS = new ItemJutsu.JutsuEnum(3, "finger_bone", 'S', 150, 5d, new EntityFingerBone.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum BULLETS = new ItemJutsu.JutsuEnum(3, "finger_bone", 'S', 150, 75d, new EntityFingerBone.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum CFLOWER = new ItemJutsu.JutsuEnum(4, "tooltip.shikotsumyaku.danceclementisflower", 'S', 500, 500d, new ClementisFlower());
 	public static final ItemJutsu.JutsuEnum BRACKEN = new ItemJutsu.JutsuEnum(5, "entitybrackendance", 'S', 400, 20d, new EntityBrackenDance.Jutsu());
 
@@ -244,7 +244,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 						if (ticksAlive < 5) {
 							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),
 									this.damage);
-							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 25, 1, false, false));
+							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 35, 1, false, false));
 						}
 					}
 				}
@@ -272,7 +272,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 						 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")),
 						 SoundCategory.NEUTRAL, 5f, entity.getRNG().nextFloat() * 0.4f + 0.4f);
 					}
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20*3);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*5);
 					return true;
 				}
 				return false;
