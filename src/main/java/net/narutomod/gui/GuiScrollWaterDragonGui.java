@@ -1,6 +1,9 @@
 
+
+
 package net.narutomod.gui;
 
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
@@ -31,6 +34,11 @@ public class GuiScrollWaterDragonGui extends ElementsNarutomodMod.ModElement {
 			// security measure to prevent arbitrary chunk generation
 			if (player.world.isRemote || !player.world.isBlockLoaded(new BlockPos(this.x, this.y, this.z)))
 				return;
+			ItemStack stack1 = ProcedureUtils.getMatchingItemStack(player, ItemSuiton.block);
+			if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+				player.sendStatusMessage(new TextComponentTranslation("This is not your affinity."), false);
+				return;
+			}
 			ItemStack stack = GuiNinjaScroll.enableJutsu(player, (ItemSuiton.RangedItem)ItemSuiton.block, ItemSuiton.WATERDRAGON, true);
 			if (stack != null) {
 				super.handleButtonAction(player, buttonID);
@@ -43,6 +51,7 @@ public class GuiScrollWaterDragonGui extends ElementsNarutomodMod.ModElement {
 			super(new GuiContainerMod(world, x, y, z, entity));
 		}
 
+		
 		@Override
 		protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3) {
 			super.drawGuiContainerBackgroundLayer(par1, par2, par3);
@@ -65,7 +74,6 @@ public class GuiScrollWaterDragonGui extends ElementsNarutomodMod.ModElement {
 			this.mc.renderEngine.bindTexture(new ResourceLocation("narutomod:textures/wu_.png"));
 			this.drawModalRectWithCustomSizedTexture(this.guiLeft + 216, this.guiTop + 116, 0, 0, 32, 32, 32, 32);
 		}
-
 		@Override
 		protected void drawGuiContainerForegroundLayer(int par1, int par2) {
 			this.fontRenderer.drawString(ItemSuiton.WATERDRAGON.getName(), 38, 13, -16777216);
