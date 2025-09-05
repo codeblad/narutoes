@@ -64,7 +64,7 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 			if (itemstack.getItem() == ItemKaton.block) {
 				float f = ((ItemKaton.RangedItem)itemstack.getItem()).getCurrentJutsuXpModifier(itemstack, user);
 				if (f > 0.0f) {
-					this.damageModifier = (1.0f / f) * 3;
+					this.damageModifier = (1.0f / f) * 2;
 				}
 			}
 		}
