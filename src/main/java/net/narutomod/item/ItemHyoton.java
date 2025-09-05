@@ -217,10 +217,10 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 					world.playSound(null, res.hitVec.x, res.hitVec.y, res.hitVec.z,
 					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:spiked")),
 					 net.minecraft.util.SoundCategory.NEUTRAL, 5f, entity.getRNG().nextFloat() * 0.4f + 0.8f);
-					float f = MathHelper.sqrt(power * 9f / 5f);
+					float f = MathHelper.sqrt(power * 30f / 5f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EntityIceSpike entity1 = new EntityIceSpike(entity);
-						entity1.damage = 10+4.5f*(1+2.5f*(1/100))*ItemJutsu.getDmgMult(entity);
+						entity1.damage = 18+5.0f*(1+3.0f*(1/100))*ItemJutsu.getDmgMult(entity);
 						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
 						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
@@ -235,12 +235,12 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 10.0f;
+				return 2.5f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 300.0f;
+				return 25.0f;
 			}
 		}
 	}
