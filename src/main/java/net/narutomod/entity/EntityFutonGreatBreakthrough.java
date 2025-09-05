@@ -91,7 +91,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 					 1f, this.power * 0.2f);
 				}
 				boolean canfly = this.user instanceof EntityPlayer && !this.user.onGround;
-				this.shoot(this.power * 2.0f, this.power * 0.5d, canfly);
+				this.shoot(this.power, this.power * 0.5d, canfly);
 				if (canfly && Chakra.pathway(this.user).consume(ItemFuton.BIGBLOW.chakraUsage * this.power * 0.0025d)) {
 					//++this.duration;
 					ProcedureUtils.addVelocity(this.user, Vec3d.fromPitchYaw(this.user.rotationPitch, this.user.rotationYawHead).scale(-0.08-(0.04*this.power/32)));
