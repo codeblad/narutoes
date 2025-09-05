@@ -339,7 +339,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult+= 0.15f;
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.35f;
+					defMult+= 0.2f;
 				}
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
 					defMult+=.2f;

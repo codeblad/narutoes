@@ -117,7 +117,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 			 this.getPositionVector(), targetVec, 0xc00000ff, 10, 0.1f);
 			float dmgMult = 0.25f+0.75f*1/10*this.power;
-			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 40+7.35f*dmgMult*ItemJutsu.getDmgMult(this.summoner), this.summoner);
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 40+6.35f*dmgMult*ItemJutsu.getDmgMult(this.summoner), this.summoner);
 			this.world.spawnEntity(entity2);
 		}
 

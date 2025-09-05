@@ -251,7 +251,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 80.0f;
 			}
 	
 			@Override

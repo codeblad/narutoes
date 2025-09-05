@@ -56,8 +56,8 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 	}
 
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
-		public static final float MAX_RANGE = 64.0f;
-		private int duration = 100;
+		public static final float MAX_RANGE = 50.0f;
+		private int duration = 50;
 		private EntityLivingBase user;
 		private float power;
 
@@ -91,10 +91,10 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 					 1f, this.power * 0.2f);
 				}
 				boolean canfly = this.user instanceof EntityPlayer && !this.user.onGround;
-				this.shoot(this.power, this.power * 0.25d, canfly);
+				this.shoot(this.power * 2.0f, this.power * 0.5d, canfly);
 				if (canfly && Chakra.pathway(this.user).consume(ItemFuton.BIGBLOW.chakraUsage * this.power * 0.0025d)) {
 					//++this.duration;
-					ProcedureUtils.addVelocity(this.user, Vec3d.fromPitchYaw(this.user.rotationPitch, this.user.rotationYawHead).scale(-0.08-(0.04*this.power/64)));
+					ProcedureUtils.addVelocity(this.user, Vec3d.fromPitchYaw(this.user.rotationPitch, this.user.rotationYawHead).scale(-0.08-(0.04*this.power/32)));
 				}
 			}
 			if (!this.world.isRemote && this.ticksExisted > this.duration) {
@@ -168,7 +168,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 	
 			@Override
 			public float getPowerupDelay() {
-				return 20.0f;
+				return 3.0f;
 			}
 	
 			@Override
@@ -235,7 +235,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 			RayTraceResult res = ProjectileHelper.forwardsRaycast(this, true, true, shooter);
 			if (res != null && shooter != null) {
 				if (res.entityHit != null) {
-					ProcedureUtils.pushEntity(shooter, res.entityHit, this.getRange(), 3.0F);
+					ProcedureUtils.pushEntity(shooter, res.entityHit, this.getRange(), 6.0F);
 				} else if (this.world.isRemote) {
 					IBlockState blockstate = this.world.getBlockState(res.getBlockPos());
 					if (this.canRaiseDustList.contains(blockstate.getMaterial())) {

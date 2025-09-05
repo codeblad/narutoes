@@ -153,7 +153,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 					if (jd != null) {
 						ItemJutsu.Base item = (ItemJutsu.Base)jd.stack.getItem();
 						item.setJutsuCooldown(jd.stack, ItemRaiton.CHIDORI,
-						 (long)((float)this.ticksExisted * item.getModifier(jd.stack, this.summoner)) + 100);
+						 (long)((float)this.ticksExisted * item.getModifier(jd.stack, this.summoner)) + 200);
 						jd.stack.getTagCompound().removeTag(Jutsu.ID_KEY);
 					}
 				}

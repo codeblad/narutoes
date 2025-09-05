@@ -28,7 +28,7 @@ import net.narutomod.ElementsNarutomodMod;
 public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 241;
 	public static final int ENTITYID_RANGED = 242;
-	private static final float BASE_DAMAGE = 2.1f;
+	private static final float BASE_DAMAGE = 4.0f;
 
 	public EntityFalseDarkness(ElementsNarutomodMod instance) {
 		super(instance, 568);
@@ -92,7 +92,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 					 SoundEvents.ENTITY_LIGHTNING_IMPACT, SoundCategory.WEATHER, 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, this.getPositionVector(), 
 					 this.target.getPositionEyes(1f), 0x000000FF, 40, 0f);
-					float damage = 10+(BASE_DAMAGE * (1+1.25f*(this.power/20))) *ItemJutsu.getDmgMult(this.user);
+					float damage = 10+(BASE_DAMAGE * (1+1.0f*(this.power/15))) *ItemJutsu.getDmgMult(this.user);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemRaiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 						damage*=1.35f;

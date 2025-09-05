@@ -104,7 +104,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.fullScale = fullScale;
 			this.explosionSize = Math.max((int)fullScale - 2, 0);
 			//this.damage = fullScale * 10.0f;
-			this.mult = 2f + 4f*(fullScale/10);
+			this.mult = 2.5f + 4.0f*(fullScale/10);
 			this.damage = 15 + ItemJutsu.getDmgMult(shooter)*mult;
 			this.damage*= 1.3f;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter,ItemKaton.block);

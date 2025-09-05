@@ -120,7 +120,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 					float f = MathHelper.sqrt(power * 18f / 4f);
 					for (int i = 0; i < Math.round(power); i++) {
 						EC entity1 = new EC(entity, power);
-						entity1.damage = 12+4f*(1+4f*(1/100))*ItemJutsu.getDmgMult(entity);
+						entity1.damage = 14+6f*(1+4f*(1/100))*ItemJutsu.getDmgMult(entity);
 						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 							entity1.damage*=1.35f;
 						}
@@ -130,7 +130,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 						entity1.setLocationAndAngles(vec.x, vec.y + 0.5d, vec.z, entity.getRNG().nextFloat() * 360f, (entity.getRNG().nextFloat() - 0.5f) * 60f);
 						world.spawnEntity(entity1);
 					}
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*3);
 					return true;
 				}
 				return false;

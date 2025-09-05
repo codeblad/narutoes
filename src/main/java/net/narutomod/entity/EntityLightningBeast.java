@@ -65,6 +65,8 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 		private Vec3d startVec;
 		private int jumpTicks;
 		private final double ogSpeed = 1.6D;
+		private float damage = 5;
+		private float mult = 1;
 
 		public EC(World world) {
 			super(world);
@@ -140,7 +142,8 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
-			float damage = 8+(1+2*this.power/5)*1.5f*ItemJutsu.getDmgMult(this.getOwner());
+			this.mult = 0.5f+1f*(this.power/5);
+			this.damage = 4+mult*1.5f*ItemJutsu.getDmgMult(this.getOwner());
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getOwner(), ItemRaiton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.35f;
@@ -251,7 +254,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity instanceof EntityPlayer && power >= 5.0f) {
 					entity.world.spawnEntity(new EC((EntityPlayer)entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack,20*2);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*6);
 					return true;
 				}
 				return false;
@@ -259,7 +262,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getBasePower() {
-				return 4.0f;
+				return 1.0f;
 			}
 	
 			@Override
@@ -270,7 +273,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getMaxPower() {
-				return 100.0f;
+				return 20.0f;
 			}
 		}
 	}

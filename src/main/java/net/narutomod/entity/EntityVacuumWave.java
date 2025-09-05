@@ -111,7 +111,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 							vec = vec.subtract(this.rotationYaw, this.rotationPitch);
 				            if (Math.abs(vec.x) <= 90f && Math.abs(vec.y) <= 90f) {
 							 	entity.hurtResistantTime = 10;
-								 float damage = 5+0.8f*(1+0.4f*(this.power/10))* ItemJutsu.getDmgMult(this.shootingEntity);
+								 float damage = 6+2.0f*(1+0.4f*(this.power/10))* ItemJutsu.getDmgMult(this.shootingEntity);
 								ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemFuton.block);
 								if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 									damage*=1.35f;
