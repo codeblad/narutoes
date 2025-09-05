@@ -129,6 +129,8 @@ public class EntityC0 extends ElementsNarutomodMod.ModElement {
 			
 			if (this.ticksExisted > this.growTime ) {
 			if (this.extraeffectEntity == null) {
+				//this.world.playSound(null, this.user.posX, this.user.posY, this.user.posZ, 
+					// SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:katsu")), SoundCategory.NEUTRAL, 1f, 1f);
 				this.extraeffectEntity = EntitySpecialEffect.spawn(
 						this.user.world,
 						EntitySpecialEffect.Type.LINES_BURST_COLOR_END,

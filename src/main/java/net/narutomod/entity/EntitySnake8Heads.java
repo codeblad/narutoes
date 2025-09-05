@@ -88,6 +88,7 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 			this.setSize(0.8f * MODELSCALE, 2.0f * MODELSCALE);
 			this.stepHeight = this.height / 3;
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(500+ItemJutsu.getNinjaMult(this.getSummoner())*80f);
+			//this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(45.0D+ItemJutsu.getNinjaMult(summonerIn)*3.0f);
 			this.setHealth(this.getMaxHealth());
 			this.chakraBurn = chakraUsagePerSec;
 		}
@@ -114,11 +115,11 @@ public class EntitySnake8Heads extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.55D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.75D);
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(50D);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(30.0D);
-			//this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3D);
+			//this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(30.0D);
 		}
 
 		@Override
