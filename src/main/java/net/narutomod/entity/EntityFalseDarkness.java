@@ -110,7 +110,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public boolean isInRangeToRenderDist(double distance) {
-			double d = 68.5d * this.getRenderDistanceWeight();
+			double d = 90.5d * this.getRenderDistanceWeight();
 			return distance < d * d;
 		}
 
