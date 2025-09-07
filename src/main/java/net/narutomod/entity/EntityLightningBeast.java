@@ -211,7 +211,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 				EntityLightningArc.spawnAsParticle(this.world, this.posX + this.rand.nextGaussian() * this.width * 0.5d,
 				 this.posY + this.rand.nextDouble() * this.height, this.posZ + this.rand.nextGaussian() * this.width * 0.5d);
 			}
-			if (!this.world.isRemote && (this.ticksExisted > 40 + (int)(this.power) || owner == null || !owner.isEntityAlive())) {
+			if (!this.world.isRemote && (this.ticksExisted > 80 + (int)(this.power) || owner == null || !owner.isEntityAlive())) {
 				this.setDead();
 			}
 		}
@@ -254,7 +254,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity instanceof EntityPlayer && power >= 5.0f) {
 					entity.world.spawnEntity(new EC((EntityPlayer)entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack,20*6);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*7);
 					return true;
 				}
 				return false;
@@ -262,7 +262,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getBasePower() {
-				return 1.0f;
+				return 3.0f;
 			}
 	
 			@Override
