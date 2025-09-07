@@ -99,6 +99,11 @@
           "name": "narutomod:scroll_futon_vacuum",
           "weight": 10
         },
+       {
+          "type": "item",
+          "name": "narutomod:scroll_lightning_chakra_mode",
+          "weight": 15
+        },
         {
           "type": "item",
           "name": "narutomod:scroll_vacuum_wave",

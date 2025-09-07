@@ -103,8 +103,9 @@ public class ItemBijuSpawner extends ElementsNarutomodMod.ModElement {
 					double posY = Math.ceil(entity.posY);
 					double posZ = Math.ceil(entity.posZ);
 
-					final EntityBijuManager bm = EntityBijuManager.getAvailableBiju(entity);
-					if (!bm.isAddedToWorld()) {
+					final EntityBijuManager bm = EntityBijuManager.getRandomAvailableBiju();
+					final EntityBijuManager abm = EntityBijuManager.anyBijuAddedToWorld();
+					if (abm == null) {
 						Entity beast = bm.getEntity();
 						beast = bm.spawnEntity(world,posX+20,posY,posZ,0);
 						beast.setPosition(posX,posY+20,posZ);
@@ -115,15 +116,12 @@ public class ItemBijuSpawner extends ElementsNarutomodMod.ModElement {
 						if (!entity.capabilities.isCreativeMode) {
 							itemstack.shrink(1);
 						}
-					} else {
-						Entity beast = bm.getEntity();
-						BlockPos pos = bm.getPosition();
+					} else if (abm != null) {
+						Entity beast = abm.getEntity();
+						BlockPos pos = abm.getPosition();
 						String abc = pos.getX()+" "+pos.getY()+" "+pos.getZ();
 						entity.sendStatusMessage(new TextComponentString("The biju is already at "+abc), true);
 					}
-
-
-
 				}
 
 			}

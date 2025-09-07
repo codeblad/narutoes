@@ -115,7 +115,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 		return i;
 	}
 
-	public static int getRandomAvailableBiju() {
+	public static EntityBijuManager getRandomAvailableBiju() {
 		int i = availableBijus();
 		if (i > 0) {
 			i = rand.nextInt(i);
@@ -126,22 +126,22 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 				//if (!bm.isSealed()) {
 				if (bm != null && !bm.isSealed()) {
 					if (j == i) {
-						return bm.getTails();
+						return bm;
 					}
 					++j;
 				}
 			}
 		}
-		return 0;
+		return null;
 	}
 
-	public static boolean anyBijuAddedToWorld() {
+	public static EntityBijuManager anyBijuAddedToWorld() {
 		for (EntityBijuManager bm : mapByClass.values()) {
 			if (bm.isAddedToWorld()) {
-				return true;
+				return bm;
 			}
 		}
-		return false;
+		return null;
 	}
 
 	public static boolean isBijuAddedToWorld(int tails) {
