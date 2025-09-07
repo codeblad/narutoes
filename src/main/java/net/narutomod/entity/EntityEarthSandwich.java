@@ -173,7 +173,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 					 this.posX, this.posY, this.posZ, (int)(f * f * 6f), this.width * 0.2, 0.5d, this.width * 0.2,
 					 0.15d, Block.getIdFromBlock(Blocks.DIRT));
 				}
-				if (age > 60) {
+				if (age > 70) {
 					this.setDead();
 				}
 			}

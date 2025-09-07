@@ -215,7 +215,7 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 				 SoundCategory.NEUTRAL, 0.6f, world.rand.nextFloat() * 0.4f + 1.2f);
 				EC entity1 = shooter != null ? new EC(shooter) : new EC(world);
 				entity1.setPosition(fromX, fromY, fromZ);
-				entity1.shoot(toX - fromX, toY - fromY, toZ - fromZ, speed, inaccuracy);
+				entity1.shoot(toX - fromX, toY - fromY, toZ - fromZ, speed, 0.0f);
 				world.spawnEntity(entity1);
 			}
 		}
