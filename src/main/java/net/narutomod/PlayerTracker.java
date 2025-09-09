@@ -325,7 +325,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (cheststack.getItem() == ItemBoneArmor.body) {
 					if (ItemBoneArmor.isLarchActive(cheststack)) {
-						defMult += 0.4f;
+						defMult += 0.25f;
 					}
 				}
 				if (cheststack.getItem() == ItemTenseigan.body) {
@@ -336,16 +336,16 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult+= 0.1f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.1f;
+					defMult+= 0.01f;
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
 					defMult+= 0.15f;
 				}
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
-					defMult+=.1f;
+					defMult+=.15f;
 				}
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
-					defMult+=.2f;
+					defMult+=.25f;
 				}
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {

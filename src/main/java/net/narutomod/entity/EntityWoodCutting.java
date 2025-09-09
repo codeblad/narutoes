@@ -197,7 +197,7 @@ public class EntityWoodCutting extends ElementsNarutomodMod.ModElement {
 				Vec3d vec2 = vec1.add(vec);
 		 		entity.swingArm(EnumHand.MAIN_HAND);
 				this.createJutsu(entity.world, entity, vec1.x, vec1.y, vec1.z, vec2.x, vec2.y, vec2.z, 5f, 0.0f);
-				ItemJutsu.setCurrentJutsuCooldown(stack, 20*10);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);
 				return true;
 			}
 
