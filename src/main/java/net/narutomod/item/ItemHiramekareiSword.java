@@ -93,7 +93,7 @@ public class ItemHiramekareiSword extends ElementsNarutomodMod.ModElement {
 			Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
 			if (slot == EntityEquipmentSlot.MAINHAND) {
 				NBTTagCompound cmp = this.effectActive(stack) ? stack.getTagCompound().getCompoundTag("EffectEntityActive") : null;
-				double strength = cmp != null ? cmp.getDouble("strength") : 10d;
+				double strength = cmp != null ? cmp.getDouble("strength") : 5d;
 				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
 				 new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Ranged item modifier", strength, 0));
 				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
@@ -187,7 +187,8 @@ public class ItemHiramekareiSword extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityEffects extends EntityChakraFlow.Base {
 		private final int duration = 200;
-		private int ticksSinceLastSwing;
+
+		private int ticksSinceLastSwing;
 
 		public EntityEffects(World a) {
 			super(a);
