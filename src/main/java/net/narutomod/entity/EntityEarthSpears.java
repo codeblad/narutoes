@@ -111,7 +111,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				World world = entity.world;
 				Vec3d vec3d = entity.getPositionEyes(1f);
-				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(100d));
+				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(200d));
 				RayTraceResult res = world.rayTraceBlocks(vec3d, vec3d2, false, true, true);
 				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK && res.sideHit == EnumFacing.UP) {
 					world.playSound(null, res.getBlockPos(),

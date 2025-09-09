@@ -79,8 +79,8 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 		private ItemJiton.SwarmTarget sandTarget;
 		private Vec3d capturedVec;
 		private int funeralTime;
-		private final float funeralDamage = 1f; // per tick for 20 ticks
-		private static final int MAXTIME = 100;
+		private final float funeralDamage = 2f; // per tick for 20 ticks
+		private static final int MAXTIME = 150;
 
 		public EC(World world) {
 			super(world);
@@ -129,7 +129,7 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 			if (!flag && this.getEntityBoundingBox().intersects(this.targetEntity.getEntityBoundingBox())) {
 				AxisAlignedBB bb = this.getEntityBoundingBox().intersect(this.targetEntity.getEntityBoundingBox());
 				flag = bb.equals(this.targetEntity.getEntityBoundingBox())
-				 && this.getEntityBoundingBox().getAverageEdgeLength() < this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 2.5d;
+				 && this.getEntityBoundingBox().getAverageEdgeLength3() < this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 2.5d;
 			}
 			if (flag && this.capturedVec == null) {
 				this.capturedVec = this.targetEntity.getPositionVector();
@@ -140,7 +140,7 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void sandFuneral() {
-			this.funeralTime = 20;
+			this.funeralTime = 10;
 		}
 
 		private boolean canFuneral() {
