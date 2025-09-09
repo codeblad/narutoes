@@ -153,7 +153,7 @@ public class EntityWoodArm extends ElementsNarutomodMod.ModElement {
 				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 100d, 5d, ItemMokuton.WoodSegment.class);
 				if (res != null && res.entityHit != null) {
 					entity.world.spawnEntity(new EC(entity, res.entityHit));
-					((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 20*5);
+					((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 20*10);
 					return true;
 				}
 				return false;
