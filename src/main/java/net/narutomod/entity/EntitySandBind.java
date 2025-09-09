@@ -129,7 +129,7 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 			if (!flag && this.getEntityBoundingBox().intersects(this.targetEntity.getEntityBoundingBox())) {
 				AxisAlignedBB bb = this.getEntityBoundingBox().intersect(this.targetEntity.getEntityBoundingBox());
 				flag = bb.equals(this.targetEntity.getEntityBoundingBox())
-				 && this.getEntityBoundingBox().getAverageEdgeLength3() < this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 2.5d;
+				 && this.getEntityBoundingBox().getAverageEdgeLength() < this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 2.5d;
 			}
 			if (flag && this.capturedVec == null) {
 				this.capturedVec = this.targetEntity.getPositionVector();
