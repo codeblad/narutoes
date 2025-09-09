@@ -325,7 +325,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (cheststack.getItem() == ItemBoneArmor.body) {
 					if (ItemBoneArmor.isLarchActive(cheststack)) {
-						defMult += 0.55f;
+						defMult += 0.25f;
 					}
 				}
 				if (cheststack.getItem() == ItemTenseigan.body) {
@@ -333,28 +333,28 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
 				if (stackwood != null) {
-					defMult+= 0.2f;
+					defMult+= 0.1f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.15f;
+					defMult+= 0.01f;
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.2f;
+					defMult+= 0.15f;
 				}
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
-					defMult+=.2f;
+					defMult+=.15f;
 				}
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
-					defMult+=.3f;
+					defMult+=.25f;
 				}
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
-						defMult+= 0.4f;
+						defMult+= 0.3f;
 					} else {
 						if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
-							defMult+= 0.4f;
+							defMult+= 0.3f;
 						} else {
-							defMult+= 0.8f;
+							defMult+= 0.7f;
 						}
 					}
 				}

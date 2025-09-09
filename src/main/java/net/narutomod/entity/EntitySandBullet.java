@@ -150,7 +150,7 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 				ProcedureAoeCommand bruh = ProcedureAoeCommand.set(this,0,4);
 				for (Entity entity : bruh.getList()) {
 					entity.hurtResistantTime = 10;
-					entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 4+2.0f*ItemJutsu.getDmgMult(this.shootingEntity));
+					entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 8+2.0f*ItemJutsu.getDmgMult(this.shootingEntity));
 				}
 				this.world.createExplosion(this.shootingEntity, result.hitVec.x, result.hitVec.y, result.hitVec.z, 2f,
 						net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
