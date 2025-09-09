@@ -83,10 +83,10 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void postScaleFixup() {
 			float f = this.getScale();
-			float newPower = (1+7*(this.power/5)) * ItemJutsu.getDmgMult(this.getSummoner());
+			float newPower = (1+8*(this.power/5)) * ItemJutsu.getDmgMult(this.getSummoner());
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(60.0D + 4*newPower);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10.0D + 0.5*newPower);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D + 0.5*newPower);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(10.0D + 6.0D * f);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D + (f - 1F) * 0.1D);
 			super.postScaleFixup();
