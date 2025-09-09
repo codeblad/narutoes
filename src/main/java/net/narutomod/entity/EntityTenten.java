@@ -11,6 +11,7 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Items;
+import net.minecraft.init.MobEffects;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.world.World;
 import net.minecraft.world.DifficultyInstance;
@@ -20,6 +21,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.entity.*;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
 import net.minecraft.entity.monster.EntitySkeleton;
@@ -38,6 +40,7 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 
 import net.narutomod.block.BlockExplosiveTag;
 import net.narutomod.item.*;
+import net.narutomod.item.ItemHiramekareiSword.EntityEffects;
 import net.narutomod.ElementsNarutomodMod;
 
 import javax.annotation.Nullable;
@@ -121,6 +124,8 @@ public class EntityTenten extends ElementsNarutomodMod.ModElement {
 		public IEntityLivingData onInitialSpawn(DifficultyInstance difficulty, @Nullable IEntityLivingData livingdata) {
 			this.setItemToInventory(new ItemStack(ItemKunai.block), 0);
 			this.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(ItemNinjaArmorKonoha.helmet, 1));
+			this.setGlowing(true);
+			//this.addPotionEffect(new PotionEffect(MobEffects.GLOWING, 3000, 0));
 			return super.onInitialSpawn(difficulty, livingdata);
 		}
 

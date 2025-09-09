@@ -98,6 +98,7 @@ public class EntityIrukaSensei extends ElementsNarutomodMod.ModElement {
 			this.setItemStackToSlot(EntityEquipmentSlot.HEAD, new ItemStack(ItemNinjaArmorKonoha.helmet, 1));
 			this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ItemNinjaArmorKonoha.body, 1));
 			this.setItemStackToSlot(EntityEquipmentSlot.LEGS, new ItemStack(ItemNinjaArmorKonoha.legs, 1));
+			this.setGlowing(true);
 			return super.onInitialSpawn(difficulty, livingdata);
 		}
 

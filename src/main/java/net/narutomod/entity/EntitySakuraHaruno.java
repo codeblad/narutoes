@@ -136,6 +136,7 @@ public class EntitySakuraHaruno extends ElementsNarutomodMod.ModElement {
 			this.setItemToInventory(iryoJutsu, 0);
 			this.setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(ItemNinjaArmorSakura1.body, 1));
 			this.setItemStackToSlot(EntityEquipmentSlot.LEGS, new ItemStack(ItemNinjaArmorSakura1.legs, 1));
+			this.setGlowing(true);
 			return livingdata;
 		}
 
