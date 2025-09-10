@@ -8,12 +8,20 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.narutomod.ElementsNarutomodMod;
+import net.minecraft.util.DamageSource;
+
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.World;
@@ -29,6 +37,8 @@ import net.minecraft.entity.ai.EntityAIAttackMelee;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.EnumCreatureAttribute;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
@@ -80,6 +90,7 @@ public class EntityTestDummy extends ElementsNarutomodMod.ModElement {
             };
         });
     }
+
     public static class EntityCustom extends EntityMob {
         public EntityCustom(World world) {
             super(world);
@@ -134,6 +145,7 @@ public class EntityTestDummy extends ElementsNarutomodMod.ModElement {
             return 1.0F;
         }
 
+
         @Override
         protected boolean processInteract(EntityPlayer player, EnumHand hand) {
             double exp = PlayerTracker.getBattleXp(player);
@@ -153,7 +165,6 @@ public class EntityTestDummy extends ElementsNarutomodMod.ModElement {
                 this.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).setBaseValue(8D);
 
             this.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 99999, 4, false, false));
-            this.addTag("Dummy");
             return super.processInteract(player, hand);
         }
 
@@ -163,6 +174,32 @@ public class EntityTestDummy extends ElementsNarutomodMod.ModElement {
             if (this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED) != null)
                 this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.1D);
         }
+    }
+
+    @SubscribeEvent
+    public void onDamaged(LivingDamageEvent event) {
+        Entity sourceEntity = event.getSource().getTrueSource();
+        System.out.println(sourceEntity);
+        float amount = event.getAmount();
+
+        float defMult = 1.0f;
+
+        if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 1) {
+            defMult += .25f;
+        }
+
+        if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 2) {
+            defMult += .45f;
+        }
+
+        if (ItemSenjutsu.isSageModeActivated((EntityPlayer) sourceEntity)) {
+            defMult += 0.6f;
+        }
+
+        float defense = PlayerTracker.getDefense(sourceEntity) * defMult;
+        float newAmount = amount / defense;
+        event.setAmount(newAmount);
+
     }
 
     // Made with Blockbench 3.7.4

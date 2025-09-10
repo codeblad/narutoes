@@ -39,7 +39,6 @@ import net.narutomod.entity.EntitySummonAnimal;
 import net.narutomod.item.ItemIryoJutsu;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.entity.EntityTestDummy;
 
 import java.util.UUID;
 import java.util.List;
@@ -304,14 +303,13 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			Entity targetEntity = event.getEntity();
 			Entity sourceEntity = event.getSource().getTrueSource();
 			float amount = event.getAmount();
-
 			//I PUT DEFENSE IN HERE LOOK FOR DEFENSE HERE DAMAGE REDUCER DEFENSE MODIFIER
 			if (targetEntity instanceof EntityPlayer) {
 				float defMult = 1;
 
 				ItemStack cheststack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 				ItemStack headstack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-				if (headstack.getItem() == ItemSharingan.helmet ||headstack.getItem() == ItemSharingan.helmet  ) {
+				if (headstack.getItem() == ItemSharingan.helmet ||headstack.getItem() == ItemSharingan.helmet ) {
 					defMult += .1f;
 				}
 				if (headstack.getItem() == ItemMangekyoSharinganEternal.helmet ||headstack.getItem() == ItemMangekyoSharinganObito.helmet||headstack.getItem() == ItemMangekyoSharingan.helmet   ) {
@@ -386,42 +384,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					newAmount = amount;
 				}
 				event.setAmount(newAmount);
-			}
-
-            if (!targetEntity.equals(sourceEntity)) {
-                if (sourceEntity instanceof EntityPlayer) {
-                    boolean immune = targetEntity.isImmuneToFire();
-
-                    if (immune == true) {
-
-                        float defMult = 1.0f;
-
-                        if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 1) {
-                            defMult += .25f;
-                        }
-
-                        if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 2) {
-                            defMult += .45f;
-                        }
-
-                        if (ItemSenjutsu.isSageModeActivated((EntityPlayer) sourceEntity)) {
-                            if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) > 0) {
-                                defMult += 0.3f;
-                            } else {
-                                if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
-                                    defMult += 0.3f;
-                                } else {
-                                    defMult += 0.6f;
-                                }
-                            }
-                        }
-
-                        float defense = PlayerTracker.getDefense(sourceEntity) * defMult;
-                        float newAmount = amount / defense;
-                        event.setAmount(newAmount);
-                    }
-                }
-            }
+			    }
 
 			
 			if (sourceEntity instanceof EntitySummonAnimal.ISummon) {
