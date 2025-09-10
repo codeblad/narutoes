@@ -4,10 +4,10 @@
   <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="net.minecraftforge.legacydev.MainServer"/>
   <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Dforge.logging.console.level=debug -Dforge.logging.markers=REGISTRIES"/>
   <stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value=""/>
-  <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="C:\Users\Joshua\Documents\GitHub\narutoes\run"/>
+  <stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="C:\Users\bruhs\Downloads\narutoes-main\narutoes\run"/>
   <mapAttribute key="org.eclipse.debug.core.environmentVariables">
-    <mapEntry key="MCP_TO_SRG" value="C:\Users\Joshua\Documents\GitHub\narutoes\build\createSrgToMcp\output.srg"/>
-    <mapEntry key="MOD_CLASSES" value="examplemod%%C:\Users\Joshua\Documents\GitHub\narutoes\bin\main;examplemod%%C:\Users\Joshua\Documents\GitHub\narutoes\bin\main"/>
+    <mapEntry key="MCP_TO_SRG" value="C:\Users\bruhs\Downloads\narutoes-main\narutoes\build\createSrgToMcp\output.srg"/>
+    <mapEntry key="MOD_CLASSES" value="examplemod%%C:\Users\bruhs\Downloads\narutoes-main\narutoes\bin\main;examplemod%%C:\Users\bruhs\Downloads\narutoes-main\narutoes\bin\main"/>
     <mapEntry key="mainClass" value="net.minecraft.launchwrapper.Launch"/>
     <mapEntry key="MCP_MAPPINGS" value="snapshot_20171003-1.12"/>
     <mapEntry key="FORGE_VERSION" value="14.23.5.2860"/>
