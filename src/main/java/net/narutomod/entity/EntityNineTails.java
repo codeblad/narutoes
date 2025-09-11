@@ -2,6 +2,7 @@
 package net.narutomod.entity;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -40,6 +41,7 @@ import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
+import net.narutomod.item.ItemFuton;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.Random;
@@ -82,6 +84,26 @@ public class EntityNineTails extends ElementsNarutomodMod.ModElement {
 				this.getEntity().setKCM(true);
 			}
 			return ret;
+		}
+
+		@Override
+		public void setVesselEntity(@Nullable Entity player) {
+			super.setVesselEntity(player);
+			if (player instanceof EntityPlayer) {
+				((EntityPlayer)player).capabilities.allowFlying = true;
+				((EntityPlayer)player).sendPlayerAbilities();
+				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)player, ItemFuton.block);
+				if (stack == null) {
+					stack = new ItemStack(ItemFuton.block);
+					((ItemFuton.RangedItem)stack.getItem()).setOwner(stack, (EntityPlayer)player);
+					((ItemFuton.RangedItem)stack.getItem()).setIsAffinity(stack, true);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer)player, stack);
+				}
+				if (stack != null) {
+					((ItemFuton.RangedItem)stack.getItem()).setIsAffinity(stack, true);
+					((ItemFuton.RangedItem)stack.getItem()).enableJutsu(stack, ItemFuton.RASENSHURIKEN, true);
+				}
+			}
 		}
 
 		@Override

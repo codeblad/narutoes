@@ -32,7 +32,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
-
+import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemKaton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
@@ -76,9 +76,11 @@ public class EntityTwoTails extends ElementsNarutomodMod.ModElement {
 				if (stack == null) {
 					stack = new ItemStack(ItemKaton.block);
 					((ItemKaton.RangedItem)stack.getItem()).setOwner(stack, (EntityPlayer)player);
+					((ItemKaton.RangedItem)stack.getItem()).setIsAffinity(stack, true);
 					ItemHandlerHelper.giveItemToPlayer((EntityPlayer)player, stack);
 				}
 				if (stack != null) {
+					((ItemKaton.RangedItem)stack.getItem()).setIsAffinity(stack, true);
 					((ItemKaton.RangedItem)stack.getItem()).enableJutsu(stack, ItemKaton.GREATFIREBALL, true);
 				}
 			}

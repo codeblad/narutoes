@@ -2,6 +2,7 @@
 package net.narutomod.entity;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -33,12 +34,15 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.item.ItemStack;
 
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemSuiton;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.Random;
+
+import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityEightTails extends ElementsNarutomodMod.ModElement {
@@ -69,7 +73,23 @@ public class EntityEightTails extends ElementsNarutomodMod.ModElement {
 		public TailBeastManager() {
 			super(EntityCustom.class, 8);
 		}
-
+		@Override
+		public void setVesselEntity(@Nullable Entity player) {
+			super.setVesselEntity(player);
+			if (player instanceof EntityPlayer) {
+				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)player, ItemSuiton.block);
+				if (stack == null) {
+					stack = new ItemStack(ItemSuiton.block);
+					((ItemSuiton.RangedItem)stack.getItem()).setOwner(stack, (EntityPlayer)player);
+					((ItemSuiton.RangedItem)stack.getItem()).setIsAffinity(stack, true);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer)player, stack);
+				}
+				if (stack != null) {
+					((ItemSuiton.RangedItem)stack.getItem()).setIsAffinity(stack, true);
+					((ItemSuiton.RangedItem)stack.getItem()).enableJutsu(stack, ItemSuiton.WATERSHOCK, true);
+				}
+			}
+		}
 		@Override
 		public void markDirty() {
 			Save.getInstance().markDirty();

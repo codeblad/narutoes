@@ -7,7 +7,10 @@ import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
@@ -18,6 +21,25 @@ import java.util.Map;
 public class ProcedurePowerIncreaseOnKeyPressed extends ElementsNarutomodMod.ModElement {
 	public ProcedurePowerIncreaseOnKeyPressed(ElementsNarutomodMod instance) {
 		super(instance, 104);
+	}
+	public static boolean hasSlot(NBTTagCompound nbt, int targetSlot) {
+    if (nbt.hasKey("ForgeCaps", Constants.NBT.TAG_COMPOUND)) {
+        NBTTagCompound forgeCaps = nbt.getCompoundTag("ForgeCaps");
+        if (forgeCaps.hasKey("knapm:container", Constants.NBT.TAG_COMPOUND)) {
+            NBTTagCompound container = forgeCaps.getCompoundTag("knapm:container");
+            if (container.hasKey("Items", Constants.NBT.TAG_LIST)) {
+                NBTTagList items = container.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+                for (int i = 0; i < items.tagCount(); i++) {
+                    NBTTagCompound itemEntry = items.getCompoundTagAt(i);
+                        int slot = itemEntry.getInteger("Slot");
+                        if (slot == targetSlot) {
+                            return true;
+                        }
+                }
+            }
+        }
+    }
+    return false; 
 	}
 
 	public static void executeProcedure(Map<String, Object> dependencies) {
@@ -61,6 +83,12 @@ public class ProcedurePowerIncreaseOnKeyPressed extends ElementsNarutomodMod.Mod
 							&& (((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(1) : ItemStack.EMPTY)
 									.getItem() == new ItemStack(ItemBijuCloak.legs, (int) (1)).getItem())))) {
 				if ((!(is_pressed))) {
+					NBTTagCompound nbt = new NBTTagCompound();
+					entity.writeToNBT(nbt);
+					if (hasSlot(nbt, 0)) {
+						ProcedureUtils.sendStatusMessage((EntityPlayer) entity, "You are bound.", false);
+						return;
+			}
 					EntityBijuManager.increaseCloakLevel((EntityPlayer) entity);
 				}
 			}

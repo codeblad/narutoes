@@ -2,6 +2,7 @@
 package net.narutomod.entity;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -30,11 +31,14 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.init.MobEffects;
+import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 
 import net.narutomod.procedure.ProcedureRenderView;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
+import net.narutomod.item.ItemFuton;
+import net.narutomod.item.ItemSuiton;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.Random;
@@ -74,9 +78,20 @@ public class EntitySevenTails extends ElementsNarutomodMod.ModElement {
 			if (player instanceof EntityPlayer) {
 				((EntityPlayer)player).capabilities.allowFlying = true;
 				((EntityPlayer)player).sendPlayerAbilities();
+				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)player, ItemFuton.block);
+				if (stack == null) {
+					stack = new ItemStack(ItemFuton.block);
+					((ItemFuton.RangedItem)stack.getItem()).setOwner(stack, (EntityPlayer)player);
+					((ItemFuton.RangedItem)stack.getItem()).setIsAffinity(stack, true);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer)player, stack);
+				}
+				if (stack != null) {
+					((ItemFuton.RangedItem)stack.getItem()).setIsAffinity(stack, true);
+					((ItemFuton.RangedItem)stack.getItem()).enableJutsu(stack, ItemFuton.VACWAVE, true);
+				}
 			}
 		}
-
+		
 		@Override
 		public void markDirty() {
 			Save.getInstance().markDirty();
@@ -243,7 +258,7 @@ public class EntitySevenTails extends ElementsNarutomodMod.ModElement {
 					return p_apply_1_ != null && p_apply_1_ != EntityCustom.this && p_apply_1_ != EntityCustom.this.getBijuManager().getJinchurikiPlayer();
 				}
 			})) {
-				if (this.rand.nextFloat() < 0.005f) {
+				if (this.rand.nextFloat() < 0.1f) {
 					if (entity instanceof EntityPlayer && (this.getSummoningPlayer() != null && !entity.equals(this.getSummoningPlayer()))) {
 						ProcedureRenderView.sendToPlayer(entity, 100, 100, 1.0f, 1.0f, 1.0f, 1.0f);
 						entity.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 5));

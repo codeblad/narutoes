@@ -4,17 +4,19 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandler;
 import net.narutomod.Chakra;
 import net.narutomod.entity.*;
 import net.narutomod.item.*;
 import net.narutomod.world.WorldKamuiDimension;
-import net.narutomod.item.ItemDojutsu;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraft.world.World;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.Entity;
 
@@ -29,6 +31,27 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 	public ProcedureSpecialJutsu1OnKeyPressed(ElementsNarutomodMod instance) {
 		super(instance, 64);
 	}
+
+	public static boolean hasSlot(NBTTagCompound nbt, int targetSlot) {
+    if (nbt.hasKey("ForgeCaps", Constants.NBT.TAG_COMPOUND)) {
+        NBTTagCompound forgeCaps = nbt.getCompoundTag("ForgeCaps");
+        if (forgeCaps.hasKey("knapm:container", Constants.NBT.TAG_COMPOUND)) {
+            NBTTagCompound container = forgeCaps.getCompoundTag("knapm:container");
+            if (container.hasKey("Items", Constants.NBT.TAG_LIST)) {
+                NBTTagList items = container.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+                for (int i = 0; i < items.tagCount(); i++) {
+                    NBTTagCompound itemEntry = items.getCompoundTagAt(i);
+                        int slot = itemEntry.getInteger("Slot");
+                        if (slot == targetSlot) {
+                            return true;
+                        }
+                }
+            }
+        }
+    }
+    return false; 
+	}
+	
 
 	public static void executeProcedure(Map<String, Object> dependencies) {
 
@@ -57,9 +80,18 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 		}
 
 		helmet = ((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY);
+		
+
 		if ((((helmet).getItem() == new ItemStack(ItemRinnegan.helmet, (int) (1)).getItem())
 				|| ((helmet).getItem() == new ItemStack(ItemTenseigan.helmet, (int) (1)).getItem()))) {
 			{
+				NBTTagCompound nbt = new NBTTagCompound();
+				entity.writeToNBT(nbt);
+
+				if (hasSlot(nbt, 2)) {
+					ProcedureUtils.sendStatusMessage((EntityPlayer) entity, "You are blindfolded.", false);
+					return;
+				}
 				Map<String, Object> $_dependencies = new HashMap<>();
 				$_dependencies.put("is_pressed", is_pressed);
 				$_dependencies.put("entity", entity);
@@ -72,6 +104,13 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 		} else if ((((helmet).getItem() == new ItemStack(ItemMangekyoSharingan.helmet, (int) (1)).getItem())
 				|| ((helmet).getItem() == new ItemStack(ItemMangekyoSharinganEternal.helmet, (int) (1)).getItem()))) {
 			{
+				NBTTagCompound nbt = new NBTTagCompound();
+				entity.writeToNBT(nbt);
+
+				if (hasSlot(nbt, 2)) {
+					ProcedureUtils.sendStatusMessage((EntityPlayer) entity, "You are blindfolded.", false);
+					return;
+				}
 				Map<String, Object> $_dependencies = new HashMap<>();
 				$_dependencies.put("is_pressed", is_pressed);
 				$_dependencies.put("entity", entity);
@@ -84,6 +123,13 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 		} else if (((helmet).getItem() == new ItemStack(ItemMangekyoSharinganObito.helmet, (int) (1)).getItem())) {
 			if ((((world.provider.getDimension()) == (WorldKamuiDimension.DIMID)) && (!(entity.isSneaking())))) {
 				{
+					NBTTagCompound nbt = new NBTTagCompound();
+					entity.writeToNBT(nbt);
+
+					if (hasSlot(nbt, 2)) {
+						ProcedureUtils.sendStatusMessage((EntityPlayer) entity, "You are blindfolded.", false);
+						return;
+					}
 					Map<String, Object> $_dependencies = new HashMap<>();
 					$_dependencies.put("is_pressed", is_pressed);
 					$_dependencies.put("entity", entity);
@@ -92,6 +138,13 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 				}
 			} else {
 				{
+					NBTTagCompound nbt = new NBTTagCompound();
+					entity.writeToNBT(nbt);
+
+					if (hasSlot(nbt, 2)) {
+						ProcedureUtils.sendStatusMessage((EntityPlayer) entity, "You are blindfolded.", false);
+						return;
+					}
 					Map<String, Object> $_dependencies = new HashMap<>();
 					$_dependencies.put("is_pressed", is_pressed);
 					$_dependencies.put("entity", entity);
@@ -104,6 +157,13 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 			}
 		} else if (((helmet).getItem() == new ItemStack(ItemByakugan.helmet, (int) (1)).getItem())) {
 			{
+				NBTTagCompound nbt = new NBTTagCompound();
+				entity.writeToNBT(nbt);
+
+				if (hasSlot(nbt, 2)) {
+					ProcedureUtils.sendStatusMessage((EntityPlayer) entity, "You are blindfolded.", false);
+					return;
+				}
 				Map<String, Object> $_dependencies = new HashMap<>();
 				$_dependencies.put("is_pressed", is_pressed);
 				$_dependencies.put("entity", entity);
@@ -203,8 +263,18 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 				biju.setSwingingArms(false);
 			}
 			if (helmet.getItem() instanceof ItemDojutsu.Base) {
-				((ItemDojutsu.Base) helmet.getItem()).onJutsuKey1(is_pressed, helmet, (EntityPlayer) entity);
+			NBTTagCompound nbt = new NBTTagCompound();
+			entity.writeToNBT(nbt);
+
+			if (hasSlot(nbt, 2)) {
+				ProcedureUtils.sendStatusMessage((EntityPlayer) entity, "You are blindfolded.", false);
+				return;
 			}
+
+			if (((ItemDojutsu.Base) helmet.getItem()).onJutsuKey1(is_pressed, helmet, (EntityPlayer) entity)) {
+				return;
+			}
+		}
 		}
 	}
 }
