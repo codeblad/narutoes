@@ -197,7 +197,7 @@ public class ItemTenseiganChakraMode extends ElementsNarutomodMod.ModElement {
 						return;
 					}
 					if (result.entityHit instanceof EntityLivingBase) {
-						Chakra.pathway((EntityLivingBase) result.entityHit).consume(1.0F);
+						Chakra.pathway((EntityLivingBase) result.entityHit).consume(0.2F);
 					}
 				}
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
