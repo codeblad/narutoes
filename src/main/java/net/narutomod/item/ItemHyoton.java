@@ -213,7 +213,7 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 				Vec3d vec3d = entity.getPositionEyes(1f);
 				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(30d));
 				RayTraceResult res = world.rayTraceBlocks(vec3d, vec3d2, false, true, true);
-				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK && res.sideHit == EnumFacing.UP) {
+				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK) {
 					world.playSound(null, res.hitVec.x, res.hitVec.y, res.hitVec.z,
 					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:spiked")),
 					 net.minecraft.util.SoundCategory.NEUTRAL, 5f, entity.getRNG().nextFloat() * 0.4f + 0.8f);

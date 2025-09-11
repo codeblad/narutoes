@@ -258,8 +258,8 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 				Vec3d vec3d = entity.getPositionEyes(1f);
 				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(200d));
 				RayTraceResult res = world.rayTraceBlocks(vec3d, vec3d2, false, true, true);
-				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK && res.sideHit == EnumFacing.UP) {
-					float f = MathHelper.sqrt(power * 35f / 5f);
+				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK) {
+					float f = MathHelper.sqrt(power * 35f / 5f); //controls the max area
 					for (int i = 0; i < Math.round(power); i++) {
 						EntityBrackenDance entity1 = new EntityBrackenDance(entity, power);
 						entity1.damage = 15+5f*(1+3f*(1/100))*ItemJutsu.getDmgMult(entity);

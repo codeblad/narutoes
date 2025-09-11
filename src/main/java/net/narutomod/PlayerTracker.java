@@ -99,8 +99,8 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static float getDefense(Entity entity) {
-		return 1.5f+19*ItemJutsu.getDmgMult(entity)/63;
+    public static float getDefense(Entity entity) {
+		return 1.5f+17*ItemJutsu.getDmgMult(entity)/63;
 	}
 
 	private static void logBattleExp(EntityPlayer entity, double xp) {
@@ -306,30 +306,31 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			//I PUT DEFENSE IN HERE LOOK FOR DEFENSE HERE DAMAGE REDUCER DEFENSE MODIFIER
 			if (targetEntity instanceof EntityPlayer) {
 				float defMult = 1;
+
 				ItemStack cheststack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 				ItemStack headstack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.HEAD);
-				if (headstack.getItem() == ItemSharingan.helmet ||headstack.getItem() == ItemSharingan.helmet  ) {
+				if (headstack.getItem() == ItemSharingan.helmet ||headstack.getItem() == ItemSharingan.helmet ) {
 					defMult += .1f;
 				}
 				if (headstack.getItem() == ItemMangekyoSharinganEternal.helmet ||headstack.getItem() == ItemMangekyoSharinganObito.helmet||headstack.getItem() == ItemMangekyoSharingan.helmet   ) {
-					defMult += .2f;
+					defMult += .15f;
 				}
 				if (headstack.getItem() == ItemRinnegan.helmet ||headstack.getItem() == ItemTenseigan.helmet  ) {
-					defMult += .3f;
+					defMult += .2f;
 				}
 				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
-					defMult += 0.3f;
+					defMult += 0.2f;
 				}
 				if (cheststack.getItem() == ItemRinnegan.body) {
-					defMult += 4f;
+					defMult += 1f;
 				}
 				if (cheststack.getItem() == ItemBoneArmor.body) {
 					if (ItemBoneArmor.isLarchActive(cheststack)) {
-						defMult += 0.25f;
+						defMult += 0.2f;
 					}
 				}
 				if (cheststack.getItem() == ItemTenseigan.body) {
-					defMult += .65f;
+					defMult += .35f;
 				}
 				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
 				if (stackwood != null) {
@@ -341,12 +342,15 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
 					defMult+= 0.15f;
 				}
+
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
-					defMult+=.15f;
-				}
-				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
 					defMult+=.25f;
 				}
+
+				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
+					defMult+=.45f;
+				}
+
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
 						defMult+= 0.3f;
@@ -354,7 +358,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 						if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
 							defMult+= 0.3f;
 						} else {
-							defMult+= 0.7f;
+							defMult+= 0.6f;
 						}
 					}
 				}
@@ -380,7 +384,8 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					newAmount = amount;
 				}
 				event.setAmount(newAmount);
-			}
+			    }
+
 			
 			if (sourceEntity instanceof EntitySummonAnimal.ISummon) {
 				Entity summoner = ((EntitySummonAnimal.ISummon)sourceEntity).getSummoner();
