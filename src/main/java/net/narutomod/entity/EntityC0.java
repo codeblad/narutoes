@@ -51,7 +51,7 @@ public class EntityC0 extends ElementsNarutomodMod.ModElement {
 		private final int startupTime = 25;
 		private final int growTime = 200;
 		private final int fuseTime = 225;
-		private final int explosionRange = 82;
+		private final int explosionRange = 64;
 		private final float explosionDamage = 50.0f;
 		private EntitySpecialEffect.EntityCustom effectEntity;
 		private EntitySpecialEffect.EntityCustom extraeffectEntity;

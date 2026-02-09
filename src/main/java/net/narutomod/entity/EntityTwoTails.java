@@ -208,7 +208,7 @@ public class EntityTwoTails extends ElementsNarutomodMod.ModElement {
 			if (!this.isAIDisabled() && (this.mouthShootingJutsu == null || this.mouthShootingJutsu.isDead)
 			 && distanceFactor < 1.0f && distanceFactor > (float)(ProcedureUtils.getReachDistance(this) * 0.6d / this.getBijudamaMinRange())) {
 				this.setSwingingArms(true);
-				this.mouthShootingJutsu = new ItemKaton.EntityBigFireball(this, 10.0f, false);
+				this.mouthShootingJutsu = new ItemKaton.EntityBigFireball(this, 10.0f, false, false);
 				((ItemKaton.EntityBigFireball)this.mouthShootingJutsu).shoot(target.posX - this.mouthShootingJutsu.posX, target.posY - this.mouthShootingJutsu.posY, target.posZ - this.mouthShootingJutsu.posZ, 1.2f, 0);
 				((ItemKaton.EntityBigFireball)this.mouthShootingJutsu).setDamage(300.0f);
 				this.world.spawnEntity(this.mouthShootingJutsu);

@@ -35,6 +35,7 @@ import javax.annotation.Nullable;
 public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 445;
 	public static final int ENTITYID_RANGED = 446;
+	private static final int BLUE_FLAME_COLOR = 0xff59b8f7;
 	private static final int FLAME_COLOR = 0xffffcf00;
 
 	public EntityFlameSlice(ElementsNarutomodMod instance) {
@@ -197,7 +198,7 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 		}
 
 		public EntitySweepParticle(EntityLivingBase shooter, float scale) {
-			super(shooter, FLAME_COLOR, scale);
+			super(shooter, EntityBijuManager.hasJinchurikiFire(shooter) ? BLUE_FLAME_COLOR : FLAME_COLOR, scale);
 			Vec3d vec = shooter.getPositionEyes(1f);
 			this.setLocationAndAngles(vec.x, vec.y, vec.z, shooter.rotationYaw, 0.0f);
 			this.maxAge = 6;
@@ -231,7 +232,7 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 					for (int i = 0; i < 3; i++) {
 						Vec3d vec1 = startvec.add(vec.scale(entity.getRNG().nextDouble() * 0.9d + 0.1d));
 						Particles.spawnParticle(entity.world, Particles.Types.FLAME, vec1.x, vec1.y, vec1.z,
-						  1, 0.025d, 0.025d, 0.025d, vec2.x, vec2.y, vec2.z, FLAME_COLOR);
+						  1, 0.025d, 0.025d, 0.025d, vec2.x, vec2.y, vec2.z, EntityBijuManager.hasJinchurikiFire(entity) ? BLUE_FLAME_COLOR : FLAME_COLOR);
 					}
 				}
 			}
@@ -248,7 +249,7 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 				Vec3d vec1 = entityVec.add(relVec);
 				Vec3d vec2 = relVec.scale(0.05d);
 				Particles.spawnParticle(entity.world, Particles.Types.FLAME, vec1.x, vec1.y, vec1.z,
-				 1, 0d, 0d, 0d, vec2.x, vec2.y, vec2.z, FLAME_COLOR, (int)(scale * (entity.rand().nextFloat() * 3.0f + 1.0f)));
+				 1, 0d, 0d, 0d, vec2.x, vec2.y, vec2.z, color, (int)(scale * (entity.rand().nextFloat() * 3.0f + 1.0f)));
 			}
 		}
 	}

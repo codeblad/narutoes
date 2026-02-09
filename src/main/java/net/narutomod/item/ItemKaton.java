@@ -30,6 +30,7 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 
+import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntityScalableProjectile;
 import net.narutomod.entity.EntityHidingInAsh;
@@ -41,7 +42,10 @@ import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.Particles;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.narutomod.ElementsNarutomodMod;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemKaton extends ElementsNarutomodMod.ModElement {
@@ -85,6 +89,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EntityBigFireball extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
+		private static final DataParameter<Boolean> COLORED = EntityDataManager.createKey(EntityBigFireball.class, DataSerializers.BOOLEAN);
 		private float fullScale = 1f;
 		private final int timeToFullscale = 10;
 		private int explosionSize;
@@ -98,7 +103,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.setOGSize(0.8F, 0.8F);
 		}
 
-		public EntityBigFireball(EntityLivingBase shooter, float fullScale, boolean isGuided) {
+		public EntityBigFireball(EntityLivingBase shooter, float fullScale, boolean isGuided, boolean colored) {
 			super(shooter);
 			this.setOGSize(0.8F, 0.8F);
 			this.fullScale = fullScale;
@@ -113,6 +118,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			}
 			//this.guided = isGuided;
 			this.guided = false;
+			this.dataManager.set(COLORED, colored);
 			//this.setEntityScale(0.1f);
 			Vec3d vec3d = shooter.getLookVec();
 			this.setPosition(shooter.posX + vec3d.x, shooter.posY + shooter.getEyeHeight() - 0.2d * fullScale + vec3d.y, shooter.posZ + vec3d.z);
@@ -122,6 +128,18 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 		public ItemJutsu.JutsuEnum.Type getJutsuType() {
 			return ItemJutsu.JutsuEnum.Type.KATON;
 		}
+
+		
+		public boolean isColored() {
+			return this.dataManager.get(COLORED);
+		}
+
+		@Override
+		protected void entityInit() {
+			super.entityInit();
+			this.dataManager.register(COLORED, false);
+		}
+
 
 		public void setDamage(float amount) {
 			this.damage = amount;
@@ -157,7 +175,8 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 		public void renderParticles() {
 			Particles.spawnParticle(this.world, Particles.Types.FLAME, this.posX, this.posY + (this.height / 2.0F), this.posZ,
 			  (int)this.fullScale * 2, 0.3d * this.width, 0.3d * this.height, 0.3d * this.width, 0d, 0d, 0d,
-			  0xffff0000|((0x40+this.rand.nextInt(0x80))<<8), 30);
+			  (this.isColored() ? 0xff59b8f7 : 0xffff0000) | ((0x40 + this.rand.nextInt(0x80)) << 24));
+
 		}
 
 
@@ -211,11 +230,15 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			}
 
 			public void createJutsu(EntityLivingBase entity, double x, double y, double z, float power) {
-				this.createJutsu(entity, x, y, z, power, false);
+				this.createJutsu(entity, x, y, z, power, false, EntityBijuManager.hasJinchurikiFire(entity));
 			}
 
 			public void createJutsu(EntityLivingBase entity, double x, double y, double z, float power, boolean isGuided) {
-				EntityBigFireball entityarrow = new EntityBigFireball(entity, power, isGuided);
+				this.createJutsu(entity, x, y, z, power, isGuided, EntityBijuManager.hasJinchurikiFire(entity));
+			}
+
+			public void createJutsu(EntityLivingBase entity, double x, double y, double z, float power, boolean isGuided, boolean colored) {
+				EntityBigFireball entityarrow = new EntityBigFireball(entity, power, isGuided, colored);
 				entityarrow.shootPrecise(x, y, z, 0.97f);
 				entity.world.spawnEntity(entityarrow);
 			}
@@ -254,6 +277,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		public class RenderBigFireball extends Render<EntityBigFireball> {
 			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/fireball.png");
+			private final ResourceLocation textureB = new ResourceLocation("narutomod:textures/fireball_blue.png");
 	
 			public RenderBigFireball(RenderManager renderManagerIn) {
 				super(renderManagerIn);
@@ -290,6 +314,9 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			protected ResourceLocation getEntityTexture(EntityBigFireball entity) {
+				if (entity.isColored()) {
+					return this.textureB;
+				}
 				return this.texture;
 			}
 		}

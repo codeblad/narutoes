@@ -6,6 +6,8 @@ import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemKaton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
+import net.narutomod.entity.EntityFirestream.EC;
+import net.narutomod.entity.EntityFirestream.FlameParticle;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -23,6 +25,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.entity.projectile.ProjectileHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -30,6 +33,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 
 import javax.vecmath.Vector4f;
+
+import org.w3c.dom.css.ElementCSSInlineStyle;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityFirestream extends ElementsNarutomodMod.ModElement {
@@ -161,17 +166,39 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu1 implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemKaton.block);
-				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+				if (this.createJutsu(entity, power) == null) {
 					return false;
 				}
-				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
-				  SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:katon_gokamekeku")),
-				  SoundCategory.NEUTRAL, 5, 1f);
-				entity.world.spawnEntity(new EC(entity, power * 0.8, power * 1.5, power));
 				ItemJutsu.setCurrentJutsuCooldown(stack, 240);
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
 				return true;
+			}
+
+
+			public EC createJutsu(EntityLivingBase entity, float power) {
+				int color = 0xffffcf00;
+
+				if (EntityBijuManager.hasJinchurikiFire(entity)) {
+					color = 0xff59b8f7;
+				}
+
+				return this.createJutsu(entity, power, color);
+			}
+
+
+			public EC createJutsu(EntityLivingBase entity, float power, int color) {
+				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemKaton.block);
+				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+					return null;
+				}
+				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
+				SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:katon_gokamekeku")),
+				SoundCategory.NEUTRAL, 5, 1f);
+				EC ec =new EC(entity, power * 0.8, power * 1.5, power);
+				ec.setFlameColor(color);
+				entity.world.spawnEntity(ec);
+				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
+				return ec;
 			}
 
 			@Override
@@ -195,8 +222,14 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			}
 
 			public EC createJutsu(EntityLivingBase entity, float power, int duration) {
-				return this.createJutsu(entity, power, duration, 0xffffcf00);
+				int color = 0xffffcf00;
+				if (EntityBijuManager.hasJinchurikiFire(entity)) {
+					color = 0xff59b8f7;
+				}
+
+				return this.createJutsu(entity, power, duration, color);
 			}
+
 
 			public EC createJutsu(EntityLivingBase entity, float power, int duration, int color) {
 				EC entity1 = new EC(entity, 1.0f, power, power);

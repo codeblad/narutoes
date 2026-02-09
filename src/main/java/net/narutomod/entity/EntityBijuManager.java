@@ -10,6 +10,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.util.math.BlockPos;
@@ -93,6 +94,18 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 		EntityBijuManager tb = mapByClass.get(clazz);
 		return tb != null && player.equals(tb.getJinchurikiPlayer());
 	}
+
+	public static boolean hasJinchurikiFire(EntityLivingBase entity) {
+		if (entity instanceof EntityPlayer) {
+					EntityPlayer player = (EntityPlayer) entity;
+					if (EntityBijuManager.cloakLevel(player) > 0 &&
+						EntityBijuManager.isJinchurikiOf(player, EntityTwoTails.EntityCustom.class)) {
+						return true;
+					}
+				}
+			return false;
+		}
+	
 
 	@Nullable
 	public static EntityTailedBeast.Base getBijuOfPlayerInWorld(EntityPlayer player) {

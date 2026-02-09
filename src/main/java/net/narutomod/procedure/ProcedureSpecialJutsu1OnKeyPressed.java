@@ -242,7 +242,7 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 					} else if (tails == 2) {
 						cd = 40;
 						if (cp.consume(350d)) {
-							biju.mouthShootingJutsu = new ItemKaton.EntityBigFireball(biju, 10.0f, false);
+							biju.mouthShootingJutsu = new ItemKaton.EntityBigFireball(biju, 10.0f, false, false);
 							Vec3d vec = biju.getLookVec();
 							((ItemKaton.EntityBigFireball) biju.mouthShootingJutsu).shoot(vec.x, vec.y, vec.z, 1.2f, 0);
 							((ItemKaton.EntityBigFireball) biju.mouthShootingJutsu).setDamage(250.0f);

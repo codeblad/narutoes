@@ -24,6 +24,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.GlStateManager;
@@ -63,6 +64,9 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private static final DataParameter<Float> SCALE = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
+		private static final DataParameter<Boolean> BLUE_FIRE = EntityDataManager.<Boolean>createKey(EC.class, DataSerializers.BOOLEAN);
+
+
 		private final int growTime = 20;
 		private EntityLivingBase user;
 		private final float contactDamage = 20.0f;
@@ -76,6 +80,9 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 		public EC(EntityLivingBase userIn, float size) {
 			this(userIn.world);
 			this.user = userIn;
+			if (EntityBijuManager.hasJinchurikiFire(userIn)) {
+				this.setBlueFire(true);
+			}
 			int lowestY = 256;
 			BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
 			for (double d0 = -size * 0.5f; d0 < size * 0.5f; d0 += 1d) {
@@ -109,10 +116,19 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void entityInit() {
 			this.getDataManager().register(SCALE, Float.valueOf(1.0F));
+			this.getDataManager().register(BLUE_FIRE, false);
 		}
 
 		public float getScale() {
 			return ((Float) this.getDataManager().get(SCALE)).floatValue();
+		}
+
+		public boolean isBlueFire() {
+			return this.getDataManager().get(BLUE_FIRE);
+		}
+
+		public void setBlueFire(boolean value) {
+			this.getDataManager().set(BLUE_FIRE, value);
 		}
 
 		public void setScale(float scale) {
@@ -167,24 +183,24 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 					for (int i = 0; i < 20; i++) {
 						Vec3d vec1 = vec.add(new Vec3d(thisaabb.maxX - thisaabb.minX, 0d, 0d).scale(this.rand.nextFloat()));
 						Particles.spawnParticle(this.world, Particles.Types.FLAME, vec1.x, vec1.y + this.rand.nextFloat() * this.height * 0.5,
-						 vec1.z, 1, 0.0d, 0.0d, 0.0d, 0.0d, 0.09d * size, 0.0d, 0xffffcf00, (int)(size * 5f));
+						 vec1.z, 1, 0.0d, 0.0d, 0.0d, 0.0d, 0.09d * size, 0.0d, this.isBlueFire() ? 0xff59b8f7 : 0xffffcf00, (int)(size * 5f));
 					}
 					for (int i = 0; i < 20; i++) {
 						Vec3d vec1 = vec.add(new Vec3d(0d, 0d, thisaabb.maxZ - thisaabb.minZ).scale(this.rand.nextFloat()));
 						Particles.spawnParticle(this.world, Particles.Types.FLAME, vec1.x, vec1.y + this.rand.nextFloat() * this.height * 0.5,
-						 vec1.z, 1, 0.0d, 0.0d, 0.0d, 0.0d, 0.09d * size, 0.0d, 0xffffcf00, (int)(size * 5f));
+						 vec1.z, 1, 0.0d, 0.0d, 0.0d, 0.0d, 0.09d * size, 0.0d, this.isBlueFire() ? 0xff59b8f7 : 0xffffcf00, (int)(size * 5f));
 					}
 					vec = new Vec3d(thisaabb.maxX, thisaabb.minY, thisaabb.minZ);
 					for (int i = 0; i < 20; i++) {
 						Vec3d vec1 = vec.add(new Vec3d(0d, 0d, thisaabb.maxZ - thisaabb.minZ).scale(this.rand.nextFloat()));
 						Particles.spawnParticle(this.world, Particles.Types.FLAME, vec1.x, vec1.y + this.rand.nextFloat() * this.height * 0.5,
-						 vec1.z, 1, 0.0d, 0.0d, 0.0d, 0.0d, 0.09d * size, 0.0d, 0xffffcf00, (int)(size * 5f));
+						 vec1.z, 1, 0.0d, 0.0d, 0.0d, 0.0d, 0.09d * size, 0.0d, this.isBlueFire() ? 0xff59b8f7 : 0xffffcf00, (int)(size * 5f));
 					}
 					vec = new Vec3d(thisaabb.minX, thisaabb.minY, thisaabb.maxZ);
 					for (int i = 0; i < 20; i++) {
 						Vec3d vec1 = vec.add(new Vec3d(thisaabb.maxX - thisaabb.minX, 0d, 0d).scale(this.rand.nextFloat()));
 						Particles.spawnParticle(this.world, Particles.Types.FLAME, vec1.x, vec1.y + this.rand.nextFloat() * this.height * 0.5,
-						 vec1.z, 1, 0.0d, 0.0d, 0.0d, 0.0d, 0.09d * size, 0.0d, 0xffffcf00, (int)(size * 5f));
+						 vec1.z, 1, 0.0d, 0.0d, 0.0d, 0.0d, 0.09d * size, 0.0d, this.isBlueFire() ? 0xff59b8f7 : 0xffffcf00, (int)(size * 5f));
 					}
 				} else if (this.ticksExisted % 10 == 1) {
 					this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:flamethrow")), 
@@ -296,6 +312,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		public class RenderCustom extends Render<EC> {
 			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/red_flames_128.png");
+			private final ResourceLocation textureB = new ResourceLocation("narutomod:textures/blue_flames_128.png");
 			private final ModelFlameFormation model = new ModelFlameFormation();
 
 			public RenderCustom(RenderManager renderManager) {
@@ -333,6 +350,9 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			protected ResourceLocation getEntityTexture(EC entity) {
+				if (entity.isBlueFire()) {
+						return this.textureB;
+				}
 				return this.texture;
 			}
 		}
