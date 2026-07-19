@@ -11,8 +11,17 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,19 +36,12 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.world.WorldServer;
 import net.minecraft.nbt.NBTTagCompound;
 
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureAoeCommand;
+import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntityScalableProjectile;
 import net.narutomod.Particles;
 import net.narutomod.creativetab.TabModTab;
@@ -47,15 +49,14 @@ import net.narutomod.ElementsNarutomodMod;
 
 import java.util.List;
 import javax.annotation.Nullable;
-import net.minecraft.util.DamageSource;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:shakuton")
 	public static final Item block = null;
 	public static final int ENTITYID = 269;
-	public static final ItemJutsu.JutsuEnum ORB = new ItemJutsu.JutsuEnum(0, "scorchorb", 'S', 150, 100d, new EntityScorchBall.Jutsu());
-	public static final ItemJutsu.JutsuEnum SHOOT = new ItemJutsu.JutsuEnum(1, "tooltip.shakuton.scorchkill", 'S', 200, 50d, new SetOrbTarget());
+	public static final ItemJutsu.JutsuEnum ORB = new ItemJutsu.JutsuEnum(0, "scorchorb", 'S', 150, 150d, new EntityScorchBall.Jutsu());
+	public static final ItemJutsu.JutsuEnum SHOOT = new ItemJutsu.JutsuEnum(1, "tooltip.shakuton.scorchkill", 'S', 200, 100d, new SetOrbTarget());
 	public static final ItemJutsu.JutsuEnum BLAST = new ItemJutsu.JutsuEnum(2, "tooltip.shakuton.scorchblast", 'S', 250, 50d, new SuperSteamBlast());
 
 	public ItemShakuton(ElementsNarutomodMod instance) {
@@ -75,14 +76,6 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:shakuton", "inventory"));
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntityScorchBall.class, renderManager -> {
-			return new RenderCustom(renderManager);
-		});
-	}
-
 	public static class RangedItem extends ItemJutsu.Base {
 		protected static final String spawnedBalls = "SpawnedBallsId";
 
@@ -94,11 +87,6 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 			this.defaultCooldownMap[ORB.index] = 0;
 			this.defaultCooldownMap[SHOOT.index] = 0;
 			this.defaultCooldownMap[BLAST.index] = 0;
-		}
-
-		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			return 1f;
 		}
 
 		protected void saveSpawnedBall(ItemStack stack, Entity entity) {
@@ -172,7 +160,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 			EntityScorchBall entity1 = ((RangedItem)block).get1stBallAndPutLast(entity.world, stack);
 			if (entity1 != null && entity1.isEntityAlive()) {
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 30d);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 45d, 1.5d, EntityScorchBall.class);
 				if (res != null && res.entityHit != null) {
 					entity1.setTarget(res.entityHit);
 					return true;
@@ -182,13 +170,15 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static class EntityScorchBall extends EntityScalableProjectile.Base {
+	public static class EntityScorchBall extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private double idleHeight;
 		private Entity target;
 		//private final int growTime = 60;
 		private final float inititalScale = 0.5f;
+		public boolean attacking = false;
 		private float maxScale = inititalScale;
 		private int targetTime = -1;
+		private boolean firstHit = false;
 		
 		public EntityScorchBall(World a) {
 			super(a);
@@ -203,6 +193,11 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 			this.idleHeight = shooter.getEyeHeight();
 		}
 
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.SHAKUTON;
+		}
+
 		private Vec3d getIdlePosition() {
 			if (this.shootingEntity != null) {
 				Vec3d vec = Vec3d.fromPitchYaw(0f, this.ticksExisted * 9).addVector(0d, this.idleHeight, 0d);
@@ -213,7 +208,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 
 		public void setNextPosition(Vec3d vec) {
 			if (this.getDistance(vec.x, vec.y, vec.z) > 0.5d && this.targetTime >= 0) {
-				this.setVelocity(vec.subtract(this.getPositionVector()).normalize().scale(0.4d));
+				this.setVelocity(vec.subtract(this.getPositionVector()).normalize().scale(0.9d));
 			} else {
 				this.setVelocity(vec.subtract(this.getPositionVector()));
 				if (vec.equals(this.getIdlePosition()) && this.targetTime >= 0) {
@@ -224,7 +219,8 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 
 		protected void setTarget(@Nullable Entity targetIn) {
 			this.target = targetIn;
-			this.targetTime = targetIn != null ? 60 : -1;
+			this.firstHit = false;
+			this.targetTime = targetIn != null ? 35: -1;
 		}
 
 		protected void setMaxScale(float scale) {
@@ -234,16 +230,17 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 		private void moveGrowAndShoot() {
 			if (this.shootingEntity != null) {
 				Vec3d vec = this.shootingEntity.getPositionVector().addVector(0d, this.shootingEntity.height + 1.5f, 0d);
-				if (this.getDistance(vec.x, vec.y, vec.z) > 0.2d) {
-					this.setVelocity(vec.subtract(this.getPositionVector()).normalize().scale(0.1d));
+				if (this.getDistance(vec.x, vec.y, vec.z) > 0.5d) {
+					this.setVelocity(vec.subtract(this.getPositionVector()).normalize().scale(0.5d));
 				} else if (this.maxScale > 0) {
 					this.setVelocity(Vec3d.ZERO);
 					float scale = this.getEntityScale();
 					if (scale < this.maxScale) {
-						this.setEntityScale(scale * 1.03f);
+						this.setEntityScale(scale * 1.35f);
 					} else {
+						this.setEntityScale(this.maxScale);
 						Vec3d vec2 = this.shootingEntity.getLookVec();
-						this.shoot(vec2.x, vec2.y, vec2.z, 0.95f, 0f);
+						this.shoot(vec2.x, vec2.y, vec2.z, 0.99f, 0f);
 					}
 				} else {
 					this.setDead();
@@ -266,8 +263,10 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 					this.moveGrowAndShoot();
 				} else if (this.target != null && this.targetTime > 0) {
 					if (this.target.isEntityAlive()) {
+						if (!firstHit) {
+							--this.targetTime;
+						}
 						this.setNextPosition(this.target.getPositionEyes(1f));
-						--this.targetTime;
 					} else {
 						this.targetTime = 0;
 					}
@@ -277,8 +276,16 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 				if (!this.world.isRemote) {
 					for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox())) {
 						if (!entity.equals(this.shootingEntity) && !entity.equals(this)) {
-							entity.hurtResistantTime = 0;
-							entity.attackEntityFrom(ItemJutsu.NINJUTSU_DAMAGE, 1f);
+							if (this.target != null) {
+								entity.hurtResistantTime = 10;
+								if (!this.firstHit) {
+									this.firstHit = true;
+									this.targetTime = 25;
+								}
+								--this.targetTime;
+							}
+							entity.getEntityData().setBoolean("TempData_disableKnockback", true);
+							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 2f+1.25f*ItemJutsu.getDmgMult(this.shootingEntity));
 							this.scorchEffects(entity.posX, entity.posY+entity.height/2, entity.posZ, entity.width/2, entity.height/2);
 						}
 					}
@@ -307,14 +314,15 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void onImpact(RayTraceResult result) {
 			if (!this.world.isRemote) {
-				if (result.entityHit != null && result.entityHit.equals(this.shootingEntity)) {
+				if ((result.entityHit != null && result.entityHit.equals(this.shootingEntity))
+				 || (result.typeOfHit == RayTraceResult.Type.BLOCK && this.ticksInAir <= 10)) {
 					return;
 				}
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				new net.narutomod.event.EventSphericalExplosion(this.world, this.shootingEntity,
 				 (int)this.posX, (int)this.posY + 5, (int)this.posZ, (int)this.maxScale, 0, 0.3333f);
 				ProcedureAoeCommand.set(this, 0d, this.maxScale)
-				 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.maxScale * 60f);
+				 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 120f+ItemJutsu.getDmgMult(this.shootingEntity)*30);
 				//this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.maxScale * 5f, flag, flag);
 				this.scorchEffects(this.posX, this.posY, this.posZ, 2.5d * this.maxScale, 1d);
 				this.setDead();
@@ -346,7 +354,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 			//private static final String ID_KEY = "JitonSandShieldEntityIdKey";
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				if (((RangedItem)block).getTotalBalls(stack) < 20) {
+				if (((RangedItem)block).getTotalBalls(stack) < 12) {
 					Entity entity1 = new EntityScorchBall(entity);
 					entity.world.spawnEntity(entity1);
 					((RangedItem)block).saveSpawnedBall(stack, entity1);
@@ -364,7 +372,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 			for (int i = 0; i < j; i++) {
 				EntityScorchBall entity1 = ((RangedItem)block).get1stBallAndPutLast(entity.world, stack);
 				if (entity1 != null) {
-					entity1.setMaxScale(i == 0 ? 0.5f * j : 0f);
+					entity1.setMaxScale(i == 0 ? 2.5f * j : 0f);
 				}
 			}
 			((RangedItem)block).clearBalls(stack);
@@ -372,44 +380,59 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class RenderCustom extends Render<EntityScorchBall> {
-		private final ResourceLocation TEXTURE = new ResourceLocation("narutomod:textures/fireball2.png");
-
-		public RenderCustom(RenderManager renderManager) {
-			super(renderManager);
-			shadowSize = 0.1f;
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
+	
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
+		@Override
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EntityScorchBall.class, renderManager -> {
+				return new RenderCustom(renderManager);
+			});
 		}
 
-		@Override
-		public void doRender(EntityScorchBall entity, double x, double y, double z, float entityYaw, float partialTicks) {
-			GlStateManager.pushMatrix();
-			this.bindEntityTexture(entity);
-			float scale = entity.getEntityScale();
-			GlStateManager.translate(x, y + 0.5d * scale, z);
-			GlStateManager.enableRescaleNormal();
-			GlStateManager.scale(scale, scale, scale);
-			Tessellator tessellator = Tessellator.getInstance();
-			BufferBuilder bufferbuilder = tessellator.getBuffer();
-			GlStateManager.rotate(180F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate((float)(this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-			GlStateManager.rotate(9f * entity.ticksExisted, 0.0F, 0.0F, 1.0F);
-			GlStateManager.disableLighting();
-			OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-			bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_NORMAL);
-			bufferbuilder.pos(-0.5D, -0.5D, 0.0D).tex(0.0D, 1.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
-			bufferbuilder.pos(0.5D, -0.5D, 0.0D).tex(1.0D, 1.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
-			bufferbuilder.pos(0.5D, 0.5D, 0.0D).tex(1.0D, 0.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
-			bufferbuilder.pos(-0.5D, 0.5D, 0.0D).tex(0.0D, 0.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
-			tessellator.draw();
-			GlStateManager.enableLighting();
-			GlStateManager.disableRescaleNormal();
-			GlStateManager.popMatrix();
-		}
-
-		@Override
-		protected ResourceLocation getEntityTexture(EntityScorchBall entity) {
-			return TEXTURE;
+		@SideOnly(Side.CLIENT)
+		public class RenderCustom extends Render<EntityScorchBall> {
+			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/fireball2.png");
+	
+			public RenderCustom(RenderManager renderManager) {
+				super(renderManager);
+				shadowSize = 0.1f;
+			}
+	
+			@Override
+			public void doRender(EntityScorchBall entity, double x, double y, double z, float entityYaw, float partialTicks) {
+				GlStateManager.pushMatrix();
+				this.bindEntityTexture(entity);
+				float scale = entity.getEntityScale();
+				GlStateManager.translate(x, y + 0.5d * scale, z);
+				GlStateManager.enableRescaleNormal();
+				GlStateManager.scale(scale, scale, scale);
+				Tessellator tessellator = Tessellator.getInstance();
+				BufferBuilder bufferbuilder = tessellator.getBuffer();
+				GlStateManager.rotate(180F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+				GlStateManager.rotate((float)(this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+				GlStateManager.rotate(9f * (partialTicks + entity.ticksExisted), 0.0F, 0.0F, 1.0F);
+				GlStateManager.disableLighting();
+				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
+				bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_NORMAL);
+				bufferbuilder.pos(-0.5D, -0.5D, 0.0D).tex(0.0D, 1.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
+				bufferbuilder.pos(0.5D, -0.5D, 0.0D).tex(1.0D, 1.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
+				bufferbuilder.pos(0.5D, 0.5D, 0.0D).tex(1.0D, 0.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
+				bufferbuilder.pos(-0.5D, 0.5D, 0.0D).tex(0.0D, 0.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
+				tessellator.draw();
+				GlStateManager.enableLighting();
+				GlStateManager.disableRescaleNormal();
+				GlStateManager.popMatrix();
+			}
+	
+			@Override
+			protected ResourceLocation getEntityTexture(EntityScorchBall entity) {
+				return this.texture;
+			}
 		}
 	}
 }

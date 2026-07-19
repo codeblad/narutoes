@@ -41,7 +41,7 @@ public class ProcedureBasicNinjaSkills extends ElementsNarutomodMod.ModElement {
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, (int) 2, (int) 1, (false), (false)));
 		}
 		if ((((world.getBlockState(new BlockPos((int) Math.floor((entity.posX)), (int) (entity.posY), (int) Math.floor((entity.posZ)))))
-				.getMaterial() == Material.WATER) && (!(entity.isSneaking())))) {
+				.getMaterial() == Material.WATER) && (!(entity.isSneaking() && entity.getLookVec().y < -.7)))) {
 			entity.motionY = 0.01D;
 			entity.onGround = true;
 		}

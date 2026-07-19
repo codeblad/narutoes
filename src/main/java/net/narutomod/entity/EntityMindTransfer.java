@@ -10,35 +10,35 @@ import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
+import net.minecraft.world.GameType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-//import net.minecraft.entity.player.InventoryPlayer;
-//import net.minecraft.inventory.ContainerPlayer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.world.GameType;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.init.MobEffects;
 
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
+import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemInton;
 import net.narutomod.PlayerInput;
 import net.narutomod.PlayerRender;
+import net.narutomod.PlayerTracker;
 import net.narutomod.Chakra;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
 
 import javax.annotation.Nullable;
-import javax.management.remote.TargetedNotification;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
@@ -59,16 +59,16 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 		 .tracker(64, 3, true).build());
 	}
 
-	public static class EC extends Entity implements PlayerInput.Hook.IHandler {
+	public static class EC extends Entity implements PlayerInput.Hook.IHandler, ItemJutsu.IJutsu {
 		private EntityLivingBase user;
 		private EntityLivingBase target;
 		private EntityDuplicate clone;
-		private Vec3d targetVec;
 		private Vec3d motion2Target;
 		private double chakraBurn;
 		//private GameType targetGamemode = GameType.SURVIVAL;
 		private final int move2TargetTime = 60;
 		private PlayerInput.Hook userInput = new PlayerInput.Hook();
+		private boolean transfered;
 
 		public EC(World world) {
 			super(world);
@@ -80,13 +80,17 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 			this(userIn.world);
 			this.user = userIn;
 			this.target = targetIn;
-			this.targetVec = target.getPositionVector().add(Vec3d.ZERO);
-			this.motion2Target = this.targetVec.subtract(userIn.getPositionVector()).scale(1d / this.move2TargetTime);
+			this.motion2Target = targetIn.getPositionVector().subtract(userIn.getPositionVector()).scale(1d / (this.move2TargetTime - 1));
 			//if (targetIn instanceof EntityPlayerMP) {
 			//	this.targetGamemode = ((EntityPlayerMP)targetIn).interactionManager.getGameType();
 			//}
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
 			this.chakraBurn = chakraBurnIn;
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.INTON;
 		}
 
 		@Override
@@ -98,11 +102,8 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 			super.setDead();
 			if (!this.world.isRemote) {
 				if (this.user != null) {
-					this.user.getEntityData().removeTag(Jutsu.ECENTITYID);
-					if (this.clone != null) {
-						this.user.rotationYaw = this.clone.rotationYaw;
-						this.user.setPositionAndUpdate(this.clone.posX, this.clone.posY, this.clone.posZ);
-					}
+					//this.user.getEntityData().removeTag(Jutsu.ECENTITYID);
+					ProcedureSync.EntityNBTTag.removeAndSync(this.user, Jutsu.ECENTITYID);
 					if (this.user instanceof EntityPlayer) {
 						PlayerRender.setSkinCloneTarget((EntityPlayer)this.user, null);
 						PlayerInput.Hook.copyInputFrom((EntityPlayerMP)this.user, this, false);
@@ -124,9 +125,6 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 					PlayerInput.Hook.haltTargetInput(this.target, false);
 				}
 				if (this.clone != null) {
-					if (this.user != null) {
-						this.user.setHealth(this.clone.getHealth());
-					}
 					this.clone.setDead();
 				}
 			}
@@ -136,17 +134,18 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user instanceof EntityPlayer && this.user.isEntityAlive() 
 			 && this.target != null && this.target.isEntityAlive()
+			 && !this.user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed)
 			 && Chakra.pathway(this.user).consume(this.chakraBurn)) {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				if (this.ticksExisted == 1) {
 					this.clone = new EntityDuplicate(this.user);
 					this.world.spawnEntity(this.clone);
-					this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:mindtransfer")), 1f, 1f);
+					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:mindtransfer")), 1f, 1f);
 				}
-				if (this.clone != null && this.clone.getHealth() < this.clone.getMaxHealth() * 0.2F) {
+				if (this.clone != null && this.clone.getHealth() < Math.max(this.clone.getMaxHealth() * 0.1F, 5f)) {
 					this.setDead();
 				}
-				if (this.ticksExisted <= this.move2TargetTime) {
+				if (this.ticksExisted < this.move2TargetTime) {
 					if (this.ticksExisted == 1) {
 						this.user.setNoGravity(true);
 						ProcedureOnLivingUpdate.setNoClip(this.user, true);
@@ -156,37 +155,38 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 					this.user.motionZ = this.motion2Target.z;
 					this.user.velocityChanged = true;
 					this.user.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, 2, 0, false, false));
-				} else if (this.user.getEntityBoundingBox().intersects(this.target.getEntityBoundingBox())) {
-					if (this.target instanceof EntityPlayer) {
-						if (this.ticksExisted == this.move2TargetTime + 1) {
-							this.user.copyLocationAndAnglesFrom(this.target);
-							PlayerRender.setSkinCloneTarget((EntityPlayer)this.user, (EntityPlayer)this.target);
-							ProcedureOnLivingUpdate.setNoClip(this.user, false);
-							PlayerInput.Hook.haltTargetInput(this.target, true);
-							this.user.setHealth(this.target.getHealth());
-							this.user.setNoGravity(false);
-							//((EntityPlayerMP)this.target).setGameType(GameType.SPECTATOR);
-						}
-						//((EntityPlayerMP)this.target).setSpectatingEntity(this.user);
-						this.spectate((EntityPlayerMP)this.target, this.user);
-					} else {
-						if (this.ticksExisted == this.move2TargetTime + 1) {
-							ProcedureOnLivingUpdate.setNoClip(this.user, false);
-							PlayerInput.Hook.copyInputFrom((EntityPlayerMP)this.user, this, true);
-							PlayerInput.Hook.haltTargetInput(this.target, true);
-							//this.user.setHealth(this.target.getHealth());
-							this.user.setNoGravity(false);
-						}
-						if (this.userInput.hasNewMovementInput()) {
-							this.userInput.handleMovement(this.target);
-						}
-						if (this.userInput.hasNewMouseEvent()) {
-							this.userInput.handleMouseEvent(this.target);
-						}
-						this.spectate((EntityPlayerMP)this.user, this.target);
-					}
 				} else {
-					this.setDead();
+					this.user.setNoGravity(false);
+					if (this.user.getEntityBoundingBox().intersects(this.target.getEntityBoundingBox().grow(0.2d))) {
+						if (this.target instanceof EntityPlayer) {
+							if (this.ticksExisted == this.move2TargetTime) {
+								this.user.copyLocationAndAnglesFrom(this.target);
+								PlayerRender.setSkinCloneTarget((EntityPlayer)this.user, (EntityPlayer)this.target);
+								ProcedureOnLivingUpdate.setNoClip(this.user, false);
+								PlayerInput.Hook.haltTargetInput(this.target, true);
+								this.user.setHealth(this.target.getHealth());
+								//((EntityPlayerMP)this.target).setGameType(GameType.SPECTATOR);
+							}
+							//((EntityPlayerMP)this.target).setSpectatingEntity(this.user);
+							this.spectate((EntityPlayerMP)this.target, this.user);
+						} else {
+							if (this.ticksExisted == this.move2TargetTime) {
+								ProcedureOnLivingUpdate.setNoClip(this.user, false);
+								PlayerInput.Hook.copyInputFrom((EntityPlayerMP)this.user, this, true);
+								PlayerInput.Hook.haltTargetInput(this.target, true);
+								//this.user.setHealth(this.target.getHealth());
+							}
+							if (this.userInput.hasNewMovementInput()) {
+								this.userInput.handleMovement(this.target);
+							}
+							if (this.userInput.hasNewMouseEvent()) {
+								this.userInput.handleMouseEvent(this.target);
+							}
+							this.spectate((EntityPlayerMP)this.user, this.target);
+						}
+					} else {
+						this.setDead();
+					}
 				}
 			} else if (!this.world.isRemote) {
 				this.setDead();
@@ -194,14 +194,19 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 		}
 
 		private void spectate(EntityPlayerMP spectator, @Nullable Entity targetEntity) {
-			ProcedureOnLivingUpdate.setNoClip(spectator, targetEntity != null, spectator == this.user);
+			this.transfered = targetEntity != null;
+			ProcedureOnLivingUpdate.setNoClip(spectator, this.transfered, spectator == this.user);
 			spectator.setSpectatingEntity(targetEntity);
-			if (targetEntity != null) {
+			if (this.transfered) {
 				spectator.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, 2, 0, false, false));
 				spectator.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 10d);
 				//spectator.setPositionAndUpdate(targetEntity.posX, targetEntity.posY + targetEntity.height + 1.0d, targetEntity.posZ);
 				spectator.setPositionAndUpdate(targetEntity.posX, targetEntity.posY, targetEntity.posZ);
 			}
+		}
+
+		public boolean isMindTransfered() {
+			return this.transfered;
 		}
 
 		@Override
@@ -230,11 +235,25 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 				if (entity1 instanceof EC) {
 					entity1.setDead();
 				} else {
+					ProcedureSync.EntityNBTTag.removeAndSync(entity, ECENTITYID);
+					//entity.getEntityData().removeTag(ECENTITYID);
 					RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 30d);
-					if (res != null && res.entityHit instanceof EntityLivingBase) {
-						entity1 = new EC(entity, (EntityLivingBase)res.entityHit, ItemInton.MBTRANSFER.chakraUsage * 0.005d);
+					if (res != null && (res.entityHit instanceof EntityLiving || res.entityHit instanceof EntityPlayer)) {
+						double d = 1.0d;
+						if (entity instanceof EntityPlayer) {
+							double d1 = PlayerTracker.getNinjaLevel((EntityPlayer)entity);
+							if (res.entityHit instanceof EntityPlayer) {
+								d = Math.max(PlayerTracker.getNinjaLevel((EntityPlayer)res.entityHit) / d1, 1.0d);
+							} else if (res.entityHit instanceof EntityNinjaMob.Base) {
+								d = Math.max(((EntityNinjaMob.Base)res.entityHit).getNinjaLevel() / d1, 1.0d);
+							} else {
+								d = Math.max(((EntityLivingBase)res.entityHit).getHealth() / entity.getHealth(), 1.0d);
+							}
+						}
+						entity1 = new EC(entity, (EntityLivingBase)res.entityHit, ItemInton.MBTRANSFER.chakraUsage * d * 0.005d);
 						entity.world.spawnEntity(entity1);
-						entity.getEntityData().setInteger(ECENTITYID, entity1.getEntityId());
+						ProcedureSync.EntityNBTTag.setAndSync(entity, ECENTITYID, entity1.getEntityId());
+						//entity.getEntityData().setInteger(ECENTITYID, entity1.getEntityId());
 						return true;
 					}
 				}
@@ -243,18 +262,24 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 		}
 
 		public static class PlayerHook {
+			@Nullable
+			private EC getJutsuEntityFrom(Entity entity) {
+				int i = entity.getEntityData().getInteger(Jutsu.ECENTITYID);
+				if (i > 0) {
+					Entity entity1 = entity.world.getEntityByID(i);
+					if (entity1 instanceof EC) {
+						return (EC)entity1;
+					}
+				}
+				return null;
+			}
+
 			@SubscribeEvent
 			public void onChangeDimension(EntityTravelToDimensionEvent event) {
-				Entity entity = event.getEntity();
-				if (entity instanceof EntityLivingBase) {
-					int i = entity.getEntityData().getInteger(Jutsu.ECENTITYID);
-					if (i > 0) {
-						Entity entity1 = entity.world.getEntityByID(i);
-						if (entity1 instanceof EC) {
-							entity1.setDead();
-							event.setCanceled(true);
-						}
-					}
+				EC ec = this.getJutsuEntityFrom(event.getEntity());
+				if (ec != null) {
+					ec.setDead();
+					event.setCanceled(true);
 				}
 			}
 		}
@@ -276,8 +301,16 @@ public class EntityMindTransfer extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void onUpdate() {
-			super.onUpdate();
+		public void setDead() {
+			super.setDead();
+			if (!this.world.isRemote && this.getSummoner() != null) {
+				EntityLivingBase summoner = this.getSummoner();
+				summoner.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, 1, 0, false, false));
+				summoner.setInvisible(true);
+				summoner.rotationYaw = this.rotationYaw;
+				summoner.setPositionAndUpdate(this.posX, this.posY, this.posZ);
+				summoner.setHealth(this.getHealth());
+			}
 		}
 	}
 

@@ -9,24 +9,27 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.item.EnumAction;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.MathHelper;
 
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.block.BlockExplosiveTag;
-import net.narutomod.event.EventVanillaExplosion;
+import net.narutomod.procedure.ProcedureAoeCommand;
+import net.narutomod.event.EventSphericalExplosion;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.Set;
@@ -73,25 +76,10 @@ public class ItemShibukiSword extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public boolean isShield(ItemStack stack, EntityLivingBase entity) {
-			return stack.getItem() == block;
+		public boolean canDisableShield(ItemStack stack, ItemStack shield, EntityLivingBase entity, EntityLivingBase attacker) {
+			return true;
 		}
-	
-		@Override
-		public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-			playerIn.setActiveHand(handIn);
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
-		}
-		
-		@Override
-		public EnumAction getItemUseAction(ItemStack stack) {
-			return EnumAction.BLOCK;
-		}
-		
-		@Override
-		public int getMaxItemUseDuration(ItemStack stack) {
-			return 72000;
-		}
+
 
 		public Set<String> getToolClasses(ItemStack stack) {
 			HashMap<String, Integer> ret = new HashMap<String, Integer>();
@@ -103,7 +91,22 @@ public class ItemShibukiSword extends ElementsNarutomodMod.ModElement {
 		public boolean hitEntity(ItemStack itemstack, EntityLivingBase entity, EntityLivingBase sourceentity) {
 			super.hitEntity(itemstack, entity, sourceentity);
 			if (!entity.world.isRemote && itemstack.getItemDamage() < itemstack.getMaxDamage() && entity instanceof EntityLivingBase) {
-				new EventVanillaExplosion(entity.world, entity, 0, 0, 0, 5, entity.world.getTotalWorldTime() + 20, false);
+				//new EventVanillaExplosion(entity.world, entity, 0, 0, 0, 5, entity.world.getTotalWorldTime() + 20, false);
+				new EventSphericalExplosion(entity.world, entity, 0, 0, 0, 5, entity.world.getTotalWorldTime() + 20, 0.0f) {
+					@Override
+					protected void doOnTick(int currentTick) {
+						Entity target = this.getEntity();
+						if (target != null) {
+							this.x0 = MathHelper.floor(target.posX);
+							this.y0 = MathHelper.floor(target.posY + 0.5d * target.height + 0.1d);
+							this.z0 = MathHelper.floor(target.posZ);
+							if (currentTick == 1) {
+								ProcedureAoeCommand.set(target, 0d, 4d)
+								 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(sourceentity, null), 40f);
+							}
+						}
+					}
+				};
 			}
 			return true;
 		}

@@ -1,11 +1,9 @@
 package net.narutomod.procedure;
 
+import net.narutomod.item.*;
 import net.narutomod.item.ItemTenseigan;
 import net.narutomod.item.ItemSharingan;
-import net.narutomod.item.ItemMangekyoSharinganObito;
 import net.narutomod.item.ItemMangekyoSharinganEternal;
-import net.narutomod.item.ItemMangekyoSharingan;
-import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemByakugan;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
@@ -55,11 +53,7 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 		double TenseiganEvolvedTime = 0;
 		boolean hasKey = false;
 		if ((((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
-				? ((EntityPlayerMP) entity).getAdvancements()
-						.getProgress(((WorldServer) (entity).world).getAdvancementManager()
-								.getAdvancement(new ResourceLocation("narutomod:achievementmedicalgenin")))
-						.isDone()
-				: false)) {
+				&& ProcedureUtils.getMatchingItemStack((EntityPlayer) entity, ItemIryoJutsu.block) != null)) {
 			stack0 = (new Object() {
 				public ItemStack getItemStack(int sltid) {
 					if (entity instanceof EntityPlayerMP) {
@@ -88,19 +82,23 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 					return ItemStack.EMPTY;
 				}
 			}.getItemStack((int) (1)));
-			if (((((stack0).getItem() == new ItemStack(ItemMangekyoSharingan.helmet, (int) (1)).getItem())
-					|| ((stack0).getItem() == new ItemStack(ItemMangekyoSharinganObito.helmet, (int) (1)).getItem()))
-					&& (((stack1).getItem() == new ItemStack(ItemMangekyoSharingan.helmet, (int) (1)).getItem())
-							|| ((stack1).getItem() == new ItemStack(ItemMangekyoSharinganObito.helmet, (int) (1)).getItem())))) {
+			if (((stack0.getItem() instanceof ItemSharingan.Base && ((ItemSharingan.Base) stack0.getItem()).isMangekyo())
+					&& (stack1.getItem() instanceof ItemSharingan.Base && ((ItemSharingan.Base) stack1.getItem()).isMangekyo()))) {
 				UUID owner_uuid = ProcedureUtils.getOwnerId(stack0);
 				UUID other_uuid = ProcedureUtils.getOwnerId(stack1);
 				System.out.println("-- owner_uuid=" + owner_uuid + ", other_uuid=" + other_uuid);
-				if (owner_uuid != null && other_uuid != null && !owner_uuid.equals(other_uuid)) {
-					EntityLivingBase owner = ProcedureUtils.searchPlayerMatchingId(owner_uuid);
-					if ((owner instanceof EntityPlayerMP)) {
+				// && !owner_uuid.equals(other_uuid) readd this line to force ids to not match
+				if (owner_uuid != null && other_uuid != null ) {
+					EntityLivingBase owner = ProcedureUtils.searchLivingMatchingId(owner_uuid);
+					if ((((owner instanceof EntityPlayerMP) && ((owner).world instanceof WorldServer))
+							/*? ((EntityPlayerMP) owner).getAdvancements()
+									.getProgress(((WorldServer) (owner).world).getAdvancementManager()
+											.getAdvancement(new ResourceLocation("narutomod:mangekyosharinganopened")))
+									.isDone()
+							: false*/
+							)) {
 						newstack = new ItemStack(ItemMangekyoSharinganEternal.helmet, (int) (1));
-						((ItemDojutsu.Base) newstack.getItem()).setOwner(newstack, owner);
-						((ItemSharingan.Base) newstack.getItem()).setColor(newstack, ((ItemSharingan.Base) stack0.getItem()).getColor(stack0));
+						((ItemSharingan.Base) newstack.getItem()).copyOwner(newstack, stack0);
 						if (entity instanceof EntityPlayerMP) {
 							Container _current = ((EntityPlayerMP) entity).openContainer;
 							if (_current instanceof Supplier) {
@@ -158,60 +156,70 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 				UUID owner_uuid = ProcedureUtils.getOwnerId(stack0);
 				UUID other_uuid = ProcedureUtils.getOwnerId(stack1);
 				System.out.println("-- owner_uuid=" + owner_uuid + ", other_uuid=" + other_uuid);
-				if (owner_uuid != null && other_uuid != null && !owner_uuid.equals(other_uuid)) {
+				if (owner_uuid != null && other_uuid != null) {
+					EntityLivingBase owner = ProcedureUtils.searchLivingMatchingId(owner_uuid);
+					if ((((owner instanceof EntityPlayerMP) && ((owner).world instanceof WorldServer))
+							/*? ((EntityPlayerMP) owner).getAdvancements()
+									.getProgress(((WorldServer) (owner).world).getAdvancementManager()
+											.getAdvancement(new ResourceLocation("narutomod:byakuganopened")))
+									.isDone()
+							: false*/))
 					{
-						ItemStack _stack = (stack0);
-						if (!_stack.hasTagCompound())
-							_stack.setTagCompound(new NBTTagCompound());
-						_stack.getTagCompound().setDouble("ByakuganCount",
-								(((stack0).hasTagCompound() ? (stack0).getTagCompound().getDouble("ByakuganCount") : -1) + 1));
-					}
-					newstack = ((stack0).copy());
-					if (((stack0).getItem() == new ItemStack(ItemByakugan.helmet, (int) (1)).getItem())) {
-						hasKey = (boolean) newstack.hasTagCompound() && newstack.getTagCompound().hasKey(NarutomodModVariables.tenseiganEvolvedTime);;
-						if ((!(hasKey))) {
-							TenseiganEvolvedTime = (double) 1728000;
-						} else {
-							TenseiganEvolvedTime = (double) (((newstack).hasTagCompound()
-									? (newstack).getTagCompound().getDouble((NarutomodModVariables.tenseiganEvolvedTime))
-									: -1) - 345600);
-						}
 						{
-							ItemStack _stack = (newstack);
+							ItemStack _stack = (stack0);
 							if (!_stack.hasTagCompound())
 								_stack.setTagCompound(new NBTTagCompound());
-							_stack.getTagCompound().setDouble((NarutomodModVariables.tenseiganEvolvedTime), (TenseiganEvolvedTime));
+							_stack.getTagCompound().setDouble("ByakuganCount",
+									(((stack0).hasTagCompound() ? (stack0).getTagCompound().getDouble("ByakuganCount") : -1) + 1));
 						}
-					}
-					if (entity instanceof EntityPlayerMP) {
-						Container _current = ((EntityPlayerMP) entity).openContainer;
-						if (_current instanceof Supplier) {
-							Object invobj = ((Supplier) _current).get();
-							if (invobj instanceof Map) {
-								ItemStack _setstack = (newstack);
-								_setstack.setCount(1);
-								((Slot) ((Map) invobj).get((int) (2))).putStack(_setstack);
-								_current.detectAndSendChanges();
+						newstack = ((stack0).copy());
+						if (((stack0).getItem() == new ItemStack(ItemByakugan.helmet, (int) (1)).getItem())) {
+							hasKey = (boolean) newstack.hasTagCompound()
+									&& newstack.getTagCompound().hasKey(NarutomodModVariables.tenseiganEvolvedTime);;
+							if ((!(hasKey))) {
+								TenseiganEvolvedTime = (double) 1728000;
+							} else {
+								TenseiganEvolvedTime = (double) (((newstack).hasTagCompound()
+										? (newstack).getTagCompound().getDouble((NarutomodModVariables.tenseiganEvolvedTime))
+										: -1) - 345600);
+							}
+							{
+								ItemStack _stack = (newstack);
+								if (!_stack.hasTagCompound())
+									_stack.setTagCompound(new NBTTagCompound());
+								_stack.getTagCompound().setDouble((NarutomodModVariables.tenseiganEvolvedTime), (TenseiganEvolvedTime));
 							}
 						}
-					}
-					if (entity instanceof EntityPlayerMP) {
-						Container _current = ((EntityPlayerMP) entity).openContainer;
-						if (_current instanceof Supplier) {
-							Object invobj = ((Supplier) _current).get();
-							if (invobj instanceof Map) {
-								((Slot) ((Map) invobj).get((int) (0))).decrStackSize((int) (1));
-								_current.detectAndSendChanges();
+						if (entity instanceof EntityPlayerMP) {
+							Container _current = ((EntityPlayerMP) entity).openContainer;
+							if (_current instanceof Supplier) {
+								Object invobj = ((Supplier) _current).get();
+								if (invobj instanceof Map) {
+									ItemStack _setstack = (newstack);
+									_setstack.setCount(1);
+									((Slot) ((Map) invobj).get((int) (2))).putStack(_setstack);
+									_current.detectAndSendChanges();
+								}
 							}
 						}
-					}
-					if (entity instanceof EntityPlayerMP) {
-						Container _current = ((EntityPlayerMP) entity).openContainer;
-						if (_current instanceof Supplier) {
-							Object invobj = ((Supplier) _current).get();
-							if (invobj instanceof Map) {
-								((Slot) ((Map) invobj).get((int) (1))).decrStackSize((int) (1));
-								_current.detectAndSendChanges();
+						if (entity instanceof EntityPlayerMP) {
+							Container _current = ((EntityPlayerMP) entity).openContainer;
+							if (_current instanceof Supplier) {
+								Object invobj = ((Supplier) _current).get();
+								if (invobj instanceof Map) {
+									((Slot) ((Map) invobj).get((int) (0))).decrStackSize((int) (1));
+									_current.detectAndSendChanges();
+								}
+							}
+						}
+						if (entity instanceof EntityPlayerMP) {
+							Container _current = ((EntityPlayerMP) entity).openContainer;
+							if (_current instanceof Supplier) {
+								Object invobj = ((Supplier) _current).get();
+								if (invobj instanceof Map) {
+									((Slot) ((Map) invobj).get((int) (1))).decrStackSize((int) (1));
+									_current.detectAndSendChanges();
+								}
 							}
 						}
 					}

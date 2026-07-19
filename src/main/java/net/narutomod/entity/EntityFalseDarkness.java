@@ -19,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.item.ItemStack;
 
+import net.narutomod.item.ItemRaiton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
@@ -27,7 +28,7 @@ import net.narutomod.ElementsNarutomodMod;
 public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 241;
 	public static final int ENTITYID_RANGED = 242;
-	private static final float BASE_DAMAGE = 30f;
+	private static final float BASE_DAMAGE = 6.0f;
 
 	public EntityFalseDarkness(ElementsNarutomodMod instance) {
 		super(instance, 568);
@@ -39,10 +40,11 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		 .id(new ResourceLocation("narutomod", "false_darkness"), ENTITYID).name("false_darkness").tracker(64, 3, true).build());
 	}
 
-	public static class EC extends Entity {
+	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private EntityLivingBase user;
 		private EntityLivingBase target;
 		private float power;
+
 
 		public EC(World world) {
 			super(world);
@@ -59,6 +61,11 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.RAITON;
+		}
+
+		@Override
 		protected void entityInit() {
 		}
 
@@ -66,7 +73,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY + this.user.getEyeHeight() - 0.2d, this.user.posZ);
-				int buildtime = (int)(this.power * 20f);
+				int buildtime = (int)(20* (1+1*(this.power/20)));
 				if (this.ticksExisted <= buildtime) {
 					float f = Math.min((float)this.ticksExisted / buildtime, 1.0f);
 					if (this.rand.nextFloat() <= f * 0.2f) {
@@ -85,19 +92,25 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 					 SoundEvents.ENTITY_LIGHTNING_IMPACT, SoundCategory.WEATHER, 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, this.getPositionVector(), 
 					 this.target.getPositionEyes(1f), 0x000000FF, 40, 0f);
-					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.user), BASE_DAMAGE * this.power, this.user);
+					float damage = 15+(BASE_DAMAGE * (1+1.0f*(this.power/15))) *ItemJutsu.getDmgMult(this.user);
+					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemRaiton.block);
+					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+						damage*=1.35f;
+					}
+					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.user), damage, this.user);
 					this.world.spawnEntity(entity);
 					this.setDead();
 				}
 			} else if (!this.world.isRemote) {
 				this.setDead();
 			}
+
 		}
 
 		@SideOnly(Side.CLIENT)
 		@Override
 		public boolean isInRangeToRenderDist(double distance) {
-			double d = 68.5d * this.getRenderDistanceWeight();
+			double d = 90.5d * this.getRenderDistanceWeight();
 			return distance < d * d;
 		}
 
@@ -112,12 +125,24 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 20d);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 80d, 3d);
 				if (res != null && res.entityHit instanceof EntityLivingBase) {
 					entity.world.spawnEntity(new EC(entity, (EntityLivingBase)res.entityHit, power));
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
 					return true;
 				}
 				return false;
+			}
+
+			@Override
+			public float getPowerupDelay() {
+				return 40.0f;
+			}
+
+
+			@Override
+			public float getMaxPower() {
+				return 20.0f;
 			}
 		}
 	}

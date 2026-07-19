@@ -10,7 +10,8 @@ import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
-import net.minecraft.entity.Entity;
+import net.minecraft.entity.Entity;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
@@ -22,7 +23,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.SoundEvent;
 
-import net.narutomod.item.ItemJutsu;
+
+import net.narutomod.item.ItemJutsu;
+import net.narutomod.potion.PotionCorrosion;
 import net.narutomod.procedure.ProcedureAirPunch;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -42,7 +45,7 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 		 .id(new ResourceLocation("narutomod", "poison_mist"), ENTITYID).name("poison_mist").tracker(64, 3, true).build());
 	}
 
-	public static class EC extends Entity {
+	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private final AirPunch airPunch = new AirPunch();
 		private EntityLivingBase user;
 		private float power;
@@ -60,6 +63,11 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.IRYO;
+		}
+
+		@Override
 		protected void entityInit() {
 		}
 
@@ -68,7 +76,7 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				if (this.ticksExisted % 5 == 1) {
-					this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:windecho")), 
+					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:windecho")), 
 					 1f, this.power * 0.2f);
 				}
 				this.airPunch.execute(this.user, this.power, this.power * 0.25d);
@@ -93,28 +101,32 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
-			protected void preExecuteParticles(EntityLivingBase player) {
+			protected void preExecuteParticles(Entity player) {
 				Vec3d vec = player.getLookVec().scale(2d);
-				for (int i = 1; i <= 50; i++) {
+				Particles.Renderer particles = new Particles.Renderer(player.world);
+				for (int i = 1; i <= 10; i++) {
 					Vec3d vec1 = player.getLookVec().scale(((EC.this.rand.nextDouble() * 0.8d) + 0.2d) * this.getRange(0) * 0.09d);
-					Particles.spawnParticle(player.world, Particles.Types.SMOKE, 
+					particles.spawnParticles(Particles.Types.SMOKE, 
 					 player.posX + vec.x, player.posY + 1.5d + vec.y, player.posZ + vec.z, 1, 0d, 0d, 0d, 
 					 vec1.x + (EC.this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
 					 vec1.y + (EC.this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
 					 vec1.z + (EC.this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
 					 0xff630065, 80 + EC.this.rand.nextInt(20), 0, 0, -1, 0);
 				}
+				particles.send();
 			}
 
 			@Override
-			protected void attackEntityFrom(EntityLivingBase player, Entity target) {
+			protected void attackEntityFrom(Entity player, Entity target) {
 				if (target instanceof EntityLivingBase) {
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.WITHER, 300, 2));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, (int) (80+80*(power/20)), (int) (8+ItemJutsu.getDmgMult(player)*0.6)));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.POISON, (int) (40+100*(power/20)), 4));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) (40+100*(power/20)), 2));
 				}
 			}
 
 			@Override
-			protected float getBreakChance(BlockPos pos, EntityLivingBase player, double range) {
+			protected float getBreakChance(BlockPos pos, Entity player, double range) {
 				return 0.0f;
 			}
 		}
@@ -123,7 +135,23 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power));
+				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (20+power*2));
 				return true;
+			}
+
+			@Override
+			public float getBasePower() {
+				return 5.0f;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 10.0f;
+			}
+	
+			@Override
+			public float getMaxPower() {
+				return 20.0f;
 			}
 		}
 	}

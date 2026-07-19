@@ -30,6 +30,7 @@ import com.google.common.collect.HashMultimap;
 public class ItemAnbuSword extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:anbu_sword")
 	public static final Item block = null;
+
 	public ItemAnbuSword(ElementsNarutomodMod instance) {
 		super(instance, 747);
 	}
@@ -41,7 +42,7 @@ public class ItemAnbuSword extends ElementsNarutomodMod.ModElement {
 
 	static class ItemCustom extends ItemSword implements ItemOnBody.Interface {
 		ItemCustom() {
-			super(EnumHelper.addToolMaterial("ANBU_SWORD", 1, 500, 7f, 3f, 2));
+			super(EnumHelper.addToolMaterial("ANBU_SWORD", 1, 500, 7f, 6f, 2));
 		}
 
 		@Override

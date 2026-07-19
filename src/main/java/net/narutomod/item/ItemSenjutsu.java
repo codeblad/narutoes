@@ -3,13 +3,18 @@ package net.narutomod.item;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
@@ -21,6 +26,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.entity.ai.attributes.IAttribute;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -30,20 +36,26 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.nbt.NBTTagCompound;
 
+import net.narutomod.PlayerTracker;
+import net.narutomod.entity.EntityBijuManager;
+import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntityRasengan;
 import net.narutomod.entity.EntityRasenshuriken;
 import net.narutomod.entity.EntityBuddha1000;
 import net.narutomod.entity.EntitySnake8Heads;
+import net.narutomod.entity.EntityGamarinsho;
 import net.narutomod.procedure.ProcedureOnLeftClickEmpty;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.creativetab.TabModTab;
@@ -52,22 +64,27 @@ import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.List;
+import java.util.UUID;
+import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:senjutsu")
 	public static final Item block = null;
 	public static final int ENTITYID = 355;
-	private static final String SAGEMODEACTIVATEDKEY = "SageModeActivated";
+	//private static final String SAGEMODEACTIVATEDKEY = "SageModeActivated";
 	private static final String SAGECHAKRADEPLETIONAMOUNT = "SageChakraDepletionAmount";
-	public static final ItemJutsu.JutsuEnum SAGEMODE = new ItemJutsu.JutsuEnum(0, "item.sage_mode_armorhelmet.name", 'S', 10d, new SageMode());
-	public static final ItemJutsu.JutsuEnum RASENGAN = new ItemJutsu.JutsuEnum(1, "tooltip.senjutsu.rasengan", 'S', ItemNinjutsu.RASENGAN.chakraUsage, new EntityRasengan.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(2, "tooltip.senjutsu.rasenshuriken", 'S', ItemFuton.RASENSHURIKEN.chakraUsage, new EntityRasenshuriken.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum WOODBUDDHA = new ItemJutsu.JutsuEnum(3, "buddha_1000", 'S', 5000d, new EntityBuddha1000.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum SNAKE8H = new ItemJutsu.JutsuEnum(4, "snake_8_heads", 'S', 3000d, new EntitySnake8Heads.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SAGEMODE = new ItemJutsu.JutsuEnum(0, "tooltip.senjutsu.sagemode", 'S', 10d, new SageMode());
+	public static final ItemJutsu.JutsuEnum RASENGAN = new ItemJutsu.JutsuEnum(1, "tooltip.senjutsu.rasengan", 'S', ItemNinjutsu.RASENGAN.chakraUsage, new EntityRasengan.EC.SageModeVariant());
+	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(2, "tooltip.senjutsu.rasenshuriken", 'S', ItemFuton.RASENSHURIKEN.chakraUsage, new EntityRasenshuriken.EC.SageModeVairant());
+	public static final ItemJutsu.JutsuEnum WOODBUDDHA = new ItemJutsu.JutsuEnum(3, "buddha_1000", 'S', 3000d, new EntityBuddha1000.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SNAKE8H = new ItemJutsu.JutsuEnum(4, "snake_8_heads", 'S', 2500d, new EntitySnake8Heads.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum GAMARINSHO = new ItemJutsu.JutsuEnum(5, "gamarinsho", 'S', 2500d, new EntityGamarinsho.EC.Jutsu());
+
 	private static final Random RAND = new Random();
 
 	public ItemSenjutsu(ElementsNarutomodMod instance) {
@@ -76,7 +93,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.items.add(() -> new RangedItem(SAGEMODE, RASENGAN, RASENSHURIKEN, WOODBUDDHA, SNAKE8H));
+		elements.items.add(() -> new RangedItem(SAGEMODE, RASENGAN, RASENSHURIKEN, WOODBUDDHA, SNAKE8H, GAMARINSHO));
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntitySitPlatform.class)
 		 .id(new ResourceLocation("narutomod", "entitybulletsenjutsu"), ENTITYID).name("entitybulletsenjutsu").tracker(64, 1, true).build());
 	}
@@ -87,36 +104,34 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:senjutsu", "inventory"));
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntitySitPlatform.class, renderManager -> {
-			return new Render(renderManager) {
-				@Override
-				public void doRender(Entity entity, double x, double y, double z, float entityYaw, float partialTicks) {
-				}
-				@Override
-				protected ResourceLocation getEntityTexture(Entity entity) {
-					return null;
-				}
-			};
-		});
-	}
-
 	@Override
 	public void init(FMLInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(new EventHook());
 		ProcedureOnLeftClickEmpty.addQualifiedItem(block, EnumHand.MAIN_HAND);
 	}
 
 	public static class RangedItem extends ItemJutsu.Base implements ItemOnBody.Interface {
 		private static final String TYPEKEY = "SageType";
+		private static final Map<IAttribute, AttributeModifier> buffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
+			.put(EntityPlayer.REACH_DISTANCE, new AttributeModifier(UUID.fromString("c3ee1250-8b80-4668-b58a-33af5ea73ee6"), "sagemode.reach", 2.0d, 0))
+			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(UUID.fromString("33b7fa14-828a-4964-b014-b61863526589"), "sagemode.damagespeed", 2.0d, 1))
+			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.25d, 1))
+			.build();
+			private static final Map<IAttribute, AttributeModifier> snakebuffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
+			.put(EntityPlayer.REACH_DISTANCE, new AttributeModifier(UUID.fromString("c3ee1250-8b80-4668-b58a-33af5ea73ee6"), "sagemode.reach", 2.0d, 0))
+			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(UUID.fromString("33b7fa14-828a-4964-b014-b61863526589"), "sagemode.damagespeed", 2.2d, 1))
+			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.35d, 1))
+			.build();
+
+		@SideOnly(Side.CLIENT)
+		private ModelBiped armorModel;
 
 		public RangedItem(ItemJutsu.JutsuEnum... list) {
 			super(ItemJutsu.JutsuEnum.Type.SENJUTSU, list);
 			this.setUnlocalizedName("senjutsu");
 			this.setRegistryName("senjutsu");
 			this.setCreativeTab(TabModTab.tab);
-			this.defaultCooldownMap[SAGEMODE.index] = 0;
+			//this.defaultCooldownMap[SAGEMODE.index] = 0;
 		}
 
 		public void setSageType(ItemStack stack, Type type) {
@@ -131,66 +146,86 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected float getMaxPower(ItemStack stack, EntityLivingBase entity) {
-			ItemJutsu.JutsuEnum jutsu = this.getCurrentJutsu(stack);
-			float f = super.getMaxPower(stack, entity);
-			if (jutsu == RASENGAN) {
-				return Math.min(f, 7.0f);
-			} else if (jutsu == RASENSHURIKEN) {
-				return Math.min(f, 6.0f);
-			}
-			return Math.min(f, 100.0f);
-		}
-		
-		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			ItemJutsu.JutsuEnum jutsu = this.getCurrentJutsu(stack);
-			if (jutsu == RASENGAN) {
-				return this.getPower(stack, entity, timeLeft, 2.9f, 200f);
-			} else if (jutsu == RASENSHURIKEN) {
-				return this.getPower(stack, entity, timeLeft, 1.9f, 300f);
-			} else if (jutsu == SAGEMODE) {
-				return this.getPower(stack, entity, timeLeft, 0f, 20f);
-			}
-			return 1f;
-		}
-
-		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
-			if (this.getSageType(itemstack) == Type.NONE) {
-				if (entity instanceof EntityPlayer && ((EntityPlayer)entity).isCreative()) {
-					this.setSageType(itemstack, Type.random());
-				} else {
-					return;
-				}
-			}
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (!world.isRemote && entity instanceof EntityLivingBase) {
-				EntityLivingBase living = (EntityLivingBase)entity;
-				boolean flag = isSageModeActivated(itemstack);
-				boolean flag1 = living.getEntityAttribute(EntityPlayer.REACH_DISTANCE).hasModifier(ItemSageModeArmor.buffMap.get(EntityPlayer.REACH_DISTANCE));
-				if (flag && !flag1) {
-					for (Map.Entry<IAttribute, AttributeModifier> entry : ItemSageModeArmor.buffMap.entrySet()) {
-						living.getEntityAttribute(entry.getKey()).applyModifier(entry.getValue());
-					}
-					if (entity instanceof EntityPlayer) {
-						itemstack.getTagCompound().setInteger("prevFoodStat", ((EntityPlayer)entity).getFoodStats().getFoodLevel());
-					}
-				} else if (!flag && flag1) {
-					for (Map.Entry<IAttribute, AttributeModifier> entry : ItemSageModeArmor.buffMap.entrySet()) {
-						living.getEntityAttribute(entry.getKey()).removeModifier(entry.getValue().getID());
-					}
-					if (entity instanceof EntityPlayer) {
-						((EntityPlayer)entity).getFoodStats().setFoodLevel(itemstack.getTagCompound().getInteger("prevFoodStat") - 5);
+				Type sageType = this.getSageType(itemstack);
+				if (sageType == Type.NONE) {
+					Type forcedType = itemstack.hasTagCompound() && itemstack.getTagCompound().hasKey("Type", 8)
+					 ? Type.getTypeFromName(itemstack.getTagCompound().getString("Type")) 
+					 : entity instanceof EntityPlayer && ((EntityPlayer)entity).isCreative() ? Type.random() : Type.NONE;
+					if (forcedType != Type.NONE) {
+						this.setSageType(itemstack, forcedType);
+						this.enableJutsu(itemstack, SAGEMODE, true);
+						itemstack.getTagCompound().removeTag("Type");
+						sageType = forcedType;
+					} else {
+						return;
 					}
 				}
+				EntityLivingBase living = (EntityLivingBase)entity;
+				boolean flag = isSageModeActivated(itemstack);
+				//boolean flag1 = living.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).hasModifier(buffMap.get(SharedMonsterAttributes.MAX_HEALTH));
 				if (flag) {
-					living.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 3, 0, false, false));
+					if (this.getSageType(itemstack) == Type.SNAKE) {
+						for (Map.Entry<IAttribute, AttributeModifier> entry : snakebuffMap.entrySet()) {
+							IAttributeInstance attr = living.getEntityAttribute(entry.getKey());
+								if (attr != null && !attr.hasModifier(entry.getValue())) {
+									attr.applyModifier(entry.getValue());
+								}
+						}
+					}
+					else {
+						for (Map.Entry<IAttribute, AttributeModifier> entry : buffMap.entrySet()) {
+							IAttributeInstance attr = living.getEntityAttribute(entry.getKey());
+								if (attr != null && !attr.hasModifier(entry.getValue())) {
+									attr.applyModifier(entry.getValue());
+								}
+						}
+					}
+					
+					double d = 15.0d+ItemJutsu.getNinjaMult(living)*2.5f;
+					if (living instanceof  EntityPlayer) {
+						if (EntityBijuManager.cloakLevel((EntityPlayer) living) > 0) {
+							d = 7.0d+ItemJutsu.getNinjaMult(living)*0.8;
+						}
+					}
+					if (living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868")) == null) {
+						living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868"), "sagemode.damage", d, 0));
+					}
+					if (this.getSageType(itemstack) == Type.SLUG && living.getHealth() < living.getMaxHealth() && living.ticksExisted%20 == 0) {
+						living.heal(0.2f);
+					}
+					/*if (entity instanceof EntityPlayer) {
+
+						int foodlevel = ((EntityPlayer)entity).getFoodStats().getFoodLevel();
+						if (itemstack.getTagCompound().getInteger("prevFoodStat") != foodlevel) {
+							itemstack.getTagCompound().setInteger("prevFoodStat", foodlevel);
+						}
+					}*/
+				} else if (!flag) {
+					for (Map.Entry<IAttribute, AttributeModifier> entry : buffMap.entrySet()) {
+						IAttributeInstance attr = living.getEntityAttribute(entry.getKey());
+						if (attr != null) {
+							attr.removeModifier(entry.getValue().getID());
+						}
+					}
+					living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868"));
+					/*if (entity instanceof EntityPlayer) {
+						itemstack.getTagCompound().removeTag("prevFoodStat");
+						((EntityPlayer)entity).getFoodStats().setFoodLevel(itemstack.getTagCompound().getInteger("prevFoodStat"));
+					}*/
+				}
+				if (flag) {
 					Chakra.Pathway cp = Chakra.pathway(living);
 					if (cp.getAmount() < itemstack.getTagCompound().getDouble(SAGECHAKRADEPLETIONAMOUNT)) {
 						deactivateSageMode(itemstack, living);
 					} else if (living.ticksExisted % 20 == 10) {
-						cp.consume(50d);
+						if (entity instanceof EntityPlayer)
+							((EntityPlayer) entity).addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 4, false, false));
+							((EntityPlayer) entity).getFoodStats().addStats(2,0);
+						//living.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 22, 0, false, false));
+						cp.consume(25d);
 					}
 				}
 				if (entity.ticksExisted % 40 == 5 && entity instanceof EntityPlayer) {
@@ -202,7 +237,9 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 					 stack1 != null && ((ItemFuton.RangedItem)stack1.getItem()).canUseJutsu(stack1, ItemFuton.RASENSHURIKEN, living));
 					stack1 = ProcedureUtils.getMatchingItemStack((EntityPlayer)entity, ItemMokuton.block);
 					this.enableJutsu(itemstack, WOODBUDDHA,
-					 stack1 != null && ((ItemMokuton.ItemCustom)stack1.getItem()).canUseJutsu(stack1, ItemMokuton.GOLEM, living));
+					 stack1 != null &&  (PlayerTracker.getBattleXp((EntityPlayer) entity) >= 14999) && ((ItemMokuton.ItemCustom)stack1.getItem()).canUseJutsu(stack1, ItemMokuton.GOLEM, living));
+					this.enableJutsu(itemstack, SNAKE8H, sageType == Type.SNAKE);
+					this.enableJutsu(itemstack, GAMARINSHO, sageType == Type.TOAD);
 				}
 			}
 		}
@@ -221,9 +258,11 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int timeLeft) {
-			if (!player.world.isRemote && this.getCurrentJutsu(stack) == SAGEMODE
-			 && !(player.getRidingEntity() instanceof EntitySitPlatform)) {
+			ItemJutsu.JutsuEnum jutsu = this.getCurrentJutsu(stack);
+			if (!player.world.isRemote && jutsu == SAGEMODE
+ && !(player.getRidingEntity() instanceof EntitySitPlatform)) {
 				player.resetActiveHand();
+				return;
 			}
 			super.onUsingTick(stack, player, timeLeft);
 		}
@@ -233,7 +272,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 			ItemStack stack = entity.getHeldItem(hand);
 			ItemJutsu.JutsuEnum jutsu = this.getCurrentJutsu(stack);
 			if (jutsu == SAGEMODE && isSageModeActivated(stack)) {
-				//deactivateSageMode(stack, entity);
+				deactivateSageMode(stack, entity);
 				return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
 			}
 			if (jutsu != SAGEMODE && !isSageModeActivated(stack)) {
@@ -241,6 +280,11 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 			}
 			ActionResult<ItemStack> res = super.onItemRightClick(world, entity, hand);
 			if (jutsu == SAGEMODE && res.getType() == EnumActionResult.SUCCESS && !world.isRemote) {
+				if (EntityBijuManager.cloakLevel(entity) > 0 && EntityBijuManager.getCloakXp(entity, 1) < 800 && EntityBijuManager.getTails(entity) != 9) {
+					entity.sendStatusMessage(new TextComponentTranslation("chattext.senjutsu.denied", 
+				 	 EntityBijuManager.getNameOfJinchurikisBiju(entity)), true);
+					return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
+				}
 				entity.world.spawnEntity(new EntitySitPlatform(entity));
 			}
 			return res;
@@ -249,9 +293,12 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
 			if (attacker.equals(target) && this.getSageType(itemstack) == Type.TOAD && isSageModeActivated(itemstack)) {
-				target = ProcedureUtils.objectEntityLookingAt(attacker, ProcedureUtils.getReachDistance(attacker), 2d).entityHit;
-				if (target != null) {
-					attacker.attackTargetEntityWithCurrentItem(target);
+				target = ProcedureUtils.objectEntityLookingAt(attacker, ProcedureUtils.getReachDistance(attacker), 5d).entityHit;
+				if (target == null) {
+					target = ProcedureUtils.objectEntityLookingAt(attacker, ProcedureUtils.getReachDistance(attacker), 8d).entityHit;
+					if (target != null) {
+						attacker.attackTargetEntityWithCurrentItem(target);
+					}
 				}
 			}
 			return super.onLeftClickEntity(itemstack, attacker, target);
@@ -260,8 +307,11 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void addInformation(ItemStack itemstack, World world, List<String> list, ITooltipFlag flag) {
-			list.add(TextFormatting.BLUE + new TextComponentTranslation("tooltip.senjutsu.type").getUnformattedComponentText()
-			 + this.getSageType(itemstack).getName() + TextFormatting.RESET);
+			Type type = this.getSageType(itemstack);
+			if (type != Type.NONE) {
+				list.add(TextFormatting.BLUE + new TextComponentTranslation("tooltip.senjutsu.type").getUnformattedComponentText()
+				 + type.getLocalizedName() + TextFormatting.RESET);
+			}
 			super.addInformation(itemstack, world, list, flag);
 		}
 
@@ -269,11 +319,13 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		public ModelBiped getArmorModel(EntityLivingBase living, ItemStack stack, EntityEquipmentSlot slot, ModelBiped defaultModel) {
 			if (isSageModeActivated(stack)) {
-				ModelBiped armorModel = new ModelHelmetSnug();
-				armorModel.isSneak = living.isSneaking();
-				armorModel.isRiding = living.isRiding();
-				armorModel.isChild = living.isChild();
-				return armorModel;
+				if (this.armorModel == null) {
+					this.armorModel = Renderer.instance.new ModelHelmetSnug();
+				}
+				this.armorModel.isSneak = living.isSneaking();
+				this.armorModel.isRiding = living.isRiding();
+				this.armorModel.isChild = living.isChild();
+				return this.armorModel;
 			}
 			return null;
 		}
@@ -303,17 +355,82 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
+	public static boolean canUseSageMode(EntityLivingBase entity) {
+		if (entity instanceof EntityPlayer) {
+			ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, block);
+			return stack != null && ((RangedItem)stack.getItem()).canActivateJutsu(stack, SAGEMODE, (EntityPlayer)entity) == EnumActionResult.SUCCESS;
+		}
+		return false;
+	}
+
+	public static Type getSageType(EntityLivingBase entity) {
+		if (entity instanceof EntityPlayer) {
+			ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, block);
+			if (stack != null) {
+				return ((RangedItem)stack.getItem()).getSageType(stack);
+			}
+		}
+		return Type.NONE;
+	}
+
 	public static boolean isSageModeActivated(ItemStack stack) {
-		return stack.hasTagCompound() && stack.getTagCompound().getBoolean(SAGEMODEACTIVATEDKEY);
+		return stack.hasTagCompound() && stack.getTagCompound().hasKey(SAGECHAKRADEPLETIONAMOUNT, 6);
+	}
+
+	public static boolean isSageModeActivated(EntityLivingBase entity) {
+		if (entity instanceof EntityPlayer) {
+			ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, block);
+			return stack != null && isSageModeActivated(stack);
+		}
+		return false;
+	}
+
+	public static void deactivateSageMode(EntityLivingBase entity) {
+		if (entity instanceof EntityPlayer) {
+			ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)entity, block);
+			if (stack != null && isSageModeActivated(stack)) {
+				deactivateSageMode(stack, entity);
+			}
+		}
 	}
 
 	private static void deactivateSageMode(ItemStack stack, EntityLivingBase entity) {
 		if (stack.hasTagCompound()) {
-			stack.getTagCompound().setBoolean(SAGEMODEACTIVATEDKEY, false);
-			stack.getTagCompound().setDouble(SAGECHAKRADEPLETIONAMOUNT, 0.0d);
+			Chakra.Pathway cp = Chakra.pathway(entity);
+			double d = stack.getTagCompound().getDouble(SAGECHAKRADEPLETIONAMOUNT);
+			if (d > 0.0d && cp.getAmount() > d) {
+				cp.consume(cp.getAmount() - d);
+			}
+			//stack.getTagCompound().removeTag(SAGEMODEACTIVATEDKEY);
+			stack.getTagCompound().removeTag(SAGECHAKRADEPLETIONAMOUNT);
 		}
 		if (entity instanceof EntityPlayerMP) {
 			OverlayChakraDisplay.ShowFlamesMessage.send((EntityPlayerMP)entity, false);
+		}
+	}
+
+	public static class EventHook {
+		@SubscribeEvent
+		public void onDeath(LivingDeathEvent event) {
+			deactivateSageMode(event.getEntityLiving());
+		}
+
+		@SubscribeEvent
+		public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+			if (!event.player.world.isRemote) {
+				deactivateSageMode(event.player);
+			}
+		}
+		
+		@SubscribeEvent
+		public void onAttack(LivingAttackEvent event) {
+			if (event.getSource().getImmediateSource() instanceof EntityPlayer) {
+				EntityPlayer attacker = (EntityPlayer)event.getSource().getImmediateSource();
+				if (isSageModeActivated(attacker) && !ItemJutsu.isDamageSourceSenjutsu(event.getSource())) {
+					event.setCanceled(true);
+					event.getEntityLiving().attackEntityFrom(ItemJutsu.causeSenjutsuDamage(attacker, null), event.getAmount());
+				}
+			}
 		}
 	}
 
@@ -325,8 +442,8 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 				stack.getTagCompound().setDouble(SAGECHAKRADEPLETIONAMOUNT, cp.getAmount());
 				float f = stack.getItem() == block && ((RangedItem)stack.getItem()).getCurrentJutsu(stack) == SAGEMODE
 				 ? ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) : 1.0f;
-				cp.consume(-0.6f / f, true);
-				stack.getTagCompound().setBoolean(SAGEMODEACTIVATEDKEY, true);
+				cp.consume(-0.8f / f, true);
+				//stack.getTagCompound().setBoolean(SAGEMODEACTIVATEDKEY, true);
 				if (entity instanceof EntityPlayerMP) {
 					OverlayChakraDisplay.ShowFlamesMessage.send((EntityPlayerMP)entity, true);
 				}
@@ -339,6 +456,30 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		public boolean isActivated(ItemStack stack) {
 			return isSageModeActivated(stack);
 		}
+
+		@Override
+		public float getBasePower() {
+			return 0.0f;
+		}
+	
+		@Override
+		public float getPowerupDelay() {
+			return 3.0f;
+		}
+	
+		@Override
+		public float getMaxPower() {
+			return 100.0f;
+		}
+		
+		@Override
+		public void onUsingTick(ItemStack stack, EntityLivingBase player, float power) {
+			if (!(player.getRidingEntity() instanceof EntitySitPlatform)) {
+				player.resetActiveHand();
+				return;
+			}
+			ItemJutsu.IJutsuCallback.super.onUsingTick(stack, player, power);
+		}
 	}
 
 	public static class EntitySitPlatform extends Entity {
@@ -349,7 +490,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 
 		public EntitySitPlatform(EntityLivingBase entity) {
 			this(entity.world);
-			this.setLocationAndAngles(entity.posX, entity.posY+0.1d, entity.posZ, entity.rotationYaw, 0f);
+			this.setLocationAndAngles(entity.posX, entity.posY+0.15d, entity.posZ, entity.rotationYaw, 0f);
 			entity.startRiding(this);
 		}
 
@@ -359,11 +500,21 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public double getMountedYOffset() {
-			return -0.25d;
+			return -0.2d;
+		}
+
+		@Override @Nullable
+		public Entity getControllingPassenger() {
+			return this.getPassengers().isEmpty() ? null : (Entity)this.getPassengers().get(0);
 		}
 
 		@Override
 		public void onUpdate() {
+			Entity rider = this.getControllingPassenger();
+			if (rider instanceof EntityLivingBase) {
+				rider.setRenderYawOffset(rider.getRotationYawHead() + 10.0F);
+				rider.prevRotationPitch = rider.rotationPitch = 30.0F;
+			}
 			this.move(MoverType.SELF, 0.0d, this.motionY, 0.0d);
 			this.motionY = this.onGround ? 0.0D : this.motionY - 0.08D;
 			this.motionY *= 0.98D;
@@ -383,17 +534,20 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 
 	public enum Type {
 		NONE("none", 0),
-		TOAD("entity.toad.name", 1),
-		SNAKE("entity.snake.name", 2),
-		SLUG("entity.slug.name", 3);
+		TOAD("toad", 1),
+		SNAKE("snake", 2),
+		SLUG("slug", 3);
 
 		private final String name;
 		private final int id;
-		private static final Map<Integer, Type> TYPES = Maps.newHashMap();
+		private static final Map<Integer, Type> TYPES_BY_ID = Maps.newHashMap();
+		private static final Map<String, Type> TYPES_BY_NAME = Maps.newHashMap();
 
 		static {
-			for (Type type : values())
-				TYPES.put(Integer.valueOf(type.getID()), type);
+			for (Type type : values()) {
+				TYPES_BY_ID.put(Integer.valueOf(type.getID()), type);
+				TYPES_BY_NAME.put(type.name, type);
+			}
 		}
 		
 		Type(String s, int i) {
@@ -401,8 +555,8 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 			this.id = i;
 		}
 
-		public String getName() {
-			return new TextComponentTranslation(this.name).getUnformattedComponentText();
+		public String getLocalizedName() {
+			return new TextComponentTranslation("entity."+this.name+".name").getUnformattedComponentText();
 		}
 
 		public int getID() {
@@ -414,38 +568,99 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		}
 
 		public static Type getTypeFromId(int id) {
-			return TYPES.get(Integer.valueOf(id));
+			return TYPES_BY_ID.containsKey(Integer.valueOf(id)) ? TYPES_BY_ID.get(Integer.valueOf(id)) : Type.NONE;
+		}
+
+		public static Type getTypeFromName(String s) {
+			return TYPES_BY_NAME.containsKey(s) ? TYPES_BY_NAME.get(s) : Type.NONE;
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public static class ModelHelmetSnug extends ModelBiped {
-		private final ModelRenderer highlight;
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
 
-		public ModelHelmetSnug() {
-			textureWidth = 64;
-			textureHeight = 16;
-			this.bipedHead = new ModelRenderer(this);
-			this.bipedHead.setRotationPoint(0.0F, 0.0F, 0.0F);
-			this.bipedHead.cubeList.add(new ModelBox(this.bipedHead, 0, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.02F, false));
-			this.highlight = new ModelRenderer(this);
-			this.highlight.setRotationPoint(0.0F, 0.0F, 0.0F);
-			this.highlight.cubeList.add(new ModelBox(this.highlight, 24, 0, -4.0F, -8.0F, -4.15F, 8, 8, 0, 0.0F, false));
-			this.bipedHeadwear = new ModelRenderer(this);
-			this.bipedHeadwear.setRotationPoint(0.0F, 0.0F, 0.0F);
-			this.bipedHeadwear.cubeList.add(new ModelBox(this.bipedHeadwear, 32, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.2F, false));
+	public static class Renderer extends EntityRendererRegister {
+		private static Renderer instance;
+
+		public Renderer() {
+			instance = this;
 		}
 
+		@SideOnly(Side.CLIENT)
 		@Override
-		public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-			this.bipedBody.showModel = false;
-			this.bipedLeftArm.showModel = false;
-			this.bipedLeftLeg.showModel = false;
-			this.bipedRightArm.showModel = false;
-			this.bipedRightLeg.showModel = false;
-			GlStateManager.enableBlend();
-			super.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
-			GlStateManager.disableBlend();
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EntitySitPlatform.class, renderManager -> {
+				return new Render(renderManager) {
+					@Override
+					public void doRender(Entity entity, double x, double y, double z, float entityYaw, float partialTicks) {
+					}
+					@Override
+					protected ResourceLocation getEntityTexture(Entity entity) {
+						return null;
+					}
+				};
+			});
+		}
+
+		@SideOnly(Side.CLIENT)
+		public class ModelHelmetSnug extends ModelBiped {
+			//private final ModelRenderer highlight;
+			private ModelBiped wearerModel;
+
+			public ModelHelmetSnug() {
+				textureWidth = 64;
+				textureHeight = 16;
+				this.bipedHead = new ModelRenderer(this);
+				this.bipedHead.setRotationPoint(0.0F, 0.0F, 0.0F);
+				this.bipedHead.cubeList.add(new ModelBox(this.bipedHead, 0, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.02F, false));
+				//this.highlight = new ModelRenderer(this);
+				//this.highlight.setRotationPoint(0.0F, 0.0F, 0.0F);
+				//this.highlight.cubeList.add(new ModelBox(this.highlight, 24, 0, -4.0F, -8.0F, -4.15F, 8, 8, 0, 0.0F, false));
+				this.bipedHeadwear = new ModelRenderer(this);
+				this.bipedHeadwear.setRotationPoint(0.0F, 0.0F, 0.0F);
+				this.bipedHeadwear.cubeList.add(new ModelBox(this.bipedHeadwear, 32, 0, -4.0F, -8.0F, -4.0F, 8, 8, 8, 0.05F, false));
+			}
+	
+			@Override
+			public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+				this.bipedBody.showModel = false;
+				this.bipedLeftArm.showModel = false;
+				this.bipedLeftLeg.showModel = false;
+				this.bipedRightArm.showModel = false;
+				this.bipedRightLeg.showModel = false;
+				GlStateManager.enableBlend();
+				super.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+				GlStateManager.disableBlend();
+			}
+
+			@Override
+			public void setModelAttributes(ModelBase model) {
+				super.setModelAttributes(model);
+				if (model instanceof ModelBiped) {
+					this.wearerModel = (ModelBiped)model;
+				}
+			}
+
+			@Override
+			public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
+				if (this.wearerModel != null) {
+					copyModelAngles(this.wearerModel.bipedHead, this.bipedHead);
+					copyModelAngles(this.wearerModel.bipedHeadwear, this.bipedHeadwear);
+					copyModelAngles(this.wearerModel.bipedBody, this.bipedBody);
+					copyModelAngles(this.wearerModel.bipedLeftArm, this.bipedLeftArm);
+					copyModelAngles(this.wearerModel.bipedRightArm, this.bipedRightArm);
+					copyModelAngles(this.wearerModel.bipedLeftLeg, this.bipedLeftLeg);
+					copyModelAngles(this.wearerModel.bipedRightLeg, this.bipedRightLeg);
+				} else {
+					if (entity instanceof AbstractClientPlayer && ((AbstractClientPlayer)entity).getSkinType().equals("slim")) {
+						this.bipedLeftArm.setRotationPoint(5.0F, 2.5F, 0.0F);
+						this.bipedRightArm.setRotationPoint(-5.0F, 2.5F, 0.0F);
+					}
+					super.setRotationAngles(f, f1, f2, f3, f4, f5, entity);
+				}
+			}
 		}
 	}
 }

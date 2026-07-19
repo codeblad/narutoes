@@ -24,6 +24,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.ActionResult;
 
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.procedure.ProcedureUtils;
 
 import java.util.Set;
 import java.util.HashMap;
@@ -39,6 +40,7 @@ public class ItemBoneSword extends ElementsNarutomodMod.ModElement {
 		super(instance, 661);
 	}
 
+
 	@Override
 	public void initElements() {
 		elements.items.add(() -> new ItemSword(EnumHelper.addToolMaterial("BONE_SWORD", 1, 50, 4f, 8f, 0)) {
@@ -47,39 +49,21 @@ public class ItemBoneSword extends ElementsNarutomodMod.ModElement {
 				Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(slot);
 				if (slot == EntityEquipmentSlot.MAINHAND) {
 					multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(),
-							new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double) this.getAttackDamage(), 0));
+							new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", (double) this.getAttackDamage() * 2.0f, 0));
 					multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(),
 							new AttributeModifier(ATTACK_SPEED_MODIFIER, "Weapon modifier", -3, 0));
+					multimap.put(EntityPlayer.REACH_DISTANCE.getName(), new AttributeModifier(ProcedureUtils.REACH_MODIFIER, "Tool modifier", 6, 0));
 				}
 				return multimap;
 			}
 
-			@Override
-			public boolean isShield(ItemStack stack, EntityLivingBase entity) {
-				return stack.getItem() == block;
-			}
-
-			@Override
-			public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-				playerIn.setActiveHand(handIn);
-				return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
-			}
-	
-			@Override
-			public EnumAction getItemUseAction(ItemStack stack) {
-				return EnumAction.BLOCK;
-			}
-	
-			@Override
-			public int getMaxItemUseDuration(ItemStack stack) {
-				return 72000;
-			}
 
 			public Set<String> getToolClasses(ItemStack stack) {
 				HashMap<String, Integer> ret = new HashMap<String, Integer>();
 				ret.put("sword", 1);
 				return ret.keySet();
 			}
+
 
 			@Override
 			public boolean onDroppedByPlayer(ItemStack item, EntityPlayer player) {

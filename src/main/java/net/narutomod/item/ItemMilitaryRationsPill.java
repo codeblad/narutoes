@@ -52,7 +52,7 @@ public class ItemMilitaryRationsPill extends ElementsNarutomodMod.ModElement {
 			this.setUnlocalizedName("military_rations_pill");
 			this.setRegistryName("military_rations_pill");
 			this.setCreativeTab(TabModTab.tab);
-			this.setMaxStackSize(3);
+			this.setMaxStackSize(16);
 			//this.setAlwaysEdible();
 		}
 
@@ -83,9 +83,9 @@ public class ItemMilitaryRationsPill extends ElementsNarutomodMod.ModElement {
 			super.onFoodEaten(itemStack, world, entity);
 			if (!world.isRemote) {
 				Chakra.pathway(entity).consume(-200d, true);
-				entity.addPotionEffect(new PotionEffect(PotionChakraRegeneration.potion, 200, 0));
-				entity.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 800, 0));
-				entity.getCooldownTracker().setCooldown(block, 1200);
+				entity.addPotionEffect(new PotionEffect(PotionChakraRegeneration.potion, 100, 0));
+				entity.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 1200, 0));
+				entity.getCooldownTracker().setCooldown(block, 1800);
 			}
 		}
 

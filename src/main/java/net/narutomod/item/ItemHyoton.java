@@ -7,7 +7,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -17,29 +18,31 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Item;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.Entity;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.enchantment.EnchantmentFrostWalker;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.DamageSource;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Item;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.block.material.Material;
+import net.minecraft.enchantment.EnchantmentFrostWalker;
+import net.minecraft.nbt.NBTTagCompound;
 
+import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntitySpike;
 import net.narutomod.entity.EntityIceSpear;
 import net.narutomod.entity.EntityIceDome;
@@ -56,10 +59,10 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:hyoton")
 	public static final Item block = null;
 	public static final int ENTITYID = 219;
-	public static final ItemJutsu.JutsuEnum KILLSPIKES = new ItemJutsu.JutsuEnum(0, "ice_spike", 'S', 150, 100d, new EntityIceSpike.Jutsu());
-	public static final ItemJutsu.JutsuEnum ICESPEARS = new ItemJutsu.JutsuEnum(1, "ice_spear", 'S', 150, 20d, new EntityIceSpear.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum ICEDOME = new ItemJutsu.JutsuEnum(2, "ice_dome", 'S', 200, 5d, new EntityIceDome.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum ICEPRISON = new ItemJutsu.JutsuEnum(3, "ice_prison", 'S', 150, 50d, new EntityIcePrison.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum KILLSPIKES = new ItemJutsu.JutsuEnum(0, "ice_spike", 'S', 150, 40d, new EntityIceSpike.Jutsu());
+	public static final ItemJutsu.JutsuEnum ICESPEARS = new ItemJutsu.JutsuEnum(1, "ice_spear", 'S', 150, 30d, new EntityIceSpear.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum ICEDOME = new ItemJutsu.JutsuEnum(2, "ice_dome", 'S', 200, 400d, new EntityIceDome.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum ICEPRISON = new ItemJutsu.JutsuEnum(3, "ice_prison", 'S', 150, 150d, new EntityIcePrison.EC.Jutsu());
 
 	public ItemHyoton(ElementsNarutomodMod instance) {
 		super(instance, 531);
@@ -76,12 +79,6 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:hyoton", "inventory"));
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntityIceSpike.class, renderManager -> new CustomRender(renderManager));
 	}
 
 	@Override
@@ -102,12 +99,6 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			float f = this.getCurrentJutsu(stack) == KILLSPIKES ? 80f : 40f;
-			return this.getPower(stack, entity, timeLeft, 1f, f);
-		}
-
-		@Override
 		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {
 			if (entity.isCreative() || (ProcedureUtils.hasItemInInventory(entity, ItemFuton.block) 
 			 && ProcedureUtils.hasItemInInventory(entity, ItemSuiton.block))) { 
@@ -116,20 +107,44 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 			return new ActionResult<ItemStack>(EnumActionResult.FAIL, entity.getHeldItem(hand));
 		}
 
+		private void setlastTickPos(Entity entity, BlockPos pos) {
+			NBTTagCompound compound = entity.getEntityData().getCompoundTag("lastTickBlockPos");
+			if (compound == null) {
+				compound = new NBTTagCompound();
+			}
+			compound.setInteger("X", pos.getX());
+			compound.setInteger("Y", pos.getY());
+			compound.setInteger("Z", pos.getZ());
+			entity.getEntityData().setTag("lastTickBlockPos", compound);
+		}
+
+		private BlockPos getLastTickPos(Entity entity) {
+			NBTTagCompound compound = entity.getEntityData().getCompoundTag("lastTickBlockPos");
+			return compound != null
+			 ? new BlockPos(compound.getInteger("X"), compound.getInteger("Y"), compound.getInteger("Z"))
+			 : BlockPos.ORIGIN;
+		}
+
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
-			BlockPos pos = new BlockPos(entity);
-			EntityTracker.DataHolder edh = EntityTracker.getOrCreate(entity);
 			if (!world.isRemote && entity instanceof EntityLivingBase) {
-				((EntityLivingBase)entity).addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 3, false, false));
-				((EntityLivingBase)entity).extinguish();
-				if (!pos.equals(edh.prevBlockPos)) {
-					edh.prevBlockPos = pos;
-					EnchantmentFrostWalker.freezeNearby((EntityLivingBase)entity, world, pos, 1);
+				//BlockPos pos = new BlockPos(entity);
+				//EntityTracker.SessionDataHolder edh = EntityTracker.getOrCreate(entity);
+				BlockPos pos = entity.getPosition();
+				EntityLivingBase living = (EntityLivingBase)entity;
+				living.extinguish();
+				//if (!pos.equals(edh.prevBlockPos)) {
+				//	edh.prevBlockPos = pos;
+				if (!pos.equals(this.getLastTickPos(entity))) {
+					this.setlastTickPos(entity, pos);
+					EnchantmentFrostWalker.freezeNearby(living, world, pos, 1);
 				}
-				if (entity instanceof EntityPlayer && !ProcedureUtils.hasItemInInventory((EntityPlayer)entity, ItemIceSenbon.block)) {
-					ItemHandlerHelper.giveItemToPlayer((EntityPlayer)entity, new ItemStack(ItemIceSenbon.block));
+				if (living.ticksExisted % 20 == 3) {
+					living.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 3, false, false));
+					if (entity instanceof EntityPlayer && !ProcedureUtils.hasItemInInventory((EntityPlayer)entity, ItemIceSenbon.block)) {
+						ItemHandlerHelper.giveItemToPlayer((EntityPlayer)entity, new ItemStack(ItemIceSenbon.block));
+					}
 				}
 			}
 		}
@@ -153,9 +168,10 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static class EntityIceSpike extends EntitySpike.Base {
+	public static class EntityIceSpike extends EntitySpike.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 10;
 		private final float maxScale = 3.0f;
+		private float damage = 20.0f;
 		private EntityLivingBase user;
 
 		public EntityIceSpike(World worldIn) {
@@ -170,15 +186,21 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.HYOTON;
+		}
+
+		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (this.ticksAlive <= this.growTime) {
+			if (!this.world.isRemote && this.ticksAlive <= this.growTime) {
 				this.setEntityScale(MathHelper.clamp(this.maxScale * (float)this.ticksAlive / this.growTime, 0.0f, this.maxScale));
 				for (EntityLivingBase entity : 
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
 					if (!entity.equals(this.user)) {
-						entity.hurtResistantTime = 0;
-						entity.attackEntityFrom(DamageSource.causeIndirectDamage(this, this.user), 30f);
+						entity.getEntityData().setBoolean("TempData_disableKnockback", true);
+						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),
+						 this.damage);
 					}
 				}
 			}
@@ -191,36 +213,62 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 				Vec3d vec3d = entity.getPositionEyes(1f);
 				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(30d));
 				RayTraceResult res = world.rayTraceBlocks(vec3d, vec3d2, false, true, true);
-				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK && res.sideHit == EnumFacing.UP) {
-					world.playSound(null, entity.posX, entity.posY, entity.posZ, (net.minecraft.util.SoundEvent)
+				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK) {
+					world.playSound(null, res.hitVec.x, res.hitVec.y, res.hitVec.z,
 					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:spiked")),
 					 net.minecraft.util.SoundCategory.NEUTRAL, 5f, entity.getRNG().nextFloat() * 0.4f + 0.8f);
-					for (int i = 0; i < (int)(power * power * 5f); i++) {
+					float f = MathHelper.sqrt(power * 30f / 5f);
+					for (int i = 0; i < Math.round(power); i++) {
 						EntityIceSpike entity1 = new EntityIceSpike(entity);
-						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * power * 3d, 0d, (entity.getRNG().nextDouble() - 0.5d) * power * 3d);
+						entity1.damage = 18+5.0f*(1+3.0f*(1/100))*ItemJutsu.getDmgMult(entity);
+						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
 						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
 						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
 						entity1.setLocationAndAngles(vec.x, vec.y + 0.5d, vec.z, entity.getRNG().nextFloat() * 360f, (entity.getRNG().nextFloat() - 0.5f) * 60f);
 						world.spawnEntity(entity1);
 					}
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*1);
 					return true;
 				}
 				return false;
 			}
+
+			@Override
+			public float getPowerupDelay() {
+				return 2.5f;
+			}
+	
+			@Override
+			public float getMaxPower() {
+				return 25.0f;
+			}
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class CustomRender extends EntitySpike.Renderer<EntityIceSpike> {
-		private final ResourceLocation TEXTURE = new ResourceLocation("narutomod:textures/spike_ice.png");
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
 
-		public CustomRender(RenderManager renderManagerIn) {
-			super(renderManagerIn);
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
+		@Override
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EntityIceSpike.class, renderManager -> new CustomRender(renderManager));
 		}
 
-		@Override
-		protected ResourceLocation getEntityTexture(EntityIceSpike entity) {
-			return TEXTURE;
+		@SideOnly(Side.CLIENT)
+		public class CustomRender extends EntitySpike.ClientSide.Renderer<EntityIceSpike> {
+			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/spike_ice.png");
+	
+			public CustomRender(RenderManager renderManagerIn) {
+				super(renderManagerIn);
+			}
+	
+			@Override
+			protected ResourceLocation getEntityTexture(EntityIceSpike entity) {
+				return this.texture;
+			}
 		}
 	}
 }

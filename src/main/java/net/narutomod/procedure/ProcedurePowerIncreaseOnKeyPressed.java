@@ -1,20 +1,16 @@
 package net.narutomod.procedure;
 
-import net.narutomod.item.ItemTenseigan;
-import net.narutomod.item.ItemSharingan;
-import net.narutomod.item.ItemRinnegan;
 import net.narutomod.item.ItemJutsu;
-import net.narutomod.item.ItemByakugan;
+import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemBijuCloak;
-import net.narutomod.gui.overlay.OverlayByakuganView;
-import net.narutomod.entity.EntitySusanooBase;
 import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraft.world.World;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.common.util.Constants;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
@@ -25,6 +21,25 @@ import java.util.Map;
 public class ProcedurePowerIncreaseOnKeyPressed extends ElementsNarutomodMod.ModElement {
 	public ProcedurePowerIncreaseOnKeyPressed(ElementsNarutomodMod instance) {
 		super(instance, 104);
+	}
+	public static boolean hasSlot(NBTTagCompound nbt, int targetSlot) {
+    if (nbt.hasKey("ForgeCaps", Constants.NBT.TAG_COMPOUND)) {
+        NBTTagCompound forgeCaps = nbt.getCompoundTag("ForgeCaps");
+        if (forgeCaps.hasKey("knapm:container", Constants.NBT.TAG_COMPOUND)) {
+            NBTTagCompound container = forgeCaps.getCompoundTag("knapm:container");
+            if (container.hasKey("Items", Constants.NBT.TAG_LIST)) {
+                NBTTagList items = container.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+                for (int i = 0; i < items.tagCount(); i++) {
+                    NBTTagCompound itemEntry = items.getCompoundTagAt(i);
+                        int slot = itemEntry.getInteger("Slot");
+                        if (slot == targetSlot) {
+                            return true;
+                        }
+                }
+            }
+        }
+    }
+    return false; 
 	}
 
 	public static void executeProcedure(Map<String, Object> dependencies) {
@@ -59,41 +74,21 @@ public class ProcedurePowerIncreaseOnKeyPressed extends ElementsNarutomodMod.Mod
 				if ((!(is_pressed))) {
 					ItemJutsu.Base.switchNextJutsu(itemoffhand, (EntityLivingBase) entity);
 				}
-			} else if ((((helmet).getItem() == new ItemStack(ItemByakugan.helmet, (int) (1)).getItem())
-					&& (entity.getEntityData().getBoolean("byakugan_activated")))) {
-				if ((is_pressed)) {
-					entity.getEntityData().setDouble("byakugan_fov", ((entity.getEntityData().getDouble("byakugan_fov")) - 1));
-					OverlayByakuganView.sendCustomData(entity, true, (float) entity.getEntityData().getDouble("byakugan_fov"));
-				}
-			} else if ((helmet.getItem() instanceof ItemSharingan.Base && entity.getRidingEntity() instanceof EntitySusanooBase)) {
-				if ((!(is_pressed))) {
-					ProcedureSusanoo.upgrade((EntityPlayer) entity);
-				}
-			} else if ((((helmet).getItem() == new ItemStack(ItemRinnegan.helmet, (int) (1)).getItem())
-					|| ((helmet).getItem() == new ItemStack(ItemTenseigan.helmet, (int) (1)).getItem()))) {
-				if ((!(is_pressed))) {
-					i = (double) (((helmet).hasTagCompound() ? (helmet).getTagCompound().getDouble("which_path") : -1) + 1);
-					if (((i) > 5)) {
-						i = (double) 0;
-					}
-					{
-						ItemStack _stack = (helmet);
-						if (!_stack.hasTagCompound())
-							_stack.setTagCompound(new NBTTagCompound());
-						_stack.getTagCompound().setDouble("which_path", (i));
-					}
-					if (entity instanceof EntityPlayer && !entity.world.isRemote) {
-						((EntityPlayer) entity).sendStatusMessage(new TextComponentString(
-								net.minecraft.util.text.translation.I18n.translateToLocal(String.format("chattext.rinnegan.path%d", (int) i))),
-								(true));
-					}
-				}
+			} else if ((helmet.getItem() instanceof ItemDojutsu.Base
+					&& ((ItemDojutsu.Base) helmet.getItem()).onSwitchJutsuKey(is_pressed, helmet, (EntityPlayer) entity))) {
+				return;
 			} else if ((((helmet).getItem() == new ItemStack(ItemBijuCloak.helmet, (int) (1)).getItem())
 					&& ((((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(2) : ItemStack.EMPTY)
 							.getItem() == new ItemStack(ItemBijuCloak.body, (int) (1)).getItem())
 							&& (((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(1) : ItemStack.EMPTY)
 									.getItem() == new ItemStack(ItemBijuCloak.legs, (int) (1)).getItem())))) {
 				if ((!(is_pressed))) {
+					NBTTagCompound nbt = new NBTTagCompound();
+					entity.writeToNBT(nbt);
+					if (hasSlot(nbt, 0)) {
+						ProcedureUtils.sendStatusMessage((EntityPlayer) entity, "You are bound.", false);
+						return;
+			}
 					EntityBijuManager.increaseCloakLevel((EntityPlayer) entity);
 				}
 			}

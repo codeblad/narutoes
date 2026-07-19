@@ -1,13 +1,18 @@
 package net.narutomod.procedure;
 
+import net.minecraft.util.text.TextComponentTranslation;
+import net.narutomod.item.ItemJutsu;
 import net.narutomod.potion.PotionAmaterasuFlame;
 import net.narutomod.item.ItemMangekyoSharingan;
+import net.narutomod.block.BlockAmaterasuBlock;
+import net.narutomod.PlayerTracker;
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.Chakra;
 
 import net.minecraft.world.World;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.potion.PotionEffect;
@@ -69,7 +74,12 @@ public class ProcedureAmaterasu extends ElementsNarutomodMod.ModElement {
 			return;
 		}
 		cooldown = (double) (entity.getEntityData().getDouble("amaterasu_cd"));
-		if ((is_pressed)) {
+		if ((is_pressed) && !entity.isSneaking()) {
+			if (cooldown > world.getTotalWorldTime() && !(entity.getEntityData().getBoolean("amaterasu_active"))) {
+				((EntityPlayer) entity).sendStatusMessage(new TextComponentTranslation("chattext.cooldown.formatted",
+						(cooldown - world.getTotalWorldTime()) / 20), true);
+				return;
+			}
 			chakraAmount = Chakra.pathway((EntityPlayer) entity).getAmount();
 			chakraUsage = ItemMangekyoSharingan.getAmaterasuChakraUsage((EntityLivingBase) entity);
 			if ((((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).capabilities.isCreativeMode : false)
@@ -80,34 +90,27 @@ public class ProcedureAmaterasu extends ElementsNarutomodMod.ModElement {
 						world.playSound((EntityPlayer) null, x, y, z, (net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY
 								.getObject(new ResourceLocation("narutomod:amaterasu2")), SoundCategory.NEUTRAL, (float) 1, (float) 1);
 					}
-					cooldown = (double) ((NarutomodModVariables.world_tick) + ((cd_modifier) * 300));
 					Chakra.pathway((EntityPlayer) entity).consume(chakraUsage);
 				}
+				cooldown = (double) (world.getTotalWorldTime() + 10*20);
 				entity.getEntityData().setBoolean("amaterasu_active", (true));
-				if ((((cooldown) - (NarutomodModVariables.world_tick)) < 2000)) {
-					cooldown = (double) ((cooldown) + ((cd_modifier) * 10));
-				}
 				entity.getEntityData().setDouble("amaterasu_cd", (cooldown));
 				Chakra.pathway((EntityPlayer) entity).consume(chakraUsage * 0.25d);
 				RayTraceResult t = ProcedureUtils.objectEntityLookingAt(entity, 30d);
+				i = (double) 4+ItemJutsu.getDmgMult(entity)*2;
 				if (t.typeOfHit == RayTraceResult.Type.ENTITY) {
-					i = (double) (((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).experienceLevel : 0) / 30);
+					if (t.entityHit instanceof EntityLivingBase) {
+						((EntityLivingBase) t.entityHit).setRevengeTarget((EntityLivingBase) entity);
+					}
 					entity = t.entityHit;
 					if (entity instanceof EntityLivingBase)
 						((EntityLivingBase) entity)
-								.addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, (int) 10000, (int) (i), (false), (false)));
+								.addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, (int) 20*7, (int) (i), (false), (false)));
 				} else {
 					x = (int) t.getBlockPos().getX() + t.sideHit.getDirectionVec().getX();
 					y = (int) t.getBlockPos().getY() + t.sideHit.getDirectionVec().getY();
 					z = (int) t.getBlockPos().getZ() + t.sideHit.getDirectionVec().getZ();
-					{
-						Map<String, Object> $_dependencies = new HashMap<>();
-						$_dependencies.put("world", world);
-						$_dependencies.put("x", x);
-						$_dependencies.put("y", y);
-						$_dependencies.put("z", z);
-						ProcedureAmaterasuPlaceBlock.executeProcedure($_dependencies);
-					}
+					BlockAmaterasuBlock.placeBlock(world, new BlockPos(x, y, z), (int) i);
 				}
 			}
 		} else {
@@ -134,11 +137,11 @@ public class ProcedureAmaterasu extends ElementsNarutomodMod.ModElement {
 				}
 			} else if (((entity.getEntityData().getBoolean("amaterasu_active"))
 					&& (!((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).capabilities.isCreativeMode : false)))) {
-				i = (double) (((cooldown) - (NarutomodModVariables.world_tick)) * 0.5);
+				i = (double) (((cooldown) - world.getTotalWorldTime()))/20;
 				if (entity instanceof EntityLivingBase)
-					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, (int) (i), (int) 2));
+					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, (int) (i)*2, (int) 2));
 				if (entity instanceof EntityLivingBase)
-					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.NAUSEA, (int) (i), (int) 0));
+					((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.NAUSEA, (int) ((i) * 2), (int) 0));
 			}
 			entity.getEntityData().setBoolean("amaterasu_active", (false));
 		}

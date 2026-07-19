@@ -1,6 +1,7 @@
 
 package net.narutomod.gui;
 
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraft.world.World;
 import net.minecraft.util.math.BlockPos;
@@ -9,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 import net.narutomod.item.ItemKaton;
+import net.narutomod.item.ItemSuiton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.PlayerTracker;
 import net.narutomod.ElementsNarutomodMod;
@@ -31,14 +33,13 @@ public class GuiScrollFireAnnihilationGui extends ElementsNarutomodMod.ModElemen
 			// security measure to prevent arbitrary chunk generation
 			if (player.world.isRemote || !player.world.isBlockLoaded(new BlockPos(this.x, this.y, this.z)))
 				return;
-			ItemStack stack = ProcedureUtils.getMatchingItemStack(player, ItemKaton.block);
-			if (stack == null && PlayerTracker.isNinja(player)) {
-				stack = new ItemStack(ItemKaton.block, 1);
-				((ItemKaton.RangedItem)stack.getItem()).setOwner(stack, player);
-				ItemHandlerHelper.giveItemToPlayer(player, stack);
+			ItemStack stack1 = ProcedureUtils.getMatchingItemStack(player, ItemKaton.block);
+			if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+				player.sendStatusMessage(new TextComponentTranslation("This is not your affinity."), false);
+				return;
 			}
+			ItemStack stack = GuiNinjaScroll.enableJutsu(player, (ItemKaton.RangedItem)ItemKaton.block, ItemKaton.GFANNIHILATION, true);
 			if (stack != null) {
-				((ItemKaton.RangedItem)stack.getItem()).enableJutsu(stack, ItemKaton.GFANNIHILATION, true);
 				super.handleButtonAction(player, buttonID);
 			}
 		}

@@ -14,14 +14,14 @@
  *
  * If you change workspace package, modid or prefix, you will need
  * to manually adapt this file to these changes or remake it.
-*/
+ */
 package net.narutomod;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
@@ -39,17 +39,21 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.entity.layers.LayerBipedArmor;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.Minecraft;
 
+import net.narutomod.entity.EntityShieldBase;
 import net.narutomod.item.ItemOnBody;
-import net.narutomod.procedure.ProcedureUtils;
+import net.narutomod.item.ItemBijuCloak;
+import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureSync;
+import net.narutomod.procedure.ProcedureUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -57,27 +61,34 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.Iterator;
 import javax.annotation.Nullable;
+import javax.vecmath.Vector2f;
 import com.google.common.collect.Maps;
-import net.minecraft.client.model.ModelPlayer;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class PlayerRender extends ElementsNarutomodMod.ModElement {
+	private static PlayerRender INSTANCE;
 	private static final String CLONETARGETID = "SkinCloningTargetId";
 	private static final String CLONETARGETLAYERS = "SkinCloningRenderTargetLayers";
 	private static final String PLAYERTRANSPARENT = "PlayerRenderTransparent";
 	private static final String COLORMULTIPLIER = "SkinColorMultiplier";
-	//private static final String FORCEBOWPOSE = "PlayerForcedBowPoseSide";
+	private static final String HIDEHEADWEAR = "HideBipedHeadwear";
 	private RenderPlayer playerRenderer;
 	/**
 	 * Do not remove this constructor
 	 */
 	public PlayerRender(ElementsNarutomodMod instance) {
 		super(instance, 608);
-	}
-	
+		INSTANCE = this;
+	}
+
+	public static PlayerRender getInstance() {
+		return INSTANCE;
+	}
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void init(FMLInitializationEvent event) {
+		MinecraftForge.EVENT_BUS.register(this);
 		RenderManager renderManager = Minecraft.getMinecraft().getRenderManager();
 		this.playerRenderer = new Renderer(renderManager);
 		try {
@@ -143,30 +154,26 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 		return entity.getEntityData().hasKey(COLORMULTIPLIER) ? entity.getEntityData().getInteger(COLORMULTIPLIER) : 0;
 	}
 
-	/*public static void forceBowPose(EntityPlayer entity, EnumHandSide side, boolean force) {
-		if (force) {
-			if (side == EnumHandSide.LEFT) {
-				entity.getEntityData().setInteger(FORCEBOWPOSE, 2);
-				ProcedureSync.EntityNBTTag.sendToTracking(entity, FORCEBOWPOSE, 2);
-			} else {
-				entity.getEntityData().setInteger(FORCEBOWPOSE, 1);
-				ProcedureSync.EntityNBTTag.sendToTracking(entity, FORCEBOWPOSE, 1);
-			}
+	public static void hideHeadwear(EntityPlayer entity, int hideTicks) {
+		if (hideTicks > 0) {
+			ProcedureSync.EntityNBTTag.setAndSync(entity, HIDEHEADWEAR, hideTicks);
 		} else {
-			entity.getEntityData().removeTag(FORCEBOWPOSE);
-			ProcedureSync.EntityNBTTag.sendToTracking(entity, FORCEBOWPOSE);
+			ProcedureSync.EntityNBTTag.removeAndSync(entity, HIDEHEADWEAR);
 		}
 	}
 
-	@Nullable
-	public static EnumHandSide poseForcedArm(EntityPlayer entity) {
-		return entity.getEntityData().hasKey(FORCEBOWPOSE) ? entity.getEntityData().getInteger(FORCEBOWPOSE) == 1 
-		 ? EnumHandSide.RIGHT : EnumHandSide.LEFT : null;
-	}*/
+	public static int headwearHiddenTicks(EntityPlayer entity) {
+		return entity.getEntityData().getInteger(HIDEHEADWEAR);
+	}
 
-	private static boolean shouldNarutoRun(EntityPlayer player) {
-		return !player.capabilities.isFlying 
-		 && player.getPositionVector().subtract(player.lastTickPosX, player.lastTickPosY, player.lastTickPosZ).lengthSquared() >= 0.125d;
+	@SubscribeEvent
+	public void onPlayerTickPost(TickEvent.PlayerTickEvent event) {
+		if (event.phase == TickEvent.Phase.END) {
+			int i = headwearHiddenTicks(event.player);
+			if (i > 0) {
+				hideHeadwear(event.player, i - 1);
+			}
+		}
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -177,16 +184,15 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 
 		public Renderer(RenderManager renderManager, boolean useSmallArms) {
 			super(renderManager, useSmallArms);
-			//this.mainModel = new ModelPlayerCustom(0.0F, useSmallArms);
-			this.addLayer(new LayerInventoryItem(this));
-			/*Iterator iter = this.layerRenderers.iterator();
+			Iterator iter = this.layerRenderers.iterator();
 			while (iter.hasNext()) {
 				LayerRenderer renderer = (LayerRenderer)iter.next();
-				if (renderer instanceof net.minecraft.client.renderer.entity.layers.LayerEntityOnShoulder) {
+				if (renderer instanceof LayerBipedArmor) {
 					iter.remove();
 				}
 			}
-			this.addLayer(new LayerEntityOnShoulder(renderManager));*/
+			this.addLayer(new LayerArmorCustom(this));
+			this.addLayer(new LayerInventoryItem(this));
 		}
 
 		@Override
@@ -198,15 +204,100 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 					GlStateManager.disableBlendProfile(GlStateManager.Profile.TRANSPARENT_MODEL);
 				}
 			} else {
-				//boolean flag = shouldNarutoRun(entityIn);
-				//if (flag) {
-				//	this.doNarutoRunPre();
-				//}
-				super.renderModel(entityIn, f0, f1, f2, f3, f4, f5);
-				//if (flag) {
-				//	this.doNarutoRunPost(f5);
-				//}
+				boolean flag = this.isVisible(entityIn);
+				boolean flag1 = !flag && !entityIn.isInvisibleToPlayer(Minecraft.getMinecraft().player);
+				if (flag || flag1) {
+					if (flag1) {
+						GlStateManager.enableBlendProfile(GlStateManager.Profile.TRANSPARENT_MODEL);
+					}
+					this.bindEntityTexture(entityIn);
+					ModelPlayer model = this.getMainModel();
+					if (headwearHiddenTicks(entityIn) > 0) {
+						model.bipedHeadwear.showModel = false;
+					}
+					if (shouldNarutoRun(entityIn) && model.swingProgress == 0.0f
+				 	 && model.rightArmPose == ModelBiped.ArmPose.EMPTY && model.leftArmPose == ModelBiped.ArmPose.EMPTY) {
+						this.renderNarutoRun(model, entityIn, f0, f1, f2, f3, f4, f5);
+				 	} else {
+				 		Vector2f vec2f = this.getRevisedLimbSwingAmount(model, entityIn, f0, f1, f2 - entityIn.ticksExisted);
+				 		f0 = vec2f.x;
+				 		f1 = vec2f.y;
+				 		model.render(entityIn, f0, f1, f2, f3, f4, f5);
+				 	}
+					if (flag1) {
+						GlStateManager.disableBlendProfile(GlStateManager.Profile.TRANSPARENT_MODEL);
+					}
+				}
 			}
+		}
+
+		public Vector2f getRevisedLimbSwingAmount(ModelBiped model, EntityLivingBase entityIn, float limbSwing, float limbSwingAmount, float pt) {
+	 		if (entityIn.getRidingEntity() instanceof EntityShieldBase
+	 		 && !((EntityShieldBase)entityIn.getRidingEntity()).shouldRiderSit()
+	 		 && !((EntityShieldBase)entityIn.getRidingEntity()).shouldRiderBeStill()) {
+	 			model.isRiding = false;
+	 			limbSwingAmount = Math.min((entityIn.prevLimbSwingAmount + (entityIn.limbSwingAmount - entityIn.prevLimbSwingAmount) * pt) * 4.0f, 1.0f);
+	 			limbSwing = (entityIn.limbSwing - entityIn.limbSwingAmount * (1.0f - pt)) * 4.0f;
+	 		}
+	 		return new Vector2f(limbSwing, limbSwingAmount);
+		}
+
+		public void renderNarutoRun(ModelBiped model, Entity entityIn, float f0, float f1, float f2, float f3, float f4, float scale) {
+			model.isSneak = true;
+			model.setRotationAngles(f0, f1, f2, f3, f4, scale, entityIn);
+			model.bipedRightArm.rotateAngleX = 1.4835F;
+			model.bipedRightArm.rotateAngleY = -0.3927F;
+			model.bipedLeftArm.rotateAngleX = 1.4835F;
+			model.bipedLeftArm.rotateAngleY = 0.3927F;
+			if (model instanceof ModelPlayer) {
+				((ModelPlayer)model).bipedRightArmwear.rotateAngleX = model.bipedRightArm.rotateAngleX;
+				((ModelPlayer)model).bipedRightArmwear.rotateAngleY = model.bipedRightArm.rotateAngleY;
+				((ModelPlayer)model).bipedLeftArmwear.rotateAngleX = model.bipedLeftArm.rotateAngleX;
+				((ModelPlayer)model).bipedLeftArmwear.rotateAngleY = model.bipedLeftArm.rotateAngleY;
+			}
+			GlStateManager.pushMatrix();
+	        if (model.isChild) {
+	            float f = 2.0F;
+	            GlStateManager.scale(0.75F, 0.75F, 0.75F);
+	            GlStateManager.translate(0.0F, 16.0F * scale, 0.0F);
+	            model.bipedHead.render(scale);
+	            GlStateManager.popMatrix();
+	            GlStateManager.pushMatrix();
+	            GlStateManager.scale(0.5F, 0.5F, 0.5F);
+	            GlStateManager.translate(0.0F, 24.0F * scale, 0.0F);
+	            model.bipedBody.render(scale);
+	            model.bipedRightArm.render(scale);
+	            model.bipedLeftArm.render(scale);
+	            model.bipedRightLeg.render(scale);
+	            model.bipedLeftLeg.render(scale);
+	            model.bipedHeadwear.render(scale);
+	            if (model instanceof ModelPlayer) {
+		            ((ModelPlayer)model).bipedLeftLegwear.render(scale);
+		            ((ModelPlayer)model).bipedRightLegwear.render(scale);
+		            ((ModelPlayer)model).bipedLeftArmwear.render(scale);
+		            ((ModelPlayer)model).bipedRightArmwear.render(scale);
+		            ((ModelPlayer)model).bipedBodyWear.render(scale);
+	            }
+	        } else {
+	            if (entityIn.isSneaking()) {
+	                GlStateManager.translate(0.0F, 0.2F, 0.0F);
+	            }
+	            model.bipedHead.render(scale);
+	            model.bipedBody.render(scale);
+	            model.bipedRightArm.render(scale);
+	            model.bipedLeftArm.render(scale);
+	            model.bipedRightLeg.render(scale);
+	            model.bipedLeftLeg.render(scale);
+	            model.bipedHeadwear.render(scale);
+	            if (model instanceof ModelPlayer) {
+		            ((ModelPlayer)model).bipedLeftLegwear.render(scale);
+		            ((ModelPlayer)model).bipedRightLegwear.render(scale);
+		            ((ModelPlayer)model).bipedLeftArmwear.render(scale);
+		            ((ModelPlayer)model).bipedRightArmwear.render(scale);
+		            ((ModelPlayer)model).bipedBodyWear.render(scale);
+	            }
+	        }
+	        GlStateManager.popMatrix();
 		}
 
 		@Override
@@ -227,36 +318,12 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		private void doNarutoRunPre() {
-			ModelBiped model = (ModelBiped)this.getMainModel();
-			model.bipedRightArm.showModel = false;
-			model.bipedLeftArm.showModel = false;
-		}
-
-		private void doNarutoRunPost(float scale) {
-			ModelBiped model = (ModelBiped)this.getMainModel();
-			model.bipedRightArm.showModel = true;
-			model.bipedLeftArm.showModel = true;
-			model.bipedRightArm.rotateAngleX = 1.3963f;
-			model.bipedLeftArm.rotateAngleX = 1.3963f;
-			model.bipedRightArm.render(scale);
-			model.bipedLeftArm.render(scale);
-		}
-		
-		@Override
-		protected void applyRotations(AbstractClientPlayer entityLiving, float p_77043_2_, float rotationYaw, float partialTicks) {
-			super.applyRotations(entityLiving, p_77043_2_, rotationYaw, partialTicks);
-			if (shouldNarutoRun(entityLiving)) {
-				((ModelBiped)this.getMainModel()).isSneak = true;
-			}
-		}
-
 		@Override
 		public ResourceLocation getEntityTexture(AbstractClientPlayer entity) {
 			AbstractClientPlayer target = this.getSkinCloneTarget(entity);
 			return target != null ? target.getLocationSkin() : super.getEntityTexture(entity);
 		}
-		
+
 		@Override
 		protected void renderEntityName(AbstractClientPlayer entityIn, double x, double y, double z, String name, double distanceSq) {
 			if (entityIn.getAlwaysRenderNameTag()) {
@@ -281,7 +348,13 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 		@Nullable
 		private AbstractClientPlayer getSkinCloneTarget(Entity entity) {
 			if (entity.getEntityData().hasKey(CLONETARGETID)) {
-				Entity target = this.renderManager.world.getEntityByID(entity.getEntityData().getInteger(CLONETARGETID));
+				Entity target = null;
+				for (EntityPlayer player : this.renderManager.world.playerEntities) {
+					if (player.getEntityId() == entity.getEntityData().getInteger(CLONETARGETID)) {
+						target = player;
+						break;
+					}
+				}
 				if (target instanceof AbstractClientPlayer) {
 					return (AbstractClientPlayer)target;
 				} else {
@@ -296,6 +369,7 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 	public static class LayerInventoryItem implements LayerRenderer<AbstractClientPlayer> {
 		private final RenderPlayer playerRenderer;
 		private static final Map<String, ResourceLocation> ARMOR_TEXTURE_RES_MAP = Maps.<String, ResourceLocation>newHashMap();
+		private final ModelBiped defaultModel = new ModelBiped(1.0F);
 
 		public LayerInventoryItem(RenderPlayer playerRendererIn) {
 			this.playerRenderer = playerRendererIn;
@@ -303,22 +377,25 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void doRenderLayer(AbstractClientPlayer entityIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-			for (int i = 0; i < entityIn.inventory.mainInventory.size(); i++) {
-				ItemStack stack = entityIn.inventory.mainInventory.get(i);
-				if (stack.getItem() instanceof ItemOnBody.Interface) {
-					ItemOnBody.Interface item = (ItemOnBody.Interface)stack.getItem();
-					if (item.showSkinLayer()) {
-						this.renderSkinLayer(stack, entityIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
-					}
-					if (item.showOnBody() != ItemOnBody.BodyPart.NONE && i != entityIn.inventory.currentItem) {
-						this.renderItemOnBody(stack, entityIn, item.showOnBody());
+			if (!entityIn.isSpectator()) {
+				for (int i = 0; i < entityIn.inventory.getSizeInventory(); i++) {
+					ItemStack stack = entityIn.inventory.getStackInSlot(i);
+					//if ((i < entityIn.inventory.mainInventory.size() || i >= entityIn.inventory.mainInventory.size() + entityIn.inventory.armorInventory.size())
+					if (stack.getItem() instanceof ItemOnBody.Interface) {
+						ItemOnBody.Interface item = (ItemOnBody.Interface)stack.getItem();
+						if (item.showSkinLayer()) {
+							this.renderSkinLayer(stack, entityIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+						}
+						if (item.showOnBody(stack) != ItemOnBody.BodyPart.NONE && i != entityIn.inventory.currentItem && i != 40) {
+							this.renderItemOnBody(stack, entityIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+						}
 					}
 				}
 			}
 		}
 
 		private void renderSkinLayer(ItemStack stack, AbstractClientPlayer entityIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-			ModelBiped model = stack.getItem().getArmorModel(entityIn, stack, EntityEquipmentSlot.HEAD, new ModelBiped(1.0F));
+			ModelBiped model = stack.getItem().getArmorModel(entityIn, stack, EntityEquipmentSlot.HEAD, this.defaultModel);
 			if (model != null) {
 				String s = stack.getItem().getArmorTexture(stack, entityIn, EntityEquipmentSlot.HEAD, null);
 				if (s != null) {
@@ -327,6 +404,7 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 						resourcelocation = new ResourceLocation(s);
 						ARMOR_TEXTURE_RES_MAP.put(s, resourcelocation);
 					}
+					model.setModelAttributes(this.playerRenderer.getMainModel());
 					model.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
 					this.playerRenderer.bindTexture(resourcelocation);
 					model.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
@@ -334,10 +412,15 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		private void renderItemOnBody(ItemStack stack, AbstractClientPlayer entityIn, ItemOnBody.BodyPart bodypart) {
+		private void renderItemOnBody(ItemStack stack, AbstractClientPlayer entityIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
 			Vec3d offset = ((ItemOnBody.Interface)stack.getItem()).getOffset();
+			ItemOnBody.BodyPart bodypart = ((ItemOnBody.Interface)stack.getItem()).showOnBody(stack);
 			GlStateManager.pushMatrix();
 			ModelBiped model = this.playerRenderer.getMainModel();
+			//model.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale, entityIn);
+			if (entityIn.isSneaking()) {
+				GlStateManager.translate(0.0F, 0.2F, 0.0F);
+			}
 			switch (bodypart) {
 				case HEAD:
 					model.bipedHead.postRender(0.0625F);
@@ -372,106 +455,78 @@ public class PlayerRender extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	/*@SideOnly(Side.CLIENT)
-	public static class LayerEntityOnShoulder implements LayerRenderer<EntityPlayer> {
-	    private final RenderManager renderManager;
-	    private DataHolder dataHolderLeft;
-	    private DataHolder dataHolderRight;
-	
-	    public LayerEntityOnShoulder(RenderManager renderManagerIn) {
-	        this.renderManager = renderManagerIn;
-	    }
-
-	    @Nullable
-	    private DataHolder getShoulderEntityData(World world, NBTTagCompound compound, @Nullable DataHolder data) {
-	    	UUID uuid = compound.getUniqueId("UUID");
-	    	if (data == null || !data.entity.getUniqueID().equals(uuid)) {
-	    		Entity entity = ProcedureUtils.getEntityFromUUID(world, uuid);
-	    		if (entity instanceof EntityLivingBase) {
-	    			RenderLivingBase renderer = (RenderLivingBase)this.renderManager.getEntityRenderObject(entity);
-	    			ModelBase model = renderer.getMainModel();
-	    			ResourceLocation resource = (ResourceLocation)ProcedureUtils.invokeMethodByParameters(renderer, ResourceLocation.class, entity);
-	    			return new DataHolder((EntityLivingBase)entity, renderer, model, resource);
-	    		}
-	    		return null;
-	    	} else {
-	    		return data;
-	    	}
-	    }
-	
-	    public void doRenderLayer(EntityPlayer entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
-	        if (entitylivingbaseIn.getLeftShoulderEntity() != null || entitylivingbaseIn.getRightShoulderEntity() != null) {
-	            GlStateManager.enableRescaleNormal();
-	            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-	            NBTTagCompound nbttagcompound = entitylivingbaseIn.getLeftShoulderEntity();
-	            if (!nbttagcompound.hasNoTags()) {
-	            	DataHolder dataholder = this.getShoulderEntityData(entitylivingbaseIn.world, nbttagcompound, this.dataHolderLeft);
-	            	if (dataholder != null) {
-	                	this.renderEntityOnShoulder(entitylivingbaseIn, dataholder, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, true);
-	                	this.dataHolderLeft = dataholder;
-	            	}
-	            }
-	            NBTTagCompound nbttagcompound1 = entitylivingbaseIn.getRightShoulderEntity();
-	            if (!nbttagcompound1.hasNoTags()) {
-	            	DataHolder dataholder = this.getShoulderEntityData(entitylivingbaseIn.world, nbttagcompound1, this.dataHolderRight);
-	            	if (dataholder != null) {
-	                	this.renderEntityOnShoulder(entitylivingbaseIn, dataholder, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, false);
-	                	this.dataHolderRight = dataholder;
-	            	}
-	            }
-	            GlStateManager.disableRescaleNormal();
-	        }
-	    }
-	
-	    private void renderEntityOnShoulder(EntityPlayer player, DataHolder data, float p_192864_8_, float p_192864_9_, float p_192864_10_, float p_192864_11_, float p_192864_12_, float p_192864_13_, float p_192864_14_, boolean p_192864_15_) {
-	        data.renderer.bindTexture(data.textureLocation);
-	        GlStateManager.pushMatrix();
-	        float f = player.isSneaking() ? -1.3F : -1.5F;
-	        float f1 = p_192864_15_ ? 0.4F : -0.4F;
-	        GlStateManager.translate(f1, f, 0.0F);
-	        if (data.entity instanceof net.minecraft.entity.passive.EntityParrot) {
-	            p_192864_11_ = 0.0F;
-	            p_192864_9_ = 0.0F;
-	        }
-	        data.model.setLivingAnimations(player, p_192864_8_, p_192864_9_, p_192864_10_);
-	        data.model.setRotationAngles(p_192864_8_, p_192864_9_, p_192864_11_, p_192864_12_, p_192864_13_, p_192864_14_, player);
-	        data.model.render(player, p_192864_8_, p_192864_9_, p_192864_11_, p_192864_12_, p_192864_13_, p_192864_14_);
-	        GlStateManager.popMatrix();
-	    }
-	
-	    public boolean shouldCombineTextures() {
-	        return false;
-	    }
-	
-	    @SideOnly(Side.CLIENT)
-	    class DataHolder {
-	        public EntityLivingBase entity;
-	        public RenderLivingBase <? extends EntityLivingBase > renderer;
-	        public ModelBase model;
-	        public ResourceLocation textureLocation;
-	
-	        public DataHolder(EntityLivingBase entityIn, RenderLivingBase <? extends EntityLivingBase > p_i47463_3_, ModelBase p_i47463_4_, ResourceLocation p_i47463_5_) {
-	            this.entity = entityIn;
-	            this.renderer = p_i47463_3_;
-	            this.model = p_i47463_4_;
-	            this.textureLocation = p_i47463_5_;
-	        }
-	    }
+	public static boolean shouldNarutoRun(Entity entity) {
+		return ModConfig.NARUTO_RUN && !entity.isRiding() && !ProcedureOnLivingUpdate.isForcedBowPose(entity)
+		 && (!(entity instanceof EntityPlayer) || !((EntityPlayer)entity).capabilities.isFlying)
+		 && entity.getPositionVector().subtract(entity.lastTickPosX, entity.lastTickPosY, entity.lastTickPosZ).lengthSquared() >= 0.125d;
 	}
 
 	@SideOnly(Side.CLIENT)
-	public class ModelPlayerCustom extends ModelPlayer {
-		public ModelPlayerCustom(float modelSize, boolean smallArmsIn) {
-			super(modelSize, smallArmsIn);
+	public class LayerArmorCustom extends LayerBipedArmor {
+		private final Renderer renderer;
+
+		public LayerArmorCustom(Renderer rendererIn) {
+			super(rendererIn);
+			this.renderer = rendererIn;
 		}
 
 		@Override
-		public void setRotationAngles(float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scaleFactor, Entity entityIn) {
-			super.setRotationAngles(limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scaleFactor, entityIn);
-			if (shouldNarutoRun((EntityPlayer)entityIn)) {
-				this.bipedRightArm.rotateAngleX = 1.3963f;
-				this.bipedLeftArm.rotateAngleX = 1.3963f;
+		public void doRenderLayer(EntityLivingBase entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale) {
+	        this.renderArmorLayer(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, EntityEquipmentSlot.CHEST);
+	        this.renderArmorLayer(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, EntityEquipmentSlot.LEGS);
+	        this.renderArmorLayer(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, EntityEquipmentSlot.FEET);
+	        this.renderArmorLayer(entitylivingbaseIn, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale, EntityEquipmentSlot.HEAD);
+		}
+
+	    private void renderArmorLayer(EntityLivingBase entityIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale, EntityEquipmentSlot slotIn) {
+	        ItemStack itemstack = entityIn.getItemStackFromSlot(slotIn);	
+	        if (itemstack.getItem() instanceof ItemArmor) {
+	            ItemArmor itemarmor = (ItemArmor)itemstack.getItem();
+	            if (itemarmor.getEquipmentSlot() == slotIn) {
+	                ModelBiped t = this.getModelFromSlot(slotIn);
+	                t = getArmorModelHook(entityIn, itemstack, slotIn, t);
+	                ModelBiped wearerModel = (ModelBiped)this.renderer.getMainModel();
+	                t.setModelAttributes(wearerModel);
+				 	Vector2f vec2f = this.renderer.getRevisedLimbSwingAmount(t, entityIn, limbSwing, limbSwingAmount, partialTicks);
+				 	limbSwing = vec2f.x;
+				 	limbSwingAmount = vec2f.y;
+	                t.setLivingAnimations(entityIn, limbSwing, limbSwingAmount, partialTicks);
+	                this.setModelSlotVisible(t, slotIn);
+	                this.renderer.bindTexture(this.getArmorResource(entityIn, itemstack, slotIn, null));
+                    if (itemarmor.hasOverlay(itemstack)) { // Allow this for anything, not only cloth 
+	                    int i = itemarmor.getColor(itemstack);
+	                    float f = (float)(i >> 16 & 255) / 255.0F;
+	                    float f1 = (float)(i >> 8 & 255) / 255.0F;
+	                    float f2 = (float)(i & 255) / 255.0F;
+	                    GlStateManager.color(f, f1, f2, 1.0F);
+                        this.renderArmorModel(t, entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+	                    this.renderer.bindTexture(this.getArmorResource(entityIn, itemstack, slotIn, "overlay"));
+	                }
+                    { // Non-colored
+                        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                        this.renderArmorModel(t, entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+                    } // Default
+                    if (itemstack.hasEffect()) {
+                        renderEnchantedGlint(this.renderer, entityIn, t, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch, scale);
+                    }
+	            }
+	        }
+	    }
+
+		private void renderArmorModel(ModelBiped model, Entity entityIn, float f0, float f1, float f2, float f3, float f4, float f5) {
+			if ((model.bipedRightArm.showModel || model.bipedLeftArm.showModel)
+			 && shouldNarutoRun(entityIn) && model.swingProgress == 0.0f
+			 && model.rightArmPose == ModelBiped.ArmPose.EMPTY && model.leftArmPose == ModelBiped.ArmPose.EMPTY) {
+				if (model instanceof ItemBijuCloak.ModelBijuCloak) {
+					((ItemBijuCloak.ModelBijuCloak)model).setNarutoRunPose(true);
+					model.render(entityIn, f0, f1, f2, f3, f4, f5);
+					((ItemBijuCloak.ModelBijuCloak)model).setNarutoRunPose(false);
+				} else {
+					this.renderer.renderNarutoRun(model, entityIn, f0, f1, f2, f3, f4, f5);
+				}
+			} else {
+				model.render(entityIn, f0, f1, f2, f3, f4, f5);
 			}
 		}
-	}*/
+	}
 }

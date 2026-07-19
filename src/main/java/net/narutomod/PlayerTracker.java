@@ -1,16 +1,16 @@
 package net.narutomod;
 
-import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.world.WorldEvent;
-//import net.minecraftforge.event.entity.player.AttackEntityEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
@@ -18,40 +18,54 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.client.Minecraft;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.scoreboard.Team;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
+import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.entity.EntityNinjaMob;
+import net.narutomod.item.*;
+import net.narutomod.entity.EntitySummonAnimal;
+import net.narutomod.item.ItemIryoJutsu;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.item.ItemEightGates;
-import net.narutomod.item.ItemJutsu;
 
 import java.util.UUID;
 import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	private static final String BATTLEXP = NarutomodModVariables.BATTLEXP;
 	private static final String KEEPXP_RULE = "keepNinjaXp";
+	public static final String FORCE_DOJUTSU_DROP_RULE = "forceDojutsuDropOnDeath";
+	private static final String FORCE_SEND = "forceSendBattleXP2self";
+	private static final String UPDATE_HEALTH = "forceUpdateHealth";
 
 	public PlayerTracker(ElementsNarutomodMod instance) {
 		super(instance, 181);
 	}
 
+	public static boolean keepNinjaXp(World world) {
+		return world.getGameRules().getBoolean(KEEPXP_RULE);
+	}
+
 	public static boolean isNinja(EntityPlayer player) {
-		return player.getEntityData().getDouble(BATTLEXP) > 0.0d;
+		return true;
+		//return player.getEntityData().getDouble(BATTLEXP) > 0.0d;
 	}
 
 	public static double getBattleXp(EntityPlayer player) {
@@ -62,25 +76,50 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 		return MathHelper.sqrt(getBattleXp(player));
 	}
 
-	public static void addBattleXp(EntityPlayerMP entity, double xp) {
-		entity.getEntityData().setDouble(BATTLEXP, Math.min(getBattleXp(entity) + xp, 100000.0d));
-		sendBattleXPToSelf(entity);
-		entity.sendStatusMessage(new TextComponentString(
-		 net.minecraft.util.text.translation.I18n.translateToLocal("chattext.ninjaexperience")+
-		 String.format("%.1f", getBattleXp(entity))), true);
+	public static void addBattleXp(EntityPlayer entity, double xp) {
+		addBattleXp(entity, xp, true);
 	}
 
-	public static void logBattleExp(EntityPlayer entity, double xp) {
+	private static void addBattleXp(EntityPlayer entity, double xp, boolean sendMessage) {
+
+		if (xp != 0.0d) {
+			double max = ModConfig.MAX_NINJAXP;
+			if (entity.getEntityData().getInteger("KekkeiGenkai") == 69) {
+				max = 1;
+			}
+			entity.getEntityData().setDouble(BATTLEXP, Math.min(getBattleXp(entity) + xp, max));
+			if (entity instanceof EntityPlayerMP) {
+				sendBattleXPToTracking((EntityPlayerMP)entity);
+				if (sendMessage) {
+					entity.sendStatusMessage(new TextComponentString(
+					 net.minecraft.util.text.translation.I18n.translateToLocal("chattext.ninjaexperience")+
+					 String.format("%.1f", getBattleXp(entity))), true);
+				}
+			}
+		}
+	}
+
+    public static float getDefense(Entity entity) {
+		return 1.5f+17*ItemJutsu.getDmgMult(entity)/63;
+	}
+
+	private static void logBattleExp(EntityPlayer entity, double xp) {
 		if (entity instanceof EntityPlayerMP 
 		 && ProcedureUtils.advancementAchieved((EntityPlayerMP)entity, "narutomod:ninjaachievement")) {
 			addBattleXp((EntityPlayerMP)entity, xp);
 			ItemEightGates.logBattleXP(entity);
 			ItemJutsu.logBattleXP(entity);
+			//EntityTracker.getOrCreate(entity).lastLoggedXpTime = entity.ticksExisted;
+			entity.getEntityData().setInteger("lastLoggedXpTime", entity.ticksExisted);
 		}
 	}
 
 	private static void sendBattleXPToSelf(EntityPlayerMP player) {
 		ProcedureSync.EntityNBTTag.sendToSelf(player, BATTLEXP, getBattleXp(player));
+	}
+
+	private static void sendBattleXPToTracking(EntityPlayerMP player) {
+		ProcedureSync.EntityNBTTag.sendToTracking(player, BATTLEXP, getBattleXp(player));
 	}
 
 	public static class Deaths {
@@ -104,14 +143,18 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 		}
 
 		public static void log(EntityPlayer entity) {
-			if (deadPlayers.contains(entity)) {
-				deadPlayers.remove(entity);
+			Iterator<Deaths> iter = deadPlayers.iterator();
+			while (iter.hasNext()) {
+				Deaths death = iter.next();
+				if (death.playerId.equals(entity.getUniqueID())) {
+					iter.remove();
+				}
 			}
 			deadPlayers.add(new Deaths(entity));
-			if (!entity.world.getGameRules().getBoolean(KEEPXP_RULE)) {
+			if (!keepNinjaXp(entity.world)) {
 				entity.getEntityData().setDouble(BATTLEXP, 0.0D);
 				if (entity instanceof EntityPlayerMP) {
-					sendBattleXPToSelf((EntityPlayerMP)entity);
+					sendBattleXPToTracking((EntityPlayerMP)entity);
 				}
 			}
 		}
@@ -140,8 +183,11 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					double d1 = deadguy.y - player.posY;
 					double d2 = deadguy.z - player.posZ;
 					double d3 = d0 * d0 + d1 * d1 + d2 * d2;
+					// require guy to be strong for mangekyo here
 					if (d3 < distance * distance && player.world.getTotalWorldTime() - deadguy.time <= timeframe
-					 && (!checkTeam || player.isOnScoreboardTeam(deadguy.team))) {
+					 && (!checkTeam || player.isOnScoreboardTeam(deadguy.team))
+							&& player.getEntityData().getDouble((NarutomodModVariables.BATTLEXP)) >= 5000
+					)  {
 						return true;
 					}
 				}
@@ -181,61 +227,188 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			}
 			return 0.0d;
 		}
+
 	}
 
-	public class PlayerHook {
+	public static class PlayerHook {
+		private static final Map<UUID, Map<String, Object>> PERSISTENT_DATA = Maps.newHashMap();
+		private static final UUID HP_UUID = UUID.fromString("84d6711b-c26d-4dfa-b0c5-1ff54395f4de");
+		private static final UUID ATTACK_UUID = UUID.fromString("cb34abd5-09bb-40bd-b55a-4ced5442ea8e");
+
 		@SubscribeEvent
 		public void onTick(TickEvent.PlayerTickEvent event) {
-			if (event.phase == TickEvent.Phase.END && event.player instanceof EntityPlayerMP) {
-				if (event.player.ticksExisted < 5) {
-					sendBattleXPToSelf((EntityPlayerMP)event.player);
-					event.player.setHealth(event.player.getHealth());
-				}
-				double d = getBattleXp(event.player) * 0.005d;
+			if (event.phase == TickEvent.Phase.START && event.player instanceof EntityPlayerMP) {
+				//double d = getBattleXp(event.player) * 0.0008d;
+				// ninja hp!
+				double d = 30+190*(ItemJutsu.getDmgMult(event.player)/63);
 				if (d > 0d) {
 					IAttributeInstance maxHealthAttr = event.player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
-					AttributeModifier attr = maxHealthAttr.getModifier(EntityNinjaMob.NINJA_HEALTH);
+					AttributeModifier attr = maxHealthAttr.getModifier(HP_UUID);
+					IAttributeInstance attackAttr = event.player.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
+					AttributeModifier attr2 = maxHealthAttr.getModifier(ATTACK_UUID);
 					if (attr == null || (int)attr.getAmount() / 2 != (int)d / 2) {
 						if (attr != null) {
-							maxHealthAttr.removeModifier(EntityNinjaMob.NINJA_HEALTH);
+							maxHealthAttr.removeModifier(HP_UUID);
 						}
-						maxHealthAttr.applyModifier(new AttributeModifier(EntityNinjaMob.NINJA_HEALTH, "ninja.maxhealth", d, 0));
+						if (attr2 != null) {
+							attackAttr.removeModifier(ATTACK_UUID);
+						}
+
+						maxHealthAttr.removeModifier(HP_UUID);
+						maxHealthAttr.applyModifier(new AttributeModifier(HP_UUID, "ninja.maxhealth", d, 0));
+
+						attackAttr.removeModifier(ATTACK_UUID);
+						attackAttr.applyModifier(new AttributeModifier(ATTACK_UUID, "ninja.attackdamage", 50*(ItemJutsu.getDmgMult(event.player)/63), 0));
+
 						event.player.setHealth(event.player.getHealth() + 0.1f);
+						if (!event.player.getEntityData().getBoolean("maxhpSpawn")) {
+							event.player.setHealth(event.player.getMaxHealth());
+							event.player.getEntityData().setBoolean("maxhpSpawn",true);
+						}
 					}
+				}
+				if (event.player.getEntityData().getBoolean(FORCE_SEND)) {
+					event.player.getEntityData().removeTag(FORCE_SEND);
+					sendBattleXPToTracking((EntityPlayerMP)event.player);
+				}
+				if (event.player.getEntityData().getBoolean(UPDATE_HEALTH)) {
+					event.player.getEntityData().removeTag(UPDATE_HEALTH);
+					event.player.setHealth(event.player.getHealth());
 				}
 			}
 		}
 
 		@SubscribeEvent(priority = EventPriority.LOWEST)
 		public void onDeath(LivingDeathEvent event) {
-			Entity entity = event.getEntityLiving();
+			EntityLivingBase entity = event.getEntityLiving();
 			if (entity instanceof EntityPlayerMP) {
 				Deaths.log((EntityPlayer) entity);
+				EntityBijuManager bm = EntityBijuManager.getBijuManagerFrom((EntityPlayer) entity);
+				if (bm!=null) {
+					bm.auraCD = 0;
+				}
+				entity.clearActivePotions();
 			}
 		}
 
-		@SubscribeEvent
+		private boolean isOffCooldown(Entity entity) {
+			//int i = entity.ticksExisted - EntityTracker.getOrCreate(entity).lastLoggedXpTime;
+			int i = entity.ticksExisted - entity.getEntityData().getInteger("lastLoggedXpTime");
+			return i < 0 || i > 20;
+		}
+
+
+		@SubscribeEvent(priority = EventPriority.LOW)
 		public void onDamaged(LivingDamageEvent event) {
 			Entity targetEntity = event.getEntity();
 			Entity sourceEntity = event.getSource().getTrueSource();
 			float amount = event.getAmount();
-			if (!targetEntity.equals(sourceEntity) && amount > 0f) {
-				if (targetEntity instanceof EntityPlayer && amount < ((EntityPlayer)targetEntity).getHealth()) {
-					//logBattleExp((EntityPlayer)targetEntity, 1d);
+			//I PUT DEFENSE IN HERE LOOK FOR DEFENSE HERE DAMAGE REDUCER DEFENSE MODIFIER
+			if (targetEntity instanceof EntityPlayer) {
+				float defMult = 1;
+
+				ItemStack cheststack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
+				ItemStack headstack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+				if (headstack.getItem() == ItemSharingan.helmet ||headstack.getItem() == ItemSharingan.helmet ) {
+					defMult += .1f;
+				}
+				if (headstack.getItem() == ItemMangekyoSharinganEternal.helmet ||headstack.getItem() == ItemMangekyoSharinganObito.helmet||headstack.getItem() == ItemMangekyoSharingan.helmet   ) {
+					defMult += .15f;
+				}
+				if (headstack.getItem() == ItemRinnegan.helmet ||headstack.getItem() == ItemTenseigan.helmet  ) {
+					defMult += .2f;
+				}
+				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
+					defMult += 0.2f;
+				}
+				if (cheststack.getItem() == ItemRinnegan.body) {
+					defMult += 1f;
+				}
+				if (cheststack.getItem() == ItemBoneArmor.body) {
+					if (ItemBoneArmor.isLarchActive(cheststack)) {
+						defMult += 0.2f;
+					}
+				}
+				if (cheststack.getItem() == ItemTenseigan.body) {
+					defMult += .35f;
+				}
+				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
+				if (stackwood != null) {
+					defMult+= 0.1f;
+				}
+				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
+					defMult+= 0.01f;
+				}
+				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
+					defMult+= 0.15f;
+				}
+
+				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
+					defMult+=.25f;
+				}
+
+				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
+					defMult+=.45f;
+				}
+
+				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
+					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
+						defMult+= 0.3f;
+					} else {
+						if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
+							defMult+= 0.3f;
+						} else {
+							defMult+= 0.6f;
+						}
+					}
+				}
+				if (ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity) > 0) {
+					int gates = ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity);
+					if (gates <= 3) {
+						defMult+= 1.25*((float) gates /6);
+					}else if (gates < 7) {
+						defMult+= 1.35*((float) gates /6);
+					} else if (gates == 7) {
+						defMult+= 1.75;
+					} else if (gates == 8) {
+						defMult+= 2.5;
+					}
+				}
+				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
+					ItemYoton.EntityBiggerMe PENIS = (ItemYoton.EntityBiggerMe) targetEntity.getRidingEntity();
+					defMult += 0.4f+0.9f*(PENIS.bigRatio/3);
+				}
+				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
+				float newAmount = amount/defense;
+				if (event.getSource() == ProcedureUtils.SPECIAL_DAMAGE || event.getSource() == DamageSource.OUT_OF_WORLD) {
+					newAmount = amount;
+				}
+				event.setAmount(newAmount);
+			    }
+
+			
+			if (sourceEntity instanceof EntitySummonAnimal.ISummon) {
+				Entity summoner = ((EntitySummonAnimal.ISummon)sourceEntity).getSummoner();
+				if (summoner != null) {
+					sourceEntity = summoner;
+				}
+			}
+			if (!targetEntity.equals(sourceEntity) && sourceEntity instanceof EntityLivingBase && amount > 0f) {
+				/*if (this.isOffCooldown(targetEntity) && targetEntity instanceof EntityPlayer && amount < ((EntityPlayer)targetEntity).getHealth()) {
 					double bxp = getBattleXp((EntityPlayer)targetEntity);
 					logBattleExp((EntityPlayer)targetEntity, bxp < 1d ? 1d : (amount / MathHelper.sqrt(MathHelper.sqrt(bxp))));
-				}
+				}*/
 				if (sourceEntity instanceof EntityPlayer) {
-					//logBattleExp((EntityPlayer)sourceEntity, 1d);
-					double xp = 1d;
-					if (targetEntity instanceof EntityLivingBase) {
+					double xp = 0.0d;
+					if ((targetEntity instanceof EntityPlayer || (targetEntity instanceof EntityLiving && !((EntityLiving)targetEntity).isAIDisabled()))
+					 && this.isOffCooldown(sourceEntity)) {
 						EntityLivingBase target = (EntityLivingBase)targetEntity;
 						int resistance = target.isPotionActive(MobEffects.RESISTANCE) 
-						 ? target.getActivePotionEffect(MobEffects.RESISTANCE).getAmplifier() : 1;
+						 ? target.getActivePotionEffect(MobEffects.RESISTANCE).getAmplifier() + 2 : 1;
 						double x = MathHelper.sqrt(target.getMaxHealth() * ProcedureUtils.getModifiedAttackDamage(target)
-						 * MathHelper.sqrt(ProcedureUtils.getArmorValue(target)+1d)) * resistance;
-						xp = Math.min(x * Math.min(amount / target.getMaxHealth(), 1f) * 0.5d, 50d);
-//System.out.println(">>> target:"+target.getName()+", x="+x+", amount="+amount+", maxhp="+target.getMaxHealth()+", xp="+xp);
+						 * MathHelper.sqrt(ProcedureUtils.getArmorValue(target)+1d) * Math.min(resistance, 6));
+						xp = Math.min(x * Math.min(amount / target.getMaxHealth(), 1f), 60d);
+						xp *= ModConfig.NINJAXP_MULTIPLIER;
 					}
 					if (xp > 0d) {
 						logBattleExp((EntityPlayer)sourceEntity, xp);
@@ -248,31 +421,75 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 		public void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
 			if (!event.player.world.isRemote) {
 				event.player.setAlwaysRenderNameTag(true);
-				sendBattleXPToSelf((EntityPlayerMP)event.player);
+				//sendBattleXPToSelf((EntityPlayerMP)event.player);
+				event.player.getEntityData().setBoolean(FORCE_SEND, true);
+				event.player.getEntityData().setBoolean(UPDATE_HEALTH, true);
 			}
 		}
 
 		@SubscribeEvent
 		public void onChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
 			if (event.player instanceof EntityPlayerMP) {
-				sendBattleXPToSelf((EntityPlayerMP)event.player);
+				//sendBattleXPToSelf((EntityPlayerMP)event.player);
+				event.player.getEntityData().setBoolean(FORCE_SEND, true);
 			}
 		}
 
 		@SubscribeEvent
+		public void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
+			this.reloadPersistentData(event.player);
+		}
+
+		@SubscribeEvent
 		public void onClone(net.minecraftforge.event.entity.player.PlayerEvent.Clone event) {
-			//if (!event.isWasDeath()) {
-				EntityPlayer newPlayer = event.getEntityPlayer();
-				newPlayer.getEntityData().setDouble(BATTLEXP, getBattleXp(event.getOriginal()));
-				sendBattleXPToSelf((EntityPlayerMP)newPlayer);
-			//}
+			EntityPlayer oldPlayer = event.getOriginal();
+			addPersistentData(oldPlayer, BATTLEXP, Double.valueOf(getBattleXp(oldPlayer)));
+			addPersistentData(oldPlayer, FORCE_SEND, Boolean.valueOf(true));
+			addPersistentData(oldPlayer, "MedicalNinjaChecked", Boolean.valueOf(oldPlayer.getEntityData().getBoolean("MedicalNinjaChecked")));
+			addPersistentData(oldPlayer, "KekkeiGenkai", Integer.valueOf(oldPlayer.getEntityData().getInteger("KekkeiGenkai")));
+			addPersistentData(oldPlayer, "kgReceived", Boolean.valueOf(oldPlayer.getEntityData().getBoolean("kgReceived")));
+			addPersistentData(oldPlayer, NarutomodModVariables.FirstGotNinjutsu, Boolean.valueOf(oldPlayer.getEntityData().getBoolean(NarutomodModVariables.FirstGotNinjutsu)));
+			if (event.isWasDeath()) {
+				addPersistentData(oldPlayer, "ForceExtinguish", Integer.valueOf(5));
+			}
+		}
+
+		private void reloadPersistentData(Entity entity) {
+			UUID uuid = entity.getUniqueID();
+			if (PERSISTENT_DATA.containsKey(uuid)) {
+				Map<String, Object> map = PERSISTENT_DATA.get(uuid);
+				for (Map.Entry<String, Object> entry : map.entrySet()) {
+					if (entry.getValue() instanceof Boolean) {
+						entity.getEntityData().setBoolean(entry.getKey(), ((Boolean)entry.getValue()).booleanValue());
+					} else if (entry.getValue() instanceof Integer) {
+						entity.getEntityData().setInteger(entry.getKey(), ((Integer)entry.getValue()).intValue());
+					} else if (entry.getValue() instanceof Float) {
+						entity.getEntityData().setFloat(entry.getKey(), ((Float)entry.getValue()).floatValue());
+					} else if (entry.getValue() instanceof Double) {
+						entity.getEntityData().setDouble(entry.getKey(), ((Double)entry.getValue()).doubleValue());
+					}
+				}
+				PERSISTENT_DATA.remove(uuid);
+			}
+		}
+
+		public static void addPersistentData(Entity entityIn, String key, Object value) {
+			Map<String, Object> map = PERSISTENT_DATA.get(entityIn.getUniqueID());
+			if (map == null) {
+				map = Maps.newHashMap();
+			}
+			map.put(key, value);
+			PERSISTENT_DATA.put(entityIn.getUniqueID(), map);
 		}
 
 		@SubscribeEvent
 		public void onWorldLoad(WorldEvent.Load event) {
 			World world = event.getWorld();
 			if (!world.isRemote && !world.getGameRules().hasRule(KEEPXP_RULE)) {
-				world.getGameRules().addGameRule(KEEPXP_RULE, "false", net.minecraft.world.GameRules.ValueType.BOOLEAN_VALUE);
+				world.getGameRules().addGameRule(KEEPXP_RULE, "true", net.minecraft.world.GameRules.ValueType.BOOLEAN_VALUE);
+			}
+			if (!world.isRemote && !world.getGameRules().hasRule(FORCE_DOJUTSU_DROP_RULE)) {
+				world.getGameRules().addGameRule(FORCE_DOJUTSU_DROP_RULE, "false", net.minecraft.world.GameRules.ValueType.BOOLEAN_VALUE);
 			}
 		}
 	}

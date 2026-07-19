@@ -11,31 +11,33 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraft.world.World;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.init.MobEffects;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.client.renderer.entity.RenderManager;
 
 import net.narutomod.entity.EntityLightningArc;
 import net.narutomod.entity.EntityLightningBeast;
+import net.narutomod.entity.EntityLightningPanther;
 import net.narutomod.entity.EntityChidori;
 import net.narutomod.entity.EntityFalseDarkness;
 import net.narutomod.entity.EntityKirin;
 import net.narutomod.procedure.ProcedureUtils;
+import net.narutomod.procedure.ProcedureWhenPlayerAttcked;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.Particles;
 import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
+
+import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemRaiton extends ElementsNarutomodMod.ModElement {
@@ -44,10 +46,11 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 129;
 	public static final int ENTITY2ID = 10129;
 	public static final ItemJutsu.JutsuEnum CHIDORI = new ItemJutsu.JutsuEnum(0, "chidori", 'A', EntityChidori.CHAKRA_USAGE, new EntityChidori.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum CHAKRAMODE = new ItemJutsu.JutsuEnum(1, "raitonchakramode", 'B', 10d, new EntityChakraMode.Jutsu());
-	public static final ItemJutsu.JutsuEnum CHASINGDOG = new ItemJutsu.JutsuEnum(2, "lightning_beast", 'C', 20d, new EntityLightningBeast.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum GIAN = new ItemJutsu.JutsuEnum(3, "false_darkness", 'B', 100d, new EntityFalseDarkness.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum KIRIN = new ItemJutsu.JutsuEnum(4, "kirin", 'S', 1500d, new EntityKirin.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHAKRAMODE = new ItemJutsu.JutsuEnum(1, "raitonchakramode", 'B', 100d, new EntityChakraMode.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHASINGDOG = new ItemJutsu.JutsuEnum(2, "lightning_beast", 'C', 40d, new EntityLightningBeast.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum GIAN = new ItemJutsu.JutsuEnum(3, "false_darkness", 'B', 150d, new EntityFalseDarkness.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum KIRIN = new ItemJutsu.JutsuEnum(4, "kirin", 'S', 2500d, new EntityKirin.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum BLACKPANTHER = new ItemJutsu.JutsuEnum(5, "lightning_panther", 'S', 80d, new EntityLightningPanther.EC.Jutsu());
 
 	public ItemRaiton(ElementsNarutomodMod instance) {
 		super(instance, 373);
@@ -55,7 +58,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.items.add(() -> new RangedItem(CHIDORI, CHAKRAMODE, CHASINGDOG, GIAN, KIRIN));
+		elements.items.add(() -> new RangedItem(CHIDORI, CHAKRAMODE, CHASINGDOG, GIAN, KIRIN, BLACKPANTHER));
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityChakraMode.class)
 			.id(new ResourceLocation("narutomod", "raitonchakramode"), ENTITYID).name("raitonchakramode").tracker(64, 1, true).build());
 	}
@@ -72,89 +75,38 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			this.setUnlocalizedName("raiton");
 			this.setRegistryName("raiton");
 			this.setCreativeTab(TabModTab.tab);
-			//this.defaultCooldownMap[CHIDORI.index] = 0;
 		}
 
-		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			ItemJutsu.JutsuEnum jutsu = this.getCurrentJutsu(stack);
-			if (jutsu == CHASINGDOG) {
-				return this.getPower(stack, entity, timeLeft, 5f, 30f);
-				//return Math.min(5f + (float)(this.getMaxUseDuration() - timeLeft) / 20f, this.getMaxPower(stack, entity));
-			} else if (jutsu == GIAN) {
-				return this.getPower(stack, entity, timeLeft, 1f, 150f);
-			} else if (jutsu == KIRIN) {
-				 return this.getPower(stack, entity, timeLeft, 0f, 400f);
-			}
-			return 1f;
-		}
-
-		@Override
-		protected float getMaxPower(ItemStack stack, EntityLivingBase entity) {
-			float f = super.getMaxPower(stack, entity);
-			if (this.getCurrentJutsu(stack) == KIRIN) {
-				return Math.min(f, 1.0f);
-			}
-			return f;
-		}
-
-		@Override
-		public void onUsingTick(ItemStack stack, EntityLivingBase player, int timeLeft) {
-			if (this.getCurrentJutsu(stack) == KIRIN && !player.world.isRemote) {
-				EntityKirin.chargingEffects(player, this.getPower(stack, player, timeLeft));
-			}
-			super.onUsingTick(stack, player, timeLeft);
-		}
-
-		@Override
-		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {
-			ActionResult<ItemStack> result = super.onItemRightClick(world, entity, hand);
-			if (result.getType() == EnumActionResult.SUCCESS && this.getCurrentJutsu(entity.getHeldItem(hand)) == KIRIN && !world.isRemote) {
-				EntityKirin.startWeatherThunder(entity);
-			}
-			return result;
-		}
 	}
 
-	public static class EntityChakraMode extends Entity {
+	public static class EntityChakraMode extends Entity implements ItemJutsu.IJutsu {
 		private final double CHAKRA_BURN = CHAKRAMODE.chakraUsage; // per second
-		//private int maxCooldown = 400;
 		private EntityLivingBase summoner;
 		private ItemStack usingItemstack;
-		private int strengthAmplifier = 9;
-		//private int jutsuIndex;
-		//private int duration;
+		private int strengthAmplifier = 12;
+		private float modifier;
 
 		public EntityChakraMode(World a) {
 			super(a);
 			this.setSize(0.01f, 0.01f);
 		}
 
-		/*public EntityChakraMode(World worldIn, Vec3d fromVec, Vec3d toVec) {
-			super(worldIn, fromVec, toVec, 0xC000E5FF, 200, 0.2f);
-			this.soundVolume = 2f;
-			this.soundPitch = 0.6f;
-		}
-
-		public EntityLightning(World world, Vec3d cVec, double length, double xMotion, double yMotion, double zMotion) {
-			super(world, cVec, length, xMotion, yMotion, zMotion, 0xC000E5FF);
-			this.soundVolume = 0.1f;
-			this.soundPitch = 0.3f;
-		}*/
-
 		protected EntityChakraMode(EntityLivingBase summonerIn, ItemStack stack) {
 			this(summonerIn.world);
 			this.summoner = summonerIn;
 			this.setPosition(summonerIn.posX, summonerIn.posY, summonerIn.posZ);
-			//this.maxCooldown *= Chakra.getChakraModifier(summonerIn);
-			if (stack.getItem() instanceof ItemJutsu.Base) {
-				//this.jutsuIndex = ((ItemJutsu.Base)stack.getItem()).getCurrentJutsuIndex(stack);
-				//((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, this.duration + this.maxCooldown);
+			if (stack.getItem() == block) {
 				this.usingItemstack = stack;
+				this.modifier = ((RangedItem)stack.getItem()).getModifier(stack, summonerIn);
 			}
 			if (summonerIn.isPotionActive(MobEffects.STRENGTH)) {
 				this.strengthAmplifier += summonerIn.getActivePotionEffect(MobEffects.STRENGTH).getAmplifier() + 1;
 			}
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.RAITON;
 		}
 
 		@Override
@@ -167,51 +119,93 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			this.setNewCooldown();
 		}
 
+		float tpCool;
+
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (this.summoner != null && this.summoner.isEntityAlive()) {
-				if (this.ticksExisted % 20 == 2) {
-					if (!Chakra.pathway(this.summoner).consume(this.CHAKRA_BURN)) {
+			if (this.summoner != null && this.summoner.isEntityAlive() && this.getStackFromInventory() != null) {
+				this.setPosition(this.summoner.posX, this.summoner.posY, this.summoner.posZ);
+				if (this.ticksExisted % 20 == 0) {
+					Chakra.Pathway chakra = Chakra.pathway(this.summoner);
+					if (!chakra.consume(this.CHAKRA_BURN)) {
 						this.setDead();
 					}
-					this.summoner.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 21, 3, false, false));
-					this.summoner.addPotionEffect(new PotionEffect(MobEffects.SPEED, 21, 32, false, false));
-					this.summoner.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 21, this.strengthAmplifier, false, false));
-					this.summoner.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 21, 6, false, false));
+					//this.summoner.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, 3, false, false));
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 18, false, false));
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 22, 2+(int)(1.9*ItemJutsu.getDmgMult(this.summoner))/3, false, false));
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 5, false, false));
 				}
-				this.setPosition(this.summoner.posX, this.summoner.posY, this.summoner.posZ);
+				if (this.modifier > 0.0f) {
+					ProcedureWhenPlayerAttcked.setExtraDamageReduction(this.summoner, 1.0f - this.modifier);
+				}
+				if (this.summoner instanceof EntityPlayer) {
+					if (!this.summoner.isSprinting()) {
+						double d0 = this.posX - this.prevPosX;
+						double d1 = this.posZ - this.prevPosZ;
+						((EntityPlayer)this.summoner).addExhaustion(0.02f * (float)MathHelper.sqrt(d0 * d0 + d1 * d1) * this.modifier);
+					}
+					if (((EntityPlayer)this.summoner).getFoodStats().getFoodLevel() < 1.0f) {
+						this.setDead();
+					}
+				}
 				if (this.rand.nextInt(8) == 0) {
-					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:electricity"))),
+					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")),
 					 0.1f, this.rand.nextFloat() * 0.6f + 0.3f);
 				}
-				//if (this.rand.nextFloat() <= 0.5f) {
-					EntityLightningArc.spawnAsParticle(this.world, this.posX + this.rand.nextGaussian() * 0.3d, 
-					  this.posY + this.rand.nextDouble() * 1.3d, this.posZ + this.rand.nextGaussian() * 0.3d);
-				//}
-				//for (int i = 0; i < 50; i++) {
-					Particles.spawnParticle(world, Particles.Types.SMOKE, this.posX, this.posY, this.posZ,
-					  //50, 0.3d, 0.0d, 0.3d, 0d, this.rand.nextDouble() * 0.1d + 0.3d, 0d, 0x2080D0FF, 50,
-					  //(int) (2.0D / (this.rand.nextDouble() * 0.8D + 0.2D)), 0xF0, this.summoner.getEntityId());
-					  20, 0.3d, 0.0d, 0.3d, 0d, 0.5d, 0d, 0x2080D0FF, 50,
-					  5, 0xF0, this.summoner.getEntityId());
-				//}
+				EntityLightningArc.spawnAsParticle(this.world, this.posX + this.rand.nextGaussian() * 0.3d, 
+				  this.posY + this.rand.nextDouble() * 1.3d, this.posZ + this.rand.nextGaussian() * 0.3d,
+				  0.5d, 0d, 0.15d, 0d);
+				Particles.spawnParticle(world, Particles.Types.SMOKE, this.posX, this.posY, this.posZ,
+				  20, 0.3d, 0.0d, 0.3d, 0d, 0.5d, 0d, 0x2080D0FF, 50, 5, 0xF0, this.summoner.getEntityId());
+				if (this.tpCool == 0) {
+					if (this.summoner.swingProgressInt == 1 && this.summoner instanceof EntityPlayer) {
+						RayTraceResult result = ProcedureUtils.objectEntityLookingAt(this.summoner, 3d, this);
+						if (result == null || result.entityHit == null) {
+							this.tpCool = 60;
+							result = ProcedureUtils.objectEntityLookingAt(this.summoner, 15d, 3d, this);
+							if (result != null && result.entityHit instanceof EntityLivingBase) {
+								Vec3d vec = result.entityHit.getPositionEyes(1f).subtract(this.summoner.getPositionEyes(1f)).normalize();
+								this.summoner.rotationYaw = ProcedureUtils.getYawFromVec(vec);
+								this.summoner.rotationPitch = ProcedureUtils.getPitchFromVec(vec);
+								this.summoner.setPositionAndUpdate(result.entityHit.posX - vec.x, result.entityHit.posY - vec.y + 0.5d, result.entityHit.posZ - vec.z);
+								((EntityPlayer)this.summoner).attackTargetEntityWithCurrentItem(result.entityHit);
+							}
+						}
+						if (result != null && result.entityHit instanceof EntityLivingBase) {
+							ProcedureUtils.pushEntity(this.summoner, result.entityHit, 12d, 1.5f);
+						}
+					}
+				} else {
+					--this.tpCool;
+				}
+
 			} else if (!this.world.isRemote) {
 				this.setDead();
 			}
 		}
 
 		private void setNewCooldown() {
+			ItemStack stack = this.getStackFromInventory();
+			if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
+				ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
+				/*long cooldown = (long)((float)this.ticksExisted * item.getModifier(stack, this.summoner)) + 40;
+				if (cooldown > 1200) {
+					cooldown = 1200;
+				}*/
+				item.setJutsuCooldown(stack, CHAKRAMODE, 45*20);
+			}
+		}
+
+		@Nullable
+		private ItemStack getStackFromInventory() {
 			if (this.usingItemstack != null && this.summoner != null) {
 				ItemStack stack = this.summoner instanceof EntityPlayer
-				 ? ProcedureUtils.getItemStackIgnoreDurability(((EntityPlayer)this.summoner).inventory, this.usingItemstack)
+				 ? ProcedureUtils.getMatchingItemStack((EntityPlayer)this.summoner, this.usingItemstack)
 				 : this.usingItemstack;
-				if (stack != null) {
-					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
-					long newcd = (long)((float)this.ticksExisted * item.getModifier(stack, this.summoner));
-					item.setJutsuCooldown(stack, CHAKRAMODE, newcd);
-				}
+				return stack;
 			}
+			return null;
 		}
 
 		@Override
@@ -226,16 +220,65 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			private static final String ID_KEY = "EntityChakraModeIdKey";
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				Entity entity1 = entity.world.getEntityByID(entity.getEntityData().getInteger(ID_KEY));
-				if (entity1 instanceof EntityChakraMode) {
+				ItemStack stack1 = ProcedureUtils.getMatchingItemStack(entity, ItemRaiton.block);
+				if (stack1 == null || !stack1.hasTagCompound() || !stack1.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+					return false;
+				}
+				Entity entity1 = entity.world.getEntityByID(stack.getTagCompound().getInteger(ID_KEY));
+				if (entity1 instanceof EntityChakraMode && entity instanceof EntityPlayer) {
 					entity1.setDead();
+					stack.getTagCompound().removeTag(ID_KEY);
 					return false;
 				} else {
+					if (ItemFuton.CHAKRAFLOW.jutsu.isActivated(entity)) {
+						ItemFuton.CHAKRAFLOW.jutsu.deactivate(entity);
+					}
+					if (ItemKaton.FLAMESLICE.jutsu.isActivated(entity)) {
+						ItemKaton.FLAMESLICE.jutsu.deactivate(entity);
+					}
+					if (ItemIryoJutsu.POWERMODE.jutsu.isActivated(entity)) {
+						ItemIryoJutsu.POWERMODE.jutsu.deactivate(entity);
+					}
+					if (ItemRanton.CLOUD.jutsu.isActivated(entity)) {
+						ItemRanton.CLOUD.jutsu.deactivate(entity);
+					}
 					entity1 = new EntityChakraMode(entity, stack);
+					stack.getTagCompound().setInteger(ID_KEY, entity1.getEntityId());
 					entity.world.spawnEntity(entity1);
-					entity.getEntityData().setInteger(ID_KEY, entity1.getEntityId());
 					return true;
 				}
+			}
+
+			@Override
+			public boolean isActivated(ItemStack stack) {
+				return stack.getTagCompound().hasKey(ID_KEY);
+			}
+
+			@Override
+			public boolean isActivated(EntityLivingBase entity) {
+				return this.getData(entity) != null;
+			}
+
+			@Override
+			public void deactivate(EntityLivingBase entity) {
+				ItemJutsu.IJutsuCallback.JutsuData jd = this.getData(entity);
+				if (jd != null) {
+					jd.entity.setDead();
+					jd.stack.getTagCompound().removeTag(ID_KEY);
+				}
+			}
+
+			@Override
+			@Nullable
+			public ItemJutsu.IJutsuCallback.JutsuData getData(EntityLivingBase entity) {
+				if (entity instanceof EntityPlayer) {
+					ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)entity, block);
+					if (stack != null && stack.hasTagCompound() && stack.getTagCompound().hasKey(ID_KEY)) {
+						Entity entity1 = entity.world.getEntityByID(stack.getTagCompound().getInteger(ID_KEY));
+						return entity1 instanceof EntityChakraMode ? new JutsuData(entity1, stack) : null;
+					}
+				}
+				return null;
 			}
 		}
 	}

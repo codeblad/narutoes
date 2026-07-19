@@ -1,7 +1,6 @@
 
 package net.narutomod.potion;
 
-import net.narutomod.procedure.ProcedureHeavinessOnPotionActiveTick;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -15,9 +14,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.potion.PotionType;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.potion.Potion;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.Minecraft;
+import net.minecraft.init.MobEffects;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -28,6 +30,7 @@ public class PotionHeaviness extends ElementsNarutomodMod.ModElement {
 	public static final Potion potion = null;
 	@GameRegistry.ObjectHolder("narutomod:heaviness")
 	public static final PotionType potionType = null;
+
 	public PotionHeaviness(ElementsNarutomodMod instance) {
 		super(instance, 436);
 	}
@@ -41,6 +44,7 @@ public class PotionHeaviness extends ElementsNarutomodMod.ModElement {
 	public void init(FMLInitializationEvent event) {
 		ForgeRegistries.POTION_TYPES.register(new PotionTypeCustom());
 	}
+
 	public static class PotionTypeCustom extends PotionType {
 		public PotionTypeCustom() {
 			super(new PotionEffect[]{new PotionEffect(potion, 3600)});
@@ -55,6 +59,8 @@ public class PotionHeaviness extends ElementsNarutomodMod.ModElement {
 			setRegistryName("heaviness");
 			setPotionName("effect.heaviness");
 			potionIcon = new ResourceLocation("narutomod:textures/mob_effect/heaviness.png");
+			this.registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED, "fedf4303-bc45-4ad8-80e8-2237e9c90a18", -0.15D, 2);
+			this.registerPotionAttributeModifier(SharedMonsterAttributes.ATTACK_SPEED, "7d735ff6-8872-482d-ac1f-cd2249e8f584", -0.15D, 2);
 		}
 
 		@Override
@@ -74,16 +80,21 @@ public class PotionHeaviness extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void performEffect(EntityLivingBase entity, int amplifier) {
-			World world = entity.world;
-			int x = (int) entity.posX;
-			int y = (int) entity.posY;
-			int z = (int) entity.posZ;
-			{
-				Map<String, Object> $_dependencies = new HashMap<>();
-				$_dependencies.put("entity", entity);
-				$_dependencies.put("amplifier", amplifier);
-				ProcedureHeavinessOnPotionActiveTick.executeProcedure($_dependencies);
+			PotionEffect effect = entity.getActivePotionEffect(MobEffects.JUMP_BOOST);
+			if (effect == null) {
+				entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 5, -2 - amplifier, false, false));
+			} else if (effect.getAmplifier() > -2 - amplifier) {
+				entity.removePotionEffect(MobEffects.JUMP_BOOST);
+				entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 5, -2 - amplifier, false, false));
 			}
+			if (entity instanceof EntityPlayer && ((EntityPlayer)entity).capabilities.isFlying) {
+				((EntityPlayer)entity).capabilities.isFlying = false;
+				((EntityPlayer)entity).sendPlayerAbilities();
+			}
+			if (entity.hasNoGravity()) {
+				entity.setNoGravity(false);
+			}
+			entity.motionY -= 0.05d + amplifier * 0.01d;
 		}
 
 		@SideOnly(Side.CLIENT)

@@ -16,6 +16,16 @@
       "entries": [
         {
           "type": "item",
+          "name": "narutomod:scroll_sealing_4_symbols",
+          "weight": 5
+        },
+        {
+          "type": "item",
+          "name": "narutomod:bijuspawner",
+          "weight": 3
+        },
+        {
+          "type": "item",
           "name": "narutomod:scroll_chidori",
           "weight": 10
         },
@@ -26,12 +36,17 @@
         },
         {
           "type": "item",
-          "name": "narutomod:scroll_swamp_pit",
+          "name": "narutomod:scroll_wind_blade",
           "weight": 20
         },
         {
           "type": "item",
-          "name": "narutomod:scroll_shadow_imitation",
+          "name": "narutomod:scroll_earth_golem",
+          "weight": 10
+        },
+        {
+          "type": "item",
+          "name": "narutomod:scroll_swamp_pit",
           "weight": 20
         },
         {
@@ -66,12 +81,32 @@
         },
         {
           "type": "item",
+          "name": "narutomod:scroll_lightning_panther",
+          "weight": 10
+        },
+        {
+          "type": "item",
           "name": "narutomod:scroll_fire_annihilation",
           "weight": 10
         },
         {
           "type": "item",
+          "name": "narutomod:scroll_flame_formation",
+          "weight": 10
+        },
+        {
+          "type": "item",
           "name": "narutomod:scroll_futon_vacuum",
+          "weight": 10
+        },
+       {
+          "type": "item",
+          "name": "narutomod:scroll_lightning_chakra_mode",
+          "weight": 15
+        },
+        {
+          "type": "item",
+          "name": "narutomod:scroll_vacuum_wave",
           "weight": 10
         },
         {
@@ -91,11 +126,6 @@
         },
         {
           "type": "item",
-          "name": "narutomod:scroll_lightning_chakra_mode",
-          "weight": 10
-        },
-        {
-          "type": "item",
           "name": "narutomod:scroll_healing",
           "weight": 10
         },
@@ -107,11 +137,6 @@
         {
           "type": "item",
           "name": "narutomod:scroll_poison_mist",
-          "weight": 10
-        },
-        {
-          "type": "item",
-          "name": "narutomod:scroll_multi_size",
           "weight": 10
         },
         {
@@ -168,6 +193,11 @@
         },
         {
           "type": "item",
+          "name": "narutomod:scroll_flame_slice",
+          "weight": 10
+        },
+        {
+          "type": "item",
           "name": "narutomod:scroll_hiding_in_mist",
           "weight": 10
         },
@@ -183,17 +213,17 @@
         },
         {
           "type": "item",
+          "name": "narutomod:scroll_water_cannon",
+          "weight": 5
+        },
+        {
+          "type": "item",
           "name": "narutomod:scroll_water_prison",
           "weight": 5
         },
         {
           "type": "item",
           "name": "narutomod:scroll_earth_spears",
-          "weight": 5
-        },
-        {
-          "type": "item",
-          "name": "narutomod:scroll_mind_transfer",
           "weight": 5
         },
         {

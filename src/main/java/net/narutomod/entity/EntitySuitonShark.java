@@ -33,8 +33,10 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockLiquid;
 
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.item.ItemSuiton;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
@@ -57,22 +59,18 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 		 .id(new ResourceLocation("narutomod", "suiton_shark"), ENTITYID).name("suiton_shark").tracker(64, 3, true).build());
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
-	}
-
-	public static class EC extends EntityScalableProjectile.Base {
+	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private static final DataParameter<Float> PREVLSA = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> LSA = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> LS = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> MOUTHOPENAMOUNT = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
-		private final int wait = 30;
+		private final int wait = 20;
 		private final int mouthOpenTime = 20;
 		private float fullScale;
 		private Entity target;
 		private float health;
+		public float power;
+		public float dmg = 15f;
 		
 		public EC(World a) {
 			super(a);
@@ -88,8 +86,14 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 			this.setEntityScale(0.2f);
 			this.fullScale = power;
 			this.health = power * 20f;
+			this.power = (1+2*(power/5));
 			this.setWaterSlowdown(1.0f);
 			this.isImmuneToFire = true;
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.SUITON;
 		}
 
 		@Override
@@ -149,18 +153,18 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 					this.setEntityScale(this.fullScale * MathHelper.clamp((float)this.ticksAlive / this.wait, 0.2F, 1.0F));
 					if (this.world instanceof WorldServer) {
 						((WorldServer)this.world).spawnParticle(EnumParticleTypes.WATER_WAKE, this.posX, this.posY + this.height/2, this.posZ, 
-						  10, this.width/2, this.height/2, this.width/2, 0);
+						  2, this.width/2, this.height/2, this.width/2, 0);
 					}
 				} else {
 					if (this.target != null) {
-						Vec3d vec = this.target.getPositionEyes(1f).subtract(this.getPositionVector());
-						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.85f : 0.8f, 0f);
+						Vec3d vec = this.target.getPositionEyes(1f).subtract(this.getPositionVector()).subtract(0,this.target.getEyeHeight()/2,0);
+						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.99f : 0.975f, 0f);
 					} else {
 						this.target = this.shootingEntity instanceof EntityLiving ? ((EntityLiving)this.shootingEntity).getAttackTarget()
-						 : ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 50d, this).entityHit;
+						 : ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 50d, 3d, this).entityHit;
 						Vec3d vec = this.target != null ? this.target.getPositionEyes(1f).subtract(this.getPositionVector())
 						 : this.shootingEntity.getLookVec();
-						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.9f : 0.85f, 0f);
+						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.99f : 0.975f, 0f);
 					}
 					if (this.ticksAlive <= this.wait + this.mouthOpenTime) {
 						this.setMOA((float)(this.ticksAlive - this.wait) / this.mouthOpenTime);
@@ -169,7 +173,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 			}
 			this.updateLimbSwing();
 			if (!this.world.isRemote
-			 && (this.ticksInAir > 120 || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
+			 && (this.ticksInAir > 60 || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
 				this.setDead();
 			}
 		}
@@ -201,19 +205,27 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 		protected void onImpact(RayTraceResult result) {
 			if (result.entityHit != null && result.entityHit.equals(this.shootingEntity))
 				return;
+			if (result.typeOfHit == RayTraceResult.Type.BLOCK && this.fullScale >= 2.0f && this.ticksInAir <= 15) {
+				return;
+			}
 			if (!this.world.isRemote) {
 				if (result.typeOfHit == RayTraceResult.Type.BLOCK
 				 || (result.entityHit != null && result.entityHit.equals(this.target))) {
 					float size = this.getEntityScale();
+					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*3.5f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
+					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);
+					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+						damage*=1.35f;
+					}
 					ProcedureAoeCommand.set(this, 0.0D, size).exclude(this.shootingEntity)
-					  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), size * (this.isInWater() ? 24f : 16f));
+					  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);
 					this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, size * 2.0F, false,
 					  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
-					Map<BlockPos, IBlockState> map = Maps.newHashMap();
+					/*Map<BlockPos, IBlockState> map = Maps.newHashMap();
 					for (BlockPos pos : ProcedureUtils.getAllAirBlocks(this.world, this.getEntityBoundingBox().contract(0d, this.height-1, 0d))) {
-						map.put(pos, Blocks.FLOWING_WATER.getDefaultState());
+						map.put(pos, Blocks.FLOWING_WATER.getDefaultState().withProperty(BlockLiquid.LEVEL, Integer.valueOf(1)));
 					}
-					new net.narutomod.event.EventSetBlocks(this.world, map, 0, 10, false, false);
+					new net.narutomod.event.EventSetBlocks(this.world, map, 0, 10, false, false);*/
 					this.setDead();
 				}
 			}
@@ -252,7 +264,10 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				return power >= 1.0f ? this.createJutsu(entity, power) : false;
+				if (power >= 1.0f) {
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);
+				}
+				return power >= 1.0f ? this.createJutsu(entity, power)  : false;
 			}
 
 			public boolean createJutsu(EntityLivingBase entity, float power) {
@@ -264,133 +279,162 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 				entity.world.spawnEntity(new EC(entity, power));
 				return true;
 			}
+
+			@Override
+			public float getBasePower() {
+				return 0.9f;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 50.0f;
+			}
+	
+			@Override
+			public float getMaxPower() {
+				return 5.0f;
+			}
 		}
 	}
 
 	@SideOnly(Side.CLIENT)
-	public class RenderCustom extends Render<EC> {
-		private final ResourceLocation TEXTURE = new ResourceLocation("narutomod:textures/shark.png");
-		private final ModelShark model;
-
-		public RenderCustom(RenderManager renderManager) {
-			super(renderManager);
-			this.model = new ModelShark();
-			this.shadowSize = 0.5F;
-		}
-
-		@Override
-		public void doRender(EC entity, double x, double y, double z, float yaw, float pt) {
-			float f5 = entity.getPrevLSA() + (entity.getLSA() - entity.getPrevLSA()) * pt;
-			float f6 = entity.getLS() - entity.getLSA() * (1.0F - pt);
-			this.model.setRotationAngles(f6, f5, (float)entity.ticksExisted + pt, 0f, entity.getMOA(), 0.0625F, entity);
-			this.bindEntityTexture(entity);
-			GlStateManager.pushMatrix();
-			float scale = entity.getEntityScale();
-			GlStateManager.translate(x, y, z);
-			GlStateManager.rotate(-entity.prevRotationYaw - MathHelper.wrapDegrees(entity.rotationYaw - entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * pt - 180.0F, 1.0F, 0.0F, 0.0F);
-			GlStateManager.scale(scale, scale, scale);
-			GlStateManager.enableBlend();
-			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-			GlStateManager.disableLighting();
-			this.model.render(entity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
-			GlStateManager.enableLighting();
-			GlStateManager.disableBlend();
-			GlStateManager.popMatrix();
-		}
-
-		@Override
-		protected ResourceLocation getEntityTexture(EC entity) {
-			return TEXTURE;
-		}
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
 	}
 
-	// Made with Blockbench 3.7.5
-	// Exported for Minecraft version 1.12
-	// Paste this class into your mod and generate all required imports
-	@SideOnly(Side.CLIENT)
-	public class ModelShark extends ModelBase {
-		private final ModelRenderer body;
-		private final ModelRenderer head;
-		private final ModelRenderer foreHead;
-		private final ModelRenderer jaw;
-		private final ModelRenderer tail;
-		private final ModelRenderer tailFin;
-		private final ModelRenderer tailFinUpper;
-		private final ModelRenderer tailFinLower;
-		private final ModelRenderer backFin;
-		private final ModelRenderer leftFin;
-		private final ModelRenderer rightFin;
-		public ModelShark() {
-			textureWidth = 64;
-			textureHeight = 64;
-			body = new ModelRenderer(this);
-			body.setRotationPoint(0.0F, 0.0F, -5.0F);
-			body.cubeList.add(new ModelBox(body, 0, 0, -4.0F, -7.0F, 0.0F, 8, 7, 13, 0.0F, false));
-			head = new ModelRenderer(this);
-			head.setRotationPoint(0.0F, -3.0F, 0.0F);
-			body.addChild(head);
-			foreHead = new ModelRenderer(this);
-			foreHead.setRotationPoint(0.0F, -3.5F, 0.0F);
-			head.addChild(foreHead);
-			setRotationAngle(foreHead, 0.1745F, 0.0F, 0.0F);
-			foreHead.cubeList.add(new ModelBox(foreHead, 19, 20, -4.0F, 0.0F, -6.0F, 8, 4, 6, 0.0F, false));
-			jaw = new ModelRenderer(this);
-			jaw.setRotationPoint(0.0F, 1.5F, 0.25F);
-			head.addChild(jaw);
-			jaw.cubeList.add(new ModelBox(jaw, 29, 0, -3.5F, -1.5F, -4.75F, 7, 2, 5, 0.0F, false));
-			tail = new ModelRenderer(this);
-			tail.setRotationPoint(0.0F, -3.5F, 13.0F);
-			body.addChild(tail);
-			tail.cubeList.add(new ModelBox(tail, 0, 20, -2.0F, -2.5F, -1.0F, 4, 5, 11, 0.0F, false));
-			tailFin = new ModelRenderer(this);
-			tailFin.setRotationPoint(0.0F, -0.5F, 8.0F);
-			tail.addChild(tailFin);
-			tailFinUpper = new ModelRenderer(this);
-			tailFinUpper.setRotationPoint(0.0F, -1.0F, 1.0F);
-			tailFin.addChild(tailFinUpper);
-			setRotationAngle(tailFinUpper, -0.6109F, 0.0F, 0.0F);
-			tailFinUpper.cubeList.add(new ModelBox(tailFinUpper, 0, 20, -0.5F, -6.9924F, -1.1743F, 1, 8, 3, 0.0F, false));
-			tailFinLower = new ModelRenderer(this);
-			tailFinLower.setRotationPoint(0.0F, 1.0F, 1.0F);
-			tailFin.addChild(tailFinLower);
-			setRotationAngle(tailFinLower, 0.5236F, 0.0F, 0.0F);
-			tailFinLower.cubeList.add(new ModelBox(tailFinLower, 0, 36, -0.5F, -1.4924F, -1.0403F, 1, 6, 3, 0.0F, false));
-			backFin = new ModelRenderer(this);
-			backFin.setRotationPoint(0.0F, -6.0F, 6.0F);
-			body.addChild(backFin);
-			setRotationAngle(backFin, -0.5236F, 0.0F, 0.0F);
-			backFin.cubeList.add(new ModelBox(backFin, 0, 0, -0.5F, -7.75F, -1.5F, 1, 8, 4, 0.0F, false));
-			leftFin = new ModelRenderer(this);
-			leftFin.setRotationPoint(3.0F, -3.0F, 8.0F);
-			body.addChild(leftFin);
-			setRotationAngle(leftFin, 0.9599F, 0.0F, 1.8675F);
-			leftFin.cubeList.add(new ModelBox(leftFin, 32, 34, 0.0F, -4.0F, -1.5F, 1, 4, 7, 0.0F, false));
-			rightFin = new ModelRenderer(this);
-			rightFin.setRotationPoint(-3.0F, -3.0F, 8.0F);
-			body.addChild(rightFin);
-			setRotationAngle(rightFin, 0.9599F, 0.0F, -1.8675F);
-			rightFin.cubeList.add(new ModelBox(rightFin, 32, 34, -1.0F, -4.0F, -1.5F, 1, 4, 7, 0.0F, false));
-		}
-
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
 		@Override
-		public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
-			body.render(f5);
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
 		}
 
-		public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
-			modelRenderer.rotateAngleX = x;
-			modelRenderer.rotateAngleY = y;
-			modelRenderer.rotateAngleZ = z;
+		@SideOnly(Side.CLIENT)
+		public class RenderCustom extends Render<EC> {
+			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/shark.png");
+			private final ModelShark model;
+
+			public RenderCustom(RenderManager renderManager) {
+				super(renderManager);
+				this.model = new ModelShark();
+				this.shadowSize = 0.5F;
+			}
+
+			@Override
+			public void doRender(EC entity, double x, double y, double z, float yaw, float pt) {
+				float f5 = entity.getPrevLSA() + (entity.getLSA() - entity.getPrevLSA()) * pt;
+				float f6 = entity.getLS() - entity.getLSA() * (1.0F - pt);
+				this.model.setRotationAngles(f6, f5, (float)entity.ticksExisted + pt, 0f, entity.getMOA(), 0.0625F, entity);
+				this.bindEntityTexture(entity);
+				GlStateManager.pushMatrix();
+				float scale = entity.getEntityScale();
+				GlStateManager.translate(x, y, z);
+				GlStateManager.rotate(-entity.prevRotationYaw - MathHelper.wrapDegrees(entity.rotationYaw - entity.prevRotationYaw) * pt, 0.0F, 1.0F, 0.0F);
+				GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * pt - 180.0F, 1.0F, 0.0F, 0.0F);
+				GlStateManager.scale(scale, scale, scale);
+				GlStateManager.enableBlend();
+				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+				GlStateManager.disableLighting();
+				this.model.render(entity, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+				GlStateManager.enableLighting();
+				GlStateManager.disableBlend();
+				GlStateManager.popMatrix();
+			}
+
+			@Override
+			protected ResourceLocation getEntityTexture(EC entity) {
+				return this.texture;
+			}
 		}
 
-		@Override
-		public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity e) {
-			super.setRotationAngles(f, f1, f2, f3, f4, f5, e);
-			this.tail.rotateAngleY = MathHelper.cos(f * 0.6662F) * 0.4F * f1;
-			this.tailFin.rotateAngleY = MathHelper.cos(f * 0.6662F) * 0.4F * f1;
-			this.foreHead.rotateAngleX = 0.1745F - f4 * 0.4363F;
-			this.jaw.rotateAngleX = f4 * 0.5236F;
+		// Made with Blockbench 3.7.5
+		// Exported for Minecraft version 1.12
+		// Paste this class into your mod and generate all required imports
+		@SideOnly(Side.CLIENT)
+		public class ModelShark extends ModelBase {
+			private final ModelRenderer body;
+			private final ModelRenderer head;
+			private final ModelRenderer foreHead;
+			private final ModelRenderer jaw;
+			private final ModelRenderer tail;
+			private final ModelRenderer tailFin;
+			private final ModelRenderer tailFinUpper;
+			private final ModelRenderer tailFinLower;
+			private final ModelRenderer backFin;
+			private final ModelRenderer leftFin;
+			private final ModelRenderer rightFin;
+			public ModelShark() {
+				textureWidth = 64;
+				textureHeight = 64;
+				body = new ModelRenderer(this);
+				body.setRotationPoint(0.0F, 0.0F, -5.0F);
+				body.cubeList.add(new ModelBox(body, 0, 0, -4.0F, -7.0F, 0.0F, 8, 7, 13, 0.0F, false));
+				head = new ModelRenderer(this);
+				head.setRotationPoint(0.0F, -3.0F, 0.0F);
+				body.addChild(head);
+				foreHead = new ModelRenderer(this);
+				foreHead.setRotationPoint(0.0F, -3.5F, 0.0F);
+				head.addChild(foreHead);
+				setRotationAngle(foreHead, 0.1745F, 0.0F, 0.0F);
+				foreHead.cubeList.add(new ModelBox(foreHead, 19, 20, -4.0F, 0.0F, -6.0F, 8, 4, 6, 0.0F, false));
+				jaw = new ModelRenderer(this);
+				jaw.setRotationPoint(0.0F, 1.5F, 0.25F);
+				head.addChild(jaw);
+				jaw.cubeList.add(new ModelBox(jaw, 29, 0, -3.5F, -1.5F, -4.75F, 7, 2, 5, 0.0F, false));
+				tail = new ModelRenderer(this);
+				tail.setRotationPoint(0.0F, -3.5F, 13.0F);
+				body.addChild(tail);
+				tail.cubeList.add(new ModelBox(tail, 0, 20, -2.0F, -2.5F, -1.0F, 4, 5, 11, 0.0F, false));
+				tailFin = new ModelRenderer(this);
+				tailFin.setRotationPoint(0.0F, -0.5F, 8.0F);
+				tail.addChild(tailFin);
+				tailFinUpper = new ModelRenderer(this);
+				tailFinUpper.setRotationPoint(0.0F, -1.0F, 1.0F);
+				tailFin.addChild(tailFinUpper);
+				setRotationAngle(tailFinUpper, -0.6109F, 0.0F, 0.0F);
+				tailFinUpper.cubeList.add(new ModelBox(tailFinUpper, 0, 20, -0.5F, -6.9924F, -1.1743F, 1, 8, 3, 0.0F, false));
+				tailFinLower = new ModelRenderer(this);
+				tailFinLower.setRotationPoint(0.0F, 1.0F, 1.0F);
+				tailFin.addChild(tailFinLower);
+				setRotationAngle(tailFinLower, 0.5236F, 0.0F, 0.0F);
+				tailFinLower.cubeList.add(new ModelBox(tailFinLower, 0, 36, -0.5F, -1.4924F, -1.0403F, 1, 6, 3, 0.0F, false));
+				backFin = new ModelRenderer(this);
+				backFin.setRotationPoint(0.0F, -6.0F, 6.0F);
+				body.addChild(backFin);
+				setRotationAngle(backFin, -0.5236F, 0.0F, 0.0F);
+				backFin.cubeList.add(new ModelBox(backFin, 0, 0, -0.5F, -7.75F, -1.5F, 1, 8, 4, 0.0F, false));
+				leftFin = new ModelRenderer(this);
+				leftFin.setRotationPoint(3.0F, -3.0F, 8.0F);
+				body.addChild(leftFin);
+				setRotationAngle(leftFin, 0.9599F, 0.0F, 1.8675F);
+				leftFin.cubeList.add(new ModelBox(leftFin, 32, 34, 0.0F, -4.0F, -1.5F, 1, 4, 7, 0.0F, false));
+				rightFin = new ModelRenderer(this);
+				rightFin.setRotationPoint(-3.0F, -3.0F, 8.0F);
+				body.addChild(rightFin);
+				setRotationAngle(rightFin, 0.9599F, 0.0F, -1.8675F);
+				rightFin.cubeList.add(new ModelBox(rightFin, 32, 34, -1.0F, -4.0F, -1.5F, 1, 4, 7, 0.0F, false));
+			}
+
+			@Override
+			public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+				body.render(f5);
+			}
+
+			public void setRotationAngle(ModelRenderer modelRenderer, float x, float y, float z) {
+				modelRenderer.rotateAngleX = x;
+				modelRenderer.rotateAngleY = y;
+				modelRenderer.rotateAngleZ = z;
+			}
+
+			@Override
+			public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity e) {
+				super.setRotationAngles(f, f1, f2, f3, f4, f5, e);
+				this.tail.rotateAngleY = MathHelper.cos(f * 0.6662F) * 0.4F * f1;
+				this.tailFin.rotateAngleY = MathHelper.cos(f * 0.6662F) * 0.4F * f1;
+				this.foreHead.rotateAngleX = 0.1745F - f4 * 0.4363F;
+				this.jaw.rotateAngleX = f4 * 0.5236F;
+			}
 		}
 	}
 }

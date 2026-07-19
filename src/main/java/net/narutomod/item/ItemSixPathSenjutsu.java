@@ -12,13 +12,15 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.Vec3d;
 
 import net.narutomod.entity.EntityTruthSeekerBall;
 import net.narutomod.entity.EntityIntonRaiha;
@@ -30,19 +32,17 @@ import net.narutomod.ElementsNarutomodMod;
 
 import javax.annotation.Nullable;
 import com.google.common.base.Predicate;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.math.MathHelper;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemSixPathSenjutsu extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:six_path_senjutsu")
 	public static final Item block = null;
 	public static final int ENTITYID = 347;
-	public static final ItemJutsu.JutsuEnum SHOOT = new ItemJutsu.JutsuEnum(0, "tooltip.6psenjutsu.shoot", 'S', 50d, new ShootTruthSeekerBall());
-	public static final ItemJutsu.JutsuEnum SHIELD = new ItemJutsu.JutsuEnum(1, "tooltip.6psenjutsu.shield", 'S', 50d, new TruthSeekerShield());
+	public static final ItemJutsu.JutsuEnum SHOOT = new ItemJutsu.JutsuEnum(0, "tooltip.6psenjutsu.shoot", 'S', 150d, new ShootTruthSeekerBall());
+	public static final ItemJutsu.JutsuEnum SHIELD = new ItemJutsu.JutsuEnum(1, "tooltip.6psenjutsu.shield", 'S', 250d, new TruthSeekerShield());
 	public static final ItemJutsu.JutsuEnum THUNDER = new ItemJutsu.JutsuEnum(2, "inton_raiha", 'S', 100d, new EntityIntonRaiha.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum LASER = new ItemJutsu.JutsuEnum(3, "ranton_koga", 'S', 100d, new EntityRantonKoga.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(4, "tooltip.6psenjutsu.rasenshuriken", 'S', 1000d, new EntityRasenshuriken.EC.TSBVariant());
+	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(4, "tooltip.6psenjutsu.rasenshuriken", 'S', 2200d, new EntityRasenshuriken.EC.TSBVariant());
 
 	public ItemSixPathSenjutsu(ElementsNarutomodMod instance) {
 		super(instance, 703);
@@ -51,9 +51,6 @@ public class ItemSixPathSenjutsu extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.items.add(() -> new RangedItem(SHOOT, SHIELD, THUNDER, LASER, RASENSHURIKEN));
-		//elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityArrowCustom.class)
-		//		.id(new ResourceLocation("narutomod", "entitybulletsix_path_senjutsu"), ENTITYID).name("entitybulletsix_path_senjutsu")
-		//		.tracker(64, 1, true).build());
 	}
 
 	@Override
@@ -61,15 +58,6 @@ public class ItemSixPathSenjutsu extends ElementsNarutomodMod.ModElement {
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:six_path_senjutsu", "inventory"));
 	}
-
-	//@SideOnly(Side.CLIENT)
-	//@Override
-	//public void preInit(FMLPreInitializationEvent event) {
-	//	RenderingRegistry.registerEntityRenderingHandler(EntityArrowCustom.class, renderManager -> {
-	//		return new RenderSnowball(renderManager, new ItemStack(ItemSmokeBomb.block, (int) (1)).getItem(),
-	//				Minecraft.getMinecraft().getRenderItem());
-	//	});
-	//}
 
 	public static class RangedItem extends ItemJutsu.Base {
 		private static final String SPAWNEDBALLSID = "SpawnedTruthSeekingBallsId";
@@ -86,26 +74,6 @@ public class ItemSixPathSenjutsu extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected float getMaxPower(ItemStack stack, EntityLivingBase entity) {
-			if (this.getCurrentJutsu(stack) == LASER) {
-				return 10.0f;
-			} else if (this.getCurrentJutsu(stack) == THUNDER) {
-				return 6.0f;
-			}
-			return super.getMaxPower(stack, entity);
-		}
-
-		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			if (this.getCurrentJutsu(stack) == THUNDER) {
-				return this.getPower(stack, entity, timeLeft, 1f, 80f);
-			} else if (this.getCurrentJutsu(stack) == LASER) {
-				return this.getPower(stack, entity, timeLeft, 1f, 50f);
-			}
-			return 1f;
-		}
-
-		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (!itemstack.hasTagCompound()) {
@@ -115,6 +83,7 @@ public class ItemSixPathSenjutsu extends ElementsNarutomodMod.ModElement {
 				EntityLivingBase livingEntity = (EntityLivingBase)entity;
 				if (!ItemRinnegan.wearingRinnesharingan(livingEntity) 
 				 && entity instanceof EntityPlayer && !((EntityPlayer)entity).isCreative()) {
+				 	entity.getEntityData().setTag("6pSenjutsuItem", itemstack.writeToNBT(new NBTTagCompound()));
 					itemstack.shrink(1);
 				} else if (livingEntity.getHeldItemMainhand().equals(itemstack) || livingEntity.getHeldItemOffhand().equals(itemstack)) {
 					int[] intarray = itemstack.getTagCompound().getIntArray(SPAWNEDBALLSID);
@@ -216,7 +185,8 @@ public class ItemSixPathSenjutsu extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
-	}
+
+	}
 
 	public static class ShootTruthSeekerBall implements ItemJutsu.IJutsuCallback {
 		@Override
@@ -225,7 +195,7 @@ public class ItemSixPathSenjutsu extends ElementsNarutomodMod.ModElement {
 				EntityTruthSeekerBall.EntityCustom entity1 = ((RangedItem)stack.getItem()).getNextTSB(stack, entity.world);
 				if (entity1 != null) {
 					Vec3d vec = entity.getLookVec();
-					entity1.shoot(vec.x, vec.y, vec.z, 0.95f, 0.0f);
+					entity1.shoot(vec.x, vec.y, vec.z, 0.98f, 0.0f);
 					return true;
 				}
 			}

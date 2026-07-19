@@ -56,7 +56,9 @@ public class EntitySpecialEffect extends ElementsNarutomodMod.ModElement {
 
 	public enum Type {
 		ROTATING_LINES_COLOR_END(0),
-		EXPANDING_SPHERES_FADE_TO_BLACK(1);
+		EXPANDING_SPHERES_FADE_TO_BLACK(1),
+		LINES_COLOR_END(2),
+		LINES_BURST_COLOR_END(3);
 
 		private final int id;
 		private static final Map<Integer, Type> TYPES = Maps.newHashMap();
@@ -255,9 +257,149 @@ public class EntitySpecialEffect extends ElementsNarutomodMod.ModElement {
 				case EXPANDING_SPHERES_FADE_TO_BLACK:
 					this.renderExpandingSphere(entity, x, y, z, entityYaw, partialTicks);
 					break;
+				case LINES_COLOR_END:
+					this.renderLines(entity, x, y, z, entityYaw, partialTicks);
+					break;
+				case LINES_BURST_COLOR_END:
+					this.renderBurstLines(entity, x, y, z, entityYaw, partialTicks);
+					break;
 			}
 			super.doRender(entity, x, y, z, entityYaw, partialTicks);
 		}
+		private void renderLines(EntityCustom entity, double x, double y, double z, float entityYaw, float partialTicks) {
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(x, y + entity.height / 2, z);
+			//GlStateManager.rotate(entityYaw, 0.0F, 1.0F, 0.0F);
+			Tessellator tessellator = Tessellator.getInstance();
+			BufferBuilder bufferbuilder = tessellator.getBuffer();
+			RenderHelper.disableStandardItemLighting();
+			float f = (entity.getAge() + partialTicks) / entity.getLifespan();
+			float f1 = f;// 0.0F;
+			Random random = new Random(432L);
+			GlStateManager.disableTexture2D();
+			GlStateManager.shadeModel(7425);
+			GlStateManager.enableBlend();
+			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+			GlStateManager.disableAlpha();
+			GlStateManager.enableCull();//GlStateManager.disableCull();
+			GlStateManager.depthMask(false);
+			float r = entity.getRadius();
+			int j = entity.getColor();
+			int red = j >> 16 & 0xFF;
+			int green = j >> 8 & 0xFF;
+			int blue = j & 0xFF;
+
+			for (int i = 0; i < 7; i++) {
+    // When does this line spawn? (spread evenly across lifespan)
+    float spawnTime = (float)i / 10.0F; // 0 → 1
+    float currentTime = f;               // entity age normalized 0 → 1
+
+    if (currentTime < spawnTime) continue; // not yet spawned
+
+    // Progress of THIS line’s growth (0 → 1)
+    float lineProgress = Math.min(1.0F, (currentTime - spawnTime) * 15.0F);
+    // ^ the *10 controls how fast each line expands, tweak as needed
+
+    float length = lineProgress * r;        // grows outward
+    float width  = lineProgress * 0.12F * r; // grows in thickness
+
+    // Stable random direction for this line
+    random.setSeed(i * 98761L);
+    double theta = random.nextDouble() * 2.0 * Math.PI;
+    double phi   = random.nextDouble() * Math.PI;
+
+    double dx = Math.sin(phi) * Math.cos(theta);
+    double dy = Math.cos(phi);
+    double dz = Math.sin(phi) * Math.sin(theta);
+
+    double tipX = dx * length;
+    double tipY = dy * length;
+    double tipZ = dz * length;
+
+    bufferbuilder.begin(6, DefaultVertexFormats.POSITION_COLOR);
+    bufferbuilder.pos(0.0D, 0.0D, 0.0D)
+        .color(255, 255, 255, (int)(255.0F * (1.0F - f1))).endVertex();
+
+    bufferbuilder.pos(tipX - 0.866D * width, tipY, tipZ - 0.5D * width).color(red, green, blue, 0).endVertex();
+    bufferbuilder.pos(tipX + 0.866D * width, tipY, tipZ - 0.5D * width).color(red, green, blue, 0).endVertex();
+    bufferbuilder.pos(tipX, tipY, tipZ + 1.0D * width).color(red, green, blue, 0).endVertex();
+    bufferbuilder.pos(tipX - 0.866D * width, tipY, tipZ - 0.5D * width).color(red, green, blue, 0).endVertex();
+
+    tessellator.draw();
+}
+
+
+
+			GlStateManager.depthMask(true);
+			GlStateManager.disableCull();//GlStateManager.enableCull();
+			GlStateManager.disableBlend();
+			GlStateManager.shadeModel(7424);
+			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+			GlStateManager.enableTexture2D();
+			GlStateManager.enableAlpha();
+			RenderHelper.enableStandardItemLighting();
+			GlStateManager.popMatrix();
+		}
+
+		private void renderBurstLines(EntityCustom entity, double x, double y, double z, float entityYaw, float partialTicks) {
+    GlStateManager.pushMatrix();
+    GlStateManager.translate(x, y + entity.height / 2, z);
+    GlStateManager.rotate(entityYaw, 0.0F, 1.0F, 0.0F);
+    Tessellator tessellator = Tessellator.getInstance();
+    BufferBuilder bufferbuilder = tessellator.getBuffer();
+    RenderHelper.disableStandardItemLighting();
+
+    float f = (entity.getAge() + partialTicks) / entity.getLifespan(); // 0 → 1 over lifetime
+    float f1 = f;
+
+    Random random = new Random(422L);
+    GlStateManager.disableTexture2D();
+    GlStateManager.shadeModel(7425);
+    GlStateManager.enableBlend();
+    GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+    GlStateManager.disableAlpha();
+    GlStateManager.enableCull();
+    GlStateManager.depthMask(false);
+
+    float r = entity.getRadius();
+    int j = entity.getColor();
+    int red = j >> 16 & 0xFF;
+    int green = j >> 8 & 0xFF;
+    int blue = j & 0xFF;
+
+    // radius grows from 0 → r over lifespan
+    float currentRadius = r * f;
+
+    for (int i = 0; i < 60.0F; i++) {
+        GlStateManager.rotate(random.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(random.nextFloat() * 360.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(random.nextFloat() * 360.0F, 0.0F, 0.0F, 1.0F);
+        GlStateManager.rotate(random.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(random.nextFloat() * 360.0F, 0.0F, 1.0F, 0.0F);
+        GlStateManager.rotate(random.nextFloat() * 360.0F + f * 90.0F, 0.0F, 0.0F, 1.0F);
+
+        float f2 = (random.nextFloat() + f1) * 0.5F * currentRadius;
+        float f3 = (random.nextFloat() + f1) * 0.12F * currentRadius;
+
+        bufferbuilder.begin(6, DefaultVertexFormats.POSITION_COLOR);
+        bufferbuilder.pos(0.0D, 0.0D, 0.0D).color(255, 255, 255, (int) (255.0F * (1.0F - f1))).endVertex();
+        bufferbuilder.pos(-0.866D * f3, f2, (-0.5F * f3)).color(red, green, blue, 0).endVertex();
+        bufferbuilder.pos(0.866D * f3, f2, (-0.5F * f3)).color(red, green, blue, 0).endVertex();
+        bufferbuilder.pos(0.0D, f2, (1.0F * f3)).color(red, green, blue, 0).endVertex();
+        bufferbuilder.pos(-0.866D * f3, f2, (-0.5F * f3)).color(red, green, blue, 0).endVertex();
+        tessellator.draw();
+    }
+
+    GlStateManager.depthMask(true);
+    GlStateManager.disableCull();
+    GlStateManager.disableBlend();
+    GlStateManager.shadeModel(7424);
+    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+    GlStateManager.enableTexture2D();
+    GlStateManager.enableAlpha();
+    RenderHelper.enableStandardItemLighting();
+    GlStateManager.popMatrix();
+}
 
 		private void renderRotatingLines(EntityCustom entity, double x, double y, double z, float entityYaw, float partialTicks) {
 			GlStateManager.pushMatrix();
@@ -268,6 +410,9 @@ public class EntitySpecialEffect extends ElementsNarutomodMod.ModElement {
 			RenderHelper.disableStandardItemLighting();
 			float f = (entity.getAge() + partialTicks) / entity.getLifespan();
 			float f1 = f;// 0.0F;
+			float growth = f; // or f*f for ease-in, sqrt(f) for ease-out
+		
+
 			// if (f > 0.5F)
 			// f1 = (f - 0.5F) / 0.5F;
 			Random random = new Random(432L);
@@ -283,6 +428,7 @@ public class EntitySpecialEffect extends ElementsNarutomodMod.ModElement {
 			int red = j >> 16 & 0xFF;
 			int green = j >> 8 & 0xFF;
 			int blue = j & 0xFF;
+			
 			// for (int i = 0; i < (f + f * f) / 2.0F * 60.0F; i++) {
 			for (int i = 0; i < 120.0F; i++) {
 				GlStateManager.rotate(random.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);

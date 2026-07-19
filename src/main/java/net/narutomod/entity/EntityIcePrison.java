@@ -64,7 +64,7 @@ public class EntityIcePrison extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static class EC extends Entity {
+	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private EntityLivingBase user;
 		private EntityLivingBase target;
 		private BlockPos blockpos;
@@ -95,12 +95,17 @@ public class EntityIcePrison extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.HYOTON;
+		}
+
+		@Override
 		protected void entityInit() {
 		}
 
 		@Override
 		public void onUpdate() {
-			if (this.user != null && this.target != null) {
+			if (this.user != null && ItemJutsu.canTarget(this.target)) {
 				this.target.setPositionAndUpdate(this.posX, this.posY + 0.5d, this.posZ);
 				Map<BlockPos, IBlockState> map = Maps.newHashMap();
 				for (BlockPos pos : this.tpos) {
@@ -111,7 +116,7 @@ public class EntityIcePrison extends ElementsNarutomodMod.ModElement {
 				if (!map.isEmpty()) {
 					new net.narutomod.event.EventSetBlocks(this.world, map, 0, 1200, false, false);
 				}
-				int i = this.ticksExisted % 4;
+				int i = this.ticksExisted % 2;
 				if (i == 0) {
 					this.target.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 600, 1));
 					this.tz++;
@@ -149,17 +154,18 @@ public class EntityIcePrison extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity, 10d, true);
+				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity, 10d, 3d, true);
 				if (result != null && result.entityHit instanceof EntityLivingBase) {
 					entity.world.playSound(null, result.entityHit.posX, result.entityHit.posY, result.entityHit.posZ, 
-					 (net.minecraft.util.SoundEvent)net.minecraft.util.SoundEvent.REGISTRY
-					 .getObject(new ResourceLocation("narutomod:ice_shoot")),
+					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot")),
 					 net.minecraft.util.SoundCategory.NEUTRAL, 1f, entity.getRNG().nextFloat() * 0.4f + 0.8f);
 					entity.world.spawnEntity(new EC(entity, (EntityLivingBase)result.entityHit));
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*3);
 					return true;
 				}
 				return false;
 			}
 		}
-	}
+
+	}
 }

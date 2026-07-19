@@ -1,0 +1,36 @@
+{
+  "group": "narutomod",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "012",
+    "3 5",
+    "6 8"
+  ],
+  "key": {
+    "0": {
+      "item": "minecraft:paper"
+    },
+    "1": {
+      "item": "minecraft:leather_leggings"
+    },
+    "2": {
+      "item": "minecraft:paper"
+    },
+    "3": {
+      "item": "minecraft:paper"
+    },
+    "5": {
+      "item": "minecraft:paper"
+    },
+    "6": {
+      "item": "minecraft:paper"
+    },
+    "8": {
+      "item": "minecraft:paper"
+    }
+  },
+  "result": {
+    "item": "narutomod:ninja_armor_amelegs",
+    "count": 1
+  }
+}

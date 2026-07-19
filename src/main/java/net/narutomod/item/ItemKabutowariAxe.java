@@ -29,12 +29,12 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.ActionResult;
 import net.minecraft.item.EnumAction;
+import net.minecraft.inventory.EntityEquipmentSlot;
 
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.Set;
-import net.minecraft.inventory.EntityEquipmentSlot;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemKabutowariAxe extends ElementsNarutomodMod.ModElement {
@@ -90,26 +90,6 @@ public class ItemKabutowariAxe extends ElementsNarutomodMod.ModElement {
 			return true;
 		}
 
-		@Override
-		public boolean isShield(ItemStack stack, EntityLivingBase entity) {
-			return stack.getItem() == block;
-		}
-
-		@Override
-		public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-			playerIn.setActiveHand(handIn);
-			return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
-		}
-	
-		@Override
-		public EnumAction getItemUseAction(ItemStack stack) {
-			return EnumAction.BLOCK;
-		}
-	
-		@Override
-		public int getMaxItemUseDuration(ItemStack stack) {
-			return 72000;
-		}
 
 		@Override
 		public float getDestroySpeed(ItemStack stack, IBlockState state) {

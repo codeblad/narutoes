@@ -31,7 +31,7 @@ public class EntityRantonKoga extends ElementsNarutomodMod.ModElement {
 				.id(new ResourceLocation("narutomod", "ranton_koga"), ENTITYID).name("ranton_koga").tracker(64, 3, true).build());
 	}
 
-	public static class EC extends Entity {
+	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private EntityLivingBase shooter;
 		private float power;
 
@@ -45,6 +45,11 @@ public class EntityRantonKoga extends ElementsNarutomodMod.ModElement {
 			this.shooter = shooterIn;
 			this.power = powerIn;
 			this.setLocationAndAngles(shooterIn.posX, shooterIn.posY, shooterIn.posZ, 0f, 0f);
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.SENJUTSU;
 		}
 
 		@Override
@@ -62,7 +67,7 @@ public class EntityRantonKoga extends ElementsNarutomodMod.ModElement {
 				Vec3d vec1 = vec.add(this.shooter.getPositionEyes(1f).subtract(0d, 0.15d, 0d));
 				Vec3d vec2 = vec.scale(this.power * 4f).add(this.shooter.getPositionEyes(1.0f));
 				EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, vec1, vec2, 0x80FF00FF, 1, 0f, 0f, 0);
-				entity.setDamage(ItemJutsu.causeSenjutsuDamage(this, this.shooter), 20f * this.power, true, this.shooter);
+				entity.setDamage(ItemJutsu.causeSenjutsuDamage(this, this.shooter), 15f + ItemJutsu.getNinjaMult(this.shooter)*(0.5f+1*(this.power/10)), true, this.shooter);
 				this.world.spawnEntity(entity);
 				if (this.ticksExisted > 20) {
 					this.setDead();
@@ -84,7 +89,18 @@ public class EntityRantonKoga extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power));
+				ItemJutsu.setCurrentJutsuCooldown(stack,20);
 				return true;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 50.0f;
+			}
+	
+			@Override
+			public float getMaxPower() {
+				return 10.0f;
 			}
 		}
 	}

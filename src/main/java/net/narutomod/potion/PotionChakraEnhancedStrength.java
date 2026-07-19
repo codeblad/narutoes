@@ -12,18 +12,21 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.util.EntityDamageSource;
+import net.minecraft.util.EntityDamageSourceIndirect;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityFallingBlock;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.gui.Gui;
@@ -34,7 +37,6 @@ import net.minecraft.block.Block;
 
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureAirPunch;
-//import net.narutomod.item.ItemIryoJutsu;
 import net.narutomod.Chakra;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -109,60 +111,76 @@ public class PotionChakraEnhancedStrength extends ElementsNarutomodMod.ModElemen
 
 			public Punch(World world) {
 				this.blockDropChance = 0.1F;
-				this.griefing = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, null);
+				//this.griefing = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, null);
+				this.griefing = false;
 			}
 
 			@Override
-			protected void preExecuteParticles(EntityLivingBase player) {
+			protected void preExecuteParticles(Entity player) {
 				Vec3d vec = player.getLookVec();
 				Vec3d vec1 = player.getPositionVector().addVector(0d, 1.2d, 0d).add(vec);
 				Vec3d vec2 = vec.scale(this.getRange(0));
-				for (int i = 0; i < (int)(this.getRange(0) * 100); i++) {
-					Vec3d vec3 = vec2.scale((this.rand.nextDouble() * 0.17d) + 0.03d)
-					 .addVector((this.rand.nextDouble() - 0.5d) * this.getFarRadius(0) * 0.12d,
-					 (this.rand.nextDouble() - 0.5d) * this.getFarRadius(0) * 0.12d, 
-					 (this.rand.nextDouble() - 0.5d) * this.getFarRadius(0) * 0.12d);
+				double d = MathHelper.atan2(this.getFarRadius(0), this.getRange(0));
+				for (int i = 0; i < (int)(this.getRange(0) * 10); i++) {
+					Vec3d vec3 = vec2.scale((this.rand.nextDouble() * 0.05d) + 0.2d)
+					 .rotatePitch((float)(this.rand.nextGaussian() * d))
+					 .rotateYaw((float)(this.rand.nextGaussian() * d));
 					Particles.spawnParticle(player.world, Particles.Types.SMOKE, vec1.x, vec1.y, vec1.z,
-					 1, 0d, 0d, 0d, vec3.x, vec3.y, vec3.z, 0x40ffffff, (int)this.getRange(0) * 2 + this.rand.nextInt(21),
-					 (int)(8.0D / (this.rand.nextDouble() * 0.8D + 0.2D)));
+					 1, 0d, 0d, 0d, vec3.x, vec3.y, vec3.z, 0x20ffffff, (int)this.getRange(0) * 2 + this.rand.nextInt(21), 12);
+				}
+				for (int i = 1, j = (int)(this.getRange(0) * 0.5d); i <= j; i++) {
+					Vec3d vec3 = vec2.scale(-0.0012d * i);
+					Particles.spawnParticle(player.world, Particles.Types.SONIC_BOOM, vec1.x, vec1.y, vec1.z,
+					 1, 0d, 0d, 0d, vec3.x, vec3.y, vec3.z, 0x00ffffff | ((int)((1f-(float)i/j)*0x40)<<24), i,
+					 (int)(5f * (1f + ((float)i/j) * 0.5f)));
 				}
 			}
 
 			@Override
-			protected EntityItem processAffectedBlock(EntityLivingBase player, BlockPos pos, EnumFacing facing) {
-				if (this.griefing && player.world.getBlockState(pos).isFullBlock()
+			protected EntityItem processAffectedBlock(Entity player, BlockPos pos, EnumFacing facing) {
+				/*if (this.griefing && player.world.getBlockState(pos).isFullBlock()
 				 && player.world.getBlockState(pos.up()).getCollisionBoundingBox(player.world, pos.up()) == Block.NULL_AABB) {
 					EntityFallingBlock entity = new EntityFallingBlock(player.world, 0.5d+pos.getX(), pos.getY(), 0.5d+pos.getZ(), player.world.getBlockState(pos));
 					entity.motionY = 0.45d;
 					player.world.spawnEntity(entity);
-				}
-				return super.processAffectedBlock(player, pos, facing);
+				}*/
+				//return super.processAffectedBlock(player, pos, facing);
+				return null;
 			}
 
 			@Override
-			protected float getBreakChance(BlockPos pos, EntityLivingBase player, double range) {
-				return player.getActivePotionEffect(potion).getIsAmbient()
-				//return player instanceof EntityPlayer 
+			protected float getBreakChance(BlockPos pos, Entity player, double range) {
+				return 0.0f;
+				/*return player instanceof EntityLivingBase && ((EntityLivingBase)player).getActivePotionEffect(potion).getIsAmbient()
 				 ? 1.0F - (float)((Math.sqrt(player.getDistanceSqToCenter(pos)) - 4.0D) / range)
-				 : 0.0F;
+				 : 0.0F;*/
 			}
 		}
 
 		@SubscribeEvent
 		public void onLivingHurt(LivingHurtEvent event) {
-			if (event.getSource().getTrueSource() instanceof EntityLivingBase) {
-				EntityLivingBase attacker = (EntityLivingBase)event.getSource().getTrueSource();
-				if (attacker.isPotionActive(potion)) {
-					int amplifier = attacker.getActivePotionEffect(potion).getAmplifier();
-					if (Chakra.pathway(attacker).consume((double)amplifier)) {
-						EntityLivingBase target = event.getEntityLiving();
-						target.world.playSound(null, target.posX, target.posY, target.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE,
-						  SoundCategory.BLOCKS, 1.0F, (1.0F + (target.getRNG().nextFloat() - target.getRNG().nextFloat()) * 0.2F) * 0.7F);
-						new Punch(attacker.world).execute(attacker, (double)amplifier * 0.4d, 0.1d * amplifier);
-						//ProcedureUtils.pushEntity(attacker, target, 10d, 0.1f * amplifier);
-						event.setAmount(event.getAmount() + amplifier);
-					}
+			if (event.getSource().getImmediateSource() instanceof EntityLivingBase && !event.getSource().isExplosion()
+			 && event.getSource() instanceof EntityDamageSource && !((EntityDamageSource)event.getSource()).getIsThornsDamage()) {
+				EntityLivingBase attacker = (EntityLivingBase)event.getSource().getImmediateSource();
+				float cool = attacker.getEntityData().getFloat("lastpunch");
+				if (cool-attacker.world.getTotalWorldTime() > 15) {
+					attacker.getEntityData().setFloat("lastpunch",attacker.world.getTotalWorldTime()+15);
+					return;
 				}
+				if (cool-attacker.world.getTotalWorldTime() > 0) {
+					return;
+				}
+					if (attacker.isPotionActive(potion)) {
+						attacker.getEntityData().setFloat("lastpunch",attacker.world.getTotalWorldTime()+15);
+						int amplifier = attacker.getActivePotionEffect(potion).getAmplifier();
+						if (Chakra.pathway(attacker).consume((double)amplifier*1.25)) {
+							EntityLivingBase target = event.getEntityLiving();
+							target.world.playSound(null, target.posX, target.posY, target.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE,
+									SoundCategory.BLOCKS, 1.0F, (1.0F + (target.getRNG().nextFloat() - target.getRNG().nextFloat()) * 0.2F) * 0.7F);
+							new Punch(attacker.world).execute(attacker, MathHelper.clamp((double)amplifier * 0.4d,0.0d,6d), MathHelper.clamp(0.1d * amplifier,0.0d,12d));
+							event.setAmount(event.getAmount() + amplifier);
+						}
+					}
 			}
 		}
 

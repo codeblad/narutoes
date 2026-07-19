@@ -1,19 +1,21 @@
 package net.narutomod.procedure;
 
+import net.narutomod.*;
+import net.narutomod.item.ItemJutsu;
 import net.narutomod.world.WorldKamuiDimension;
 import net.narutomod.item.ItemMangekyoSharinganObito;
 import net.narutomod.gui.overlay.OverlayByakuganView;
-import net.narutomod.PlayerTracker;
-import net.narutomod.Particles;
-import net.narutomod.ElementsNarutomodMod;
-import net.narutomod.Chakra;
 
 import net.minecraft.world.World;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.DamageSource;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.item.ItemStack;
+import net.minecraft.init.MobEffects;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
@@ -81,33 +83,47 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 			if ((entity.getEntityData().getBoolean("kamui_teleport"))) {
 				OverlayByakuganView.sendCustomData(entity, false, 70);
 				entity.getEntityData().setBoolean("kamui_teleport", (false));
-				timer = (double) 0;
+				timer = (double) (-1);
 			}
-			chakraUsage = (double) ItemMangekyoSharinganObito.getIntangibleChakraUsage((EntityLivingBase) entity);;
-			if (((chakraAmount) > (chakraUsage))) {
-				ProcedureUtils.purgeHarmfulEffects((EntityLivingBase) entity);
+			if ((world.getTotalWorldTime() > entity.getEntityData().getLong("kamui_intangible_cd"))) {
+				if (entity.getEntityData().getBoolean("susanoo_activated")) {
+					return;
+				}
+				chakraUsage = (double) ItemMangekyoSharinganObito.getIntangibleChakraUsage((EntityLivingBase) entity);;
+				f2 = (boolean) (((is_pressed) && ((timer) <= 20*10)) && ((chakraAmount) > (chakraUsage)));
+				if ((f2)) {
+					ProcedureUtils.purgeHarmfulEffects((EntityLivingBase) entity);
+					ProcedureOnLivingUpdate.setUntargetable(entity, 3);
+					entity.fallDistance = (float) (0);
+				}
 				if (entity instanceof EntityPlayer) {
-					((EntityPlayer) entity).capabilities.allowEdit = (!(is_pressed));
+					((EntityPlayer) entity).capabilities.allowEdit = (!(f2));
 					((EntityPlayer) entity).sendPlayerAbilities();
 				}
-				ProcedureOnLivingUpdate.setNoClip(entity, is_pressed);
-				if (entity instanceof EntityPlayer && !entity.world.isRemote) {
-					((EntityPlayer) entity).sendStatusMessage(
-							new TextComponentString(
-									((net.minecraft.util.text.translation.I18n.translateToLocal("chattext.intangible")) + "" + ((is_pressed)))),
-							(true));
+				if (entity instanceof EntityPlayer) {
+					((EntityPlayer) entity).capabilities.isFlying = (f2);
+					((EntityPlayer) entity).sendPlayerAbilities();
 				}
-				entity.getEntityData().setBoolean("kamui_intangible", (is_pressed));
-			}
-			if ((!(is_pressed))) {
-				timer = (double) 0;
+				ProcedureOnLivingUpdate.setNoClip(entity, f2);
+				if (entity instanceof EntityPlayer && !entity.world.isRemote) {
+					((EntityPlayer) entity).sendStatusMessage(new TextComponentString(
+							((net.minecraft.util.text.translation.I18n.translateToLocal("chattext.intangible")) + "" + ((f2)))), (true));
+				}
+				entity.getEntityData().setBoolean("kamui_intangible", (f2));
+				if ((!(f2))) {
+					entity.getEntityData().setLong("kamui_intangible_cd", world.getTotalWorldTime() + (long) timer);
+					timer = (double) (-1);
+				}
+			} else if ((entity instanceof EntityPlayer)) {
+				((EntityPlayer) entity).sendStatusMessage(new TextComponentTranslation("chattext.cooldown.formatted",
+						(entity.getEntityData().getLong("kamui_intangible_cd") - world.getTotalWorldTime()) / 20), true);
 			}
 		} else {
 			if ((entity.getEntityData().getBoolean("kamui_intangible"))) {
 				ProcedureOnLivingUpdate.setNoClip(entity, is_pressed);
 				entity.getEntityData().setBoolean("kamui_intangible", (is_pressed));
 				if ((!(is_pressed))) {
-					timer = (double) 0;
+					timer = (double) (-1);
 				}
 			} else {
 				RayTraceResult t = ProcedureUtils.objectEntityLookingAt(entity, 100d, true);
@@ -133,7 +149,7 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 						Particles.spawnParticle(world, Particles.Types.PORTAL_SPIRAL, t.hitVec.x, t.hitVec.y, t.hitVec.z, 100, 0d, 0d, 0d, 0d, 0d, 0d,
 								5, 0x20000000, 30);
 					} else {
-						timer = (double) 0;
+						timer = (double) (-1);
 					}
 				} else if ((entity.getEntityData().getBoolean("kamui_teleport"))) {
 					entity.getEntityData().setBoolean("kamui_teleport", (false));
@@ -145,21 +161,34 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 					f2 = (boolean) (t.entityHit != null);
 					if ((f2)) {
 						i = t.entityHit.getEntityBoundingBox().getAverageEdgeLength();
-						i = (double) ((timer) / (((distance) * (i)) * (2.01 - (PlayerTracker.getNinjaLevel((EntityPlayer) entity) / 300.1))));
+						i = (double) (((timer) - 5) / (((distance) * (i)) * (2.01 - (PlayerTracker.getNinjaLevel((EntityPlayer) entity) / 500.1))));
+						System.out.println(i);
 						if (((!(f3)) && ((i) <= 0.99999))) {
-							if (((i) > 0)) {
-								i = (double) ((i)
-										* ((t.entityHit instanceof EntityLivingBase) ? ((EntityLivingBase) t.entityHit).getMaxHealth() : -1));
-								if (t.entityHit instanceof EntityLivingBase)
-									((EntityLivingBase) t.entityHit).setHealth(
-											(float) (((t.entityHit instanceof EntityLivingBase) ? ((EntityLivingBase) t.entityHit).getHealth() : -1)
-													- (i)));
+							double cool = (entity.getEntityData().getFloat("kamuiDMGCD")- NarutomodModVariables.world_tick)/20;
+							if (cool > 30) {
+								entity.getEntityData().setFloat("airPalmcd", 0);
+							}
+							if (((i) > 0) && entity.getEntityData().getFloat("kamuiDMGCD") < world.getTotalWorldTime()) {
+								entity.getEntityData().setFloat("kamuiDMGCD", world.getTotalWorldTime()+20*7);
+								i = 50f;
+								if (t.entityHit instanceof EntityLivingBase) {
+									i = ((EntityLivingBase) t.entityHit).getMaxHealth()*0.2f;
+								}
+								t.entityHit.attackEntityFrom(DamageSource.OUT_OF_WORLD.setDamageIsAbsolute(), Math.min((float) i, 300f));
 							}
 						} else {
 							ProcedureKamuiTeleportEntity.eEntity(t.entityHit, x, z, dimid);
 						}
 					}
-					timer = (double) 0;
+					if ((!(f3))) {
+						if (entity instanceof EntityLivingBase)
+							((EntityLivingBase) entity)
+									.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, (int) ((timer) * 6), (int) 1, (false), (false)));
+						if (entity instanceof EntityLivingBase)
+							((EntityLivingBase) entity)
+									.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, (int) ((timer) * 6), (int) 2, (false), (false)));
+					}
+					timer = (double) (-1);
 				}
 			}
 		}

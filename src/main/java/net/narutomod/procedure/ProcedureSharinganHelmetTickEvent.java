@@ -91,8 +91,8 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 		if ((!((itemstack).hasTagCompound() && (itemstack).getTagCompound().getBoolean("sharingan_blinded")))) {
 			not_my_sharingan = (boolean) !((ItemDojutsu.Base) itemstack.getItem()).isOwner(itemstack, (EntityLivingBase) entity);;
 			if ((not_my_sharingan)) {
-				if (((((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).experienceLevel : 0) < 10)
-						|| ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) < 300))) {
+				if ((
+						((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) < 300))) {
 					if ((!(world.isRemote))) {
 						if (entity instanceof EntityPlayer) {
 							ItemStack _setstack = (itemstack);
@@ -139,16 +139,16 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 					}
 				}
 			}
+			//MANGENKYO OBTAINMENT METHOD
 			if ((((itemstack).getItem() == new ItemStack(ItemSharingan.helmet, (int) (1)).getItem())
-					&& ((((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).experienceLevel : 0) > 30)
-							&& ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) > 600)))) {
+					&& ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 5000))) {
 				if ((PlayerTracker.Deaths.hasRecentNearby((EntityPlayer) entity, 40D, 6000D) && (!(world.isRemote)))) {
 					if ((Math.random() < 0.5)) {
 						mangekyo = new ItemStack(ItemMangekyoSharingan.helmet, (int) (1));
 					} else {
 						mangekyo = new ItemStack(ItemMangekyoSharinganObito.helmet, (int) (1));
 					}
-					((ItemDojutsu.Base) mangekyo.getItem()).setOwner(mangekyo, (EntityLivingBase) entity);
+					((ItemSharingan.Base) mangekyo.getItem()).copyOwner(mangekyo, itemstack);
 					if (entity instanceof EntityPlayer) {
 						ItemStack _setstack = (mangekyo);
 						_setstack.setCount(1);
@@ -156,6 +156,7 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 					}
 					if (entity instanceof EntityPlayer)
 						((EntityPlayer) entity).inventory.clearMatchingItems((itemstack).getItem(), -1, (int) 1, null);
+					entity = ((ItemSharingan.Base) mangekyo.getItem()).getOwner(mangekyo, world);
 					if ((!(((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
 							? ((EntityPlayerMP) entity).getAdvancements()
 									.getProgress(((WorldServer) (entity).world).getAdvancementManager()
@@ -174,14 +175,18 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 								}
 							}
 						}
-						world.playSound((EntityPlayer) null, x, y, z, (net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY
-								.getObject(new ResourceLocation("ui.toast.challenge_complete")), SoundCategory.NEUTRAL, (float) 1, (float) 1);
+						if ((entity instanceof EntityPlayerMP)) {
+							world.playSound((EntityPlayer) null, (entity.posX), (entity.posY), (entity.posZ),
+									(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY
+											.getObject(new ResourceLocation("ui.toast.challenge_complete")),
+									SoundCategory.NEUTRAL, (float) 1, (float) 1);
+						}
 					}
 				}
 			}
 		} else {
-			if (entity instanceof EntityLivingBase)
-				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 1200, (int) 0, (false), (false)));
+			/*if (entity instanceof EntityLivingBase)
+				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) 40, (int) 0, (false), (false)));
 			if ((entity.getEntityData().getBoolean("susanoo_activated"))) {
 				{
 					Map<String, Object> $_dependencies = new HashMap<>();
@@ -189,7 +194,7 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 					$_dependencies.put("world", world);
 					ProcedureSusanoo.executeProcedure($_dependencies);
 				}
-			}
+			}*/
 		}
 	}
 }

@@ -16,6 +16,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 
+import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.List;
@@ -31,21 +32,28 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 	private static double centerX;
 	private static double centerY;
 	private static double centerZ;
-	private static AxisAlignedBB aabb;
+	//private static AxisAlignedBB aabb;
 	private static double minRange;
 	private static double maxRange;
 	//private static List<Entity> excludedEntities = Lists.newArrayList();
 	private static List<Entity> entitiesList = Lists.newArrayList();
 	private static ProcedureAoeCommand Instance;
-	private static final Predicate<Entity> MIN_DISTANCE = Predicates.and(EntitySelectors.NOT_SPECTATING, (p) -> {
+	/*private static final Predicate<Entity> MIN_DISTANCE = Predicates.and(EntitySelectors.NOT_SPECTATING, (p) -> {
 		return p.isEntityAlive() && !p.getEntityData().getBoolean("kamui_intangible")
 			&& p.getDistanceSq(centerX, centerY, centerZ) >= minRange*minRange;
-			//&& !excludedEntities.contains(p);
-	});
+			//&& !excludedEntities.contains(p);*/
+	private static final Predicate<Entity> MIN_DISTANCE = (p) -> {
+		return ItemJutsu.canTarget(p) && p.getDistanceSq(centerX, centerY, centerZ) >= minRange*minRange;
+	};
 	
+
 	public ProcedureAoeCommand(ElementsNarutomodMod instance) {
 		super(instance, 169);
 		Instance = this;
+	}
+
+	public static ProcedureAoeCommand getInstance() {
+		return Instance;
 	}
 
 	public static ProcedureAoeCommand set(World worldIn, double x, double y, double z, double minR, double maxR) {
@@ -53,7 +61,7 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 		centerX = x;
 		centerY = y;
 		centerZ = z;
-		aabb = new AxisAlignedBB(x - 0.5D, y, z - 0.5D, x + 0.5D, y + 1.0D, z + 0.5D);
+		AxisAlignedBB aabb = new AxisAlignedBB(x - 0.5D, y, z - 0.5D, x + 0.5D, y + 1.0D, z + 0.5D);
 		minRange = minR;
 		maxRange = maxR;
 		//excludedEntities.clear();
@@ -69,14 +77,30 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 		centerX = entity.posX;
 		centerY = entity.posY;
 		centerZ = entity.posZ;
-		aabb = entity.getEntityBoundingBox();
+		AxisAlignedBB aabb = entity.getEntityBoundingBox();
 		minRange = minR;
 		maxRange = maxR;
 		//excludedEntities.clear();
 		if (minRange < 0.0D)
 			minRange = 0.0D;
 		entitiesList = world.getEntitiesWithinAABB(Entity.class, aabb.grow(maxRange), MIN_DISTANCE);
+
 		return Instance;
+	}
+
+	public static ProcedureAoeCommand set(World worldIn, AxisAlignedBB axisalignedbb) {
+		world = worldIn;
+		centerX = ProcedureUtils.BB.getCenterX(axisalignedbb);
+		centerY = ProcedureUtils.BB.getCenterY(axisalignedbb);
+		centerZ = ProcedureUtils.BB.getCenterZ(axisalignedbb);
+		minRange = 0.0d;
+		maxRange = Math.max(Math.max(axisalignedbb.maxX - axisalignedbb.minX, axisalignedbb.maxZ - axisalignedbb.minZ), axisalignedbb.maxY - axisalignedbb.minY) * 0.5d;
+		entitiesList = world.getEntitiesWithinAABB(Entity.class, axisalignedbb, MIN_DISTANCE);
+		return Instance;
+	}
+
+	public List<Entity> getEntitiesList() {
+		return entitiesList;
 	}
 
 	public ProcedureAoeCommand exclude(Entity entity) {
@@ -161,7 +185,7 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 	public ProcedureAoeCommand resetHurtResistanceTime() {
 		if (!entitiesList.isEmpty())
 			for (Entity entity : entitiesList) {
-				entity.hurtResistantTime = 0;
+				entity.hurtResistantTime = 10;
 			}
 		return this;
 	}
@@ -199,7 +223,8 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 		//List<Entity> list = this.world.getEntitiesWithinAABB(Entity.class, aabb.grow(maxRange), MIN_DISTANCE);
 		if (!entitiesList.isEmpty())
 			for (Entity entity : entitiesList) {
-				if (!(entity instanceof EntityPlayer))
+				if (!(entity instanceof EntityPlayer)
+)
 					this.world.removeEntity(entity);
 			}
 		return this;
@@ -255,12 +280,24 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 		return this;
 	}
 
-	public ProcedureAoeCommand effect(Potion potion, int duration, int amplifier) {
+	public ProcedureAoeCommand effect(Potion potion, int duration, int amplifier, boolean showParticles) {
 		//List<EntityLivingBase> list = this.world.getEntitiesWithinAABB(EntityLivingBase.class, aabb.grow(maxRange), MIN_DISTANCE);
 		if (!entitiesList.isEmpty())
 			for (Entity entity : entitiesList) {
 				if (entity instanceof EntityLivingBase)
-					((EntityLivingBase)entity).addPotionEffect(new PotionEffect(potion, duration * 20, amplifier, false, true));
+					((EntityLivingBase)entity).addPotionEffect(new PotionEffect(potion, duration * 20, amplifier, false, showParticles));
+			}
+		return this;
+	}
+
+	public ProcedureAoeCommand effectCentered(Potion potion, int duration, int amplifier) {
+		//List<EntityLivingBase> list = this.world.getEntitiesWithinAABB(EntityLivingBase.class, aabb.grow(maxRange), MIN_DISTANCE);
+		if (!entitiesList.isEmpty())
+			for (Entity entity : entitiesList) {
+				if (entity instanceof EntityLivingBase) {
+					double d = 1.0d - entity.getDistance(centerX, centerY, centerZ) / maxRange;
+					((EntityLivingBase)entity).addPotionEffect(new PotionEffect(potion, (int)((double)duration * 20d * d), amplifier, false, true));
+				}
 			}
 		return this;
 	}
@@ -314,14 +351,19 @@ public class ProcedureAoeCommand extends ElementsNarutomodMod.ModElement {
 					//BlockPos pos = new BlockPos(i, k, j);
 					double d = pos.setPos(i, k, j).distanceSqToCenter(this.centerX, this.centerY, this.centerZ);
 					if (d <= this.maxRange * this.maxRange && d > this.minRange * this.minRange) {
-						if (this.world.isAirBlock(pos) && this.world.getBlockState(pos.down()).isFullBlock() && Math.random() <= chance)
+						if (this.world.isAirBlock(pos) && this.world.getBlockState(pos.down()).isFullBlock() && Math.random() <= chance) {
 							this.world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+						}
 					}
 				}
 			}
 		}
 		pos.release();
 		return this;
+	}
+
+	public List<Entity> getList() {
+		return entitiesList;
 	}
 
 	public ProcedureAoeCommand setFire(int seconds) {

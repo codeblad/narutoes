@@ -3,22 +3,30 @@ package net.narutomod.entity;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.entity.item.EntityFallingBlock;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.MoverType;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -26,33 +34,27 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.MoverType;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.block.Block;
-import net.minecraft.world.WorldServer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.DamageSource;
-import net.minecraft.entity.item.EntityFallingBlock;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.block.state.IBlockState;
 
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureSync;
 
-import java.util.Map;
-import java.util.List;
-import com.google.common.collect.Maps;
-import java.util.Iterator;
-import com.google.common.base.Predicate;
-import javax.annotation.Nullable;
-import com.google.common.collect.Lists;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import javax.annotation.Nullable;
+import com.google.common.collect.Maps;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Lists;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
@@ -69,22 +71,15 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 		  .id(new ResourceLocation("narutomod", "earth_blocks"), ENTITYID).name("earth_blocks").tracker(64, 3, true).build());
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(Base.class, renderManager -> {
-			return new RenderEarthBlocks(renderManager);
-		});
-	}
-
 	public static class Base extends Entity {
-		private List<BlockPos> ogList;
+		private List<? extends BlockPos> ogList;
 		private final Map<Vec3d, IBlockState> blocksMap = Maps.newHashMap();
 		private final Map<Entity, Vec3d> entityMap = Maps.newHashMap();
 		private int fallTime = 600;
 		private int ticksAlive;
-		private int fallTicks;
+		protected int fallTicks;
 		private int blocksTotal;
+		private float health;
 		private boolean breakOnImpact;
 
 		public Base(World world) {
@@ -92,7 +87,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			this.isImmuneToFire = true;
 		}
 
-		public Base(World world, List<BlockPos> list) {
+		public Base(World world, List<? extends BlockPos> list) {
 			this(world);
 			if (list.isEmpty()) {
 				return;
@@ -112,6 +107,10 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 					Vec3d vec = new Vec3d(pos).addVector(0.5d, 0.0d, 0.5d).subtract(this.getPositionVector());
 					this.blocksMap.put(vec, blockstate);
 				}
+				float hardness = blockstate.getBlockHardness(world, pos);
+				if (hardness > 0.0f) {
+					this.health += hardness * 3f;
+				}
 			}
 			this.blocksTotal = this.blocksMap.size();
 			for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox())) {
@@ -120,7 +119,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 					this.entityMap.put(entity, entity.getPositionVector().subtract(this.getPositionVector()));
 				}
 			}
-			this.ogList = new ArrayList<BlockPos>(list);
+			this.ogList = new ArrayList(list);
 		}
 
 		private boolean isAirOrLiquid(IBlockState blockstate, BlockPos pos) {
@@ -155,7 +154,15 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			this.fallTime = ticks;
 		}
 
-		@Override
+		public int getFallTime() {
+			return this.fallTime;
+		}
+
+		public void explodeOnImpact(boolean explode) {
+			this.breakOnImpact = explode;
+		}
+
+		/*@Override
 		public void setDead() {
 			if (!this.world.isRemote && !this.blocksMap.isEmpty() && this.griefingAllowed()) {
 				for (Map.Entry<Vec3d, IBlockState> entry : this.blocksMap.entrySet()) {
@@ -166,15 +173,33 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			super.setDead();
+		}*/
+
+		public final float getHealth() {
+			return this.health;
+		}
+
+		@Override
+		public boolean attackEntityFrom(DamageSource source, float amount) {
+			if (!this.world.isRemote && this.health > 0.0f && source != DamageSource.FALLING_BLOCK) {
+				this.health -= amount;
+				if (this.health <= 0.0f) {
+					this.breakOnImpact = true;
+					this.onImpact(amount);
+				}
+				return true;
+			}
+			return false;
 		}
 
 		@Override
 	    public void applyEntityCollision(Entity entityIn) {
-       		if (entityIn instanceof Base) {
-       			if (this.mass() > ((Base)entityIn).mass() / 2) {
-       				entityIn.setNoGravity(false);
-       			}
-       		} else if (!entityIn.noClip && !entityIn.isBeingRidden()) {
+       		//if (entityIn instanceof Base) {
+       		//	if (!this.world.isRemote && this.ticksAlive > 20 && this.mass() > ((Base)entityIn).mass() / 2) {
+       		//		entityIn.setNoGravity(false);
+       		//	}
+       		//} else
+       		if (!entityIn.noClip && !entityIn.isBeingRidden()) {
 	       		//EnumFacing hitface = BlocksMoveHelper.collideWithEntity(this, entityIn, this.getMotion());
 	       		EnumFacing hitface = BlocksMoveHelper.getCollidingSide(this.getCollisionBoundingBox(), entityIn.getEntityBoundingBox());
 		        if (hitface != null) {
@@ -187,10 +212,6 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 		           		entityIn.attackEntityFrom(DamageSource.FALLING_BLOCK, this.getCollisionDamage());
 		        	}
 		        }
-		        //double d = this.mass() / (ProcedureUtils.BB.getVolume(entityIn.getEntityBoundingBox()) + this.mass());
-		        //this.motionX *= d;
-		        //this.motionY *= d;
-		        //this.motionZ *= d;
        		}
 	    }
 
@@ -206,7 +227,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			return (float)(this.getVelocity() * (double)this.mass());
 		}
 
-	    private float getCollisionDamage() {
+	    public float getCollisionDamage() {
 	    	return this.collisionForce() * 0.5f;
 	    }
 
@@ -222,12 +243,16 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 	    	return this.blocksMap;
 	    }
 
-	    public List<BlockPos> getBlockposList() {
+	    public List<? extends BlockPos> getBlockposList() {
 	    	return this.ogList;
 	    }
 
 	    public boolean griefingAllowed() {
 	    	return net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, null);
+	    }
+
+	    public int getTicksAlive() {
+	    	return this.ticksAlive;
 	    }
 
 		@SideOnly(Side.CLIENT)
@@ -243,7 +268,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 	           	}
 	           	ProcedureSync.ResetBoundingBox.sendToPlayer(this, player);
 			} else if (packet.op == 1) {
-				this.onImpact();
+				this.onImpact(packet.amount);
 			}
 		}
 
@@ -292,7 +317,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
         			this.applyEntityCollision(entity);
            		}
 				if (this.onGround && !this.hasNoGravity()) {
-					this.onImpact();
+					this.onImpact(this.collisionForce());
            		}
            		this.motionX *= 0.98d;
            		this.motionY *= 0.98d;
@@ -309,9 +334,9 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			double dx = x;
 			double dy = y;
 			double dz = z;
-			List<AxisAlignedBB> list = this.world.getCollisionBoxes(this, this.getCollisionBoundingBox().expand(x, y, z));
-			BlocksMoveHelper.CollisionHelper ch = new BlocksMoveHelper.CollisionHelper(this.getCollisionBoundingBox());
-			ch.collideWithAABBs(list, x, y, z);
+			//List<AxisAlignedBB> list = this.world.getCollisionBoxes(this, this.getCollisionBoundingBox().expand(x, y, z));
+			ProcedureUtils.CollisionHelper ch = new ProcedureUtils.CollisionHelper(this);
+			ch.collideWithAABBs(x, y, z);
 			x = ch.minX(x);
 			y = ch.minY(y);
 			z = ch.minZ(z);
@@ -322,18 +347,20 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			this.collided = this.collidedHorizontally || this.collidedVertically;
 			if (!this.world.isRemote) {
 				boolean canMoveThrough = true;
-				this.breakOnImpact = this.collisionForce() > 2000.0f;
+				//this.breakOnImpact = this.collisionForce() > 1000.0f;
 				if (dx != x || dy != y || dz != z) {
-					List<BlockPos> list1 = BlocksMoveHelper.convert2BlockposList(list);
+					List<BlockPos> list1 = ch.getHitBlocks();
 					float f = BlocksMoveHelper.getBlocksTotalResistance(this.world, list1);
 					//float hitarea = (float)list.size() / this.collisionForce();
 					float hitarea = f / this.collisionForce() * 0.2f;
 					//canMoveThrough = !this.containsUnbreakableBlocks(list) && hitarea < 1.0f;
 					canMoveThrough = this.ticksAlive > 20 ? (f < 1000.0f && hitarea < 1.0f) : true;
-					double d = MathHelper.clamp(1.0d - hitarea, 0.0d, 0.8d);
-					this.motionX *= d;
-					this.motionY *= d;
-					this.motionZ *= d;
+					if (this.ticksAlive > 20) {
+						double d = MathHelper.clamp(1.0d - hitarea, 0.0d, 0.8d);
+						this.motionX *= d;
+						this.motionY *= d;
+						this.motionZ *= d;
+					}
 					if (canMoveThrough && !this.world.isRemote) {
 				        for (BlockPos pos : list1) {
 					    	ProcedureUtils.breakBlockAndDropWithChance(this.world, pos, this.destroyHardness(), 
@@ -363,14 +390,15 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			return false;
 		}
 
-	    protected void onImpact() {
+	    protected void onImpact(float impactDamage) {
 			if (this.world.isRemote) {
-				ProcedureSync.CPacketEarthBlocks.sendToServer(1, this);
+				ProcedureSync.CPacketEarthBlocks.sendToServer(1, this, impactDamage);
 			} else {
 	           	for (Map.Entry<Entity, Vec3d> entry : this.entityMap.entrySet()) {
 	           		entry.getKey().attackEntityFrom(DamageSource.FALLING_BLOCK, this.getCollisionDamage());
 	           	}
 	           	boolean flag = this.griefingAllowed();
+	           	impactDamage = MathHelper.sqrt(impactDamage) * 0.002236f;
 				BlockPos.PooledMutableBlockPos pos = BlockPos.PooledMutableBlockPos.retain();
 				for (Map.Entry<Vec3d, IBlockState> entry : this.blocksMap.entrySet()) {
 					Vec3d vec = this.getPositionVector().add(entry.getKey());
@@ -378,13 +406,12 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 		           	if (this.breakOnImpact) {
 		           		if (this.rand.nextFloat() <= 0.3f) {
 							this.world.setBlockState(pos, entry.getValue(), 3);
-			           		EntityFallingBlock entity = new EntityFallingBlock(this.world, vec.x, vec.y, vec.z, entry.getValue()) {
-								{	this.shouldDropItem = flag; }
-			           		};
+			           		EntityFallingBlock entity = new EntityFallingBlock(this.world, vec.x, vec.y, vec.z, entry.getValue());
 			           		this.world.spawnEntity(entity);
-			           		entity.motionX = entry.getKey().x * (0.1d + this.rand.nextDouble() * 0.2d);
-		           			entity.motionY = entry.getKey().y * (0.1d + this.rand.nextDouble() * 0.2d);
-			           		entity.motionZ = entry.getKey().z * (0.1d + this.rand.nextDouble() * 0.2d);
+			           		entity.motionX = entry.getKey().x * (this.rand.nextDouble() * 0.2d + impactDamage);
+		           			entity.motionY = entry.getKey().y * (this.rand.nextDouble() * 0.2d + impactDamage);
+			           		entity.motionZ = entry.getKey().z * (this.rand.nextDouble() * 0.2d + impactDamage);
+			           		ReflectionHelper.setPrivateValue(EntityFallingBlock.class, entity, !flag, 3);
 		           		}
 		           	} else {
 						((WorldServer)this.world).spawnParticle(EnumParticleTypes.BLOCK_DUST, vec.x, vec.y+0.5d, vec.z,
@@ -425,6 +452,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 					}
 				}
 			}
+			this.health = compound.getFloat("health");
 		}
 
 		@Override
@@ -457,6 +485,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			if (!nbttaglist2.hasNoTags()) {
 				compound.setTag("entityMap", nbttaglist2);
 			}
+			compound.setFloat("health", this.health);
 		}
 	}
 
@@ -543,7 +572,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 				for (EntityFallingBlock entity : this.toMove) {
 					AxisAlignedBB aabb = entity.getEntityBoundingBox().expand(mX, mY, mZ);
 					List<AxisAlignedBB> list1 = entity.world.getCollisionBoxes(null, aabb);
-					CollisionHelper stat = new CollisionHelper(entity.getEntityBoundingBox());
+					ProcedureUtils.CollisionHelper stat = new ProcedureUtils.CollisionHelper(entity);
 					stat.collideWithAABBs(list1, mX, mY, mZ);
 					this.addToCollidedBlocks(this.convert2BlockposList(list1));
 					dX = stat.minX(dX);
@@ -555,7 +584,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 							return p_apply_1_ != null && !BlocksMoveHelper.this.toMove.contains(p_apply_1_);
 						}
 					});
-					CollisionHelper stat2 = new CollisionHelper(entity.getEntityBoundingBox());
+					ProcedureUtils.CollisionHelper stat2 = new ProcedureUtils.CollisionHelper(entity);
 					List<AxisAlignedBB> list3 = this.convert2BoundingboxList(list2);
 					stat2.collideWithAABBs(list3, mX, mY, mZ);
 					this.addToCollidedAABB(list3);
@@ -759,110 +788,78 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 			 +", cMT:"+this.canMoveThrough+", motion:("+this.motionX+","+this.motionY+","+this.motionZ
 			 +"), bb:"+this.boundingBox;
 		}
-
-		public static class CollisionHelper {
-			private AxisAlignedBB source;
-			public double dx;
-			public double dy;
-			public double dz;
-			public int hitsOnSide[] = { 0, 0, 0, 0, 0, 0 };
-
-			public CollisionHelper(AxisAlignedBB sourceBB) {
-				this.source = sourceBB;
-			}
-
-			public void collideWithAABBs(List<AxisAlignedBB> list, double x, double y, double z) {
-				this.dx = x;
-				this.dy = y;
-				this.dz = z;
-	        	if (x != 0.0D) for (AxisAlignedBB aabb : list) {
-	        		double d = aabb.calculateXOffset(this.source, x);
-			    	if (Math.abs(d) < Math.abs(this.dx)) this.dx = d;
-			    	if (d != x) this.hitsOnSide[(x > 0d ? EnumFacing.WEST : EnumFacing.EAST).getIndex()]++;
-	        	}
-			    if (y != 0.0D) for (AxisAlignedBB aabb : list) {
-	        		double d = aabb.calculateYOffset(this.source, y);
-			    	if (Math.abs(d) < Math.abs(this.dy)) this.dy = d;
-			    	if (d != y) this.hitsOnSide[(y > 0d ? EnumFacing.UP : EnumFacing.DOWN).getIndex()]++;
-			    }
-			    if (z != 0.0D) for (AxisAlignedBB aabb : list) {
-	        		double d = aabb.calculateZOffset(this.source, z);
-			    	if (Math.abs(d) < Math.abs(this.dz)) this.dz = d;
-			    	if (d != z) this.hitsOnSide[(z > 0d ? EnumFacing.NORTH : EnumFacing.SOUTH).getIndex()]++;
-			    }
-			}
-
-			public double minX(double x) {
-				return Math.signum(x) != Math.signum(this.dx) ? 0d : Math.abs(x) < Math.abs(this.dx) ? x : this.dx;
-			}
-
-			public double minY(double y) {
-				return Math.signum(y) != Math.signum(this.dy) ? 0d : Math.abs(y) < Math.abs(this.dy) ? y : this.dy;
-			}
-
-			public double minZ(double z) {
-				return Math.signum(z) != Math.signum(this.dz) ? 0d : Math.abs(z) < Math.abs(this.dz) ? z : this.dz;
-			}
-		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class RenderEarthBlocks extends Render<Base> {
-	    public RenderEarthBlocks(RenderManager renderManagerIn) {
-	        super(renderManagerIn);
-	    }
-	
-		private void renderBlock(Base entity, IBlockState iblockstate, Vec3d blockvec, double x, double y, double z) {
-			if (iblockstate.getRenderType() == EnumBlockRenderType.MODEL) {
-                GlStateManager.pushMatrix();
-                GlStateManager.disableLighting();
-                Tessellator tessellator = Tessellator.getInstance();
-                BufferBuilder bufferbuilder = tessellator.getBuffer();
-                bufferbuilder.begin(7, DefaultVertexFormats.BLOCK);
-                GlStateManager.translate(x + blockvec.x - 0.5d, y + blockvec.y, z + blockvec.z - 0.5d);
-                BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-                blockrendererdispatcher.getBlockModelRenderer().renderModel(entity.world, 
-                  blockrendererdispatcher.getModelForState(iblockstate), iblockstate, BlockPos.ORIGIN, bufferbuilder, false);
-                tessellator.draw();
-                GlStateManager.enableLighting();
-                GlStateManager.popMatrix();
-	        }
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
+
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
+		@Override
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(Base.class, renderManager -> new RenderEarthBlocks(renderManager));
 		}
 
-		private boolean isFullySurrounded(Base entity, Vec3d vec, Vec3d viewer) {
-			Vec3d vec1 = vec.add(entity.getPositionVector());
-			return (viewer.y <= vec1.y || entity.blocksMap.containsKey(vec.addVector(0d, 1d, 0d))) 
-			    && (viewer.y >= vec1.y || entity.blocksMap.containsKey(vec.addVector(0d, -1d, 0d)))
-			    && (viewer.x <= vec1.x || entity.blocksMap.containsKey(vec.addVector(1d, 0d, 0d)))
-			    && (viewer.x >= vec1.x || entity.blocksMap.containsKey(vec.addVector(-1d, 0d, 0d)))
-			    && (viewer.z <= vec1.z || entity.blocksMap.containsKey(vec.addVector(0d, 0d, 1d)))
-			    && (viewer.z >= vec1.z || entity.blocksMap.containsKey(vec.addVector(0d, 0d, -1d)));
-		}
+		@SideOnly(Side.CLIENT)
+		public class RenderEarthBlocks extends Render<Base> {
+		    public RenderEarthBlocks(RenderManager renderManagerIn) {
+		        super(renderManagerIn);
+		    }
 		
-		@Override
-	    public void doRender(Base entity, double x, double y, double z, float entityYaw, float partialTicks) {
-	        if (!entity.blocksMap.isEmpty() && entity.blocksMap.size() == entity.blocksTotal) {
-		        this.shadowSize = 0.8f * entity.width;
-                this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-                EntityPlayer viewer = Minecraft.getMinecraft().player;
-                if (viewer.getDistance(entity) < (double)entity.width + 2d) {
-		        	for (Map.Entry<Vec3d, IBlockState> entry : entity.blocksMap.entrySet()) {
-		            	this.renderBlock(entity, entry.getValue(), entry.getKey(), x, y, z);
-		        	}
-                } else {
-                	Vec3d viewereyes = viewer.getPositionEyes(1f);
-		        	for (Map.Entry<Vec3d, IBlockState> entry : entity.blocksMap.entrySet()) {
-		        		if (!this.isFullySurrounded(entity, entry.getKey(), viewereyes)) {
-		            		this.renderBlock(entity, entry.getValue(), entry.getKey(), x, y, z);
-		        		}
-		        	}
-                }
-	        }
-	    }
-
-		@Override
-	    protected ResourceLocation getEntityTexture(Base entity) {
-	        return TextureMap.LOCATION_BLOCKS_TEXTURE;
-	    }
+			private void renderBlock(Base entity, IBlockState iblockstate, Vec3d blockvec, double x, double y, double z) {
+				if (iblockstate.getRenderType() == EnumBlockRenderType.MODEL) {
+	                GlStateManager.pushMatrix();
+	                GlStateManager.disableLighting();
+	                Tessellator tessellator = Tessellator.getInstance();
+	                BufferBuilder bufferbuilder = tessellator.getBuffer();
+	                bufferbuilder.begin(7, DefaultVertexFormats.BLOCK);
+	                GlStateManager.translate(x + blockvec.x - 0.5d, y + blockvec.y, z + blockvec.z - 0.5d);
+	                BlockRendererDispatcher blockrendererdispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
+	                blockrendererdispatcher.getBlockModelRenderer().renderModel(entity.world, 
+	                  blockrendererdispatcher.getModelForState(iblockstate), iblockstate, BlockPos.ORIGIN, bufferbuilder, false);
+	                tessellator.draw();
+	                GlStateManager.enableLighting();
+	                GlStateManager.popMatrix();
+		        }
+			}
+	
+			private boolean isFullySurrounded(Base entity, Vec3d vec, Vec3d viewer) {
+				Vec3d vec1 = vec.add(entity.getPositionVector());
+				return (viewer.y <= vec1.y || entity.blocksMap.containsKey(vec.addVector(0d, 1d, 0d))) 
+				    && (viewer.y >= vec1.y || entity.blocksMap.containsKey(vec.addVector(0d, -1d, 0d)))
+				    && (viewer.x <= vec1.x || entity.blocksMap.containsKey(vec.addVector(1d, 0d, 0d)))
+				    && (viewer.x >= vec1.x || entity.blocksMap.containsKey(vec.addVector(-1d, 0d, 0d)))
+				    && (viewer.z <= vec1.z || entity.blocksMap.containsKey(vec.addVector(0d, 0d, 1d)))
+				    && (viewer.z >= vec1.z || entity.blocksMap.containsKey(vec.addVector(0d, 0d, -1d)));
+			}
+			
+			@Override
+		    public void doRender(Base entity, double x, double y, double z, float entityYaw, float partialTicks) {
+		        if (!entity.blocksMap.isEmpty() && entity.blocksMap.size() == entity.blocksTotal) {
+			        this.shadowSize = 0.8f * entity.width;
+	                this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+	                EntityPlayer viewer = Minecraft.getMinecraft().player;
+	                if (viewer.getDistance(entity) < (double)entity.width + 2d) {
+			        	for (Map.Entry<Vec3d, IBlockState> entry : entity.blocksMap.entrySet()) {
+			            	this.renderBlock(entity, entry.getValue(), entry.getKey(), x, y, z);
+			        	}
+	                } else {
+	                	Vec3d viewereyes = viewer.getPositionEyes(1f);
+			        	for (Map.Entry<Vec3d, IBlockState> entry : entity.blocksMap.entrySet()) {
+			        		if (!this.isFullySurrounded(entity, entry.getKey(), viewereyes)) {
+			            		this.renderBlock(entity, entry.getValue(), entry.getKey(), x, y, z);
+			        		}
+			        	}
+	                }
+		        }
+		    }
+	
+			@Override
+		    protected ResourceLocation getEntityTexture(Base entity) {
+		        return TextureMap.LOCATION_BLOCKS_TEXTURE;
+		    }
+		}
 	}
 }

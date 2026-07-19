@@ -1,6 +1,8 @@
 
 package net.narutomod.item;
 
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -41,7 +43,7 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 278;
 	public static final ItemJutsu.JutsuEnum CLOUD = new ItemJutsu.JutsuEnum(0, "rantoncloud", 'S', 1d, new EntityRaiunkuha.Jutsu());
-	public static final ItemJutsu.JutsuEnum LASERCIRCUS = new ItemJutsu.JutsuEnum(1, "laser_circus", 'S', 100d, new EntityLaserCircus.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum LASERCIRCUS = new ItemJutsu.JutsuEnum(1, "laser_circus", 'S', 130d, new EntityLaserCircus.EC.Jutsu());
 
 	public ItemRanton(ElementsNarutomodMod instance) {
 		super(instance, 597);
@@ -71,14 +73,6 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			if (this.getCurrentJutsu(stack) == LASERCIRCUS) {
-				return this.getPower(stack, entity, timeLeft, 0.1f, 50f);
-			}
-			return 1.0f;
-		}
-
-		@Override
 		public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer entity, EnumHand hand) {
 		 	ItemStack stack = entity.getHeldItem(hand);
 			if (entity.isCreative() || (ProcedureUtils.hasItemInInventory(entity, ItemRaiton.block) 
@@ -100,10 +94,10 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static class EntityRaiunkuha extends Entity {
+	public static class EntityRaiunkuha extends Entity implements ItemJutsu.IJutsu {
 		private final double chakrUsage = CLOUD.chakraUsage;
 		private EntityLivingBase summoner;
-		private ItemStack rantonstack;
+		private float damageMultiplier;
 
 		public EntityRaiunkuha(World a) {
 			super(a);
@@ -114,8 +108,13 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 			this(summonerIn.world);
 			this.setSize(0.01f, 0.01f);
 			this.summoner = summonerIn;
-			this.rantonstack = stack;
+			this.damageMultiplier = Math.max(((ItemJutsu.Base)stack.getItem()).getXpRatio(stack, CLOUD), 1f);
 			this.setPosition(summonerIn.posX, summonerIn.posY, summonerIn.posZ);
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.RANTON;
 		}
 
 		@Override
@@ -124,19 +123,22 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate() {
-			super.onUpdate();
+			//super.onUpdate();
 			if (this.summoner != null && this.summoner.isEntityAlive() && Chakra.pathway(this.summoner).consume(this.chakrUsage)) {
 				this.setPosition(this.summoner.posX, this.summoner.posY, this.summoner.posZ);
 				if (this.rand.nextInt(20) == 0) {
-					this.playSound((SoundEvent)SoundEvent.REGISTRY
-					 .getObject(new ResourceLocation(("narutomod:electricity"))), 0.1f, this.rand.nextFloat() * 0.6f + 0.3f);
+					this.playSound(SoundEvent.REGISTRY
+					 .getObject(new ResourceLocation("narutomod:electricity")), 0.1f, this.rand.nextFloat() * 0.6f + 0.3f);
+				}
+				if (this.ticksExisted%20 == 2) {
+					this.summoner.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 13, false, false));
 				}
 				EntityLightningArc.spawnAsParticle(this.world, this.posX + (this.rand.nextDouble()-0.5d) * 2.0d,
 				  this.posY + this.rand.nextDouble() * 1.6d, this.posZ + (this.rand.nextDouble()-0.5d) * 2.0d, 1.2d, 0d, 0d, 0d);
 				Particles.spawnParticle(world, Particles.Types.SMOKE, this.posX, this.posY + 0.9d, this.posZ,
-				  100, 0.4d, 0.6d, 0.4d, 0d, 0d, 0d, 0xff303030, 30, 0, 0, this.summoner.getEntityId(), 0);
+				  20, 0.4d, 0.6d, 0.4d, 0d, 0d, 0d, 0xff303030, 30, 0, 0, this.summoner.getEntityId(), 0);
 				for (EntityLivingBase entity1 : 
-				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.summoner.getEntityBoundingBox().grow(4d))) {
+				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.summoner.getEntityBoundingBox().grow(2d))) {
 					if (!entity1.equals(this.summoner) && entity1.isEntityAlive()) {
 						this.setLightningOn(entity1);
 					}
@@ -154,12 +156,12 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 			 this.getPositionVector().addVector(0d, 1d, 0d), entity.getPositionVector().addVector(0d, entity.height/2, 0d),
 			 0xc00000ff, 1, 0f);
-			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), this.getDamage(), this.summoner);
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 4+0.8f*ItemJutsu.getDmgMult(this.summoner)*this.damageMultiplier, this.summoner, 0);
 			this.world.spawnEntity(entity2);
 		}
 
 		private float getDamage() {
-			return this.rand.nextFloat() * 0.05f * ((ItemJutsu.Base)this.rantonstack.getItem()).getJutsuXp(this.rantonstack, CLOUD);
+			return this.rand.nextFloat() * this.damageMultiplier * 10f;
 		}
 
 		@Override
@@ -183,7 +185,33 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 					entity1 = new EntityRaiunkuha(entity, stack);
 					entity.world.spawnEntity(entity1);
 					stack.getTagCompound().setInteger(RaiunkuhaID, entity1.getEntityId());
+					if (ItemRaiton.CHAKRAMODE.jutsu.isActivated(entity)) {
+						ItemRaiton.CHAKRAMODE.jutsu.deactivate(entity);
+					}
+					if (ItemFuton.CHAKRAFLOW.jutsu.isActivated(entity)) {
+						ItemFuton.CHAKRAFLOW.jutsu.deactivate(entity);
+					}
+					if (ItemKaton.FLAMESLICE.jutsu.isActivated(entity)) {
+						ItemKaton.FLAMESLICE.jutsu.deactivate(entity);
+					}
+					if (ItemIryoJutsu.POWERMODE.jutsu.isActivated(entity)) {
+						ItemIryoJutsu.POWERMODE.jutsu.deactivate(entity);
+					}
 					return true;
+				}
+			}
+
+			@Override
+			public boolean isActivated(EntityLivingBase entity) {
+				return this.getData(entity) != null;
+			}
+
+			@Override
+			public void deactivate(EntityLivingBase entity) {
+				JutsuData jd = this.getData(entity);
+				if (jd != null) {
+					jd.entity.setDead();
+					jd.stack.getTagCompound().removeTag(RaiunkuhaID);
 				}
 			}
 		}

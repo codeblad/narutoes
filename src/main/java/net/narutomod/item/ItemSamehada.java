@@ -12,22 +12,22 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.EnumAction;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumHand;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
@@ -36,6 +36,8 @@ import net.narutomod.PlayerTracker;
 import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
+
+import net.narutomod.procedure.ProcedureUtils;
 
 import com.google.common.collect.Multimap;
 import javax.annotation.Nullable;
@@ -64,7 +66,7 @@ public class ItemSamehada extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static void applyEffects(EntityLivingBase target, EntityLivingBase attacker) {
-		applyEffects(target, attacker, 1.0f);
+		applyEffects(target, attacker, 0.1f);
 	}
 
 	public static void applyEffects(EntityLivingBase target, EntityLivingBase attacker, float multiplier) {
@@ -103,8 +105,9 @@ public class ItemSamehada extends ElementsNarutomodMod.ModElement {
 		public Multimap<String, AttributeModifier> getItemAttributeModifiers(EntityEquipmentSlot equipmentSlot) {
 			Multimap<String, AttributeModifier> multimap = super.getItemAttributeModifiers(equipmentSlot);
 			if (equipmentSlot == EntityEquipmentSlot.MAINHAND) {
-				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", 11f, 0));
+				multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Tool modifier", 17f, 0));
 				multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", -3.4, 0));
+				multimap.put(EntityPlayer.REACH_DISTANCE.getName(), new AttributeModifier(ProcedureUtils.REACH_MODIFIER, "Tool modifier", 1, 0));
 			}
 			return multimap;
 		}
@@ -133,8 +136,16 @@ public class ItemSamehada extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public boolean isShield(ItemStack stack, @Nullable EntityLivingBase entity) {
+		public boolean canDisableShield(ItemStack stack, ItemStack shield, EntityLivingBase entity, EntityLivingBase attacker) {
 			return true;
+		}
+
+		@Override
+		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
+			if (attacker.isHandActive()) {
+				return true;
+			}
+			return super.onLeftClickEntity(itemstack, attacker, target);
 		}
 
 		@Override
@@ -151,10 +162,6 @@ public class ItemSamehada extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		@Override
-		public EnumAction getItemUseAction(ItemStack stack) {
-			return EnumAction.BLOCK;
-		}
 
 		@Override
 		public int getMaxItemUseDuration(ItemStack stack) {

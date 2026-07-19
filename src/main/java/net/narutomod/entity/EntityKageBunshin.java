@@ -5,39 +5,45 @@ import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.WorldServer;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.Entity;
+import net.minecraft.item.ItemStack;
 
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.Chakra;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.primitives.Ints;
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
+import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
@@ -45,6 +51,7 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID_RANGED = 140;
 	public static final String OGCLONE_KEY = "I_am_clone_ogCloneIDKey";
 	public static final PlayerEventHook playerEventHook = new PlayerEventHook();
+	private static final Map<Integer, EC> UNLOADED_EC = Maps.newHashMap();
 
 	public EntityKageBunshin(ElementsNarutomodMod instance) {
 		super(instance, 388);
@@ -57,34 +64,67 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static boolean isPlayerClone(EntityPlayer player) {
-		return player.getEntityData().getInteger(OGCLONE_KEY) > 0;
+		return getOriginalClone(player) != null;
 	}
 
-	public static class EC extends EntityClone.Base {
+	@Nullable
+	private static EC getCloneByID(World world, int id) {
+		Entity entity = world.getEntityByID(id);
+		if (entity == null) {
+			entity = UNLOADED_EC.get(id);
+		}
+		if (!(entity instanceof EC)) {
+			UNLOADED_EC.remove(id);
+			return null;
+		}
+		return (EC)entity;
+	}
+
+	@Nullable
+	public static EC getOriginalClone(EntityLivingBase player) {
+		if (player.getEntityData().hasKey(OGCLONE_KEY)) {
+			EC entity = getCloneByID(player.world, player.getEntityData().getInteger(OGCLONE_KEY));
+			if (entity != null && entity.isEntityAlive()) {
+				return entity;
+			}
+			player.getEntityData().removeTag(OGCLONE_KEY);
+		}
+		return null;
+	}
+
+	public static class EC extends EntityClone.Base implements ItemJutsu.IJutsu {
 		//private final NonNullList<ItemStack> inventory = NonNullList.<ItemStack>withSize(36, ItemStack.EMPTY);
 		//private InventoryPlayer summonerInventory;
 		private boolean isOriginal;
-		private double chakra;
 		private DamageSource deathCause;
 
 		public EC(World world) {
 			super(world);
+			this.stepHeight = 16f;
+			this.moveHelper = new EntityNinjaMob.MoveHelper(this);
+			this.entityCollisionReduction = -1.0f;
 		}
 
 		public EC(EntityLivingBase user) {
 			super(user);
-			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).applyModifier(new AttributeModifier("bunshin.followRange", 32, 0));
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(ProcedureUtils.getModifiedSpeed(user) * 3.5d);
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR)
-			 .setBaseValue(user.getEntityAttribute(SharedMonsterAttributes.ARMOR).getAttributeValue());
+			this.stepHeight = 16f;
+			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0d);
+			//this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(ProcedureUtils.getModifiedSpeed(user) * 4.0d);
+			//this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(user.getEntityAttribute(SharedMonsterAttributes.ARMOR).getAttributeValue());
+			this.moveHelper = new EntityNinjaMob.MoveHelper(this);
+			this.entityCollisionReduction = -1.0f;
 		}
 
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.NINJUTSU;
+		}
+
+		@Nullable
 		private EC getOriginal() {
 			EntityLivingBase summoner = this.getSummoner();
 			if (summoner != null) {
-				Entity entity = this.world.getEntityByID(summoner.getEntityData().getInteger(OGCLONE_KEY));
-				if (entity instanceof EC)
-					return (EC)entity;
+				return getOriginalClone(summoner);
 			}
 			return null;
 		}
@@ -92,7 +132,8 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void initEntityAI() {
 			super.initEntityAI();
-			this.tasks.addTask(2, new EntityClone.AIFollowSummoner(this, 0.6d, 3.0F) {
+			this.tasks.addTask(0, new EntityNinjaMob.AILeapAtTarget(this, 0.0f, 20.0f));
+			this.tasks.addTask(2, new EntityClone.AIFollowSummoner(this, 1.0d, 8.0F) {
 				@Override
 				public boolean shouldExecute() {
 					return super.shouldExecute() && !EC.this.isOriginal;
@@ -102,11 +143,11 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean processInteract(EntityPlayer entity, EnumHand hand) {
-			if (entity.equals(this.getSummoner())) {
+			if (entity.equals(this.getSummoner()) && entity.getHeldItem(hand).isEmpty()) {
 				if (this.isOriginal) {
 					this.cancelCloneControl();
 					if (!this.world.isRemote) 
-						entity.sendStatusMessage(new TextComponentString("You are now the original"), false);
+						ProcedureUtils.sendStatusMessage(entity, "You are now the original", false);
 					return true;
 				}
 				//EC original = this.getOriginal();
@@ -122,25 +163,14 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 						entity.inventory.removeStackFromSlot(i);
 				}*/
 				if (!this.world.isRemote) 
-					entity.sendStatusMessage(new TextComponentString("You are now clone("+this.getEntityId()+")"), false);
+					ProcedureUtils.sendStatusMessage(entity, "You are now clone("+this.getEntityId()+")", false);
 				return true;
 			}
 			return super.processInteract(entity, hand);
 		}
 
 		private void poof(Entity entity) {
-			//Random rand = new Random();
 			ProcedureUtils.poofWithSmoke(entity);
-			/*} else {
-		        for (int k = 0; k < 200; ++k) {
-		       		double d2 = rand.nextGaussian() * 0.02D;
-				    double d0 = rand.nextGaussian() * 0.02D;
-				    double d1 = rand.nextGaussian() * 0.02D;
-				    entity.world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, 
-				      entity.posX + rand.nextGaussian() * 0.5d * entity.width, entity.posY + rand.nextDouble() * entity.height, 
-				      entity.posZ + rand.nextGaussian() * 0.5d * entity.width, d2, d0, d1);
-				}
-			}*/
 		}
 
 		@Override
@@ -149,23 +179,30 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				EntityLivingBase summoner = this.getSummoner();
 				boolean flag = false;
+				boolean flag2 = false;
 				if (this.isOriginal) {
 					this.poof(summoner);
 					summoner.rotationYaw = this.rotationYaw;
 					summoner.setPositionAndUpdate(this.posX, this.posY, this.posZ);
 					if (summoner.isEntityAlive()) {
+						this.cancelCloneControl();
 						summoner.attackEntityFrom(this.deathCause != null ? this.deathCause : DamageSource.GENERIC, Float.MAX_VALUE);
 					} else {
 						flag = true;
+						flag2 = true;
 					}
 				} else {
 					this.poof(this);
 					flag = true;
 				}
 				if (flag && summoner != null) {
-					Jutsu.updateClones(summoner, false);
-					//Chakra.pathway(summoner).consume(-this.chakra * (double)(this.getHealth() / this.getMaxHealth()), true);
-					Chakra.pathway(summoner).consume(-this.chakra * 0.8d, false);
+					Jutsu.updateClones(summoner, this);
+					float f0 = this.getHealth();
+					float f1 = f0 / this.getMaxHealth();
+					Chakra.pathway(summoner).consume(-Chakra.pathway(this).getAmount() * f1 * 0.9, false);
+					if (summoner.getHealth() > 0.0f || flag2) {
+						summoner.setHealth(summoner.getHealth() + f0 * 0.9f);
+					}
 				}
 			}
 		}
@@ -177,13 +214,16 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 		}
 
 		private void cancelCloneControl() {
-			this.getSummoner().getEntityData().setInteger(OGCLONE_KEY, 0);
+			this.getSummoner().getEntityData().removeTag(OGCLONE_KEY);
 			this.isOriginal = false;
 			this.shouldDefendSummoner = true;
 		}
 
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
+			if (source == DamageSource.CRAMMING) {
+				return false;
+			}
 			if (source.getImmediateSource() instanceof EntityLivingBase && source.getImmediateSource().equals(this.getSummoner())) {
 				if (this.isOriginal) {
 					this.cancelCloneControl();
@@ -207,14 +247,68 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 	    	this.deathCause = cause;
 	    }
 
+		@Override
+		public void onAddedToWorld() {
+			super.onAddedToWorld();
+			if (!this.world.isRemote) {
+				UNLOADED_EC.remove(this.getEntityId());
+			}
+		}
+		
+		@Override
+	    public void onRemovedFromWorld() {
+	    	super.onRemovedFromWorld();
+	    	if (!this.world.isRemote) {
+	    		int i = this.getEntityId();
+	    		if (!this.isDead) {
+	    			if (!UNLOADED_EC.containsKey(i)) {
+	    				UNLOADED_EC.put(i, this);
+	    			}
+	    		} else {
+	    			UNLOADED_EC.remove(i);
+	    		}
+	    	}
+	    }
+
+		@Override
+		protected float getWaterSlowDown() {
+			return 1.0f;
+		}
+
+		@Override
+		protected void updateFallState(double y, boolean onGroundIn, net.minecraft.block.state.IBlockState state, BlockPos pos) {
+			if (this.fallDistance > 4f) {
+				this.fallDistance -= 0.75f;
+			}
+			super.updateFallState(y, onGroundIn, state, pos);
+		}
+
+		@Override
+		protected void updateArmSwingProgress() {
+			super.updateArmSwingProgress();
+			for (ItemStack stack : this.getHeldEquipment()) {
+				if (!stack.isEmpty()) {
+					stack.updateAnimation(this.world, this, 0, false);
+				}
+			}
+		}
+
 	    @Override
 	    public void onUpdate() {
 	    	super.onUpdate();
-	    	ItemStack stack = this.getHeldItemMainhand();
-	    	if (!this.world.isRemote && this.ticksExisted == 1 && stack.getItem() instanceof ItemJutsu.Base) {
-	    		for (ItemJutsu.JutsuEnum je : ((ItemJutsu.Base)stack.getItem()).getActivatedJutsus(stack)) {
-	    			je.jutsu.createJutsu(stack, this, je.jutsu.getPower(stack));
-	    		}
+	    	if (!this.world.isRemote && this.ticksExisted == 15) {
+		    	ItemStack stack = this.getHeldItemMainhand();
+		    	if (stack.getItem() instanceof ItemJutsu.Base) {
+		    		for (ItemJutsu.JutsuEnum je : ((ItemJutsu.Base)stack.getItem()).getActivatedJutsus(stack)) {
+		    			je.jutsu.createJutsu(stack, this, je.jutsu.getPower(stack));
+		    		}
+		    	}
+		    	stack = this.getHeldItemOffhand();
+		    	if (stack.getItem() instanceof ItemJutsu.Base) {
+		    		for (ItemJutsu.JutsuEnum je : ((ItemJutsu.Base)stack.getItem()).getActivatedJutsus(stack)) {
+		    			je.jutsu.createJutsu(stack, this, je.jutsu.getPower(stack));
+		    		}
+		    	}
 	    	}
 	    }
 
@@ -226,68 +320,127 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity instanceof EntityPlayer && entity.isSneaking()) {
 					if (isPlayerClone((EntityPlayer)entity)) {
+						entity.getEntityData().setFloat("HealthB4Kill", entity.getHealth());
 						entity.onKillCommand();
 					} else {
-						this.removeAllClones(entity);
+						removeAllClones(entity);
 					}
 					return false;
 				}
-				if (!(entity instanceof EntityPlayer) || Chakra.pathway((EntityPlayer)entity).getAmount() >= 200d) {
+				if (!(entity instanceof EntityPlayer) || Chakra.pathway(entity).getAmount() >= 2000.0d) {
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 					  .getObject(new ResourceLocation("narutomod:kagebunshin")), SoundCategory.NEUTRAL, 1.0F, 1.0F);
-					updateClones(entity, true);
+					EC newClone = new EC(entity);
+					newClone.setPosition(newClone.posX + (entity.getRNG().nextBoolean() ? -0.1d : 0.1d), newClone.posY, newClone.posZ + (entity.getRNG().nextBoolean() ? -0.1d : 0.1d));
+					entity.world.spawnEntity(newClone);
+					updateClones(entity, newClone);
 					return true;
+				} else {
+					Chakra.pathway(entity).warningDisplay();
 				}
 				return false;
 			}
 
-			private static int updateClones(EntityLivingBase entity, boolean add1) {
+			private static int updateClones(EntityLivingBase entity, EC clone) {
 				List<Integer> clones = Lists.newArrayList();
 				int[] ids = entity.getEntityData().getIntArray(ID_KEY);
 				for (int i = 0; i < ids.length; i++) {
-					Entity e = entity.world.getEntityByID(ids[i]);
-					if (e instanceof EC && e.isEntityAlive())
+					EC ec = getCloneByID(entity.world, ids[i]);
+					if (ec != null && ec.isEntityAlive())
 						clones.add(ids[i]);
 				}
-				Chakra.Pathway chakra = entity instanceof EntityPlayer ? Chakra.pathway((EntityPlayer)entity) : null;
-				if (add1) {
-					Entity newClone = new EC(entity);
-					entity.world.spawnEntity(newClone);
-					clones.add(newClone.getEntityId());
-					if (chakra != null) {
-						chakra.consume(chakra.getAmount() / (clones.size()+1));
-					}
-				}
 				entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).removeModifier(MAXHEALTH);
-				entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-				  .applyModifier(new AttributeModifier(MAXHEALTH, "maxhealth.modifier", 1d / (clones.size()+1) - 1d, 2));
+				if (!clone.isDead) {
+					clones.add(clone.getEntityId());
+					Chakra.Pathway chakra = Chakra.pathway(entity);
+					double d = chakra.getAmount() / (clones.size()+1);
+					chakra.consume(d);
+					Chakra.pathway(clone).setMax(d).consume(-d);
+					entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier(MAXHEALTH, "maxhealth.modifier", entity.getHealth() * clones.size() / (clones.size() + 1) - entity.getMaxHealth(), 0));
+				}
+ else if (clones.size() > 0) {
+					entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(new AttributeModifier(MAXHEALTH, "maxhealth.modifier", -clone.getMaxHealth() * clones.size(), 0));
+				}
 				if (entity.getHealth() > entity.getMaxHealth()) {
 					entity.setHealth(entity.getMaxHealth());
 				}
-				if (add1) {
+				if (!clone.isDead) {
 					for (Integer i : clones) {
-						EC e = (EC)entity.world.getEntityByID(i.intValue());
+						EC e = getCloneByID(entity.world, i.intValue());
 						e.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(entity.getHealth());
-						e.setHealth(e.getMaxHealth());
-						if (chakra != null)
-							e.chakra = chakra.getAmount();
+						if (e.ticksExisted < 2 || e.getHealth() > e.getMaxHealth()) {
+							e.setHealth(e.getMaxHealth());
+						}
 					}
 				}
-				entity.getEntityData().setIntArray(ID_KEY, Ints.toArray(clones));
+				if (clones.isEmpty()) {
+					entity.getEntityData().removeTag(ID_KEY);
+				} else {
+					entity.getEntityData().setIntArray(ID_KEY, Ints.toArray(clones));
+				}
 				return clones.size();
 			}
 
-			private void removeAllClones(EntityLivingBase entity) {
+			private static boolean hasClones(EntityLivingBase entity) {
+				return entity.getEntityData().hasKey(ID_KEY);
+			}
+
+			private static void removeAllClones(EntityLivingBase entity) {
 				List<EC> clones = Lists.newArrayList();
 				int[] ids = entity.getEntityData().getIntArray(ID_KEY);
 				for (int i = 0; i < ids.length; i++) {
-					Entity e = entity.world.getEntityByID(ids[i]);
-					if (e instanceof EC && e.isEntityAlive()) {
+					EC e = getCloneByID(entity.world, ids[i]);
+					if (e != null && e.isEntityAlive()) {
 						clones.add((EC)e);
 					}
 				}
 				for (EC e : clones) {
 					e.setDead();
+				}
+				entity.getEntityData().removeTag(ID_KEY);
+			}
+		}
+
+		public static class Jutsu2 extends Jutsu {
+			@Override
+			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+				if (!(entity instanceof EntityPlayer) || !entity.isSneaking()) {
+					if (power >= 3.0f && Chakra.pathway(entity).getAmount() > 4000d) {
+						entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
+						  .getObject(new ResourceLocation("narutomod:kagebunshin")), SoundCategory.NEUTRAL, 1.0F, 1.0F);
+						for (int i = 0, j = (int)Math.pow(2, power); i < j; i++) {
+							EC newClone = new EC(entity);
+							Vec3d vec = newClone.getPositionVector().addVector((entity.getRNG().nextDouble()-0.5d) * j * 0.3, 0.1, (entity.getRNG().nextDouble()-0.5d) * j * 0.3);
+							newClone.setPosition(vec.x, 0.1d + ProcedureUtils.getTopSolidBlockY(entity.world, new BlockPos(vec)), vec.z);
+							entity.world.spawnEntity(newClone);
+							Jutsu.updateClones(entity, newClone);
+						}
+						return true;
+					}
+					return false;
+				}
+				return super.createJutsu(stack, entity, power);
+			}
+			
+			@Override
+			public float getBasePower() {
+				return 2.9f;
+			}
+
+			@Override
+			public float getPowerupDelay() {
+				return 100.0f;
+			}
+
+			@Override
+			public float getMaxPower() {
+				return 7.0f;
+			}
+
+			@Override
+			public void onUsingTick(ItemStack stack, EntityLivingBase player, float power) {
+				if (player instanceof EntityPlayer) {
+					ProcedureUtils.sendStatusMessage((EntityPlayer)player, "" + (int)Math.pow(2, power) + " clones", true);
 				}
 			}
 		}
@@ -297,26 +450,26 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 		@SubscribeEvent(priority = EventPriority.HIGHEST)
 		public void onDeath(LivingDeathEvent event) {
 			EntityLivingBase entity = event.getEntityLiving();
-			if (entity instanceof EntityPlayer && isPlayerClone((EntityPlayer)entity)) {
-				Entity clone = entity.world.getEntityByID(entity.getEntityData().getInteger(OGCLONE_KEY));
-				if (clone instanceof EC && clone.isEntityAlive()) {
-					clone.setDead();
+			if (entity instanceof EntityPlayer) {
+				if (isPlayerClone((EntityPlayer)entity)) {
 					event.setCanceled(true);
-					entity.isDead = false;
-					entity.setHealth(((EC)clone).getHealth());
-					entity.clearActivePotions();
-					entity.getEntityData().setInteger("ForceExtinguish", 3);
+					this.revertClone(entity);
+				} else if (EC.Jutsu.hasClones(entity)) {
+					EC.Jutsu.removeAllClones(entity);
 				}
-				entity.getEntityData().setInteger(OGCLONE_KEY, 0);
 			}
 		}
 
 		@SubscribeEvent
 		public void onPlayerChangeDimension(EntityTravelToDimensionEvent event) {
 			Entity entity = event.getEntity();
-			if (entity instanceof EntityPlayer && isPlayerClone((EntityPlayer)entity)) {
-				event.setCanceled(true);
-				((EntityPlayer)entity).sendStatusMessage(new TextComponentString("You are a clone, you can't travel to another dimension."), false);
+			if (entity instanceof EntityPlayer) {
+				if (isPlayerClone((EntityPlayer)entity)) {
+					event.setCanceled(true);
+					ProcedureUtils.sendStatusMessage((EntityPlayer)entity, "You are a clone, you can't travel to another dimension.", false);
+				} else if (EC.Jutsu.hasClones((EntityPlayer)entity)) {
+					EC.Jutsu.removeAllClones((EntityPlayer)entity);
+				}
 			}
 		}
 
@@ -326,8 +479,46 @@ public class EntityKageBunshin extends ElementsNarutomodMod.ModElement {
 //System.out.println("isPlayerClone:"+isPlayerClone(entity));
 			if (!entity.world.isRemote && isPlayerClone(entity)) {
 				event.setResult(EntityPlayer.SleepResult.OTHER_PROBLEM);
-				entity.sendStatusMessage(new TextComponentString("You are a clone, you can't sleep."), false);
+				ProcedureUtils.sendStatusMessage(entity, "You are a clone, you can't sleep.", false);
 			}			
+		}
+
+		private void revertClone(EntityLivingBase entity) {
+			EC clone = getOriginalClone(entity);
+			if (clone != null) {
+				clone.setDead();
+				entity.isDead = false;
+				if (entity.getEntityData().hasKey("HealthB4Kill")) {
+					entity.setHealth(entity.getHealth() + entity.getEntityData().getFloat("HealthB4Kill"));
+					entity.getEntityData().removeTag("HealthB4Kill");
+				}
+				entity.clearActivePotions();
+				entity.getEntityData().setInteger("ForceExtinguish", 3);
+			}
+			//entity.getEntityData().removeTag(OGCLONE_KEY);
+		}
+
+		@SubscribeEvent
+		public void onPlayerLeave(PlayerEvent.PlayerLoggedOutEvent event) {
+			if (isPlayerClone(event.player)) {
+				event.player.isDead = true;
+				this.revertClone(event.player);
+			}
+			if (EC.Jutsu.hasClones(event.player)) {
+				EC.Jutsu.removeAllClones(event.player);
+			}
+		}
+
+		@SubscribeEvent
+		public void onServerDisconnect(FMLNetworkEvent.ServerDisconnectionFromClientEvent event) {
+			EntityPlayer player = ((net.minecraft.network.NetHandlerPlayServer)event.getHandler()).player;
+			if (isPlayerClone(player)) {
+				player.isDead = true;
+				this.revertClone(player);
+			}
+			if (EC.Jutsu.hasClones(player)) {
+				EC.Jutsu.removeAllClones(player);
+			}
 		}
 	}
 

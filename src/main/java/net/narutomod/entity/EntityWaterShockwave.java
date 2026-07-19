@@ -18,7 +18,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.block.BlockStaticLiquid;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
@@ -50,14 +50,14 @@ public class EntityWaterShockwave extends ElementsNarutomodMod.ModElement {
 		 .id(new ResourceLocation("narutomod", "water_shockwave"), ENTITYID).name("water_shockwave").tracker(64, 3, true).build());
 	}
 
-	public static class EC extends Entity {
+	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private EntityLivingBase user;
 		private int radius;
 		private boolean buildUpPhase;
 		private final List<BlockPos> domeBlocks = Lists.<BlockPos>newArrayList();
 		private boolean shouldDie;
 		private int deathTicks;
-		private static final AttributeModifier SWIM_SPEED_MODIFIER = new AttributeModifier("watershockwave.swimspeed", 1.2d, 0);
+		private static final AttributeModifier SWIM_SPEED_MODIFIER = new AttributeModifier("watershockwave.swimspeed", 1.65d, 0);
 
 		public EC(World world) {
 			super(world);
@@ -73,6 +73,11 @@ public class EntityWaterShockwave extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.SUITON;
+		}
+
+		@Override
 		protected void entityInit() {
 		}
 
@@ -82,7 +87,9 @@ public class EntityWaterShockwave extends ElementsNarutomodMod.ModElement {
 			}
 			if (this.deathTicks == 0) {
 				for (BlockPos pos : this.domeBlocks) {
-					this.world.setBlockState(pos, (this.rand.nextInt(3)==0?Blocks.WATER:Blocks.AIR).getDefaultState(), 3);
+					this.world.setBlockState(pos, this.rand.nextInt(3) == 0
+					 ? Blocks.FLOWING_WATER.getDefaultState().withProperty(BlockLiquid.LEVEL, Integer.valueOf(1))
+					 : Blocks.AIR.getDefaultState(), 3);
 				}
 			} else if (this.deathTicks % 5 == 0) {
 				for (BlockPos pos : this.domeBlocks) {
@@ -103,7 +110,7 @@ public class EntityWaterShockwave extends ElementsNarutomodMod.ModElement {
 			}
 			if (this.user != null && this.user.isEntityAlive()) {
 				if (this.buildUpPhase) {
-					this.user.setPositionAndUpdate(this.posX, this.posY, this.posZ);
+					//this.user.setPositionAndUpdate(this.posX, this.posY, this.posZ);
 					List<BlockPos> list = this.getAirBlocksInRadius();
 					if (!list.isEmpty()) {
 						for (int i = 0; i < this.radius * this.radius && i < list.size(); i++) {
@@ -187,6 +194,15 @@ public class EntityWaterShockwave extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void setDead() {
+			if (!this.world.isRemote && !this.shouldDie) {
+				this.shouldDie = true;
+			} else {
+				super.setDead();
+			}
+		}
+
+		@Override
 		protected void readEntityFromNBT(NBTTagCompound compound) {
 			if (compound.hasUniqueId("userUUID") && this.world instanceof WorldServer) {
 				this.user = (EntityLivingBase)((WorldServer)this.world).getEntityFromUuid(compound.getUniqueId("userUUID"));
@@ -245,6 +261,21 @@ public class EntityWaterShockwave extends ElementsNarutomodMod.ModElement {
 				EC entity1 = new EC(entity, power);
 				entity.world.spawnEntity(entity1);
 				return entity1;
+			}
+
+			@Override
+			public float getBasePower() {
+				return 5.0f;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 50.0f;
+			}
+	
+			@Override
+			public float getMaxPower() {
+				return 25.0f;
 			}
 		}
 	}

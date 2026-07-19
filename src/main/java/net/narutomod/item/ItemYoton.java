@@ -11,7 +11,8 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -35,20 +36,24 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.init.MobEffects;
 
-import net.narutomod.entity.EntityClone;
-import net.narutomod.entity.EntitySealing;
+import net.narutomod.entity.*;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.NarutomodMod;
+
+import java.lang.reflect.Field;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemYoton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:yoton")
 	public static final Item block = null;
 	public static final int ENTITYID = 149;
-	public static final ItemJutsu.JutsuEnum MULTISIZE = new ItemJutsu.JutsuEnum(0, "biggerme", 'B', 50d, new EntityBiggerMe.Jutsu());
+	public static final ItemJutsu.JutsuEnum MULTISIZE = new ItemJutsu.JutsuEnum(0, "biggerme", 'B', 100d, new EntityBiggerMe.Jutsu());
 	public static final ItemJutsu.JutsuEnum FUUIN = new ItemJutsu.JutsuEnum(1, "sealing", 'S', 100d, new EntitySealing.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SEALINGCHAIN = new ItemJutsu.JutsuEnum(2, "sealing_chains", 'A', 50d, new EntitySealingChains.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SEALING9D = new ItemJutsu.JutsuEnum(3, "tooltip.phantom9sealing.name", 'S', 1500d, new EntityGedoStatue.Sealing9Jutsu());
+	public static final ItemJutsu.JutsuEnum SEALING10 = new ItemJutsu.JutsuEnum(4, "tooltip.10coffinseal.name", 'S', 2000d, new EntityTenTails.CoffinSealJutsu());
 
 	public ItemYoton(ElementsNarutomodMod instance) {
 		super(instance, 406);
@@ -56,7 +61,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 
 	@Override
 	public void initElements() {
-		elements.items.add(() -> new RangedItem(MULTISIZE, FUUIN));
+		elements.items.add(() -> new RangedItem(MULTISIZE, FUUIN, SEALINGCHAIN, SEALING9D, SEALING10));
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityBiggerMe.class)
 				.id(new ResourceLocation("narutomod", "biggerme"), ENTITYID).name("biggerme").tracker(64, 1, true).build());
 	}
@@ -66,14 +71,6 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:yoton", "inventory"));
 		//this.elements.addNetworkMessage(MessageHandler.class, Message.class, Side.SERVER);
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EntityBiggerMe.class, renderManager -> {
-			return new RenderBiggerMe(renderManager);
-		});
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -89,24 +86,12 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 			this.setRegistryName("yoton");
 			this.setCreativeTab(TabModTab.tab);
 		}
-
-		@Override
-		protected float getPower(ItemStack stack, EntityLivingBase entity, int timeLeft) {
-			if (this.getCurrentJutsu(stack) == MULTISIZE) {
-				return this.getPower(stack, entity, timeLeft, 2f, 50f);
-			}
-			return 1.0f;
-		}
-
-		@Override
-		protected float getMaxPower(ItemStack stack, EntityLivingBase entity) {
-			return Math.min(super.getMaxPower(stack, entity), 10f);
-		}
 	}
 
-	public static class EntityBiggerMe extends EntityClone.Base {
+	public static class EntityBiggerMe extends EntityClone.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 40;
 		private float scale;
+		public float bigRatio = 1;
 
 		public EntityBiggerMe(World a) {
 			super(a);
@@ -118,11 +103,23 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 			this.scale = scaleIn;
 			this.stepHeight = scaleIn * this.height / 3.0F;
 			this.setNoAI(true);
-			double d = MathHelper.sqrt((4d * scaleIn * scaleIn) + (this.height * this.height));
-			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("biggerme.reach", d, 0));
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("biggerme.damage", scaleIn * scaleIn, 0));
-			this.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 999999, (int)scaleIn, false, false));
+			float ratio = 1+2f*(scaleIn/20);
+			double d = MathHelper.sqrt((3d * scaleIn * scaleIn) + (this.height * this.height));
+			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("biggerme.reach", d*1.25, 0));
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("biggerme.damage", (10+ItemJutsu.getNinjaMult(user)*1.65)*ratio, 0));
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(user.getHealth() * scaleIn);
+			this.setHealth(this.getMaxHealth());
+
+			PotionEffect jumpBoostEffect = user.getActivePotionEffect(MobEffects.JUMP_BOOST);
+			int jumpBoost = (int)(scaleIn * (1 + (jumpBoostEffect != null ? jumpBoostEffect.getAmplifier() : 0)));
+			this.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 999999, jumpBoost, false, false));
+			this.bigRatio = ratio;
 			user.startRiding(this);
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.YOTON;
 		}
 
 		@Override
@@ -189,10 +186,17 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 		}
 
 		private void checkJump(EntityLivingBase entity) {
-			if (this.world.isRemote) {
-				if ((boolean)ReflectionHelper.getPrivateValue(EntityLivingBase.class, entity, 49) && this.onGround) {
-					this.jump();
-					ReflectionHelper.setPrivateValue(EntityLivingBase.class, entity, false, 49);
+			if (this.world.isRemote && this.onGround) {
+				Field isJumpingField = ReflectionHelper.findField(EntityLivingBase.class, "isJumping", "field_70703_bu");
+				try {
+					if (isJumpingField.getBoolean(entity)) {
+					//if ((boolean)ReflectionHelper.getPrivateValue(EntityLivingBase.class, entity, 49) && this.onGround) {
+						this.jump();
+						//ReflectionHelper.setPrivateValue(EntityLivingBase.class, entity, false, 49);
+						isJumpingField.setBoolean(entity, false);
+					}
+				} catch (IllegalAccessException e) {
+					System.err.println("What environment is this? "+e);
 				}
 			}
 		}
@@ -223,32 +227,61 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 				entity.world.spawnEntity(new EntityBiggerMe(entity, power));
 				return true;
 			}
+
+			@Override
+			public float getBasePower() {
+				return 2.0f;
+			}
+	
+			@Override
+			public float getPowerupDelay() {
+				return 40.0f;
+			}
+	
+			@Override
+			public float getMaxPower() {
+				return 40.0f;
+			}
 		}
 	}
 
 	@SideOnly(Side.CLIENT)
-	public class RenderBiggerMe extends EntityClone.ClientRLM.RenderClone<EntityBiggerMe> {
-		public RenderBiggerMe(RenderManager renderManager) {
-			new EntityClone.ClientRLM().super(renderManager);
-		}
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
 
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
 		@Override
-		public void doRender(EntityBiggerMe entity, double x, double y, double z, float entityYaw, float partialTicks) {
-			Entity passenger = entity.getControllingPassenger();
-			if (entity.isBeingRidden() && passenger instanceof AbstractClientPlayer) {
-				this.copyLimbSwing(entity, (AbstractClientPlayer)passenger);
-			}
-			if (!Minecraft.getMinecraft().getRenderViewEntity().equals(passenger) || this.renderManager.options.thirdPersonView != 0) {
-				super.doRender(entity, x, y, z, entityYaw, partialTicks);
-			}
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EntityBiggerMe.class, renderManager -> new RenderBiggerMe(renderManager));
 		}
 
-		private void copyLimbSwing(EntityBiggerMe entity, AbstractClientPlayer rider) {
-			entity.swingProgress = rider.swingProgress;
-			entity.swingProgressInt = rider.swingProgressInt;
-			entity.prevSwingProgress = rider.prevSwingProgress;
-			entity.isSwingInProgress = rider.isSwingInProgress;
-			entity.swingingHand = rider.swingingHand;
+		@SideOnly(Side.CLIENT)
+		public class RenderBiggerMe extends EntityClone.ClientRLM.RenderClone<EntityBiggerMe> {
+			public RenderBiggerMe(RenderManager renderManager) {
+				EntityClone.ClientRLM.getInstance().super(renderManager);
+			}
+
+			@Override
+			public void doRender(EntityBiggerMe entity, double x, double y, double z, float entityYaw, float partialTicks) {
+				Entity passenger = entity.getControllingPassenger();
+				if (entity.isBeingRidden() && passenger instanceof AbstractClientPlayer) {
+					this.copyLimbSwing(entity, (AbstractClientPlayer)passenger);
+				}
+				if (!Minecraft.getMinecraft().getRenderViewEntity().equals(passenger) || this.renderManager.options.thirdPersonView != 0) {
+					super.doRender(entity, x, y, z, entityYaw, partialTicks);
+				}
+			}
+
+			private void copyLimbSwing(EntityBiggerMe entity, AbstractClientPlayer rider) {
+				entity.swingProgress = rider.swingProgress;
+				entity.swingProgressInt = rider.swingProgressInt;
+				entity.prevSwingProgress = rider.prevSwingProgress;
+				entity.isSwingInProgress = rider.isSwingInProgress;
+				entity.swingingHand = rider.swingingHand;
+			}
 		}
 	}
 

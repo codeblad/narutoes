@@ -63,13 +63,7 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 				.id(new ResourceLocation("narutomod", "shadow_imitation"), ENTITYID).name("shadow_imitation").tracker(64, 3, true).build());
 	}
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void preInit(FMLPreInitializationEvent event) {
-		RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
-	}
-	
-	public static class EC extends Entity implements PlayerInput.Hook.IHandler {
+	public static class EC extends Entity implements PlayerInput.Hook.IHandler, ItemJutsu.IJutsu {
 		private static final DataParameter<Integer> USER_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private static final DataParameter<Integer> TARGET_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private double chakraBurn;
@@ -90,7 +84,12 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			//}
 			//PlayerInput.Hook.haltTargetInput(targetIn, true);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
-			this.chakraBurn = chakraUsagePerSec + ProcedureUtils.getPunchDamage(targetIn);
+			this.chakraBurn = chakraUsagePerSec + Math.max(ProcedureUtils.getPunchDamage(targetIn) * 10d, 90d);
+		}
+
+		@Override
+		public ItemJutsu.JutsuEnum.Type getJutsuType() {
+			return ItemJutsu.JutsuEnum.Type.INTON;
 		}
 
 		@Override
@@ -154,12 +153,12 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				if (user != null && user.isEntityAlive() && ItemJutsu.canTarget(target) && this.canTargetBeSeen()) {
 					this.setPosition(user.posX, user.posY, user.posZ);
-					if (user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed)
-					 || (this.ticksExisted % 20 == 1 && !Chakra.pathway(user).consume(this.chakraBurn))) {
+					if (user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed)
+					 || (this.ticksExisted >= 20*7 || this.ticksExisted % 20 == 1 && !Chakra.pathway(user).consume(this.chakraBurn))) {
 						this.setDead();
 					} else {
 						if (this.ticksExisted == 1) {
-							this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:shadow_sfx")), 1f, 1f);
+							this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:shadow_sfx")), 1f, 1f);
 							PlayerInput.Hook.haltTargetInput(target, true);
 							if (user instanceof EntityPlayer) {
 								PlayerInput.Hook.copyInputFrom((EntityPlayerMP)user, this, true);
@@ -202,17 +201,19 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 30d);
 				if (res != null && res.entityHit instanceof EntityLivingBase) {
-					int[] oldintarray = entity.getEntityData().getIntArray(ECENTITYID);
-					if (!this.intarrayContains(entity.world, oldintarray, res.entityHit.getEntityId())) {
-						int[] newintarray = new int[oldintarray.length + 1];
-						for (int i = 0; i < oldintarray.length; i++) {
-							newintarray[i] = oldintarray[i];
+					if (res.entityHit.onGround && entity.onGround) {
+						int[] oldintarray = entity.getEntityData().getIntArray(ECENTITYID);
+						if (!this.intarrayContains(entity.world, oldintarray, res.entityHit.getEntityId())) {
+							int[] newintarray = new int[oldintarray.length + 1];
+							for (int i = 0; i < oldintarray.length; i++) {
+								newintarray[i] = oldintarray[i];
+							}
+							EC entity1 = new EC(entity, (EntityLivingBase)res.entityHit, ItemInton.SHADOW_IMITATION.chakraUsage);
+							entity.world.spawnEntity(entity1);
+							newintarray[oldintarray.length] = entity1.getEntityId();
+							entity.getEntityData().setIntArray(ECENTITYID, newintarray);
+							return true;
 						}
-						EC entity1 = new EC(entity, (EntityLivingBase)res.entityHit, ItemInton.SHADOW_IMITATION.chakraUsage);
-						entity.world.spawnEntity(entity1);
-						newintarray[oldintarray.length] = entity1.getEntityId();
-						entity.getEntityData().setIntArray(ECENTITYID, newintarray);
-						return true;
 					}
 				}
 				return false;
@@ -259,6 +260,21 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 				}
 				return s + "]";
 			}
+
+			@Override
+			public boolean isActivated(EntityLivingBase entity) {
+				int[] intarray = entity.getEntityData().getIntArray(ECENTITYID);
+				if (intarray.length > 0) {
+					for (int i = 0; i < intarray.length; i++) {
+						Entity entity1 = entity.world.getEntityByID(intarray[i]);
+						if (entity1 instanceof EC) {
+							return true;
+						}
+					}
+					entity.getEntityData().removeTag(ECENTITYID);
+				}
+				return false;
+			}
 		}
 
 		public static class PlayerHook {
@@ -287,90 +303,103 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 		MinecraftForge.EVENT_BUS.register(new EC.PlayerHook());
 	}
 
-	@SideOnly(Side.CLIENT)
-	public class RenderCustom extends Render<EC> {
-		private final ResourceLocation TEXTURE = new ResourceLocation("narutomod:textures/black.png");
+	@Override
+	public void preInit(FMLPreInitializationEvent event) {
+		new Renderer().register();
+	}
 
-		public RenderCustom(RenderManager renderManagerIn) {
-			super(renderManagerIn);
+	public static class Renderer extends EntityRendererRegister {
+		@SideOnly(Side.CLIENT)
+		@Override
+		public void register() {
+			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
 		}
 
-		@Override
-		public boolean shouldRender(EC livingEntity, ICamera camera, double camX, double camY, double camZ) {
-			return true;
-		}
-
-		@Override
-		public void doRender(EC entity, double x, double y, double z, float entityYaw, float partialTicks) {
-			EntityLivingBase user = entity.getUser();
-			EntityLivingBase target = entity.getTarget();
-			if (user != null && target != null) {
-		        double d0 = user.lastTickPosX + (user.posX - user.lastTickPosX) * (double)partialTicks;
-		        double d1 = user.lastTickPosY + (user.posY - user.lastTickPosY) * (double)partialTicks;
-		        double d2 = user.lastTickPosZ + (user.posZ - user.lastTickPosZ) * (double)partialTicks;
-		        double d3 = target.lastTickPosX + (target.posX - target.lastTickPosX) * (double)partialTicks;
-		        double d4 = target.lastTickPosY + (target.posY - target.lastTickPosY) * (double)partialTicks;
-		        double d5 = target.lastTickPosZ + (target.posZ - target.lastTickPosZ) * (double)partialTicks;
-		        int i0 = MathHelper.floor(d0);
-		        int i1 = MathHelper.floor(Math.min(d1, d4)) - 10;
-		        int i2 = MathHelper.floor(d2);
-		        int i3 = MathHelper.floor(d3);
-		        int i4 = MathHelper.floor(Math.max(d1, d4)) + 1;
-		        int i5 = MathHelper.floor(d5);
-		        World world = this.renderManager.world;
-		        this.renderManager.renderEngine.bindTexture(TEXTURE);
-		        GlStateManager.enableBlend();
-		        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-		        GlStateManager.depthMask(false);
-		        Tessellator tessellator = Tessellator.getInstance();
-		        BufferBuilder bufferbuilder = tessellator.getBuffer();
-		        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-		        for (BlockPos blockpos : BlockPos.getAllInBoxMutable(new BlockPos(i0, i1, i2), new BlockPos(i3, i4, i5))) {
-		        	IBlockState blockstate = world.getBlockState(blockpos);
-		        	if (blockstate.getRenderType() != EnumBlockRenderType.INVISIBLE && blockstate.isFullCube()) {
-		        		AxisAlignedBB axisalignedbb = blockstate.getBoundingBox(world, blockpos).offset(blockpos);
-		        		if (blockpos.distanceSqToCenter(d0, d1, d2) < 0.25d * entity.ticksExisted * entity.ticksExisted
-		        		 && axisalignedbb.expand(0.0d, (double)i4 - axisalignedbb.maxY, 0.0d)
-		        		 .calculateIntercept(new Vec3d(d0, d1, d2), new Vec3d(d3, d4, d5)) != null) {
-			        		double d6 = axisalignedbb.minX - this.renderManager.viewerPosX;
-			        		double d7 = axisalignedbb.maxX - this.renderManager.viewerPosX;
-			        		double d8 = axisalignedbb.minY - this.renderManager.viewerPosY;
-			        		double d9 = axisalignedbb.maxY - this.renderManager.viewerPosY;
-			        		double d10 = axisalignedbb.minZ - this.renderManager.viewerPosZ;
-			        		double d11 = axisalignedbb.maxZ - this.renderManager.viewerPosZ;
-			        		bufferbuilder.pos(d6, d9 + 0.01D, d10).tex(0.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d6, d9 + 0.01D, d11).tex(0.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d7, d9 + 0.01D, d11).tex(1.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d7, d9 + 0.01D, d10).tex(1.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d7 + 0.01D, d9, d10).tex(0.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d7 + 0.01D, d9, d11).tex(0.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d7 + 0.01D, d8, d11).tex(1.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d7 + 0.01D, d8, d10).tex(1.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d6 - 0.01D, d8, d10).tex(0.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d6 - 0.01D, d8, d11).tex(0.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d6 - 0.01D, d9, d11).tex(1.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d6 - 0.01D, d9, d10).tex(1.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d7, d8, d11 + 0.01D).tex(0.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d7, d9, d11 + 0.01D).tex(0.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d6, d9, d11 + 0.01D).tex(1.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d6, d8, d11 + 0.01D).tex(1.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d6, d8, d10 - 0.01D).tex(0.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d6, d9, d10 - 0.01D).tex(0.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d7, d9, d10 - 0.01D).tex(1.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-			        		bufferbuilder.pos(d7, d8, d10 - 0.01D).tex(1.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
-		        		}
-		        	}
-		        }
-		        tessellator.draw();
-		        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		        GlStateManager.disableBlend();
-		        GlStateManager.depthMask(true);
+		@SideOnly(Side.CLIENT)
+		public class RenderCustom extends Render<EC> {
+			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/black.png");
+	
+			public RenderCustom(RenderManager renderManagerIn) {
+				super(renderManagerIn);
 			}
-		}
-
-		@Override
-		protected ResourceLocation getEntityTexture(EC entity) {
-			return TEXTURE;
+	
+			@Override
+			public boolean shouldRender(EC livingEntity, ICamera camera, double camX, double camY, double camZ) {
+				return true;
+			}
+	
+			@Override
+			public void doRender(EC entity, double x, double y, double z, float entityYaw, float partialTicks) {
+				EntityLivingBase user = entity.getUser();
+				EntityLivingBase target = entity.getTarget();
+				if (user != null && target != null) {
+			        double d0 = user.lastTickPosX + (user.posX - user.lastTickPosX) * (double)partialTicks;
+			        double d1 = user.lastTickPosY + (user.posY - user.lastTickPosY) * (double)partialTicks;
+			        double d2 = user.lastTickPosZ + (user.posZ - user.lastTickPosZ) * (double)partialTicks;
+			        double d3 = target.lastTickPosX + (target.posX - target.lastTickPosX) * (double)partialTicks;
+			        double d4 = target.lastTickPosY + (target.posY - target.lastTickPosY) * (double)partialTicks;
+			        double d5 = target.lastTickPosZ + (target.posZ - target.lastTickPosZ) * (double)partialTicks;
+			        int i0 = MathHelper.floor(d0);
+			        int i1 = MathHelper.floor(Math.min(d1, d4)) - 10;
+			        int i2 = MathHelper.floor(d2);
+			        int i3 = MathHelper.floor(d3);
+			        int i4 = MathHelper.floor(Math.max(d1, d4)) + 1;
+			        int i5 = MathHelper.floor(d5);
+			        World world = this.renderManager.world;
+			        this.renderManager.renderEngine.bindTexture(this.texture);
+			        GlStateManager.enableBlend();
+			        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+			        GlStateManager.depthMask(false);
+			        Tessellator tessellator = Tessellator.getInstance();
+			        BufferBuilder bufferbuilder = tessellator.getBuffer();
+			        bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+			        for (BlockPos blockpos : BlockPos.getAllInBoxMutable(new BlockPos(i0, i1, i2), new BlockPos(i3, i4, i5))) {
+			        	IBlockState blockstate = world.getBlockState(blockpos);
+			        	if (blockstate.getRenderType() != EnumBlockRenderType.INVISIBLE && blockstate.isFullCube()) {
+			        		AxisAlignedBB axisalignedbb = blockstate.getBoundingBox(world, blockpos).offset(blockpos);
+			        		if (blockpos.distanceSqToCenter(d0, d1, d2) < 0.25d * entity.ticksExisted * entity.ticksExisted
+			        		 && axisalignedbb.expand(0.0d, (double)i4 - axisalignedbb.maxY, 0.0d)
+			        		 .calculateIntercept(new Vec3d(d0, d1, d2), new Vec3d(d3, d4, d5)) != null) {
+				        		double d6 = axisalignedbb.minX - this.renderManager.viewerPosX;
+				        		double d7 = axisalignedbb.maxX - this.renderManager.viewerPosX;
+				        		double d8 = axisalignedbb.minY - this.renderManager.viewerPosY;
+				        		double d9 = axisalignedbb.maxY - this.renderManager.viewerPosY;
+				        		double d10 = axisalignedbb.minZ - this.renderManager.viewerPosZ;
+				        		double d11 = axisalignedbb.maxZ - this.renderManager.viewerPosZ;
+				        		bufferbuilder.pos(d6, d9 + 0.01D, d10).tex(0.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d6, d9 + 0.01D, d11).tex(0.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d7, d9 + 0.01D, d11).tex(1.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d7, d9 + 0.01D, d10).tex(1.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d7 + 0.01D, d9, d10).tex(0.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d7 + 0.01D, d9, d11).tex(0.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d7 + 0.01D, d8, d11).tex(1.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d7 + 0.01D, d8, d10).tex(1.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d6 - 0.01D, d8, d10).tex(0.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d6 - 0.01D, d8, d11).tex(0.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d6 - 0.01D, d9, d11).tex(1.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d6 - 0.01D, d9, d10).tex(1.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d7, d8, d11 + 0.01D).tex(0.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d7, d9, d11 + 0.01D).tex(0.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d6, d9, d11 + 0.01D).tex(1.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d6, d8, d11 + 0.01D).tex(1.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d6, d8, d10 - 0.01D).tex(0.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d6, d9, d10 - 0.01D).tex(0.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d7, d9, d10 - 0.01D).tex(1.0d, 0.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+				        		bufferbuilder.pos(d7, d8, d10 - 0.01D).tex(1.0d, 1.0d).color(1.0F, 1.0F, 1.0F, 0.5F).endVertex();
+			        		}
+			        	}
+			        }
+			        tessellator.draw();
+			        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+			        GlStateManager.disableBlend();
+			        GlStateManager.depthMask(true);
+				}
+			}
+	
+			@Override
+			protected ResourceLocation getEntityTexture(EC entity) {
+				return this.texture;
+			}
 		}
 	}
 }
