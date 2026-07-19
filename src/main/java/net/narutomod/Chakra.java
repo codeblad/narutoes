@@ -174,7 +174,7 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 				this.consume(10.0d);
 			}
 			if (d < 10.0d && d1 > 150.0d
-			 && (!(this.user instanceof EntityPlayer) || !((EntityPlayer)this.user).isCreative())) {
+			 && ((!(this.user instanceof EntityPlayer) || !((EntityPlayer)this.user).isCreative()) && PlayerTracker.isAlsoNinja((EntityPlayer)this.user) )) {
 				this.user.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 100, 3));
 				this.user.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 3));
 				this.user.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 200, 3));

@@ -131,7 +131,7 @@ public class OverlayChakraDisplay extends ElementsNarutomodMod.ModElement {
 		public void eventHandler(RenderGameOverlayEvent event) {
 			if (!event.isCancelable() && event.getType() == RenderGameOverlayEvent.ElementType.HELMET) {
 				Minecraft mc = Minecraft.getMinecraft();
-				if (PlayerTracker.isNinja(mc.player) && Chakra.isInitialized(mc.player)) {
+				if (PlayerTracker.isAlsoNinja(mc.player) && Chakra.isInitialized(mc.player)) {
 					int sWidth = event.getResolution().getScaledWidth();
 					int sHeight = event.getResolution().getScaledHeight();
 					int color = (instance.warningTime % 10 < 5) ? 0xFF00FFFF : 0xFFFF0000;

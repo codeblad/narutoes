@@ -278,12 +278,12 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					event.player.getEntityData().removeTag(FORCE_SEND);
 					sendBattleXPToTracking((EntityPlayerMP)event.player);
 				}
-				if (isAlsoNinja(event.player)) {
+		
 				if (event.player.getEntityData().getBoolean(UPDATE_HEALTH)) {
 					event.player.getEntityData().removeTag(UPDATE_HEALTH);
 					event.player.setHealth(event.player.getHealth());
 				}
-			}
+			
 			
 			}
 		}

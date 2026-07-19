@@ -187,7 +187,7 @@ public class GuiNinjaScroll extends ElementsNarutomodMod.ModElement {
 	public static ItemStack enableJutsu(EntityPlayer player, ItemJutsu.Base item, ItemJutsu.JutsuEnum jutsu, boolean enable) {
 		ItemStack stack = ProcedureUtils.getMatchingItemStack(player, item);
 		PlayerTracker.addBattleXp(player, 1);
-		if (stack == null && PlayerTracker.isNinja(player) && enable) {
+		if (stack == null && PlayerTracker.isAlsoNinja(player) && enable) {
 			stack = new ItemStack(item, 1);
 			((ItemJutsu.Base)stack.getItem()).setOwner(stack, player);
 			ItemHandlerHelper.giveItemToPlayer(player, stack);
