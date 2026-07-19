@@ -69,7 +69,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 
 	public static boolean isAlsoNinja(EntityPlayer player) {
 		//return true;
-		return player.getEntityData().getDouble(BATTLEXP) > 0.0d;
+		return player.getEntityData().getDouble(BATTLEXP) > 5d;
 	}
 
 
@@ -90,7 +90,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 		if (xp != 0.0d) {
 			double max = ModConfig.MAX_NINJAXP;
 			if (entity.getEntityData().getInteger("KekkeiGenkai") == 69) {
-				max = 1;
+				max = 0;
 			}
 			entity.getEntityData().setDouble(BATTLEXP, Math.min(getBattleXp(entity) + xp, max));
 			if (entity instanceof EntityPlayerMP) {

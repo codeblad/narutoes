@@ -32,6 +32,7 @@ public class ProcedureBasicNinjaSkills extends ElementsNarutomodMod.ModElement {
 		Entity entity = (Entity) dependencies.get("entity");
 		World world = (World) dependencies.get("world");
 		boolean f1 = false;
+		
 		if ((!(world.isRemote))) {
 			if (entity instanceof EntityLivingBase)
 				((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.SPEED, (int) 2, (int) 1, (false), (false)));

@@ -103,7 +103,7 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 
 
 		if ((//(((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).experienceLevel : 0) >= 10)
-				/*&&*/ ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 0))) {
+				/*&&*/ ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 5d))) {
 			if (!world.isRemote && (entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 1000 && !(entity.getEntityData().getBoolean("kgReceived"))) {
 				if (entity.getEntityData().getInteger("KekkeiGenkai") <= 12) {
 					Item jutsu = GuiScrollKG.GuiContainerMod.kgArray[entity.getEntityData().getInteger("KekkeiGenkai")];
