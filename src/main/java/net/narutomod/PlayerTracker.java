@@ -36,7 +36,6 @@ import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.item.*;
 import net.narutomod.entity.EntitySummonAnimal;
-import net.narutomod.item.ItemIryoJutsu;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
 
@@ -67,6 +66,12 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 		return true;
 		//return player.getEntityData().getDouble(BATTLEXP) > 0.0d;
 	}
+
+	public static boolean isAlsoNinja(EntityPlayer player) {
+		//return true;
+		return player.getEntityData().getDouble(BATTLEXP) > 0.0d;
+	}
+
 
 	public static double getBattleXp(EntityPlayer player) {
 		return player.getEntityData().getDouble(BATTLEXP);
@@ -100,7 +105,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	}
 
     public static float getDefense(Entity entity) {
-		return 1.5f+17*ItemJutsu.getDmgMult(entity)/63;
+		return 1f+10*ItemJutsu.getDmgMult(entity)/12.6f;
 	}
 
 	private static void logBattleExp(EntityPlayer entity, double xp) {
@@ -240,7 +245,8 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			if (event.phase == TickEvent.Phase.START && event.player instanceof EntityPlayerMP) {
 				//double d = getBattleXp(event.player) * 0.0008d;
 				// ninja hp!
-				double d = 30+190*(ItemJutsu.getDmgMult(event.player)/63);
+				if (isAlsoNinja(event.player)) {
+				double d = 20+80*(ItemJutsu.getDmgMult(event.player)/12.6);
 				if (d > 0d) {
 					IAttributeInstance maxHealthAttr = event.player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
 					AttributeModifier attr = maxHealthAttr.getModifier(HP_UUID);
@@ -267,17 +273,21 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				}
+				} // im just doing this as a safety precaution because i have no clue if the order is imp
 				if (event.player.getEntityData().getBoolean(FORCE_SEND)) {
 					event.player.getEntityData().removeTag(FORCE_SEND);
 					sendBattleXPToTracking((EntityPlayerMP)event.player);
 				}
+				if (isAlsoNinja(event.player)) {
 				if (event.player.getEntityData().getBoolean(UPDATE_HEALTH)) {
 					event.player.getEntityData().removeTag(UPDATE_HEALTH);
 					event.player.setHealth(event.player.getHealth());
 				}
 			}
+			
+			}
 		}
-
+		
 		@SubscribeEvent(priority = EventPriority.LOWEST)
 		public void onDeath(LivingDeathEvent event) {
 			EntityLivingBase entity = event.getEntityLiving();
@@ -378,7 +388,15 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					ItemYoton.EntityBiggerMe PENIS = (ItemYoton.EntityBiggerMe) targetEntity.getRidingEntity();
 					defMult += 0.4f+0.9f*(PENIS.bigRatio/3);
 				}
+				
 				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
+				if (targetEntity instanceof EntityPlayer) {
+					if (isAlsoNinja((EntityPlayer) targetEntity )) {
+						defense = 1;
+					}
+				}
+
+		
 				float newAmount = amount/defense;
 				if (event.getSource() == ProcedureUtils.SPECIAL_DAMAGE || event.getSource() == DamageSource.OUT_OF_WORLD) {
 					newAmount = amount;

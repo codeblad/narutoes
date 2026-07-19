@@ -82,14 +82,14 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			if (cheststack.getItem() == ItemRinnegan.body) {
 				boost = 2;
 			}
-			return MathHelper.clamp((float)PlayerTracker.getNinjaLevel((EntityPlayer)entity) / 5f,1.0f,10000000f)*boost;
+			return MathHelper.clamp((float)PlayerTracker.getNinjaLevel((EntityPlayer)entity) / 25f,1.0f,10000000f)*boost;
 		}
 		return 1.0f;
 	}
 
 	public static float getNinjaMult(Entity entity) {
 		if (entity instanceof EntityPlayer) {
-			return MathHelper.clamp((float)PlayerTracker.getNinjaLevel((EntityPlayer)entity) / 5f,1.0f,10000000f);
+			return MathHelper.clamp((float)PlayerTracker.getNinjaLevel((EntityPlayer)entity) / 25f,1.0f,10000000f);
 		}
 		return 1.0f;
 	}

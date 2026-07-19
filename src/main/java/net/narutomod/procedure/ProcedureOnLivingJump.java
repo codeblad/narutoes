@@ -11,6 +11,7 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.entity.player.EntityPlayer;
 
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.PlayerTracker;
 import net.narutomod.entity.EntitySusanooBase;
 import net.narutomod.item.ItemEightGates;
 
@@ -21,7 +22,9 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static void lunge(EntityPlayer entity) {
+		if (PlayerTracker.isAlsoNinja(entity)) {
 		double speed = ProcedureUtils.getModifiedSpeed(entity);
+			
 		if (entity.getEntityData().getLong("jumpCool") > entity.world.getTotalWorldTime()) {
 			return;
 		}
@@ -53,6 +56,7 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 				entity.motionY = Math.max(motionY * Math.sin(pitch) * 2.0d, 0.8d);
 			}
 			//entity.addExhaustion(0.1f);
+		}
 		}
 	}
 
