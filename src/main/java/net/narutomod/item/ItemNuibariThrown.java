@@ -98,6 +98,31 @@ public class ItemNuibariThrown extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void onUsingTick(ItemStack stack, EntityLivingBase entityLiving, int count) {
+			if (!(entityLiving instanceof EntityPlayerMP) || entityLiving.world.isRemote) {
+				return;
+			}
+
+			// 72000 - count = ticks the item has been held
+			if (72000 - count >= 100) { // 5 seconds
+				EntityPlayerMP player = (EntityPlayerMP) entityLiving;
+
+				ItemNuibariSword.EntityCustom swordEntity = this.getEntity(player.world, stack);
+				if (swordEntity != null && player.equals(swordEntity.getShooter())) {
+					double d0 = player.posX - swordEntity.posX;
+					double d1 = player.getEntityBoundingBox().minY + (double)player.height / 3D - swordEntity.posY;
+					double d2 = player.posZ - swordEntity.posZ;
+					double d3 = MathHelper.sqrt(d0 * d0 + d2 * d2);
+
+					swordEntity.retrieve(d0, d1 + d3 * 0.3D, d2,
+							(float)MathHelper.sqrt(d3) * 0.3F);
+				}
+
+				player.stopActiveHand();
+			}
+		}
+
+		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (!world.isRemote) {

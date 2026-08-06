@@ -121,7 +121,7 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 				float power = 1f;
 				itemstack.damageItem(1, entity);
 				EntityCustom entityarrow = new EntityCustom(entity, itemstack);
-				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 2, 0);
+				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power * 5, 0);
 				entityarrow.setSilent(true);
 				entityarrow.setIsCritical(false);
 				entityarrow.setDamage(7);
@@ -413,8 +413,8 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 			if (!player.world.isRemote) {
 				EntityCustom entityarrow = new EntityCustom(player, stack);
 				Vec3d vec = player.getLookVec();
-				entityarrow.shoot(vec.x, 0d, vec.z, 0.4f, 0);
-				entityarrow.setDamage(7);
+				entityarrow.shoot(vec.x, 0d, vec.z, 0.8f, 0);
+				entityarrow.setDamage(12);
 				entityarrow.pickupStatus = EntityArrow.PickupStatus.ALLOWED;
 				player.world.spawnEntity(entityarrow);
 				UUID ownerUuid = RangedItem.getOwnerUuid(stack);

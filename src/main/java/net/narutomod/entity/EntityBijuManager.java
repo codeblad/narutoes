@@ -98,9 +98,9 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 	public static boolean hasJinchurikiFire(EntityLivingBase entity) {
 		if (entity instanceof EntityPlayer) {
 					EntityPlayer player = (EntityPlayer) entity;
-					if (EntityBijuManager.cloakLevel(player) > 0 &&
+					if (
 						EntityBijuManager.isJinchurikiOf(player, EntityTwoTails.EntityCustom.class)) {
-						return true;
+						return true; //EntityBijuManager.cloakLevel(player) > 0 &&
 					}
 				}
 			return false;

@@ -143,7 +143,7 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 15.0f;
+				return 7.0f;
 			}
 	
 			@Override

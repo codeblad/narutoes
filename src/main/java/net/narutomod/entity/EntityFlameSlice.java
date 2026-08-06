@@ -89,6 +89,9 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 					}
 					if (user instanceof EntityPlayer && user.swingProgressInt == 1) {
 						this.flamecool = 40;
+						if (!net.narutomod.Chakra.pathway(user).consume(ItemKaton.FLAMESLICE.chakraUsage * 2.0d)) {
+							return;
+						}
 						this.world.spawnEntity(new EntitySweepParticle(user, 8.0f));
 						double d = ProcedureUtils.getReachDistance(user)+4;
 						float damage = (float)ProcedureUtils.getModifiedAttackDamage(user) * this.getCooledAttackStrength(user, 0.5f) + (ItemJutsu.getDmgMult(user)*0.5f*this.getCooledAttackStrength(user, 0.5f));

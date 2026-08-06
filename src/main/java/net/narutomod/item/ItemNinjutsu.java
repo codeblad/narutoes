@@ -67,7 +67,7 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum AMENOTEJIKARA = new ItemJutsu.JutsuEnum(4, "item.ninjutsu.amenotejikara", 'S', 50d, new Amenotejikara());
 	public static final ItemJutsu.JutsuEnum PUPPET = new ItemJutsu.JutsuEnum(5, "tooltip.ninjutsu.puppetjutsu", 'C', 0.5d, new EntityPuppet.Base.Jutsu());
 	public static final ItemJutsu.JutsuEnum BUGSWARM = new ItemJutsu.JutsuEnum(6, "bugball", 'C', 100d, new EntityKikaichu.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum INVISABILITY = new ItemJutsu.JutsuEnum(7, "tooltip.ninjutsu.hidingincamouflage", 'A', 100d, new HidingWithCamouflage());
+	public static final ItemJutsu.JutsuEnum INVISABILITY = new ItemJutsu.JutsuEnum(7, "tooltip.ninjutsu.hidingincamouflage", 'A', 200d, new HidingWithCamouflage());
 	public static final ItemJutsu.JutsuEnum TRANSFORM = new ItemJutsu.JutsuEnum(8, "transformation_jutsu", 'D', 50d, new EntityTransformationJutsu.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum HIRAISHIN = new ItemJutsu.JutsuEnum(9, "hiraishin", 'S', 10d, new EntityHiraishin.EC.Jutsu());
 
@@ -123,7 +123,7 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 			super.onUpdate(itemstack, world, entity, par4, par5);
 			if (!world.isRemote && entity.ticksExisted % 20 == 0
 			 && entity instanceof EntityLivingBase && INVISABILITY.jutsu.isActivated(itemstack)) {
-				if (Chakra.pathway((EntityLivingBase)entity).consume(INVISABILITY.chakraUsage * 0.2d)) {
+				if (Chakra.pathway((EntityLivingBase)entity).consume(INVISABILITY.chakraUsage)) {
 					((EntityLivingBase)entity).addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, 21, 0, false, false));
 				} else {
 					HidingWithCamouflage.deactivate(itemstack);
@@ -297,8 +297,20 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 				if (entity instanceof EntityLiving) {
 					EntityLivingBase target = event.getTarget();
 					if (target != null && target.isInvisible()
-					 && !ItemSharingan.wearingAny(entity) && !ItemByakugan.wearingAny(entity)) {
+					&& !ItemSharingan.wearingAny(entity) && !ItemByakugan.wearingAny(entity)) {
 						((EntityLiving)entity).setAttackTarget(null);
+					}
+				}
+			}
+
+			@SubscribeEvent
+			public void onLivingHurt(LivingHurtEvent event) {
+				EntityLivingBase entity = event.getEntityLiving();
+				if (!entity.world.isRemote && entity instanceof EntityPlayer) {
+					ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)entity, block);
+					if (stack != null && new HidingWithCamouflage().isActivated(stack)) {
+						HidingWithCamouflage.deactivate(stack);
+						entity.removePotionEffect(MobEffects.INVISIBILITY);
 					}
 				}
 			}

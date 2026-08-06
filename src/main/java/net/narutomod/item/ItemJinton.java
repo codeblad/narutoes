@@ -149,10 +149,23 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 				ItemStack stack = ((EntityPlayer) entity).getHeldItemMainhand();
 				ItemStack offstack = ((EntityPlayer) entity).getHeldItemOffhand();
 				Chakra.Pathway chakra = Chakra.pathway((EntityLivingBase) entity);
-				if ((stack.getItem() == ItemJinton.block || offstack.getItem() == ItemJinton.block)  && entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed)
-						&& chakra.consume(4d) ) {
-					((EntityPlayer) entity).addPotionEffect(new PotionEffect(PotionFlight.potion, 10, 1, false, false));
-				}
+				if ((stack.getItem() == ItemJinton.block || offstack.getItem() == ItemJinton.block)
+    && entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed)) {
+
+    int flightTicks = entity.getEntityData().getInteger("JintonFlightTicks");
+
+    double drain = 4D * Math.pow(1.01D, flightTicks);
+
+    if (chakra.consume(drain)) {
+        ((EntityPlayer) entity).addPotionEffect(
+            new PotionEffect(PotionFlight.potion, 10, 1, false, false)
+        );
+        entity.getEntityData().setInteger("JintonFlightTicks", flightTicks + 1);
+    }
+}
+else {
+    entity.getEntityData().setInteger("JintonFlightTicks", 0);
+}
 			}
 		}
 
@@ -370,7 +383,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 				double d = ProcedureUtils.BB.getVolume(bb.intersect(entity.getEntityBoundingBox()))
 				 / ProcedureUtils.BB.getVolume(entity.getEntityBoundingBox()) * 0.025d;
 				attackEntityWithJutsu(this, this.shootingEntity, entity,
-						5+(2.25f*(2f+7f*(this.power/25f))*ItemJutsu.getDmgMult(this.shootingEntity))/20);
+						5+(2.75f*(2f+7f*(this.power/25f))*ItemJutsu.getDmgMult(this.shootingEntity))/20);
 				//entity instanceof EntityLivingBase ? ((EntityLivingBase)entity).getMaxHealth() * (float)d : Float.MAX_VALUE);
 			}
 		}

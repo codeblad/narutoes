@@ -71,7 +71,7 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 		private final int cooldown = 1200;
 
 		public Genjutsu() {
-			this(16.0d, 200);
+			this(16.0d, 60);
 		}
 
 		public Genjutsu(double range, int durationIn) {

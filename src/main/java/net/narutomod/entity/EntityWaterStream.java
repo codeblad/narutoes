@@ -126,7 +126,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
 				target.extinguish();
-				float damage = 6 + ((1.45f+2.5f*(EC.this.power/30)) * EC.this.damageModifier)*ItemJutsu.getDmgMult(player)*1.75f;
+				float damage = 6 + ((1.35f+2.5f*(EC.this.power/30)) * EC.this.damageModifier)*ItemJutsu.getDmgMult(player)*1.36f;
 				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityLivingBase) player, ItemSuiton.block);
 				if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 					damage*=1.35f;
@@ -157,7 +157,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 5.0f) {
 					this.createJutsu(entity, power, (int) (10+70*power/30));
-					ItemJutsu.setCurrentJutsuCooldown(stack,(int) (10+70*power/30));
+					ItemJutsu.setCurrentJutsuCooldown(stack,(int) (50+70*power/30));
 					return true;
 				}
 				return false;
@@ -183,7 +183,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getMaxPower() {
-				return 30.0f;
+				return 25.0f;
 			}
 		}
 	}

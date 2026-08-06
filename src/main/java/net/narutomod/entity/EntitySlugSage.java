@@ -143,7 +143,7 @@ public class EntitySlugSage extends ElementsNarutomodMod.ModElement {
                     ProcedureUtils.sendChat(player, TextFormatting.GREEN + "Slug Sage" + ": "
                             + TextFormatting.WHITE + "Why do you not have the perc on you?");
                 }
-                if (PlayerTracker.getBattleXp(player) < 10000) {
+                if (PlayerTracker.getBattleXp(player) < 7500) {
                     giveItem = false;
                     ProcedureUtils.sendChat(player, TextFormatting.GREEN + "Slug Sage" + ": "
                             + TextFormatting.WHITE + "You are too weak to become a sage!");

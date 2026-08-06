@@ -278,12 +278,12 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 			this.buttonList.add(new GuiButton(6, this.guiLeft + 50, this.guiTop + 50, 39, 20, "Magnet"));
 			this.buttonList.add(new GuiButton(7, this.guiLeft + 100, this.guiTop + 50, 39, 20, "Scorch"));
 			this.buttonList.add(new GuiButton(8, this.guiLeft + 150, this.guiTop + 50, 39, 20, "Storm"));
-			this.buttonList.add(new GuiButton(9, this.guiLeft + 200, this.guiTop + 50, 39, 20, "bootleg hashirama"));
+			this.buttonList.add(new GuiButton(9, this.guiLeft + 200, this.guiTop + 50, 39, 20, "loosenedcube"));
 			this.buttonList.add(new GuiButton(10, this.guiLeft + 0, this.guiTop + 75, 39, 20, "Gates"));
 			this.buttonList.add(new GuiButton(11, this.guiLeft + 50, this.guiTop + 75, 39, 20, "Hyuga"));
 			this.buttonList.add(new GuiButton(12, this.guiLeft + 100, this.guiTop + 75, 39, 20, "Uchiha"));
 			this.buttonList.add(new GuiButton(13, this.guiLeft + 150, this.guiTop + 75, 39, 20, "Medical"));
-			this.buttonList.add(new GuiButton(14, this.guiLeft + 200, this.guiTop + 75, 39, 20, "loosenedcube"));
+			this.buttonList.add(new GuiButton(14, this.guiLeft + 200, this.guiTop + 75, 39, 20, "Naruto"));
 			this.buttonList.add(new GuiButton(15, this.guiLeft + 0, this.guiTop + 100, 39, 20, "Flying Raijin"));
 			this.buttonList.add(new GuiButton(16, this.guiLeft + 50, this.guiTop + 100, 39, 20, "Akimichi"));
 			this.buttonList.add(new GuiButton(17, this.guiLeft + 100, this.guiTop + 100, 39, 20, "Nara"));
@@ -291,7 +291,7 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 			this.buttonList.add(new GuiButton(19, this.guiLeft + 0, this.guiTop + 125, 39, 20, "Hiruzen"));
 			this.buttonList.add(new GuiButton(20, this.guiLeft + 50, this.guiTop + 125, 39, 20, "Crystal"));
 			this.buttonList.add(new GuiButton(21, this.guiLeft + 100, this.guiTop + 125, 39, 20, "Paper"));
-			this.buttonList.add(new GuiButton(69, this.guiLeft + 100, this.guiTop + 150, 39, 20, "are you seriously watching #### by yourself?"));
+			this.buttonList.add(new GuiButton(69, this.guiLeft + 100, this.guiTop + 150, 39, 20, "Regular Dude"));
 		}
 	}
 }

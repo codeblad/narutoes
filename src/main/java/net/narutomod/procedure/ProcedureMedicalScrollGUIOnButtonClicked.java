@@ -1,11 +1,8 @@
 package net.narutomod.procedure;
 
 import net.narutomod.item.*;
-import net.narutomod.item.ItemTenseigan;
-import net.narutomod.item.ItemSharingan;
-import net.narutomod.item.ItemMangekyoSharinganEternal;
-import net.narutomod.item.ItemByakugan;
 import net.narutomod.NarutomodModVariables;
+import net.narutomod.PlayerTracker;
 import net.narutomod.ElementsNarutomodMod;
 
 import net.minecraft.world.WorldServer;
@@ -53,7 +50,7 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 		double TenseiganEvolvedTime = 0;
 		boolean hasKey = false;
 		if ((((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
-				&& ProcedureUtils.getMatchingItemStack((EntityPlayer) entity, ItemIryoJutsu.block) != null)) {
+				&& ProcedureUtils.getMatchingItemStack((EntityPlayer) entity, ItemIryoJutsu.block) != null && PlayerTracker.getBattleXp((EntityPlayer) entity) > 7500.0d ) ) {
 			stack0 = (new Object() {
 				public ItemStack getItemStack(int sltid) {
 					if (entity instanceof EntityPlayerMP) {

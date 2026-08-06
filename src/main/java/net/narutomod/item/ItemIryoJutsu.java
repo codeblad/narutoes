@@ -42,7 +42,7 @@ public class ItemIryoJutsu extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:iryo_jutsu")
 	public static final Item block = null;
 	public static final int ENTITYID = 210;
-	public static final ItemJutsu.JutsuEnum HEALING = new ItemJutsu.JutsuEnum(0, "healingjutsu", 'A', 0.25d, new HealingJutsu());
+	public static final ItemJutsu.JutsuEnum HEALING = new ItemJutsu.JutsuEnum(0, "healingjutsu", 'A', 0.35d, new HealingJutsu());
 	public static final ItemJutsu.JutsuEnum POISONMIST = new ItemJutsu.JutsuEnum(1, "poison_mist", 'B', 20d, new EntityPoisonMist.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum MEDMODE = new ItemJutsu.JutsuEnum(2, "cellular_activation", 'A', 20d, new EntityCellularActivation.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum POWERMODE = new ItemJutsu.JutsuEnum(3, "enhanced_strength", 'A', 30d, new EntityEnhancedStrength.EC.Jutsu());
@@ -120,7 +120,7 @@ public class ItemIryoJutsu extends ElementsNarutomodMod.ModElement {
 			 target.posZ, 10, 0d, 0d, 0d, 0d, 0d, 0d, 0x0000fff6|((0x20+target.getRNG().nextInt(0x20))<<24),
 			 10 + target.getRNG().nextInt(25), 0, 0xF0, -1, 0);
 			//target.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 80, 6, false, false));
-			target.heal(power * 0.02f);
+			target.heal(power * 0.015f);
 		}
 
 		@Override

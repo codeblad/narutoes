@@ -312,6 +312,11 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 							entity.getCooldownTracker().setCooldown(itemstack.getItem(), 400);
 						}
 						break;
+					case 6 :
+						this.attackAsakujaku(entity);
+						entity.sendStatusMessage(new TextComponentString(
+							I18n.translateToLocal("entity.entityasakujaku.name")), true);
+						break;
 				}
 			}
 		}
@@ -407,11 +412,6 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			if (!attacker.world.isRemote) {
 				int gateOpened = (int)this.getGateOpened(itemstack);
 				switch (gateOpened) {
-					case 6 :
-						this.attackAsakujaku(attacker);
-						attacker.sendStatusMessage(new TextComponentString(
-							I18n.translateToLocal("entity.entityasakujaku.name")), true);
-						break;
 					case 8 :
 						int k = this.attackSekizo(itemstack, attacker);
 						if (k >= 0) {
