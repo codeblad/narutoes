@@ -21,6 +21,7 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.nbt.NBTTagCompound;
 
+import net.narutomod.potion.PotionChakraEnhancedStrength;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemSteamArmor;
@@ -61,22 +62,26 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 			this.user = userIn;
 			this.isWearingSteamArmor = ItemSteamArmor.isWearingFullSet(userIn);
 			if (this.isWearingSteamArmor) {
-				this.duration = (int)(power * 60f);
+				this.duration = (int)(power * 120f);
 				power *= 2f;
 			} else {
-				this.duration = (int)(power * 30f);
+				this.duration = (int)(power * 60f);
 			}
 			this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 			this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kairikimuso")), 1f, 1f);
+
 			PotionEffect effect = userIn.getActivePotionEffect(MobEffects.STRENGTH);
-			userIn.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, this.duration, 
-			 (int) ((1+0.15*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.25)), false, false));
+			if (!userIn.isPotionActive(PotionChakraEnhancedStrength.potion)) {
+				userIn.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, this.duration,
+						(int) ((1+0.5*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.4)), false, false));
+			}
+
 			effect = userIn.getActivePotionEffect(MobEffects.SPEED);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.SPEED, this.duration, 
-			 (int)(power * 0.5f), false, false));
+			 (int)(power * 0.65f), false, false));
 			effect = userIn.getActivePotionEffect(MobEffects.JUMP_BOOST);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, this.duration, 
-			 (int)(power * 0.2f), false, false));
+			 (int)(power * 0.25f), false, false));
 		}
 
 		@Override
@@ -92,6 +97,9 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
+				if (this.user.isPotionActive(PotionChakraEnhancedStrength.potion)) {
+					user.removePotionEffect(PotionChakraEnhancedStrength.potion);
+				}
 				if (!this.isWearingSteamArmor) {
 					boolean flag = this.ticksExisted <= 10;
 					if (flag) {

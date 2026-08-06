@@ -234,7 +234,7 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (!entity.isSneaking()) {
 					this.createJutsu(entity);
-					ItemJutsu.setCurrentJutsuCooldown(stack,20*2);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
 					return true;
 				} else {
 					for (EC clone : entity.world.getEntities(EC.class, EntitySelectors.IS_ALIVE)) {

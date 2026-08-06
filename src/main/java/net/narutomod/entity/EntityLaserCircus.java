@@ -94,11 +94,11 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			//super.onUpdate();
 			if (this.summoner != null && this.summoner.isEntityAlive() && this.ticksExisted <= this.duration) {
 				this.setIdlePosition();
-				if (this.ticksExisted % 10 == 0) {
+				if (this.ticksExisted % 1 == 0) {
 					this.playSound(SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:electricity")), 1.0f, this.rand.nextFloat() * 0.6f + 0.6f);
 				}
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 60d);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 40d+this.ticksExisted*2);
 				if (res != null) {
 					this.setLightningAt(res.hitVec);
 				}
@@ -115,7 +115,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 
 		private void setLightningAt(Vec3d targetVec) {
 			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
-			 this.getPositionVector(), targetVec, 0xc00000ff, 10, 0.1f);
+			 this.getPositionVector(), targetVec, 0xc00000ff, 2, 0.1f);
 			float dmgMult = 0.25f+0.75f*1/10*this.power;
 			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 35+6.35f*dmgMult*ItemJutsu.getDmgMult(this.summoner), this.summoner);
 			this.world.spawnEntity(entity2);

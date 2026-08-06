@@ -64,7 +64,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> LSA = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> LS = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> MOUTHOPENAMOUNT = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
-		private final int wait = 20;
+		private final int wait = 10;
 		private final int mouthOpenTime = 20;
 		private float fullScale;
 		private Entity target;
@@ -212,14 +212,14 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 				if (result.typeOfHit == RayTraceResult.Type.BLOCK
 				 || (result.entityHit != null && result.entityHit.equals(this.target))) {
 					float size = this.getEntityScale();
-					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*3.5f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
+					float damage = this.dmg+(((this.isInWater() ? 1.5f : 1f))*3.85f*ItemJutsu.getDmgMult(this.shootingEntity)*this.power);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 						damage*=1.35f;
 					}
 					ProcedureAoeCommand.set(this, 0.0D, size).exclude(this.shootingEntity)
 					  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);
-					this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, size * 2.0F, false,
+					this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, size * 3.5F, false,
 					  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 					/*Map<BlockPos, IBlockState> map = Maps.newHashMap();
 					for (BlockPos pos : ProcedureUtils.getAllAirBlocks(this.world, this.getEntityBoundingBox().contract(0d, this.height-1, 0d))) {
@@ -287,7 +287,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 40.0f;
 			}
 	
 			@Override

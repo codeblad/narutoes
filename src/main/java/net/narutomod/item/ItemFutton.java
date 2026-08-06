@@ -122,10 +122,10 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			this(userIn.world);
 			this.setSize(0.01f, 0.01f);
 			this.user = userIn;
-			this.power = powerIn;
-			this.farRadius = width;
-			this.damagePerSec = (int) (0.8*ItemJutsu.getDmgMult(userIn));
-			this.duration = (int)(powerIn * powerIn * 0.6f);
+			this.power = 10+powerIn;
+			this.farRadius = 4+width;
+			this.damagePerSec = (int) (4+0.85*ItemJutsu.getDmgMult(userIn));
+			this.duration = (int)(15+powerIn * powerIn * 0.3f);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
 		}
 
@@ -194,8 +194,8 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				if (target instanceof EntityLivingBase) {
 					target.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1f, this.rand.nextFloat() + 0.5f);
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 20, 2));
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, 100, EntityBoilingMist.this.damagePerSec));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 20, 3));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, 160, EntityBoilingMist.this.damagePerSec));
 				}
 			}
 
@@ -226,7 +226,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				this.createJutsu(entity, power, power * 0.25f);
-				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (20+(power * power * 0.5)));
+				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (10+(power * power * 0.5)));
 				return true;
 			}
 
@@ -238,12 +238,12 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getBasePower() {
-				return 0.1f;
+				return 1f;
 			}
 	
 			@Override
 			public float getPowerupDelay() {
-				return 20.0f;
+				return 10.0f;
 			}
 	
 			@Override

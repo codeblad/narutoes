@@ -61,7 +61,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
-		private final int wait = 20;
+		private final int wait = 15;
 		private Vec3d shootVec;
 		private float prevHeadYaw;
 		private float prevHeadPitch;
@@ -146,7 +146,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 						Vec3d vec = this.shootingEntity instanceof EntityLiving && ((EntityLiving)this.shootingEntity).getAttackTarget() != null
 						 ? ((EntityLiving)this.shootingEntity).getAttackTarget().getPositionVector().subtract(this.getPositionVector())
 						 : ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 50d).hitVec.subtract(this.getPositionVector());
-						this.shoot(vec.x, vec.y, vec.z, 0.99f, 0f);
+						this.shoot(vec.x, vec.y, vec.z, 1.0f, 0f);
 					}
 				}
 				this.updateSegments();
@@ -198,7 +198,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 				return;
 			if (!this.world.isRemote) {
 				float size = this.getEntityScale();
-				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 6.0F * size, false,
+				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 7.0F * size, false,
 				  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 				float damage = 22+(6f*this.mult)*ItemJutsu.getDmgMult(this.shootingEntity);
 				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);

@@ -66,8 +66,8 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 230;
 	public static final ItemJutsu.JutsuEnum JIRAIKEN = new ItemJutsu.JutsuEnum(0, "tooltip.bakuton.jiraiken", 'S', 150, 30d, new Jiraiken());
-	public static final ItemJutsu.JutsuEnum CLAY = new ItemJutsu.JutsuEnum(1, "c_1", 'S', 200, 180d, new ExplosiveClay.Jutsu());
-	public static final ItemJutsu.JutsuEnum CLONE = new ItemJutsu.JutsuEnum(2, "explosive_clone", 'S', 200, 250d, new EntityExplosiveClone.EC.Jutsu()); 
+	public static final ItemJutsu.JutsuEnum CLAY = new ItemJutsu.JutsuEnum(1, "c_1", 'S', 200, 200d, new ExplosiveClay.Jutsu());
+	public static final ItemJutsu.JutsuEnum CLONE = new ItemJutsu.JutsuEnum(2, "explosive_clone", 'S', 200, 500d, new EntityExplosiveClone.EC.Jutsu());
 public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3, "c0", 'S', 200, 500d, new C0());
 	public ItemBakuton(ElementsNarutomodMod instance) {
 		super(instance, 543);
@@ -424,7 +424,7 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 					return false;
 				} else if (powerIn < 2f) {
 					ec = new EntityC1.EC(entity);
-					ItemJutsu.setCurrentJutsuCooldown(stack,20);
+					ItemJutsu.setCurrentJutsuCooldown(stack,30);
 				} else if (powerIn < 3f) {
 					ec = new EntityC2.EC(entity);
 					ProcedureUtils.poofWithSmoke(entity.world, vec.x, vec.y, vec.z, ec.width, ec.height);

@@ -69,7 +69,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> POWER = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private final float ogWidth = 1.2F;
 		private final float ogHeight = 1.75F;
-		private final double ogSpeed = 2.0D;
+		private final double ogSpeed = 3D;
 		private BlockPos destPos;
 		private Vec3d startVec;
 
@@ -213,7 +213,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
                 this.rotationYaw = -((float)MathHelper.atan2(this.motionX, this.motionZ)) * (180F / (float)Math.PI);
                 this.renderYawOffset = this.rotationYaw;
 			}
-			if (this.ticksExisted % 5 == 0 && (this.destPos == null || this.isDestOnPath())) {
+			if (this.ticksExisted % 1 == 0 && (this.destPos == null || this.isDestOnPath())) {
 				this.destPos = this.findDestination();
 			}
 		}

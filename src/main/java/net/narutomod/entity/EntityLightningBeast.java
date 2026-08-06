@@ -64,7 +64,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 		private BlockPos destPos;
 		private Vec3d startVec;
 		private int jumpTicks;
-		private final double ogSpeed = 1.6D;
+		private final double ogSpeed = 2D;
 		private float damage = 5;
 		private float mult = 1;
 
@@ -175,7 +175,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void updateAITasks() {
 			super.updateAITasks();
-			if (this.ticksExisted % 5 == 0) {
+			if (this.ticksExisted % 1 == 0) {
 				if (this.destPos != null) {
 					Vec3d vec = new Vec3d(this.destPos).subtract(this.getPositionVector()).normalize().scale(this.ogSpeed);
 					this.motionX = vec.x;

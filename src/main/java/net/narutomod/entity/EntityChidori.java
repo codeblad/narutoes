@@ -368,7 +368,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 					if (this.rand.nextFloat() < 0.5f) {
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")), 1.2f, this.rand.nextFloat() * 2.0f + 1.5f);
 					}
-					for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.summoner, this.summoner.getEntityBoundingBox().grow(5d))) {
+					for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.summoner, this.summoner.getEntityBoundingBox().grow(10d))) {
 						if (!(entity1 instanceof EntityLightningArc.Base) && this.rand.nextInt(3) == 0) {
 							EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 							 this.summoner.getPositionVector().addVector(0d, 1d, 0d),
@@ -383,7 +383,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 						}
 					}
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world,
-					 this.summoner.getPositionVector().addVector(0d, 1d, 0d), this.rand.nextDouble() * 4d + 1d, 0d, 0d, 0d);
+					 this.summoner.getPositionVector().addVector(0d, 1d, 0d), this.rand.nextDouble() * 9d + 1d, 0d, 0d, 0d);
 					float damage = 10f+3.5f*ItemJutsu.getDmgMult(this.summoner);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
@@ -400,7 +400,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")), 0.8f, this.rand.nextFloat() * 2.0f + 1.5f);
 					}
 					Vec3d vec0 = this.summoner.getPositionEyes(1f);
-					Vec3d vec1 = vec0.add(this.summoner.getLookVec().scale(6d));
+					Vec3d vec1 = vec0.add(this.summoner.getLookVec().scale((3+this.ticksExisted*2)));
 					vec0 = this.handPos != null ? this.handPos : vec0.subtract(0d, 0.5d, 0d);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, vec0, vec1, 0x800000FF, 1, 0f, 0.04f, 0);
 					float damage = 12f+3.2f*ItemJutsu.getDmgMult(this.summoner);

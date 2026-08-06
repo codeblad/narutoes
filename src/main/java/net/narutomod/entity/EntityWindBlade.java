@@ -76,7 +76,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			this.updateInFlightRotations();
-			if (!this.world.isRemote && (this.ticksInAir > 200 || this.isInWater())) {
+			if (!this.world.isRemote && (this.ticksInAir > 800 || this.isInWater())) {
 				this.setDead();
 			} else if (this.shootingEntity != null) {
 				if (this.targetTrace == null || this.targetTrace.entityHit == null) {
@@ -139,7 +139,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0F) {
 					this.createJutsu(entity, power);
-					ItemJutsu.setCurrentJutsuCooldown(stack,40);
+					ItemJutsu.setCurrentJutsuCooldown(stack,15);
 					return true;
 				}
 				return false;
@@ -158,7 +158,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 40.0f;
+				return 30.0f;
 			}
 	
 			@Override

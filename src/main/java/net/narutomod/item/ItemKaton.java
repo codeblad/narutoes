@@ -203,10 +203,10 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					} else {
 						vec = this.target.getPositionEyes(1f).subtract(this.getPositionVector());
 					}
-					this.motionX *= 0.9D;
-					this.motionY *= 0.9D;
-					this.motionZ *= 0.9D;
-					this.shoot(vec.x, vec.y, vec.z, 0.99f, 0f);
+					this.motionX *= 0.98D;
+					this.motionY *= 0.98D;
+					this.motionZ *= 0.98D;
+					this.shoot(vec.x, vec.y, vec.z, 1.5f, 0f);
 				}
 				if (this.rand.nextFloat() <= 0.2f) {
 					//this.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1, this.rand.nextFloat() + 0.5f);
@@ -223,7 +223,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					this.createJutsu(entity, entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power,
 					 stack.getItem() instanceof RangedItem && ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) <= 0.5f);
 					//if (entity instanceof EntityPlayer)
-					ItemJutsu.setCurrentJutsuCooldown(stack,20*4);
+					ItemJutsu.setCurrentJutsuCooldown(stack,10);
 					return true;
 				}
 				return false;
@@ -239,7 +239,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 
 			public void createJutsu(EntityLivingBase entity, double x, double y, double z, float power, boolean isGuided, boolean colored) {
 				EntityBigFireball entityarrow = new EntityBigFireball(entity, power, isGuided, colored);
-				entityarrow.shootPrecise(x, y, z, 0.97f);
+				entityarrow.shootPrecise(x, y, z, 1.15f);
 				entity.world.spawnEntity(entityarrow);
 			}
 
@@ -250,12 +250,12 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 30.0f;
+				return 20.0f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 10.0f;
+				return 20.0f;
 			}
 		}
 	}

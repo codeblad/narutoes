@@ -67,7 +67,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Integer> AGE = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private final float ogWidth = 0.875F;
 		private final float ogHeight = 0.375F;
-		private final int growTime = 14;
+		private final int growTime = 12;
 		private final Map<EntityLivingBase, Vec3d> caughtEntities = Maps.newHashMap();
 		private EntityLivingBase user;
 
@@ -79,7 +79,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 		public EC(EntityLivingBase userIn, Vec3d atVec, float heightIn) {
 			this(userIn.world);
 			heightIn /= this.ogHeight;
-			this.setScale(heightIn);
+			this.setScale(heightIn*1.5f);
 			this.setLocationAndAngles(atVec.x, atVec.y, atVec.z, userIn.rotationYawHead, 0f);
 			this.user = userIn;
 		}
@@ -220,7 +220,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 30.0f;
 			}
 	
 			@Override

@@ -39,7 +39,7 @@ import java.util.Map;
 public class ItemMangekyoSharinganObito extends ElementsNarutomodMod.ModElement {
 	@ObjectHolder("narutomod:mangekyosharinganobitohelmet")
 	public static final Item helmet = null;
-	public static final double INTANGIBLE_CHAKRA_USAGE = 5d; // per tick
+	public static final double INTANGIBLE_CHAKRA_USAGE = 20d; // per tick
 	public static final double TELEPORT_CHAKRA_USAGE = 20d; // per tick
 
 	public ItemMangekyoSharinganObito(ElementsNarutomodMod instance) {

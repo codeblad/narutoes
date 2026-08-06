@@ -58,7 +58,7 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 			this(userIn.world);
 			this.user = userIn;
 			this.power = powerIn*2+1;
-			this.maxDuration = (int)(powerIn * 2f);
+			this.maxDuration = (int)(powerIn * 1.5f);
 			this.bulletSize = 2.0f;
 			this.damage = 9+1.3f*(0.5f+1.65f*(powerIn/30))*ItemJutsu.getDmgMult(userIn);
 			ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityLivingBase) userIn, ItemFuton.block);

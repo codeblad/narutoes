@@ -36,6 +36,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.block.material.Material;
 
+import net.narutomod.NarutomodModVariables;
 import net.narutomod.procedure.ProcedureSharinganHelmetTickEvent;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
@@ -109,7 +110,7 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 			if (!world.isRemote && entity.ticksExisted % 6 == 1
 			 && (!((Base)itemstack.getItem()).isEternal() || !this.isOwner(itemstack, entity))
 			 && (entity.getEntityData().getBoolean("amaterasu_active")
-			  || entity.getEntityData().getBoolean("susanoo_activated") || entity.getEntityData().getBoolean("kamui_teleport"))) {
+			  || entity.getEntityData().getBoolean("susanoo_activated") || entity.getEntityData().getBoolean("kamui_teleport") || entity.getEntityData().getBoolean("kamui_intangible"))) {
 			 	((Base)itemstack.getItem()).canDamage = true;
 				itemstack.damageItem(this.isOwner(itemstack, entity) ? 3 : 9, entity);
 				((Base)itemstack.getItem()).canDamage = false;
@@ -277,7 +278,7 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 					if (entity.world.isRemote) {
 						ProcedureOnLivingUpdate.setGlowingFor(target, 3);
 					}
-					if (this.shouldLockOnTarget(entity)) {
+					if (entity.getEntityData().getBoolean(NarutomodModVariables.EYETOGGLE)) {
 						RayTraceResult rtr = ProcedureUtils.objectEntityLookingAt(entity, 32d);
 						if (rtr == null || rtr.entityHit != target) {
 							Vec3d vec2 = target.getPositionEyes(1f).subtract(entity.getPositionEyes(1f));

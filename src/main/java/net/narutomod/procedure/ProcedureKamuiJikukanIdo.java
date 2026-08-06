@@ -90,7 +90,7 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 					return;
 				}
 				chakraUsage = (double) ItemMangekyoSharinganObito.getIntangibleChakraUsage((EntityLivingBase) entity);;
-				f2 = (boolean) (((is_pressed) && ((timer) <= 20*10)) && ((chakraAmount) > (chakraUsage)));
+				f2 = (boolean) (((is_pressed) && ((timer) <= 20*5)) && ((chakraAmount) > (chakraUsage)));
 				if ((f2)) {
 					ProcedureUtils.purgeHarmfulEffects((EntityLivingBase) entity);
 					ProcedureOnLivingUpdate.setUntargetable(entity, 3);
@@ -111,7 +111,7 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 				}
 				entity.getEntityData().setBoolean("kamui_intangible", (f2));
 				if ((!(f2))) {
-					entity.getEntityData().setLong("kamui_intangible_cd", world.getTotalWorldTime() + (long) timer);
+					entity.getEntityData().setLong("kamui_intangible_cd", world.getTotalWorldTime() + (long) timer*2);
 					timer = (double) (-1);
 				}
 			} else if ((entity instanceof EntityPlayer)) {

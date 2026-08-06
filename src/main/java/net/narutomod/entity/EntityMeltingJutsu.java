@@ -160,7 +160,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 					Vec3d vec = this.shootingEntity.getLookVec();
 					for (int i = 0; i < 1; i++) {
 						EC entity = new EC(this.shootingEntity, 0,this.supapower);
-						entity.shoot(vec.x, vec.y, vec.z, 0.875f, 0.05f);
+						entity.shoot(vec.x, vec.y, vec.z, 2f, 0.05f);
 						this.world.spawnEntity(entity);
 					}
 					--this.duration;
@@ -244,7 +244,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 20.0f;
 			}
 
 			@Override

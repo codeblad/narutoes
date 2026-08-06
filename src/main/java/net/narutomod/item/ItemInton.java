@@ -71,7 +71,7 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 		private final int cooldown = 1200;
 
 		public Genjutsu() {
-			this(16.0d, 60);
+			this(16.0d, 20);
 		}
 
 		public Genjutsu(double range, int durationIn) {
@@ -85,10 +85,10 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 
 			ItemStack helmetStack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 			if (helmetStack.getItem() == ItemSharingan.helmet) {
-				this.duration = 80;
+				this.duration = 40;
 			}
 			if (helmetStack.getItem() == ItemMangekyoSharingan.helmet && helmetStack.getItem() == ItemMangekyoSharinganObito.helmet && helmetStack.getItem() == ItemMangekyoSharinganEternal.helmet) {
-				this.duration = 120;
+				this.duration = 60;
 			}
 
 			if (target instanceof EntityLivingBase && this.createJutsu(entity, (EntityLivingBase)target, this.duration)) {
