@@ -145,7 +145,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				 vec3d.x, vec3d.y, vec3d.z, this.flameColor, 2.5f, this.damage));
 			}
 			Particles.Renderer particles = new Particles.Renderer(this.world);
-			for (int i = 0; i < (int)(range * radius * 0.8d); i++) {
+			for (int i = 0; i < (int)(range * radius * 0.3d); i++) {
 				Vec3d vec3d = Vec3d.fromPitchYaw(directionPitch + (float)((this.rand.nextDouble()-0.5d) * angle * 6.0d),
 				 directionYaw + (float)((this.rand.nextDouble()-0.5d) * angle * 3.0d)).scale(range * 0.1d);
 				particles.spawnParticles(Particles.Types.FLAME, this.posX, this.posY, this.posZ, 1, 0, 0, 0,

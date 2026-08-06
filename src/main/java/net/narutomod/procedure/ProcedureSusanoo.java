@@ -129,6 +129,7 @@ public class ProcedureSusanoo extends ElementsNarutomodMod.ModElement {
 				//	  String.format("%.2f", (player.getEntityData().getDouble("susanoo_cd") - NarutomodModVariables.world_tick) / 20.0D)), true);
 				//}
 			}
+
 		} else {
 			//double cooldown = (player.getEntityData().getDouble("susanoo_cd") - NarutomodModVariables.world_tick)
 			//				* player.getEntityData().getDouble("susanoo_ticks") / 820.0D;
