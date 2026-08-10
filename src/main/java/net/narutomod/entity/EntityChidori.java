@@ -373,7 +373,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 							EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 							 this.summoner.getPositionVector().addVector(0d, 1d, 0d),
 							 entity1.getPositionVector().addVector(0d, entity1.height/2, 0d), 0xc00000ff, 1, 0f);
-							float damage = 10f+3.5f*ItemJutsu.getDmgMult(this.summoner);
+							float damage = 10f+2.75f*ItemJutsu.getDmgMult(this.summoner);
 							ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
 							if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 								damage*=1.35f;
@@ -384,7 +384,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 					}
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world,
 					 this.summoner.getPositionVector().addVector(0d, 1d, 0d), this.rand.nextDouble() * 9d + 1d, 0d, 0d, 0d);
-					float damage = 10f+3.5f*ItemJutsu.getDmgMult(this.summoner);
+					float damage = 10f+2.75f*ItemJutsu.getDmgMult(this.summoner);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 						damage*=1.35f;

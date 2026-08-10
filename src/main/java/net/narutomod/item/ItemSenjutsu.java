@@ -461,6 +461,11 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		public float getBasePower() {
 			return 0.0f;
 		}
+
+		@Override
+		public float getMinPower() {
+			return 0.0f;
+		}
 	
 		@Override
 		public float getPowerupDelay() {

@@ -135,7 +135,7 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power));
-				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (20+power*2));
+				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (180+power*2));
 				return true;
 			}
 

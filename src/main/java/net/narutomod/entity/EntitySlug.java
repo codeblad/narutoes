@@ -131,7 +131,7 @@ public class EntitySlug extends ElementsNarutomodMod.ModElement {
 		protected void postScaleFixup() {
 			float f = this.getScale();
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0.5D * f);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(5D * f * f);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(7D * f * f);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.2D + f * 0.04);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1D * f);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(13D + 3D * f);
@@ -201,10 +201,10 @@ public class EntitySlug extends ElementsNarutomodMod.ModElement {
 	    	return entityIn instanceof EntityCustom || entityIn instanceof EntitySakuraHaruno.EntityCustom || super.isOnSameTeam(entityIn);
 	    }
 
-		@Override
-		protected void damageEntity(DamageSource damageSrc, float damageAmount) {
-			super.damageEntity(damageSrc, damageAmount * 0.1f);
-		}
+		// @Override
+		// protected void damageEntity(DamageSource damageSrc, float damageAmount) {
+		// 	super.damageEntity(damageSrc, damageAmount * 0.1f);
+		// }
 
 		public static class AcidJutsu extends EntityAcidScattering.EC {
 			public AcidJutsu(World worldIn) {
@@ -283,7 +283,7 @@ public class EntitySlug extends ElementsNarutomodMod.ModElement {
 			ItemJutsu.setCurrentJutsuCooldown(stack, 20*8);
 			Particles.spawnParticle(entity.world, Particles.Types.SEAL_FORMULA,
 			 entity.posX, entity.posY + 0.015d, entity.posZ, 1, 0d, 0d, 0d, 0d, 0d, 0d, (int)(power * 40), 0, 60);
-			for (int i = 0; i < 500; i++) {
+			for (int i = 0; i < 80; i++) {
 				Particles.spawnParticle(entity.world, Particles.Types.SMOKE,
 				 entity.posX, entity.posY + 0.015d, entity.posZ, 1, 0d, 0d, 0d,
 				 (entity.getRNG().nextDouble()-0.5d) * 0.8d, entity.getRNG().nextDouble() * 0.6d + 0.2d, (entity.getRNG().nextDouble()-0.5d) * 0.8d,

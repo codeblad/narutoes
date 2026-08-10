@@ -214,9 +214,10 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			JutsuEnum jutsuEnum = this.getCurrentJutsu(stack);
 			Chakra.Pathway pw = Chakra.pathway(entity);
 			double d = jutsuEnum.chakraUsage * power;
-			if (power <= 0f || pw.getAmount() < d) {
+			if (power <= 0f || pw.getAmount() < d || power < jutsuEnum.jutsu.getMinPower()) {
 				return false;
 			}
+					
 			if (jutsuEnum.jutsu.createJutsu(stack, entity, power)) {
 				pw.consume(d);
 				return true;
@@ -697,6 +698,10 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 
 		default float getBasePower() {
 			return 1.0f;
+		}
+
+		default float getMinPower() {
+			return 0.0f;
 		}
 
 		default float getPowerupDelay() {

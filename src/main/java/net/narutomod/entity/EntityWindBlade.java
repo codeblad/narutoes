@@ -89,7 +89,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 				}
 				if (this.targetTrace.entityHit != null) {
 					Vec3d vec = this.targetTrace.entityHit.getPositionVector().addVector(0d, this.targetTrace.entityHit.height * 0.5f, 0d).subtract(this.getPositionVector());
-					this.shootPrecise(vec.x, vec.y, vec.z, 0.96f);
+					this.shootPrecise(vec.x, vec.y, vec.z, 0.7f);
 				} else {
 					Vec3d vec = this.targetTrace.hitVec.subtract(this.getPositionVector());
 					this.shoot(vec.x, vec.y, vec.z, 0.6f, 0f);
@@ -107,7 +107,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 				if (result.entityHit != null) {
 					if (!result.entityHit.equals(this.shootingEntity) && !(result.entityHit instanceof EC)) {
 						result.entityHit.hurtResistantTime = 10;
-						float damage = 5+2.8f*(1+1.75f*(this.power/5))*ItemJutsu.getDmgMult(this.shootingEntity);
+						float damage = 5+2.45f*(1+1.75f*(this.power/5))*ItemJutsu.getDmgMult(this.shootingEntity);
 						ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemFuton.block);
 						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 							damage*=1.35f;

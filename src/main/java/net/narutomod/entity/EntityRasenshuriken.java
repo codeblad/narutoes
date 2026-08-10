@@ -308,6 +308,12 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			public float getMaxPower() {
 				return 2.0f;
 			}
+
+			@Override
+			public float getMinPower() {
+				return 0.5f;
+			}
+
 		}
 
 		public static class SageModeVairant extends Jutsu {

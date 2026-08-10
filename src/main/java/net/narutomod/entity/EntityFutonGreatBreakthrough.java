@@ -57,7 +57,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		public static final float MAX_RANGE = 50.0f;
-		private int duration = 50;
+		private int duration = 40;
 		private EntityLivingBase user;
 		private float power;
 
@@ -163,12 +163,12 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 
 			@Override
 			public float getBasePower() {
-				return 5.0f;
+				return 3.0f;
 			}
 	
 			@Override
 			public float getPowerupDelay() {
-				return 3.0f;
+				return 5.0f;
 			}
 	
 			@Override
