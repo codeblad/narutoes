@@ -52,12 +52,13 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
-		private final int growTime = 20;
+		private final int growTime = 6;
 		int duration;
 		private BlockPos drip;
 		private int deathTicks;
 		private int deathTime;
 		float supapower = 1;
+		
 
 		public EC(World world) {
 			super(world);
@@ -67,9 +68,9 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 
 		public EC(EntityLivingBase shooter, float powerIn) {
 			super(shooter);
-			this.setOGSize(0.25F, 0.25F);
+			this.setOGSize(0.25f, 0.25f);
 			this.setNoGravity(powerIn > 0f);
-			this.setEntityScale(0.5f);
+			this.setEntityScale(0.25f);
 			this.setRotation(this.rand.nextFloat() * 360f, 0f);
 			this.setIdlePosition();
 			this.supapower = powerIn;
@@ -78,9 +79,9 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 
 		public EC(EntityLivingBase shooter, float powerIn, float powerBall) {
 			super(shooter);
-			this.setOGSize(0.25F, 0.25F);
+			this.setOGSize(0.25f,0.25f);
 			this.setNoGravity(powerIn > 0f);
-			this.setEntityScale(0.5f);
+			this.setEntityScale(0.25f);
 			this.setRotation(this.rand.nextFloat() * 360f, 0f);
 			this.setIdlePosition();
 			this.supapower = powerBall;
@@ -95,7 +96,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 
 		private void setIdlePosition() {
 			if (this.shootingEntity != null) {
-				Vec3d vec = this.shootingEntity.getPositionEyes(1f).add(this.shootingEntity.getLookVec().scale(0.4d));
+				Vec3d vec = this.shootingEntity.getPositionEyes(1f).add(this.shootingEntity.getLookVec().scale(1.0d));
 				this.setPosition(vec.x, vec.y - 0.1d, vec.z);
 			}
 		}
@@ -104,12 +105,12 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 			if (this.world.getBlockState(pos).getMaterial() == Material.LAVA) {
 				this.world.setBlockToAir(pos);
 				new net.narutomod.event.EventSetBlocks(this.world,
-				 ImmutableMap.of(pos, Blocks.OBSIDIAN.getDefaultState()), 0, 600, false, false);
-				this.solidifyLava(pos.down());
-				//this.solidifyLava(pos.east());
-				//this.solidifyLava(pos.west());
-				//this.solidifyLava(pos.north());
-				//this.solidifyLava(pos.south());
+				 ImmutableMap.of(pos, Blocks.OBSIDIAN.getDefaultState()), 0, 140, false, false);
+				this.solidifyLava(pos.east());
+				this.solidifyLava(pos.up());
+				this.solidifyLava(pos.west());
+				this.solidifyLava(pos.north());
+				this.solidifyLava(pos.south());
 			}
 		}
 		
@@ -122,9 +123,9 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 					}
 				} else {
 					for (EntityLivingBase entity : 
-					 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().expand(0d, -1.0d, 0d))) {
+					 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().expand(0d, 0d, 0d))) {
 					 	ProcedureUtils.multiplyVelocity(entity, 0.4d);
-						entity.motionY -= 0.04d;
+						entity.motionY -= 0.02d;
 					}
 				}
 			}
@@ -133,7 +134,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 
 		private void setDie() {
 			this.deathTicks = 1;
-			this.deathTime = 120 + this.rand.nextInt(80);
+			this.deathTime = 80;
 			this.world.setEntityState(this, (byte)100);
 		}
 
@@ -155,26 +156,26 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 			}
 			super.onUpdate();
 			if (this.duration > 0) {
-				this.setIdlePosition();
-				if (this.duration > 3) {
+				//this.setIdlePosition();
+				if (this.duration > 1) {
 					Vec3d vec = this.shootingEntity.getLookVec();
 					for (int i = 0; i < 1; i++) {
 						EC entity = new EC(this.shootingEntity, 0,this.supapower);
-						entity.shoot(vec.x, vec.y, vec.z, 2f, 0.05f);
+						entity.shoot(vec.x, vec.y, vec.z, 2f, 0.0f);
 						this.world.spawnEntity(entity);
 					}
 					--this.duration;
 				}
 			} else {
-				if (!this.world.isRemote && this.ticksInAir <= this.growTime) {
-					this.setEntityScale(0.5F + 4.5F * (float)this.ticksInAir / this.growTime);
+				if (!this.world.isRemote) {
+					this.setEntityScale(Math.max(5.0F, 3.0F * (float)this.ticksInAir / this.growTime));
 				}
 				if (this.ticksInAir == this.rand.nextInt(99) + 1) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:movement")),
 					 0.8f, this.rand.nextFloat() * 0.4f + 0.8f);
 				}
 			}
-			if (!this.world.isRemote && this.ticksAlive > 100) {
+			if (this.ticksAlive > 90) {
 				this.setDead();
 			}
 		}
@@ -185,26 +186,33 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 				if (result.entityHit instanceof EC) {
 					return;
 				}
+
 				if (result.entityHit != null) {
 					result.entityHit.getEntityData().setBoolean("TempData_disableKnockback", true);
 					result.entityHit.hurtResistantTime = 10;
 					
-					float damage = 0.85f*ItemJutsu.getDmgMult(this.shootingEntity)*1+(2*(this.supapower/10));
-					damage += 4;
+					float damage = 6 + (ItemJutsu.getDmgMult(this.shootingEntity) * (7f * (this.supapower / 10)));
+
 					if (result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), damage)) {
 						result.entityHit.setFire(15);
 					}
 				}
+
 				Particles.spawnParticle(this.world, Particles.Types.SMOKE, result.hitVec.x, result.hitVec.y, result.hitVec.z,
 				 20, this.width, 0.0d, this.width, 0d, 0d, 0d, 0xB0202020, 20 + this.rand.nextInt(30));
+
 				this.playSound(SoundEvents.BLOCK_LAVA_AMBIENT, 1f, this.rand.nextFloat() * 0.4f + 0.8f);
-				if (this.world.getGameRules().getBoolean("mobGriefing")) {
-					BlockPos pos = result.typeOfHit == RayTraceResult.Type.BLOCK 
-					 ? result.getBlockPos().offset(result.sideHit) : new BlockPos(result.hitVec);
-					if (this.world.isAirBlock(pos)) {
+				
+					if (this.world.getGameRules().getBoolean("mobGriefing")) {
+
+						BlockPos pos = result.typeOfHit == RayTraceResult.Type.BLOCK ? new BlockPos(result.hitVec) : new BlockPos(result.hitVec);
 						this.world.setBlockState(pos, Blocks.LAVA.getDefaultState(), 2);
+						this.world.setBlockState(pos.west(), Blocks.LAVA.getDefaultState(), 2);
+						this.world.setBlockState(pos.north(), Blocks.LAVA.getDefaultState(), 2);
+						this.world.setBlockState(pos.up(), Blocks.LAVA.getDefaultState(), 2);
+						this.world.setBlockState(pos.east(), Blocks.LAVA.getDefaultState(), 2);
+						this.world.setBlockState(pos.south(), Blocks.LAVA.getDefaultState(), 2);
 						this.drip = pos;
-					}
 				}
 				this.setDie();
 			}
@@ -288,7 +296,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 				GlStateManager.matrixMode(5890);
 				GlStateManager.loadIdentity();
 				float f = entity.ticksExisted + partialTicks;
-				GlStateManager.translate(0.0F, f * 0.01F, 0.0F);
+				GlStateManager.translate(0.0F, f * 0.001F, 0.0F);
 				GlStateManager.matrixMode(5888);
 				GlStateManager.disableLighting();
 				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
