@@ -70,7 +70,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 		private final int growTime = 20;
 		private EntityLivingBase user;
 		private final float contactDamage = 20.0f;
-
+		private float power;
 		public EC(World world) {
 			super(world);
 			this.setSize(1.0f, 2.5f);
@@ -80,6 +80,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 		public EC(EntityLivingBase userIn, float size) {
 			this(userIn.world);
 			this.user = userIn;
+			this.power = size;
 			if (EntityBijuManager.hasJinchurikiFire(userIn)) {
 				this.setBlueFire(true);
 			}
@@ -168,7 +169,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate() {
-			if (!this.world.isRemote && (this.user == null || !this.user.isEntityAlive() || this.ticksExisted > 400)) {
+			if (!this.world.isRemote && (this.user == null || !this.user.isEntityAlive() || this.ticksExisted > 25 * this.power )) {
 				this.setDead();
 			} else {
 				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this.user, this.getEntityBoundingBox().grow(0.2d))) {
@@ -233,6 +234,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity.onGround) {
 					entity.world.spawnEntity(new EC(entity, power));
+					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (21*1.25*power));
 					return true;
 				}
 				return false;

@@ -12,13 +12,14 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.item.ItemStack;
-
+import net.minecraft.util.math.Vec3d;
 import net.narutomod.item.ItemRaiton;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
@@ -37,14 +38,15 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EC.class)
-		 .id(new ResourceLocation("narutomod", "false_darkness"), ENTITYID).name("false_darkness").tracker(64, 3, true).build());
+				.id(new ResourceLocation("narutomod", "false_darkness"), ENTITYID).name("false_darkness")
+				.tracker(64, 3, true).build());
 	}
 
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
-		private EntityLivingBase user;
-		private EntityLivingBase target;
+		private Vec3d direction;
 		private float power;
-
+		private EntityLivingBase user;
+		private static final float BASE_RANGE = 6.0f;
 
 		public EC(World world) {
 			super(world);
@@ -52,12 +54,17 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 			this.isImmuneToFire = true;
 		}
 
-		public EC(EntityLivingBase userIn, EntityLivingBase targetIn, float powerIn) {
+		public EC(EntityLivingBase userIn, float powerIn) {
 			this(userIn.world);
 			this.user = userIn;
-			this.target = targetIn;
 			this.power = powerIn;
-			this.setPosition(userIn.posX, userIn.posY + userIn.getEyeHeight() - 0.2d, userIn.posZ);
+
+			this.direction = userIn.getLookVec().normalize();
+
+			this.setPosition(
+					userIn.posX,
+					userIn.posY + userIn.getEyeHeight() - 0.2d,
+					userIn.posZ);
 		}
 
 		@Override
@@ -73,33 +80,47 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY + this.user.getEyeHeight() - 0.2d, this.user.posZ);
-				int buildtime = (int)(20* (1+1*(this.power/20)));
+				int buildtime = (int) (20 * (1 + 1 * (this.power / 20)));
 				if (this.ticksExisted <= buildtime) {
-					float f = Math.min((float)this.ticksExisted / buildtime, 1.0f);
+					float f = Math.min((float) this.ticksExisted / buildtime, 1.0f);
 					if (this.rand.nextFloat() <= f * 0.2f) {
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:electricity"))),
-						  0.4f, this.rand.nextFloat() * 0.5f + 1.5f);
+								0.4f, this.rand.nextFloat() * 0.5f + 1.5f);
 					}
-					for (int i = 0; i < (int)(f * 8f); i++) {
-						EntityLightningArc.spawnAsParticle(this.world, this.posX + (this.rand.nextDouble()-0.5d)*0.6d, 
-						 this.posY + (this.rand.nextDouble()-0.5d)*0.6d, this.posZ + (this.rand.nextDouble()-0.5d)*0.6d,
-						 0.15d, 0d, 0d, 0d, 0x000000ff);
+					for (int i = 0; i < (int) (f * 8f); i++) {
+						EntityLightningArc.spawnAsParticle(this.world,
+								this.posX + (this.rand.nextDouble() - 0.5d) * 0.6d,
+								this.posY + (this.rand.nextDouble() - 0.5d) * 0.6d,
+								this.posZ + (this.rand.nextDouble() - 0.5d) * 0.6d,
+								0.15d, 0d, 0d, 0d, 0x000000ff);
 					}
-				} else if (this.target != null) {
-					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:electricity"))),
-					  10f, this.rand.nextFloat() * 0.6f + 0.3f);
-					this.world.playSound(null, this.target.posX, this.target.posY, this.target.posZ,
-					 SoundEvents.ENTITY_LIGHTNING_IMPACT, SoundCategory.WEATHER, 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
-					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, this.getPositionVector(), 
-					 this.target.getPositionEyes(1f), 0x000000FF, 40, 0f);
-					float damage = 15+(BASE_DAMAGE * (1+1.0f*(this.power/15))) *ItemJutsu.getDmgMult(this.user);
-					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemRaiton.block);
-					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-						damage*=1.35f;
-					}
-					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.user), damage, this.user);
-					this.world.spawnEntity(entity);
-					this.setDead();
+				} else if (this.direction != null) {
+					this.playSound(
+							SoundEvent.REGISTRY.getObject(
+									new ResourceLocation("narutomod:electricity")),
+							10f,
+							this.rand.nextFloat() * 0.6f + 0.3f);
+
+					Vec3d start = this.getPositionVector();
+					Vec3d end = start.add(this.direction.scale(BASE_RANGE * this.power));
+
+					this.world.playSound(
+							null,
+							end.x,
+							end.y,
+							end.z,
+							SoundEvents.ENTITY_LIGHTNING_IMPACT,
+							SoundCategory.WEATHER,
+							2.0F,
+							0.5F + this.rand.nextFloat() * 0.2F);
+
+					EntityLightningArc.Base entity = new EntityLightningArc.Base(
+							this.world,
+							start,
+							end,
+							0x000000FF,
+							40,
+							0f);
 				}
 			} else if (!this.world.isRemote) {
 				this.setDead();
@@ -125,20 +146,15 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 80d, 3d);
-				if (res != null && res.entityHit instanceof EntityLivingBase) {
-					entity.world.spawnEntity(new EC(entity, (EntityLivingBase)res.entityHit, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
-					return true;
-				}
-				return false;
+				entity.world.spawnEntity(new EC(entity, power));
+				ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 5);
+				return true;
 			}
 
 			@Override
 			public float getPowerupDelay() {
 				return 40.0f;
 			}
-
 
 			@Override
 			public float getMaxPower() {
