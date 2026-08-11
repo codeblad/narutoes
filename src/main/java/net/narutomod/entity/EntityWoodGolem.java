@@ -98,7 +98,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 			this.setOwnerCanSteer(true, 1.0F);
 			this.stepHeight = this.height / 3;
 			Chakra.Pathway cp = Chakra.pathway(summonerIn);
-			float health = (20+ (80*(ItemJutsu.getNinjaMult(summonerIn)/63))) * PlayerTracker.getDefense(summonerIn);
+			float health = (20+ (78*(ItemJutsu.getNinjaMult(summonerIn)/63))) * PlayerTracker.getDefense(summonerIn);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*3+600);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(50.0D+ItemJutsu.getNinjaMult(summonerIn)*3.35f);
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(100D);
@@ -245,7 +245,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, 
 					 (net.minecraft.util.SoundEvent)net.minecraft.util.SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:mokujin_no_jutsu")), SoundCategory.PLAYERS, 1, 1f);
-					entity.world.spawnEntity(new EC(entity, GOLEM.chakraUsage * 0.001d *
+					entity.world.spawnEntity(new EC(entity, GOLEM.chakraUsage * 0.005d *
 					 ((ItemMokuton.ItemCustom)stack.getItem()).getCurrentJutsuXpModifier(stack, entity)));
 					ItemJutsu.setCurrentJutsuCooldown(stack, 500);
 					return true;
