@@ -241,7 +241,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
 					entity.world.spawnEntity(new EC(entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 8);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 12);
 					return true;
 				}
 				return false;
