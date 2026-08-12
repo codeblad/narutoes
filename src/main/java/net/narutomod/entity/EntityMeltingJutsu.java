@@ -134,7 +134,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 
 		private void setDie() {
 			this.deathTicks = 1;
-			this.deathTime = 80;
+			this.deathTime = 100;
 			this.world.setEntityState(this, (byte)100);
 		}
 
@@ -168,14 +168,16 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 				}
 			} else {
 				if (!this.world.isRemote) {
-					this.setEntityScale(Math.max(5.0F, 3.0F * (float)this.ticksInAir / this.growTime));
+					if ((float)this.ticksInAir / this.growTime <= 10.0F) {
+					this.setEntityScale(Math.max(5.0F, 5.0F * (float)this.ticksInAir / this.growTime));
+					}
 				}
 				if (this.ticksInAir == this.rand.nextInt(99) + 1) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:movement")),
 					 0.8f, this.rand.nextFloat() * 0.4f + 0.8f);
 				}
 			}
-			if (this.ticksAlive > 90) {
+			if (this.ticksAlive > 100) {
 				this.setDead();
 			}
 		}
@@ -191,7 +193,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 					result.entityHit.getEntityData().setBoolean("TempData_disableKnockback", true);
 					result.entityHit.hurtResistantTime = 10;
 					
-					float damage = 6 + (ItemJutsu.getDmgMult(this.shootingEntity) * (7f * (this.supapower / 10)));
+					float damage = 6 + (ItemJutsu.getDmgMult(this.shootingEntity) * (5.5f * (this.supapower / 10)));
 
 					if (result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), damage)) {
 						result.entityHit.setFire(15);
@@ -203,7 +205,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 
 				this.playSound(SoundEvents.BLOCK_LAVA_AMBIENT, 1f, this.rand.nextFloat() * 0.4f + 0.8f);
 				
-					if (this.world.getGameRules().getBoolean("mobGriefing")) {
+					//if (this.world.getGameRules().getBoolean("mobGriefing")) {
 
 						BlockPos pos = result.typeOfHit == RayTraceResult.Type.BLOCK ? new BlockPos(result.hitVec) : new BlockPos(result.hitVec);
 						this.world.setBlockState(pos, Blocks.LAVA.getDefaultState(), 2);
@@ -213,7 +215,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 						this.world.setBlockState(pos.east(), Blocks.LAVA.getDefaultState(), 2);
 						this.world.setBlockState(pos.south(), Blocks.LAVA.getDefaultState(), 2);
 						this.drip = pos;
-				}
+				//}
 				this.setDie();
 			}
 		}
@@ -239,7 +241,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
 					entity.world.spawnEntity(new EC(entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (power*5 + 50));
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 8);
 					return true;
 				}
 				return false;

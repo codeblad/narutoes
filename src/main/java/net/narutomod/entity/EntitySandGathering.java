@@ -159,7 +159,7 @@ public class EntitySandGathering extends ElementsNarutomodMod.ModElement {
 						this.world.createExplosion(this.summoner, result.hitVec.x, result.hitVec.y, result.hitVec.z, SCALE * 0.8f,
 						 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.summoner));
 						ProcedureAoeCommand.set(this.world, result.hitVec.x, result.hitVec.y, result.hitVec.z, 0d, SCALE * 0.6f)
-						 .exclude(this.summoner).damageEntities(ItemJutsu.causeJutsuDamage(this, this.summoner), 14+6.5f*ItemJutsu.getDmgMult(this.summoner));
+						 .exclude(this.summoner).damageEntities(ItemJutsu.causeJutsuDamage(this, this.summoner), 15+10.5f*ItemJutsu.getDmgMult(this.summoner));
 						this.accelX = 0.0d;
 						this.accelY = 0.0d;
 						this.accelZ = 0.0d;
@@ -175,9 +175,9 @@ public class EntitySandGathering extends ElementsNarutomodMod.ModElement {
 				this.motionX += this.accelX;
 				this.motionY += this.accelY;
 				this.motionZ += this.accelZ;
-				this.motionX *= 0.98D;
-				this.motionY *= 0.98D;
-				this.motionZ *= 0.98D;
+				this.motionX *= 1.15D;
+				this.motionY *= 1.15D;
+				this.motionZ *= 1.15D;
 				if (this.riseAgain && this.summoner != null && this.posY >= this.summoner.posY + 3.0d) {
 					this.riseAgain = false;
 					this.motionY = 0.0d;

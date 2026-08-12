@@ -340,7 +340,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 				EC entity1 = EC.create(entity, 4.0f, true);
 				entity1.setBallColor(0xE0101010);
 				entity1.impactDamageMultiplier = this.multiplier;
-				ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*10);
 				return true;
 			}
 		}

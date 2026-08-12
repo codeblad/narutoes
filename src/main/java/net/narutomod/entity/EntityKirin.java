@@ -58,7 +58,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
-		private final int wait = 30;
+		private final int wait = 20;
 		private Vec3d shootVec;
 		private float prevHeadYaw;
 		private float prevHeadPitch;
@@ -101,7 +101,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 				ProcedureUtils.Vec2f v2f = ProcedureUtils.getYawPitchFromVec(vec);
 				this.setRotation(v2f.x, v2f.y);
 			}
-			this.motionY -= this.ticksAlive <= this.wait / 2 ? 0.03d : 0.0d;
+			this.motionY -= this.ticksAlive <= this.wait / 2 ? 0.06d : 0.0d;
 		}
 
 		private void shoot(double x, double y, double z) {
@@ -215,7 +215,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, vec.x, vec.y, vec.z, size, flag, flag);
 				ProcedureAoeCommand.set(this.world, vec.x, vec.y, vec.z, 0.0D, 24.0D).exclude(this).exclude(this.shootingEntity)
-				 .setFire(15).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (28f*ItemJutsu.getDmgMult(this.shootingEntity)+60));
+				 .setFire(15).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (60 + 30f*ItemJutsu.getDmgMult(this.shootingEntity)));
 			}
 			//this.haltMotion();
 			this.setDead();
