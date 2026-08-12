@@ -386,6 +386,42 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				event.setAmount(newAmount);
 			    }
 
+				 if (!targetEntity.equals(sourceEntity)) {
+                if (sourceEntity instanceof EntityPlayer) {
+					System.out.println(targetEntity.getUniqueID());
+                    boolean immune = targetEntity.isImmuneToFire();
+
+                    if (immune == true) {
+
+                        float defMult = 1.0f;
+
+                        if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 1) {
+                            defMult += .25f;
+                        }
+
+                        if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 2) {
+                            defMult += .45f;
+                        }
+
+                        if (ItemSenjutsu.isSageModeActivated((EntityPlayer) sourceEntity)) {
+                            if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) > 0) {
+                                defMult += 0.3f;
+                            } else {
+                                if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
+                                    defMult += 0.3f;
+                                } else {
+                                    defMult += 0.6f;
+                                }
+                            }
+                        }
+
+                        float defense = PlayerTracker.getDefense(sourceEntity) * defMult;
+                        float newAmount = amount / defense;
+                        event.setAmount(newAmount);
+                    }
+                }
+				 }
+
 			
 			if (sourceEntity instanceof EntitySummonAnimal.ISummon) {
 				Entity summoner = ((EntitySummonAnimal.ISummon)sourceEntity).getSummoner();

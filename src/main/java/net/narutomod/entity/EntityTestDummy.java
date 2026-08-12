@@ -151,8 +151,13 @@ public class EntityTestDummy extends ElementsNarutomodMod.ModElement {
             double exp = PlayerTracker.getBattleXp(player);
             float maxhealth = player.getMaxHealth();
 
+            this.addTag("TESTDUMMY");
+
             if (this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH) != null)
                 this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(maxhealth);
+
+            float health = this.getMaxHealth();
+            this.setHealth(health);
 
             if (this.getEntityAttribute(SharedMonsterAttributes.ARMOR) != null)
                 this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20D);
@@ -164,7 +169,7 @@ public class EntityTestDummy extends ElementsNarutomodMod.ModElement {
             if (this.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS) != null)
                 this.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).setBaseValue(8D);
 
-            this.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 99999, 4, false, false));
+            this.addPotionEffect(new PotionEffect(MobEffects.REGENERATION, 99999, 2, false, false));
             return super.processInteract(player, hand);
         }
 
@@ -176,31 +181,7 @@ public class EntityTestDummy extends ElementsNarutomodMod.ModElement {
         }
     }
 
-    @SubscribeEvent
-    public void onDamaged(LivingDamageEvent event) {
-        Entity sourceEntity = event.getSource().getTrueSource();
-        System.out.println(sourceEntity);
-        float amount = event.getAmount();
 
-        float defMult = 1.0f;
-
-        if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 1) {
-            defMult += .25f;
-        }
-
-        if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 2) {
-            defMult += .45f;
-        }
-
-        if (ItemSenjutsu.isSageModeActivated((EntityPlayer) sourceEntity)) {
-            defMult += 0.6f;
-        }
-
-        float defense = PlayerTracker.getDefense(sourceEntity) * defMult;
-        float newAmount = amount / defense;
-        event.setAmount(newAmount);
-
-    }
 
     // Made with Blockbench 3.7.4
     // Exported for Minecraft version 1.12
