@@ -54,11 +54,11 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 123;
 	//public static final int ENTITY2ID = 10123;
 	public static final ItemJutsu.JutsuEnum GREATFIREBALL = new ItemJutsu.JutsuEnum(0, "katonfireball", 'C', 50d, new EntityBigFireball.Jutsu());
-	public static final ItemJutsu.JutsuEnum GFANNIHILATION = new ItemJutsu.JutsuEnum(1, "tooltip.katon.annihilation", 'B', 50d, new EntityFirestream.EC.Jutsu1());
+	public static final ItemJutsu.JutsuEnum GFANNIHILATION = new ItemJutsu.JutsuEnum(1, "tooltip.katon.annihilation", 'B', 60d, new EntityFirestream.EC.Jutsu1());
 	public static final ItemJutsu.JutsuEnum HIDINGINASH = new ItemJutsu.JutsuEnum(2, "hiding_in_ash", 'B', 10d, new EntityHidingInAsh.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum GREATFLAME = new ItemJutsu.JutsuEnum(3, "katonfirestream", 'C', 15d, new EntityFirestream.EC.Jutsu2());
 	public static final ItemJutsu.JutsuEnum FLAMESLICE = new ItemJutsu.JutsuEnum(4, "flame_slice", 'D', 20d, new EntityFlameSlice.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum BARRIER = new ItemJutsu.JutsuEnum(5, "flame_formation", 'B', 100d, new EntityFlameFormation.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum BARRIER = new ItemJutsu.JutsuEnum(5, "flame_formation", 'B', 120d, new EntityFlameFormation.EC.Jutsu());
 
 	public ItemKaton(ElementsNarutomodMod instance) {
 		super(instance, 366);
@@ -111,7 +111,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			//this.damage = fullScale * 10.0f;
 			this.mult = 2.0f + 4.0f*(fullScale/10);
 			this.damage = 17 + ItemJutsu.getDmgMult(shooter)*mult;
-			this.damage*= 1.6f;
+			this.damage*= 1.305f; //futon chakra drain
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter,ItemKaton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.35f;
@@ -250,7 +250,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 20.0f;
+				return 15.0f;
 			}
 	
 			@Override

@@ -265,7 +265,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 100*1);
 				}
 				return power >= 1.0f ? this.createJutsu(entity, power)  : false;
 			}

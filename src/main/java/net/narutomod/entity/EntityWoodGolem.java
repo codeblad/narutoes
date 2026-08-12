@@ -152,7 +152,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 					if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 						ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
 						//(30*20)+this.ticksExisted+this.ticksExisted/2
-						item.setJutsuCooldown(stack, GOLEM, 20*30);
+						item.setJutsuCooldown(stack, GOLEM, 30*30);
 					}
 				}
 			}
@@ -247,7 +247,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 					 .getObject(new ResourceLocation("narutomod:mokujin_no_jutsu")), SoundCategory.PLAYERS, 1, 1f);
 					entity.world.spawnEntity(new EC(entity, GOLEM.chakraUsage * 0.005d *
 					 ((ItemMokuton.ItemCustom)stack.getItem()).getCurrentJutsuXpModifier(stack, entity)));
-					ItemJutsu.setCurrentJutsuCooldown(stack, 500);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 700);
 					return true;
 				}
 				return false;

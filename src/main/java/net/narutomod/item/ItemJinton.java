@@ -276,7 +276,7 @@ else {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				/*double d = this.getFarRadius(0) / target.getEntityBoundingBox().getAverageEdgeLength() * 0.2d;
 				float f = target instanceof EntityLivingBase ? ((EntityLivingBase)target).getMaxHealth() * (float)d : Float.MAX_VALUE;*/
-				float f = 5+( 7.0f* (2f+7f*(this.power/10f)) * ItemJutsu.getDmgMult(player)/20 );
+				float f = 5+( 5.0f* (2f+7f*(this.power/10f)) * ItemJutsu.getDmgMult(player)/20 );
 				attackEntityWithJutsu(EntityBeam.this, player, target, f);
 			}
 
@@ -308,6 +308,14 @@ else {
 				return 15.0f;
 			}
 
+			@Override
+			public float getMinPower() {
+				return 0.8f;
+			}
+			@Override
+			public float getBasePower() {
+				return 0.5f;
+			}
 			@Override
 			public float getMaxPower() {
 				return 10.0f;
@@ -383,7 +391,7 @@ else {
 				double d = ProcedureUtils.BB.getVolume(bb.intersect(entity.getEntityBoundingBox()))
 				 / ProcedureUtils.BB.getVolume(entity.getEntityBoundingBox()) * 0.025d;
 				attackEntityWithJutsu(this, this.shootingEntity, entity,
-						5+(7.75f*(2f+7f*(this.power/25f))*ItemJutsu.getDmgMult(this.shootingEntity))/20);
+						5+(7.0f*(2f+7f*(this.power/25f))*ItemJutsu.getDmgMult(this.shootingEntity))/20);
 				//entity instanceof EntityLivingBase ? ((EntityLivingBase)entity).getMaxHealth() * (float)d : Float.MAX_VALUE);
 			}
 		}
@@ -480,6 +488,14 @@ else {
 				return 20.0f;
 			}
 
+						@Override
+			public float getMinPower() {
+				return 0.8f;
+			}
+			@Override
+			public float getBasePower() {
+				return 0.5f;
+			}
 			@Override
 			public float getMaxPower() {
 				return 25.0f;

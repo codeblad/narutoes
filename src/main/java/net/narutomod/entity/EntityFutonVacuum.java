@@ -143,12 +143,12 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 7.0f;
+				return 6.0f;
 			}
 	
 			@Override
 			public float getMaxPower() {
-				return 30.0f;
+				return 10.0f;
 			}
 		}
 
@@ -167,6 +167,7 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				if (!target.equals(player)) {
 					EC.this.playImpactSound(target.posX, target.posY, target.posZ);
+					target.hurtResistantTime = 10;
 					target.attackEntityFrom(ItemJutsu.causeJutsuDamage(EC.this, player), damage);
 				}
 			}

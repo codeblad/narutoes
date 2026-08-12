@@ -191,7 +191,7 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 					if (this.isTargetCaptured()) {
 						if (this.funeralTime > 0) {
 							this.sandTarget.setTarget(targetBB, 0.95f, 0.03f, false);
-							this.attackTargetEntity(this.funeralDamage+0.75f*ItemJutsu.getDmgMult(this.user));
+							this.attackTargetEntity(this.funeralDamage+0.77f*ItemJutsu.getDmgMult(this.user));
 							--this.funeralTime;
 						} else {
 							this.sandTarget.setTarget(targetBB, this.getEntityBoundingBox().getAverageEdgeLength() < this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 2.0d ? 0.0f : 0.3f, 0.0f, false);

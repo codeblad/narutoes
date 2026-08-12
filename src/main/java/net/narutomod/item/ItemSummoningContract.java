@@ -51,10 +51,10 @@ public class ItemSummoningContract extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITY3ID = 333;
 	public static final int ENTITY4ID = 334;
 	public static final String SUMMON_RALLY = "SummonRallyPoint";
-	public static final ItemJutsu.JutsuEnum SUMMONTOAD = new ItemJutsu.JutsuEnum(0, "toad_summon", 'C', 100d, new EntityGenericToad.Jutsu());
-	public static final ItemJutsu.JutsuEnum SUMMONSNAKE = new ItemJutsu.JutsuEnum(1, "snake_summon", 'C', 100d, new EntityGenericSnake.Jutsu());
-	public static final ItemJutsu.JutsuEnum SUMMONSLUG = new ItemJutsu.JutsuEnum(2, "slug", 'C', 100d, new EntitySlug.Jutsu());
-	public static final ItemJutsu.JutsuEnum SUMMONENMA = new ItemJutsu.JutsuEnum(3, "enma", 'C', 100d, new EntityEnma.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SUMMONTOAD = new ItemJutsu.JutsuEnum(0, "toad_summon", 'C', 300d, new EntityGenericToad.Jutsu());
+	public static final ItemJutsu.JutsuEnum SUMMONSNAKE = new ItemJutsu.JutsuEnum(1, "snake_summon", 'C', 300d, new EntityGenericSnake.Jutsu());
+	public static final ItemJutsu.JutsuEnum SUMMONSLUG = new ItemJutsu.JutsuEnum(2, "slug", 'C', 300d, new EntitySlug.Jutsu());
+	public static final ItemJutsu.JutsuEnum SUMMONENMA = new ItemJutsu.JutsuEnum(3, "enma", 'C', 300d, new EntityEnma.EC.Jutsu());
 
 	public ItemSummoningContract(ElementsNarutomodMod instance) {
 		super(instance, 718);

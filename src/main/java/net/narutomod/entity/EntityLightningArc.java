@@ -119,6 +119,7 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 		private float damageAmount;
 		private boolean resetHurtResistantTime;
 		private int paralysisTicks;
+		private double growth = 1.0d;
 		private final List<SegmentInfo> branches = Lists.newArrayList(new SegmentInfo());
 		
 		public Base(World worldIn) {
@@ -154,14 +155,18 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 		}
 
 		public Base(World worldIn, Vec3d fromVec, Vec3d toVec, int colorIn, int duration, float inaccuracyIn) {
-			this(worldIn, fromVec, toVec, colorIn, duration, inaccuracyIn, 0f, 4);
+			this(worldIn, fromVec, toVec, colorIn, duration, inaccuracyIn, 0f, 4, 1.0d);
 		}
 
 		public Base(World worldIn, Vec3d fromVec, Vec3d toVec, int colorIn, int duration, float inaccuracyIn, float thickness) {
-			this(worldIn, fromVec, toVec, colorIn, duration, inaccuracyIn, thickness, 4);
+			this(worldIn, fromVec, toVec, colorIn, duration, inaccuracyIn, thickness, 4, 1.0d);
 		}
 
 		public Base(World worldIn, Vec3d fromVec, Vec3d toVec, int colorIn, int duration, float inaccuracyIn, float thickness, int sections) {
+			this(worldIn, fromVec, toVec, colorIn, duration, inaccuracyIn, thickness, sections, 1.0d);
+		}
+
+		public Base(World worldIn, Vec3d fromVec, Vec3d toVec, int colorIn, int duration, float inaccuracyIn, float thickness, int sections, double growth) {
 			this(worldIn);
 			this.setPosition(fromVec.x, fromVec.y, fromVec.z);
 			this.ogEndVec = toVec;
@@ -175,6 +180,8 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 				this.setThickness(thickness);
 			}
 			this.setMaxRecursiveDepth(sections);
+
+			this.growth = growth;
 		}
 
 		@Override
@@ -275,8 +282,8 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 			}
 			if (this.damageAmount > 0f) {
 				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this.excludeEntity, this.getEntityBoundingBox()
-				  .expand(this.ogEndVec.x - this.posX, this.ogEndVec.y - this.posY, this.ogEndVec.z - this.posZ).grow(1))) {
-					if (entity.getEntityBoundingBox().calculateIntercept(this.getPositionVector(), this.ogEndVec) != null) {
+				  .expand(this.ogEndVec.x - this.posX, this.ogEndVec.y - this.posY, this.ogEndVec.z - this.posZ).grow(this.growth))) {
+					if (entity.getEntityBoundingBox().grow(this.growth).calculateIntercept(this.getPositionVector(), this.ogEndVec) != null) {
 						if (this.resetHurtResistantTime) {
 							entity.hurtResistantTime = 10;
 						}

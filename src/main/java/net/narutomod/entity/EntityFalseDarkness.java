@@ -83,6 +83,10 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 				int buildtime = (int) (20 * (1 + 1 * (this.power / 20)));
 				if (this.ticksExisted <= buildtime) {
 					float f = Math.min((float) this.ticksExisted / buildtime, 1.0f);
+					this.setPosition(
+					this.user.posX,
+					this.user.posY + this.user.getEyeHeight() - 0.2d,
+					this.user.posZ);
 					if (this.rand.nextFloat() <= f * 0.2f) {
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:electricity"))),
 								0.4f, this.rand.nextFloat() * 0.5f + 1.5f);
@@ -94,38 +98,25 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 								this.posZ + (this.rand.nextDouble() - 0.5d) * 0.6d,
 								0.15d, 0d, 0d, 0d, 0x000000ff);
 					}
-				} else if (this.direction != null) {
-					this.playSound(
-							SoundEvent.REGISTRY.getObject(
-									new ResourceLocation("narutomod:electricity")),
-							10f,
-							this.rand.nextFloat() * 0.6f + 0.3f);
-
+				} else {
+					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")),10f, this.rand.nextFloat() * 0.6f + 0.3f);
 					Vec3d start = this.getPositionVector();
-					Vec3d end = start.add(this.direction.scale(BASE_RANGE * this.power));
-
-					this.world.playSound(
-							null,
-							end.x,
-							end.y,
-							end.z,
-							SoundEvents.ENTITY_LIGHTNING_IMPACT,
-							SoundCategory.WEATHER,
-							2.0F,
-							0.5F + this.rand.nextFloat() * 0.2F);
-
-					EntityLightningArc.Base entity = new EntityLightningArc.Base(
-							this.world,
-							start,
-							end,
-							0x000000FF,
-							40,
-							0f);
+					
+					Vec3d end = start.add(this.user.getLookVec().normalize().scale(BASE_RANGE * this.power));
+					this.world.playSound(null,end.x, end.y, end.z, SoundEvents.ENTITY_LIGHTNING_IMPACT, SoundCategory.WEATHER, 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
+					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, start, end, 0x000000FF, 30, 0f, 0f, 4, 1.0d + (0.1d * this.power));
+					float damage = 15 + (BASE_DAMAGE * (1 + 1.0f * (this.power / 60))) * ItemJutsu.getDmgMult(this.user);
+					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemRaiton.block);
+					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) { 
+						damage *= 1.35f;
+					}
+					entity.setDamage(ItemJutsu.causeJutsuDamage(this, this.user), damage, this.user);
+					this.world.spawnEntity(entity);
+					this.setDead();
 				}
 			} else if (!this.world.isRemote) {
 				this.setDead();
 			}
-
 		}
 
 		@SideOnly(Side.CLIENT)
@@ -153,12 +144,12 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 40.0f;
+				return 20.0f;
 			}
 
 			@Override
 			public float getMaxPower() {
-				return 20.0f;
+				return 10.0f;
 			}
 		}
 	}

@@ -258,11 +258,14 @@ public class EntitySevenTails extends ElementsNarutomodMod.ModElement {
 					return p_apply_1_ != null && p_apply_1_ != EntityCustom.this && p_apply_1_ != EntityCustom.this.getBijuManager().getJinchurikiPlayer();
 				}
 			})) {
-				if (this.rand.nextFloat() < 0.1f) {
-					if (entity instanceof EntityPlayer && (this.getSummoningPlayer() != null && !entity.equals(this.getSummoningPlayer()))) {
-						ProcedureRenderView.sendToPlayer(entity, 100, 100, 1.0f, 1.0f, 1.0f, 1.0f);
-						entity.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 5));
-						entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 5));
+				  if (this.rand.nextFloat() < 0.15f) {
+					if (entity instanceof EntityPlayer) {
+						EntityPlayer player = (EntityPlayer) entity;
+						if (this.getSummoningPlayer() == null || !player.equals(this.getSummoningPlayer())) {
+							ProcedureRenderView.sendToPlayer(player, 100, 100, 1.0f, 1.0f, 1.0f, 1.0f);
+							player.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 5));
+							player.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 5));
+						}
 					} else if (entity instanceof EntityLiving) {
 						entity.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 5));
 						entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 5));

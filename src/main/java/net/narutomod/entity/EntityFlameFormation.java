@@ -169,7 +169,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate() {
-			if (!this.world.isRemote && (this.user == null || !this.user.isEntityAlive() || this.ticksExisted > 25 * this.power )) {
+			if (!this.world.isRemote && (this.user == null || !this.user.isEntityAlive() || this.ticksExisted > 20 * this.power )) {
 				this.setDead();
 			} else {
 				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this.user, this.getEntityBoundingBox().grow(0.2d))) {
@@ -234,7 +234,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity.onGround) {
 					entity.world.spawnEntity(new EC(entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (21*1.25*power));
+					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (100+(21*1.25*power) ));
 					return true;
 				}
 				return false;
