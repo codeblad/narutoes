@@ -62,7 +62,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		public EC(World w) {
 			super(w);
 			this.setOGSize(1f, 2.875f);
-			this.isImmuneToFire = true;
+			this.isImmuneToFire = false;
 			this.postScaleFixup();
 		}
 
@@ -83,15 +83,15 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void postScaleFixup() {
 			float f = this.getScale();
-			float newPower = (1+8*(this.power/5)) * ItemJutsu.getDmgMult(this.getSummoner());
+			float newPower = (1+4*(this.power/5)) * ItemJutsu.getDmgMult(this.getSummoner());
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(60.0D + 4*newPower);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(60.0D + 2*newPower);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D + 0.5*newPower);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(10.0D + 6.0D * f);
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D + (f - 1F) * 0.1D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D + (f - 1F) * 0.05D);
 			super.postScaleFixup();
 			this.experienceValue = (int)(f * 10);
-			this.stepHeight = this.height * 0.3333f;
+			this.stepHeight = this.height * 0.33333f;
 		}
 
 		@Override
@@ -121,7 +121,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public double getMountedYOffset() {
-			return (double)this.height - 0.35d;
+			return (double)this.height - 0.1d;
 		}
 
 		@Override
@@ -132,7 +132,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
 			if (source.getTrueSource() instanceof EntityLivingBase && source.getTrueSource().equals(this.getSummoner())) {
-				this.onDeathUpdate();
+				//this.onDeathUpdate();
 				return false;
 			}
 			return super.attackEntityFrom(source, amount);
@@ -202,7 +202,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 					}
 	    		}
 	    		float f = this.distanceWalkedOnStepModified * this.ogHeight / this.height;
-	    		if (f > this.nextStepDistance && !this.world.isAirBlock(new BlockPos(this.posX, this.posY - 0.2d, this.posZ))) {
+	    		if (f > this.nextStepDistance  && !this.world.isAirBlock(new BlockPos(this.posX, this.posY - 3.0d, this.posZ))) {
 	    			this.nextStepDistance = (int)f + 1;
 	    			if (!this.isInWater()) {
 	    				this.playSound(SoundEvents.ENTITY_IRONGOLEM_STEP, 1f, 1);
@@ -219,7 +219,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
 					entity.world.spawnEntity(new EC(entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20*1);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*10);
 					return true;
 				}
 				return false;

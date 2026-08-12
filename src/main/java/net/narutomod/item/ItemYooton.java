@@ -207,7 +207,7 @@ public class ItemYooton extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				this.createJutsu(entity, entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power);
-				ItemJutsu.setCurrentJutsuCooldown(stack,20*1);
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
 				return true;
 			}
 
