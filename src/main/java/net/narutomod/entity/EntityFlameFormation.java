@@ -242,7 +242,7 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 15.0f;
 			}
 	
 			@Override

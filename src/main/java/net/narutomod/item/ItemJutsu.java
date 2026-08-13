@@ -80,7 +80,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			}
 			ItemStack cheststack = ((EntityPlayer) entity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 			if (cheststack.getItem() == ItemRinnegan.body) {
-				boost = 2;
+				boost = 1.2f;
 			}
 			return MathHelper.clamp((float)PlayerTracker.getNinjaLevel((EntityPlayer)entity) / 5f,1.0f,10000000f)*boost;
 		}

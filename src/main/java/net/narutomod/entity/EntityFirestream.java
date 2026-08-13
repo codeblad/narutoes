@@ -169,7 +169,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				if (this.createJutsu(entity, power) == null) {
 					return false;
 				}
-				ItemJutsu.setCurrentJutsuCooldown(stack, 60);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 400);
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
 				return true;
 			}
@@ -221,7 +221,8 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				this.createJutsu(entity, power, (int)(power * 3f));
-				ItemJutsu.setCurrentJutsuCooldown(stack, 400);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 60);
+
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
 				return true;
 			}

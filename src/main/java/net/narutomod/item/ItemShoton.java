@@ -37,10 +37,9 @@ public class ItemShoton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 471;
 	public static final ItemJutsu.JutsuEnum ARMOR = new ItemJutsu.JutsuEnum(0, "crystal_armor", 'S', 150, 10d, new EntityCrystalArmor.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum PRISON = new ItemJutsu.JutsuEnum(1, "crystal_prison", 'S', 150, 100d, new EntityCrystalPrison.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum THORNS = new ItemJutsu.JutsuEnum(2, "crystal_thorns", 'S', 150, 25d, new EntityCrystalThorns.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum PRISON = new ItemJutsu.JutsuEnum(1, "crystal_prison", 'S', 150, 250d, new EntityCrystalPrison.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum THORNS = new ItemJutsu.JutsuEnum(2, "crystal_thorns", 'S', 150, 15d, new EntityCrystalThorns.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum RAY = new ItemJutsu.JutsuEnum(3, "crystal_ray", 'S', 300, 500d, new EntityCrystalRay.EC.Jutsu());
-
 	public ItemShoton(ElementsNarutomodMod instance) {
 		super(instance, 900);
 	}
@@ -59,6 +58,7 @@ public class ItemShoton extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class RangedItem extends ItemJutsu.Base {
+		private int thornsHoldTicks = 0;
 		public RangedItem(ItemJutsu.JutsuEnum... list) {
 			super(ItemJutsu.JutsuEnum.Type.SHOTON, list);
 			setUnlocalizedName("shoton");
@@ -71,15 +71,32 @@ public class ItemShoton extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase player, int timeLeft) {
+			super.onPlayerStoppedUsing(stack, world, player, timeLeft);
+
+			if (this.getCurrentJutsu(stack) == THORNS) {
+				this.thornsHoldTicks = 0;
+			}
+		}
+
+		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int timeLeft) {
 			ItemJutsu.JutsuEnum jutsu = this.getCurrentJutsu(stack);
+
 			if (jutsu == THORNS) {
 				if (!player.world.isRemote && player instanceof EntityPlayer
-				 && this.canActivateJutsu(stack, THORNS, (EntityPlayer)player) == EnumActionResult.SUCCESS) {
-					this.executeJutsu(stack, player, 0.99f + ((float)this.getMaxUseDuration() - timeLeft) * 0.01f);
+					&& this.canActivateJutsu(stack, THORNS, (EntityPlayer)player) == EnumActionResult.SUCCESS) {
+
+					if (this.thornsHoldTicks < 40) {
+						this.thornsHoldTicks++;
+
+						this.executeJutsu(stack, player,
+							0.99f + ((float)this.getMaxUseDuration() - timeLeft) * 0.01f);
+					}
 				}
 				return;
 			}
+
 			super.onUsingTick(stack, player, timeLeft);
 		}
 

@@ -262,7 +262,7 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 							 .exclude(this.shootingEntity)//.resetHurtResistanceTime()
 							 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 8+ItemJutsu.getDmgMult(this.shootingEntity)*5.5f);
 							this.world.newExplosion(this.shootingEntity, this.hitTrace.hitVec.x, this.hitTrace.hitVec.y, this.hitTrace.hitVec.z,
-							 3, this.rand.nextInt(4) == 0,
+							 1, false,
 							 net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 						}
 					}

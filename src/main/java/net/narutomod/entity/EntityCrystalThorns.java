@@ -218,8 +218,8 @@ public class EntityCrystalThorns extends ElementsNarutomodMod.ModElement {
 						//  this.damage * (1f - (float)(this.ticksAlive - 1) / this.growTime));
 						 
 						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),
-						 15f+ ItemJutsu.getDmgMult(this.user)*4f);
-						  entity.hurtResistantTime = 15;
+						 2.25f * ItemJutsu.getDmgMult(this.user)*0.5f);
+						  entity.hurtResistantTime = 11;
 						
 					}
 				}

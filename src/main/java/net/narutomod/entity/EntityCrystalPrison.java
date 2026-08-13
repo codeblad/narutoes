@@ -70,6 +70,7 @@ public class EntityCrystalPrison extends ElementsNarutomodMod.ModElement {
 			this.setColor(0xA0FFFFFF);
 			this.setRandYawPitch();
 			this.isImmuneToFire = true;
+			this.maxInGroundTime = 100;
 		}
 
 		public EC(EntityLivingBase userIn, float scale) {
@@ -77,6 +78,8 @@ public class EntityCrystalPrison extends ElementsNarutomodMod.ModElement {
 			this.user = userIn;
 			this.maxScale = scale;
 			this.health = scale * 50.0f;
+			this.maxInGroundTime = 100;
+			//this.maxInGroundTime = (int) (60f + (scale / 5f) * 20f);
 		}
 
 		@Override
@@ -250,7 +253,7 @@ public class EntityCrystalPrison extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 100.0f;
+				return 20.0f;
 			}
 	
 			@Override

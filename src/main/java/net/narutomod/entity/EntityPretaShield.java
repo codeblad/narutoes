@@ -66,6 +66,7 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 			super(world);
 			this.setSize(2.0F, 2.2F);
 			this.setOwnerCanSteer(true, 0.1F);
+			this.isImmuneToFire = true;
 			this.effectivePotions.addAll(Lists.newArrayList(PotionAmaterasuFlame.potion, PotionCorrosion.potion, PotionInstantDamage.potion));
 		}
 
@@ -73,6 +74,7 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 			super(player);
 			this.setSize(2.0F, 2.2F);
 			this.setOwnerCanSteer(true, 0.1F);
+			this.isImmuneToFire = true;
 			this.effectivePotions.addAll(Lists.newArrayList(PotionAmaterasuFlame.potion, PotionCorrosion.potion, PotionInstantDamage.potion));
 		}
 

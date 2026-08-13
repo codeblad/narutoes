@@ -89,7 +89,7 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 				}
 				if (this.targetTrace.entityHit != null) {
 					Vec3d vec = this.targetTrace.entityHit.getPositionVector().addVector(0d, this.targetTrace.entityHit.height * 0.5f, 0d).subtract(this.getPositionVector());
-					this.shootPrecise(vec.x, vec.y, vec.z, 0.7f);
+					this.shootPrecise(vec.x, vec.y, vec.z, 0.8f);
 				} else {
 					Vec3d vec = this.targetTrace.hitVec.subtract(this.getPositionVector());
 					this.shoot(vec.x, vec.y, vec.z, 0.6f, 0f);

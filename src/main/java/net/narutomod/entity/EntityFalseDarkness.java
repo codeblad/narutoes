@@ -29,7 +29,6 @@ import net.narutomod.ElementsNarutomodMod;
 public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 241;
 	public static final int ENTITYID_RANGED = 242;
-	private static final float BASE_DAMAGE = 6.0f;
 
 	public EntityFalseDarkness(ElementsNarutomodMod instance) {
 		super(instance, 568);
@@ -46,7 +45,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		private Vec3d direction;
 		private float power;
 		private EntityLivingBase user;
-		private static final float BASE_RANGE = 6.0f;
+		private static final float BASE_RANGE = 5.0f;
 
 		public EC(World world) {
 			super(world);
@@ -80,7 +79,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY + this.user.getEyeHeight() - 0.2d, this.user.posZ);
-				int buildtime = (int) (20 * (1 + 1 * (this.power / 20)));
+				int buildtime = (int) (20 * (1 + 1 * (this.power / 25f)));
 				if (this.ticksExisted <= buildtime) {
 					float f = Math.min((float) this.ticksExisted / buildtime, 1.0f);
 					this.setPosition(
@@ -105,7 +104,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 					Vec3d end = start.add(this.user.getLookVec().normalize().scale(BASE_RANGE * this.power));
 					this.world.playSound(null,end.x, end.y, end.z, SoundEvents.ENTITY_LIGHTNING_IMPACT, SoundCategory.WEATHER, 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, start, end, 0x000000FF, 30, 0f, 0f, 4, 1.0d + (0.1d * this.power));
-					float damage = 15 + (BASE_DAMAGE * (1 + 1.0f * (this.power / 60))) * ItemJutsu.getDmgMult(this.user);
+					float damage = 9 + (2.0f + 4.0f * (this.power / 9.5f) * ItemJutsu.getDmgMult(this.user));
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemRaiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) { 
 						damage *= 1.35f;
@@ -149,7 +148,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getMaxPower() {
-				return 10.0f;
+				return 15.0f;
 			}
 		}
 	}
