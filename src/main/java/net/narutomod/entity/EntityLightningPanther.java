@@ -173,7 +173,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
-			float damage = 10+(1+1.75f*this.getPower()/5)*1.75f*ItemJutsu.getDmgMult(this.getOwner());
+			float damage = 20 + (0.75f*this.getPower()/8) * (2.25f*ItemJutsu.getDmgMult(this.getOwner()));
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getOwner(), ItemRaiton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.35f;
@@ -184,7 +184,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 		private BlockPos findDestination() {
 			EntityLivingBase owner = this.getOwner();
 			if (owner != null) {
-				RayTraceResult rtr = ProcedureUtils.objectEntityLookingAt(owner, 40d, 3d, this);
+				RayTraceResult rtr = ProcedureUtils.objectEntityLookingAt(owner, 100d, 3d, this);
 				if (rtr != null) {
 					if (rtr.entityHit != null) {
 						this.startVec = this.getPositionVector();
@@ -208,7 +208,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			if (this.destPos != null) {
 				Vec3d vec = new Vec3d(this.destPos).subtract(this.getPositionVector()).normalize().scale(this.ogSpeed);
 				this.motionX = vec.x;
-				this.motionY = vec.y + (this.onGround ? 0.08d : 0.0d);
+				this.motionY = vec.y + (this.onGround ? 0.08d : 0.04d);
 				this.motionZ = vec.z;
                 this.rotationYaw = -((float)MathHelper.atan2(this.motionX, this.motionZ)) * (180F / (float)Math.PI);
                 this.renderYawOffset = this.rotationYaw;
@@ -228,7 +228,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			super.onUpdate();
 			EntityLivingBase owner = this.getOwner();
 			float f = this.getPower();
-			if (!this.world.isRemote && (owner == null || !owner.isEntityAlive() || this.ticksExisted > 20 + (int)(f * 10))) {
+			if (!this.world.isRemote && (owner == null || !owner.isEntityAlive() || this.ticksExisted > 60)) {
 				this.setDead();
 			} else {
 				if (this.isInWater()) {
@@ -262,7 +262,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			Vec3d vec2 = vec1.add(ProcedureUtils.getMotion(this));
 			for (Entity entity : this.world.getEntitiesInAABBexcluding(this,
 			 this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ), EntitySelectors.getTeamCollisionPredicate(this))) {
-				if (entity.getEntityBoundingBox().grow(this.width * 0.5, this.height * 0.5, this.width * 0.5).calculateIntercept(vec1, vec2) != null) {
+				if (entity.getEntityBoundingBox().grow(this.width * 1.0, this.height * 1.0, this.width * 1.0).calculateIntercept(vec1, vec2) != null) {
 					this.collideWithEntity(entity);
 				}
 			}
@@ -272,6 +272,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 		protected void collideWithEntity(Entity entityIn) {
 			if (!entityIn.equals(this.getOwner())) {
 				this.attackEntityAsMob(entityIn);
+				this.setDead();
 			}
 			super.collideWithEntity(entityIn);
 		}

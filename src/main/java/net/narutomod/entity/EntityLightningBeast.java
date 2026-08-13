@@ -47,7 +47,7 @@ import net.narutomod.ElementsNarutomodMod;
 public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 189;
 	public static final int ENTITYID_RANGED = 190;
-	private static final float MODELSCALE = 2.0F;
+	private static final float MODELSCALE = 3.0F;
 
 	public EntityLightningBeast(ElementsNarutomodMod instance) {
 		super(instance, 451);
@@ -64,7 +64,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 		private BlockPos destPos;
 		private Vec3d startVec;
 		private int jumpTicks;
-		private final double ogSpeed = 2D;
+		private final double ogSpeed = 2.5D;
 		private float damage = 5;
 		private float mult = 1;
 
@@ -142,8 +142,8 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
-			this.mult = 0.5f+1f*(this.power/5);
-			this.damage = 4+mult*1.5f*ItemJutsu.getDmgMult(this.getOwner());
+			this.mult = 1.25f*(this.power/5);
+			this.damage = 8 + (mult * (1.5f*ItemJutsu.getDmgMult(this.getOwner())));
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getOwner(), ItemRaiton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.35f;
@@ -154,7 +154,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 		private BlockPos findDestination() {
 			EntityLivingBase owner = this.getOwner();
 			if (owner != null) {
-				RayTraceResult rtr = ProcedureUtils.objectEntityLookingAt(owner, 80d, this);
+				RayTraceResult rtr = ProcedureUtils.objectEntityLookingAt(owner, 100d, 3d, this);
 				if (rtr != null) {
 					if (rtr.entityHit != null) {
 						this.startVec = this.getPositionVector();
@@ -175,19 +175,17 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void updateAITasks() {
 			super.updateAITasks();
-			if (this.ticksExisted % 1 == 0) {
 				if (this.destPos != null) {
 					Vec3d vec = new Vec3d(this.destPos).subtract(this.getPositionVector()).normalize().scale(this.ogSpeed);
 					this.motionX = vec.x;
-					this.motionY = vec.y + (this.onGround ? 0.08d : 0.0d);
+					this.motionY = vec.y + (this.onGround ? 0.08d : 0.04d);
 					this.motionZ = vec.z;
                     this.rotationYaw = -((float)MathHelper.atan2(this.motionX, this.motionZ)) * (180F / (float)Math.PI);
                     this.renderYawOffset = this.rotationYaw;
 				}
-				if (this.destPos == null || this.isDestOnPath()) {
+				if (this.ticksExisted % 1 == 0 && (this.destPos == null || this.isDestOnPath())) {
 					this.destPos = this.findDestination();
 				}
-			}
 		}
 
 		private boolean isDestOnPath() {
@@ -254,7 +252,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity instanceof EntityPlayer && power >= 5.0f) {
 					entity.world.spawnEntity(new EC((EntityPlayer)entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack,20*7);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*10);
 					return true;
 				}
 				return false;
@@ -262,18 +260,18 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getBasePower() {
-				return 3.0f;
+				return 5.0f;
 			}
 	
 			@Override
 			public float getPowerupDelay() {
-				return 30.0f;
+				return 50.0f;
 			}
 
 
 			@Override
 			public float getMaxPower() {
-				return 20.0f;
+				return 10.0f;
 			}
 		}
 	}

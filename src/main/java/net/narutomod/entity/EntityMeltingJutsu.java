@@ -103,14 +103,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 
 		private void solidifyLava(BlockPos pos) {
 			if (this.world.getBlockState(pos).getMaterial() == Material.LAVA) {
-				this.world.setBlockToAir(pos);
-				new net.narutomod.event.EventSetBlocks(this.world,
-				 ImmutableMap.of(pos, Blocks.OBSIDIAN.getDefaultState()), 0, 140, false, false);
-				this.solidifyLava(pos.east());
-				this.solidifyLava(pos.up());
-				this.solidifyLava(pos.west());
-				this.solidifyLava(pos.north());
-				this.solidifyLava(pos.south());
+
 			}
 		}
 		
@@ -190,8 +183,8 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 				}
 
 				if (result.entityHit != null) {
-					result.entityHit.getEntityData().setBoolean("TempData_disableKnockback", true);
-					result.entityHit.hurtResistantTime = 10;
+					//result.entityHit.getEntityData().setBoolean("TempData_disableKnockback", true);
+					//result.entityHit.hurtResistantTime = 10;
 					
 					float damage = 6 + (ItemJutsu.getDmgMult(this.shootingEntity) * (5.5f * (this.supapower / 10)));
 

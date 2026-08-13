@@ -383,8 +383,8 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 						}
 					}
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world,
-					 this.summoner.getPositionVector().addVector(0d, 1d, 0d), this.rand.nextDouble() * 9d + 1d, 0d, 0d, 0d);
-					float damage = 10f+2.75f*ItemJutsu.getDmgMult(this.summoner);
+					 this.summoner.getPositionVector().addVector(0d, 1d, 0d), this.rand.nextDouble() * 8d + 1d, 0d, 0d, 0d);
+					float damage = 10f+2.45f*ItemJutsu.getDmgMult(this.summoner);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 						damage*=1.35f;
@@ -400,10 +400,10 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")), 0.8f, this.rand.nextFloat() * 2.0f + 1.5f);
 					}
 					Vec3d vec0 = this.summoner.getPositionEyes(1f);
-					Vec3d vec1 = vec0.add(this.summoner.getLookVec().scale((3+this.ticksExisted*2)));
+					Vec3d vec1 = vec0.add(this.summoner.getLookVec().scale((15 + this.ticksExisted / 2 )));
 					vec0 = this.handPos != null ? this.handPos : vec0.subtract(0d, 0.5d, 0d);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, vec0, vec1, 0x800000FF, 1, 0f, 0.04f, 0);
-					float damage = 12f+3.2f*ItemJutsu.getDmgMult(this.summoner);
+					float damage = 12f+2.8f*ItemJutsu.getDmgMult(this.summoner);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 						damage*=1.35f;
