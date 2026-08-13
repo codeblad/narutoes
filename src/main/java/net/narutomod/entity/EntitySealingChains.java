@@ -57,7 +57,7 @@ public class EntitySealingChains extends ElementsNarutomodMod.ModElement {
 		private double initialDistance;
 		private int slowAmplifier;
 		private int retractTime = -1;
-		private final double baseChakraDrainOnTarget = 10.0d; // per sec
+		private final double baseChakraDrainOnTarget = 5.0d; // per sec
 
 		public EC(World worldIn) {
 			super(worldIn);
@@ -153,6 +153,9 @@ public class EntitySealingChains extends ElementsNarutomodMod.ModElement {
 			EntityLivingBase target = this.getTarget();
 			if (this.shootingEntity != null && this.shootingEntity.isEntityAlive() && this.isTargetable(target)) {
 			 	if (this.retractTime < 0) {
+					 if (this.ticksExisted > 20*5) {
+						 this.retract();
+					}
 					if (this.ticksExisted % 20 == 19) {
 						target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 22, this.slowAmplifier));
 						double d = this.shootingEntity instanceof EntityLivingBase

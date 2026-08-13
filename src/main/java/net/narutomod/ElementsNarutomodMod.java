@@ -288,6 +288,22 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "chomei_flying")));
 		sounds.put(new ResourceLocation("narutomod", "deep_forest"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "deep_forest")));
+		sounds.put(new ResourceLocation("narutomod", "hell_stab"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "hell_stab")));
+		sounds.put(new ResourceLocation("narutomod", "dynamic_entry"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "dynamic_entry")));
+		sounds.put(new ResourceLocation("narutomod", "leaf_hurricane"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "leaf_hurricane")));
+		sounds.put(new ResourceLocation("narutomod", "primary_lotus"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "primary_lotus")));
+		sounds.put(new ResourceLocation("narutomod", "hidden_lotus"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "hidden_lotus")));
+		sounds.put(new ResourceLocation("narutomod", "asa_kujaku"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "asa_kujaku")));
+		sounds.put(new ResourceLocation("narutomod", "guillotine_drop"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "guillotine_drop")));
+		sounds.put(new ResourceLocation("narutomod", "liger_bomb"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "liger_bomb")));
 		sounds.put(new ResourceLocation("narutomod", "isobu_roar"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "isobu_roar")));
 		sounds.put(new ResourceLocation("narutomod", "isobu_hurt"),

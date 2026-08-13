@@ -193,7 +193,7 @@ public class EntityDeepForest extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, (net.minecraft.util.SoundEvent)
 								net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:deep_forest"))),
-						SoundCategory.NEUTRAL, 3, 1f);
+						SoundCategory.NEUTRAL, 5, 1f);
 				entity.world.spawnEntity(new EC(entity));
 				((ItemJutsu.Base)stack.getItem()).setCurrentJutsuCooldown(stack, 20*20);
 				return true;

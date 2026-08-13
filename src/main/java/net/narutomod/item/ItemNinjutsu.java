@@ -1,6 +1,7 @@
 
 package net.narutomod.item;
 
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -299,6 +300,19 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 					if (target != null && target.isInvisible()
 					&& !ItemSharingan.wearingAny(entity) && !ItemByakugan.wearingAny(entity)) {
 						((EntityLiving)entity).setAttackTarget(null);
+					}
+				}
+			}
+
+
+			@SubscribeEvent
+			public void onDamaged(LivingDamageEvent event) {
+				EntityLivingBase entity = event.getEntityLiving();
+				if (!entity.world.isRemote && entity instanceof EntityPlayer) {
+					ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityPlayer)entity, block);
+					if (stack != null && new HidingWithCamouflage().isActivated(stack)) {
+						HidingWithCamouflage.deactivate(stack);
+						entity.removePotionEffect(MobEffects.INVISIBILITY);
 					}
 				}
 			}

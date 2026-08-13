@@ -38,10 +38,10 @@ public class GuiScrollLightningChakraModeGui extends ElementsNarutomodMod.ModEle
 				player.sendStatusMessage(new TextComponentTranslation("This is not your affinity."), false);
 				return;
 			}
-			ItemStack stack = GuiNinjaScroll.enableJutsu(player, (ItemRaiton.RangedItem)ItemRaiton.block, ItemRaiton.CHAKRAMODE, true);
+			/*ItemStack stack = GuiNinjaScroll.enableJutsu(player, (ItemRaiton.RangedItem)ItemRaiton.block, ItemRaiton.CHAKRAMODE, true);
 			if (stack != null) {
 				super.handleButtonAction(player, buttonID);
-			}
+			}*/
 		}
 	}
 

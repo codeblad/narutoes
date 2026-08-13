@@ -68,11 +68,8 @@ public class ProcedureSpecialJutsu2OnKeyPressed extends ElementsNarutomodMod.Mod
 		ItemStack stack = ItemStack.EMPTY;
 		ItemStack helmet = ItemStack.EMPTY;
 		CTRL_pressed = (String) "CTRL_pressed";
-		if (((EntityPlayer) entity).isSpectator()) {
-			return;
-		}
 		entity.getEntityData().setBoolean((NarutomodModVariables.JutsuKey2Pressed), (is_pressed));
-		if ((world.isRemote)) {
+		if (((world.isRemote) || ((EntityPlayer) entity).isSpectator())) {
 			return;
 		}
 		stack = ((entity instanceof EntityLivingBase) ? ((EntityLivingBase) entity).getHeldItemMainhand() : ItemStack.EMPTY);

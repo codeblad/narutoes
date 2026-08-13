@@ -220,7 +220,7 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 			return ((Float)this.getDataManager().get(THICKNESS)).floatValue();
 		}
 
-		private void setThickness(float f) {
+		public void setThickness(float f) {
 			this.getDataManager().set(THICKNESS, Float.valueOf(f));
 		}
 
@@ -259,7 +259,7 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void setDamage(DamageSource source, float amount, boolean resetHurtTime, @Nullable EntityLivingBase entity) {
-			this. setDamage(source, amount, resetHurtTime, entity, 100);
+			this.setDamage(source, amount, resetHurtTime, entity, 100);
 		}
 
 		public void setDamage(DamageSource source, float amount, boolean resetHurtTime, @Nullable EntityLivingBase entity, int paralysis) {

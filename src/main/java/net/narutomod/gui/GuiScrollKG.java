@@ -242,6 +242,11 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 				int num2 = randNum(player, num1);
 				giveJutsu(jutsuArray[num1], player);
 				giveJutsu(jutsuArray[num2], player);
+			} else if (buttonID == 22) {
+				//Lightning Cloak
+				int num1 = randNum(player, 2);
+				giveJutsu(ItemRaiton.block, player);
+				giveJutsu(jutsuArray[num1], player);
 			}
 			player.getEntityData().setInteger("KekkeiGenkai", realNum);
 
@@ -291,6 +296,7 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 			this.buttonList.add(new GuiButton(19, this.guiLeft + 0, this.guiTop + 125, 39, 20, "Hiruzen"));
 			this.buttonList.add(new GuiButton(20, this.guiLeft + 50, this.guiTop + 125, 39, 20, "Crystal"));
 			this.buttonList.add(new GuiButton(21, this.guiLeft + 100, this.guiTop + 125, 39, 20, "Paper"));
+			this.buttonList.add(new GuiButton(22, this.guiLeft + 150, this.guiTop + 125, 39, 20, "Lightning Cloak"));
 			this.buttonList.add(new GuiButton(69, this.guiLeft + 100, this.guiTop + 150, 39, 20, "Regular Dude"));
 		}
 	}

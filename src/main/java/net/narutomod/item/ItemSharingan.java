@@ -272,7 +272,7 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 			if (event.phase == TickEvent.Phase.END && this.hasTargetLockOnEntity(entity)) {
 				int remaining = this.targetLockTicksRemaining(entity);
 				EntityLivingBase target = this.getLockedTarget(entity);
-				if (!entity.world.isRemote && (remaining <= 0 || target == null || !target.isEntityAlive() || target.getDistanceSq(entity) > 1024d)) {
+				if (!entity.world.isRemote && (remaining <= 0 || target == null || !target.isEntityAlive() || target.getDistanceSq(entity) > 64)) {
 					this.unlockOnTarget(entity);
 				} else if (target != null) {
 					if (entity.world.isRemote) {

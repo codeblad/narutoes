@@ -657,6 +657,12 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 		return entity.world.rayTraceBlocks(vec1, vec2, false, false, true);
 	}
 
+	public static RayTraceResult raytraceLook(Entity entity, Vec3d look, double distance) {
+		Vec3d vec1 = entity.getPositionEyes(1f);
+		Vec3d vec2 = vec1.add(look.scale(distance));
+		return entity.world.rayTraceBlocks(vec1, vec2, false, false, true);
+	}
+
 	public static RayTraceResult objectEntityLookingAt(Entity entity, double range) {
 		return objectEntityLookingAt(entity, range, false, false, (Predicate)null);
 	}

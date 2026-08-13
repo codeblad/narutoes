@@ -44,10 +44,7 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBiped;
 import net.narutomod.PlayerTracker;
-import net.narutomod.item.ItemJutsu;
-import net.narutomod.item.ItemMilitaryRationsPillGold;
-import net.narutomod.item.ItemSenjutsu;
-import net.narutomod.item.ItemSummoningContract;
+import net.narutomod.item.*;
 import net.narutomod.procedure.ProcedureUtils;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.init.MobEffects;
@@ -90,6 +87,7 @@ public class EntityTestDummy extends ElementsNarutomodMod.ModElement {
             };
         });
     }
+
 
     public static class EntityCustom extends EntityMob {
         public EntityCustom(World world) {
@@ -151,7 +149,7 @@ public class EntityTestDummy extends ElementsNarutomodMod.ModElement {
             double exp = PlayerTracker.getBattleXp(player);
             float maxhealth = player.getMaxHealth();
 
-            this.addTag("TESTDUMMY");
+            this.getEntityData().setBoolean("TESTDUMMY",true);
 
             if (this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH) != null)
                 this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(maxhealth);

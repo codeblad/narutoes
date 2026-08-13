@@ -21,7 +21,9 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.nbt.NBTTagCompound;
 
+import net.narutomod.item.ItemFutton;
 import net.narutomod.potion.PotionChakraEnhancedStrength;
+import net.narutomod.potion.PotionCorrosion;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemSteamArmor;
@@ -57,11 +59,16 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 			this.isImmuneToFire = true;
 		}
 
+		public boolean isKokuoAndSteam(EntityLivingBase user) {
+			EntityBijuManager.isJinchurikiOf((EntityPlayer) user, EntityFiveTails.EntityCustom.class);
+			return false;
+		}
+
 		public EC(EntityLivingBase userIn, float power) {
 			this(userIn.world);
 			this.user = userIn;
 			this.isWearingSteamArmor = ItemSteamArmor.isWearingFullSet(userIn);
-			if (this.isWearingSteamArmor) {
+			if (this.isWearingSteamArmor || isKokuoAndSteam(userIn)) {
 				this.duration = (int)(power * 120f);
 				power *= 2f;
 			} else {
@@ -73,7 +80,7 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 			PotionEffect effect = userIn.getActivePotionEffect(MobEffects.STRENGTH);
 			if (!userIn.isPotionActive(PotionChakraEnhancedStrength.potion)) {
 				userIn.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, this.duration,
-						(int) ((1+0.5*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.4)), false, false));
+						(int) ((1+0.6*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.4)), false, false));
 			}
 
 			effect = userIn.getActivePotionEffect(MobEffects.SPEED);
@@ -100,7 +107,7 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 				if (this.user.isPotionActive(PotionChakraEnhancedStrength.potion)) {
 					user.removePotionEffect(PotionChakraEnhancedStrength.potion);
 				}
-				if (!this.isWearingSteamArmor) {
+				if (!this.isWearingSteamArmor && EntityBijuManager.cloakLevel((EntityPlayer) this.user) <= 0 ) {
 					boolean flag = this.ticksExisted <= 10;
 					if (flag) {
 						for (int i = 0; i < 50; i++) {
@@ -117,8 +124,9 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 					}
 					for (EntityLivingBase entity : this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(flag ? 8d : 5d))) {
 						if (!entity.equals(this.user)) {
-							entity.hurtResistantTime = 10;
-							entity.attackEntityFrom(DamageSource.HOT_FLOOR, 1.5f);
+							if (target instanceof EntityLivingBase) {
+								((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, 5, 5));
+							}
 						}
 					}
 				} else {
@@ -136,7 +144,7 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 					if (res != null && res.entityHit instanceof EntityLivingBase) {
 						ProcedureUtils.pushEntity(this.user, res.entityHit, 15d, 1.5f);
 					} else {
-						res = ProcedureUtils.objectEntityLookingAt(this.user, 12d, 3d, this);
+						res = ProcedureUtils.objectEntityLookingAt(this.user, 16d, 5d, this);
 						if (res != null && res.entityHit instanceof EntityLivingBase && this.tpCool == 0) {
 							this.tpCool = 60;
 							this.target = res.entityHit;
@@ -151,7 +159,7 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				}
-				if (this.attackTime < 12 && this.target != null && this.target.getDistanceSq(this.user) < 25d) {
+				if (this.attackTime < 10 && this.target != null && this.target.getDistanceSq(this.user) < 25d) {
 					((EntityPlayer)this.user).attackTargetEntityWithCurrentItem(this.target);
 					ProcedureUtils.pushEntity(this.user, this.target, 15d, 1.5f);
 					this.target = null;
@@ -193,4 +201,5 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 			}
 		}
 	}
+
 }

@@ -223,6 +223,7 @@ chattext.rinnegan.path3=Preta Path
 item.sake.name=Sake
 entity.healingjutsu.name=Healing Jutsu
 entity.entitysekizo.name=Sekizo (Evening Elephant) - foot %d
+hiddenlotus.counter= Hidden Lotus Attack Counter - %d
 tooltip.byakugan.tenseigantime=Tenseigan evolution: 
 tooltip.bijucloak.level2=Requires 800 JXP to master, 4800 JXP to Biju mode
 effect.amaterasuflame=Amaterasu

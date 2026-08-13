@@ -79,7 +79,7 @@ public class ItemScrollLightningChakraMode extends ElementsNarutomodMod.ModEleme
 			int x = (int) entity.posX;
 			int y = (int) entity.posY;
 			int z = (int) entity.posZ;
-			entity.openGui(NarutomodMod.instance, GuiScrollLightningChakraModeGui.GUIID, world, x, y, z);
+			//entity.openGui(NarutomodMod.instance, GuiScrollLightningChakraModeGui.GUIID, world, x, y, z);
 			return ar;
 		}
 	}

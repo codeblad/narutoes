@@ -51,7 +51,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 149;
 	public static final ItemJutsu.JutsuEnum MULTISIZE = new ItemJutsu.JutsuEnum(0, "biggerme", 'B', 100d, new EntityBiggerMe.Jutsu());
 	public static final ItemJutsu.JutsuEnum FUUIN = new ItemJutsu.JutsuEnum(1, "sealing", 'S', 100d, new EntitySealing.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum SEALINGCHAIN = new ItemJutsu.JutsuEnum(2, "sealing_chains", 'A', 50d, new EntitySealingChains.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum SEALINGCHAIN = new ItemJutsu.JutsuEnum(2, "sealing_chains", 'A', 500d, new EntitySealingChains.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum SEALING9D = new ItemJutsu.JutsuEnum(3, "tooltip.phantom9sealing.name", 'S', 1500d, new EntityGedoStatue.Sealing9Jutsu());
 	public static final ItemJutsu.JutsuEnum SEALING10 = new ItemJutsu.JutsuEnum(4, "tooltip.10coffinseal.name", 'S', 2000d, new EntityTenTails.CoffinSealJutsu());
 

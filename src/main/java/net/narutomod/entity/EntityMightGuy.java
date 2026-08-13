@@ -269,7 +269,8 @@ public class EntityMightGuy extends ElementsNarutomodMod.ModElement {
 				ItemStack stack = this.getHeldItemMainhand();
 				if (stack.getItem() == ItemEightGates.block) {
 					Vec3d vec = entityIn.getPositionEyes(1f).subtract(this.getPositionEyes(1f));
-					((ItemEightGates.RangedItem)stack.getItem()).attackAsakujaku(this, vec.x, vec.y, vec.z);
+					entityIn.world.spawnEntity(new ItemEightGates.RangedItem.AsaKujaku((EntityLivingBase) entityIn));
+					//((ItemEightGates.RangedItem)stack.getItem()).attackAsakujaku(this, vec.x, vec.y, vec.z);
 				}
 			} else {
 				float f = (float) this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();

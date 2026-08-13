@@ -359,6 +359,78 @@
       }
     ]
   },
+  "hell_stab": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:hell_stab",
+        "stream": false
+      }
+    ]
+  },
+  "guillotine_drop": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:guillotine_drop",
+        "stream": false
+      }
+    ]
+  },
+  "liger_bomb": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:liger_bomb",
+        "stream": false
+      }
+    ]
+  },
+  "dynamic_entry": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:dynamic_entry",
+        "stream": false
+      }
+    ]
+  },
+  "leaf_hurricane": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:leaf_hurricane",
+        "stream": false
+      }
+    ]
+  },
+  "primary_lotus": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:primary_lotus",
+        "stream": false
+      }
+    ]
+  },
+  "hidden_lotus": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:hidden_lotus",
+        "stream": false
+      }
+    ]
+  },
+  "asa_kujaku": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:asa_kujaku",
+        "stream": false
+      }
+    ]
+  },
   "bijudama": {
     "category": "master",
     "sounds": [

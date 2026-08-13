@@ -88,7 +88,7 @@ public class ItemInton extends ElementsNarutomodMod.ModElement {
 				this.duration = 40;
 			}
 			if (helmetStack.getItem() == ItemMangekyoSharingan.helmet && helmetStack.getItem() == ItemMangekyoSharinganObito.helmet && helmetStack.getItem() == ItemMangekyoSharinganEternal.helmet) {
-				this.duration = 60;
+				this.duration = 80;
 			}
 
 			if (target instanceof EntityLivingBase && this.createJutsu(entity, (EntityLivingBase)target, this.duration)) {

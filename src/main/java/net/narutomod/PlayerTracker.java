@@ -90,7 +90,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			entity.getEntityData().setDouble(BATTLEXP, Math.min(getBattleXp(entity) + xp, max));
 			if (entity instanceof EntityPlayerMP) {
 				sendBattleXPToTracking((EntityPlayerMP)entity);
-				if (sendMessage) {
+				if (sendMessage && getBattleXp(entity)+xp <= max) {
 					entity.sendStatusMessage(new TextComponentString(
 					 net.minecraft.util.text.translation.I18n.translateToLocal("chattext.ninjaexperience")+
 					 String.format("%.1f", getBattleXp(entity))), true);
@@ -337,10 +337,10 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult+= 0.1f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.01f;
+					defMult+= 0.8f;
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.15f;
+					defMult+= 0.2f;
 				}
 
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
@@ -364,7 +364,9 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity) > 0) {
 					int gates = ItemEightGates.getGatesOpened((EntityLivingBase) targetEntity);
-					if (gates <= 3) {
+					if (gates <= 2) {
+						defMult += 0.15 * ((float) gates / 6);
+					}else if (gates == 3) {
 						defMult+= 1.25*((float) gates /6);
 					}else if (gates < 7) {
 						defMult+= 1.35*((float) gates /6);
@@ -376,7 +378,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
 					ItemYoton.EntityBiggerMe PENIS = (ItemYoton.EntityBiggerMe) targetEntity.getRidingEntity();
-					defMult += 0.4f+0.9f*(PENIS.bigRatio/3);
+					defMult += 0.3f+1.2f*(PENIS.bigRatio/3);
 				}
 				float defense = PlayerTracker.getDefense(targetEntity)*defMult;
 				float newAmount = amount/defense;
@@ -386,41 +388,41 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				event.setAmount(newAmount);
 			    }
 
-				 if (!targetEntity.equals(sourceEntity)) {
-                if (sourceEntity instanceof EntityPlayer) {
+			if (!targetEntity.equals(sourceEntity) && targetEntity.getEntityData().getBoolean("TESTDUMMY") == true) {
+				if (sourceEntity instanceof EntityPlayer) {
 					System.out.println(targetEntity.getUniqueID());
-                    boolean immune = targetEntity.isImmuneToFire();
+					boolean immune = targetEntity.isImmuneToFire();
 
-                    if (immune == true) {
+					if (immune == true) {
 
-                        float defMult = 1.0f;
+						float defMult = 1.0f;
 
-                        if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 1) {
-                            defMult += .25f;
-                        }
+						if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 1) {
+							defMult += .25f;
+						}
 
-                        if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 2) {
-                            defMult += .45f;
-                        }
+						if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) == 2) {
+							defMult += .45f;
+						}
 
-                        if (ItemSenjutsu.isSageModeActivated((EntityPlayer) sourceEntity)) {
-                            if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) > 0) {
-                                defMult += 0.3f;
-                            } else {
-                                if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
-                                    defMult += 0.3f;
-                                } else {
-                                    defMult += 0.6f;
-                                }
-                            }
-                        }
+						if (ItemSenjutsu.isSageModeActivated((EntityPlayer) sourceEntity)) {
+							if (EntityBijuManager.cloakLevel((EntityPlayer) sourceEntity) > 0) {
+								defMult += 0.3f;
+							} else {
+								if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
+									defMult += 0.3f;
+								} else {
+									defMult += 0.6f;
+								}
+							}
+						}
 
-                        float defense = PlayerTracker.getDefense(sourceEntity) * defMult;
-                        float newAmount = amount / defense;
-                        event.setAmount(newAmount);
-                    }
-                }
-				 }
+						float defense = PlayerTracker.getDefense(sourceEntity) * defMult;
+						float newAmount = amount / defense;
+						event.setAmount(newAmount);
+					}
+				}
+			}
 
 			
 			if (sourceEntity instanceof EntitySummonAnimal.ISummon) {
