@@ -262,7 +262,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		private int attackTime = 200;
 		private int attackLimit = 120;
 		private int tpTime = 200;
-		private EntityLivingBase attackTarget;
+		public EntityLivingBase attackTarget;
 		private int attackNum = 0;
 		private EntityLivingBase owner;
 		// stats here
@@ -399,6 +399,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 							target = ProcedureUtils.objectEntityLookingAt(attacker, 18d, 5d).entityHit;
 							if (target instanceof EntityLivingBase && this.tpCool <= 0) {
 								this.tpCool = 50;
+								this.attackTarget = (EntityLivingBase) target;
 								if (gateOpened >= 7) {
 									Vec3d vec = target.getPositionVector().subtract(attacker.getPositionVector()).normalize();
 									attacker.rotationYaw = ProcedureUtils.getYawFromVec(vec);
@@ -407,7 +408,6 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 									attacker.attackTargetEntityWithCurrentItem(target);
 								} else {
 									this.tpTime = 0;
-									this.attackTarget = (EntityLivingBase) target;
 									attacker.rotationYaw = ProcedureUtils.getYawFromVec(this.attackTarget.getPositionVector()
 											.subtract(attacker.getPositionVector()));
 									Vec3d look = this.attackTarget.getPositionVector().subtract(attacker.getPositionVector()).normalize().scale(3);
@@ -485,6 +485,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					EntityLivingBase target= event.getEntityLiving();
 					if (gateOpened >= 3) {
 						if (gateOpened <= 5) {
+							setTarget(target);
 							int attackNum = addAttackNum(attacker,target);
 							if (attacker instanceof EntityPlayer) {
 								EntityPlayer entity2 = (EntityPlayer) attacker;
@@ -1006,7 +1007,6 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 							1,0,0,0, 0, 0,
 							0, 0x10FFFFFF, 0, 0);
 				}
-
 				this.target.addPotionEffect(new PotionEffect(PotionParalysis.potion, 20, 1, false, false));
 			}
 
@@ -1017,13 +1017,13 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public void onUpdate() {
-				if (this.user == null) {
+				if (this.user == null || this.target == null) {
 					this.setDead();
 					return;
 				}
 				if (true) {
 					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
-					if (!this.world.isRemote && !this.used) {
+					if (!this.world.isRemote) {
 						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 					}
 					if (this.ticksExisted <= 20) {
@@ -1071,7 +1071,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						this.world.newExplosion(this.user, this.end.x, this.end.y, this.end.z, 15, false, flag);
 					}
 				}
-				if (this.ticksExisted > 120|| this.used) {
+				if (this.ticksExisted > 120 || this.used) {
 					this.setDead();
 				}
 			}
@@ -1355,7 +1355,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 									}
 								} else {
 									if (gate >= 3) {
-										if (this.hiddenCool <= 0 && this.attackNum > 11) {
+										if (this.hiddenCool <= 0 && this.attackNum > 11 && this.attackTarget != null) {
 											this.hiddenCool = 20*10;
 											entity2.world.spawnEntity(new ItemEightGates.RangedItem.HiddenLotus((EntityLivingBase) entity, this.attackTarget));
 											this.attackTime = 200;
