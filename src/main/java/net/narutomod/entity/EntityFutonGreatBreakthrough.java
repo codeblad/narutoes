@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -25,6 +26,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemFuton;
@@ -233,6 +235,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 			this.motionY += 0.004d;
 			EntityLivingBase shooter = this.getShooter();
 			RayTraceResult res = ProjectileHelper.forwardsRaycast(this, true, true, shooter);
+			shooter.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 			if (res != null && shooter != null) {
 				if (res.entityHit != null) {
 					ProcedureUtils.pushEntity(shooter, res.entityHit, this.getRange(), 6.0F);

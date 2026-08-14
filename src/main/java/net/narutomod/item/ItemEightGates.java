@@ -56,6 +56,7 @@ import net.minecraft.entity.EntityLiving;
 import net.narutomod.*;
 import net.narutomod.entity.*;
 import net.narutomod.potion.PotionParalysis;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.*;
 import net.narutomod.creativetab.TabModTab;
 
@@ -688,6 +689,9 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			public void onUpdate() {
 				if (this.user != null) {
 					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
+					if (!this.world.isRemote) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
 					if (this.ticksExisted <= 20 && !this.hit) {
 						this.start = this.user.getPositionVector();
 						if (this.ticksExisted <= 5) {
@@ -730,7 +734,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				}
-				if (this.ticksExisted > 60) {
+				if (this.ticksExisted > 20) {
 					this.setDead();
 				}
 			}
@@ -777,6 +781,9 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			public void onUpdate() {
 				if (this.user != null) {
 					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
+					if (!this.world.isRemote) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
 					if (this.ticksExisted <= 20 ) {
 						this.start = this.user.getPositionVector();
 						this.look = this.user.getLookVec().scale(.5);
@@ -820,7 +827,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				}
-				if (this.ticksExisted > 60) {
+				if (this.ticksExisted > 20) {
 					this.setDead();
 				}
 			}
@@ -884,6 +891,9 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				}
 				if (true) {
 					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
+					if (!this.world.isRemote && !this.used) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
 					if (this.ticksExisted <= 21) {
 						ProcedureUtils.setVelocity(this.user, 0,1,0);
 						Vec3d tpos = this.user.getPositionVector().add(this.user.getLookVec().scale(0.75));
@@ -997,6 +1007,9 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				}
 				if (true) {
 					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
+					if (!this.world.isRemote && !this.used) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
 					if (this.ticksExisted <= 20) {
 						Vec3d vec = this.target.getPositionEyes(1f).subtract(this.user.getPositionEyes(1f)).normalize();
 						this.user.rotationYaw = ProcedureUtils.getYawFromVec(vec);
@@ -1038,7 +1051,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						this.world.newExplosion(this.user, this.end.x, this.end.y, this.end.z, 15, false, flag);
 					}
 				}
-				if (this.ticksExisted > 120) {
+				if (this.ticksExisted > 120|| this.used) {
 					this.setDead();
 				}
 			}
@@ -1085,6 +1098,9 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			public void onUpdate() {
 				if (this.user != null) {
 					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
+					if (!this.world.isRemote) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
 					if (this.ticksExisted <= 35 ) {
 						if (this.ticksExisted%2== 0) {
 							this.start = this.user.getPositionVector();
@@ -1135,7 +1151,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 
 					}
 				}
-				if (this.ticksExisted > 60) {
+				if (this.ticksExisted > 35) {
 					this.setDead();
 				}
 			}
@@ -1267,88 +1283,91 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					boolean newPressed = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed);
 					EntityPlayer entity2 = (EntityPlayer) entity;
 					int gate = (int) this.getGateOpened(itemstack);
-					if (this.jutsuKey1Pressed && !newPressed) {
-						if (entity.isSneaking()) {
-							if (this.leafCool <= 0) {
-								this.leafCool = 20*8;
-								entity.world.spawnEntity(new ItemEightGates.RangedItem.LeafHurricane((EntityLivingBase) entity));
-							}
-						} else {
-							if (this.dynamicCool <= 0) {
-								this.dynamicCool = 20*8;
-								entity.world.spawnEntity(new ItemEightGates.RangedItem.DynamicEntry((EntityLivingBase) entity));
-							}
-						}
-					}
-
-					this.jutsuKey1Pressed = newPressed;
-
-					boolean newPressed2 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
-					if (this.jutsuKey2Pressed && !newPressed2) {
-						if (gate < 6) {
-							if (!entity.isSneaking()) {
-								if (gate >= 1) {
-									if (this.primaryCool <= 0) {
-										this.primaryCool = 20*12;
-										entity2.world.spawnEntity(new ItemEightGates.RangedItem.PrimaryLotus((EntityLivingBase) entity));
-									}
+					if (!entity2.isPotionActive(PotionUsingJutsu.potion)) {
+						if (this.jutsuKey1Pressed && !newPressed) {
+							if (entity.isSneaking()) {
+								if (this.leafCool <= 0) {
+									this.leafCool = 20*8;
+									entity.world.spawnEntity(new ItemEightGates.RangedItem.LeafHurricane((EntityLivingBase) entity));
 								}
 							} else {
-								if (gate >= 3) {
-									if (this.hiddenCool <= 0 && this.attackNum > 11) {
-										this.hiddenCool = 20*10;
-										entity2.world.spawnEntity(new ItemEightGates.RangedItem.HiddenLotus((EntityLivingBase) entity, this.attackTarget));
-										this.attackTime = 200;
-										this.attackNum = 0;
+								if (this.dynamicCool <= 0) {
+									this.dynamicCool = 20*8;
+									entity.world.spawnEntity(new ItemEightGates.RangedItem.DynamicEntry((EntityLivingBase) entity));
+								}
+							}
+						}
+
+						this.jutsuKey1Pressed = newPressed;
+
+						boolean newPressed2 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
+						if (this.jutsuKey2Pressed && !newPressed2) {
+							if (gate < 6) {
+								if (!entity.isSneaking()) {
+									if (gate >= 1) {
+										if (this.primaryCool <= 0) {
+											this.primaryCool = 20*12;
+											entity2.world.spawnEntity(new ItemEightGates.RangedItem.PrimaryLotus((EntityLivingBase) entity));
+										}
+									}
+								} else {
+									if (gate >= 3) {
+										if (this.hiddenCool <= 0 && this.attackNum > 11) {
+											this.hiddenCool = 20*10;
+											entity2.world.spawnEntity(new ItemEightGates.RangedItem.HiddenLotus((EntityLivingBase) entity, this.attackTarget));
+											this.attackTime = 200;
+											this.attackNum = 0;
+										}
 									}
 								}
 							}
-						}
-						if (gate == 6) {
-							if (this.asaCool <= 0) {
-								this.asaCool = 20*8;
-								entity.world.spawnEntity(new ItemEightGates.RangedItem.AsaKujaku((EntityLivingBase) entity));
-							}
-							entity2.sendStatusMessage(new TextComponentString(
-									I18n.translateToLocal("entity.entityasakujaku.name")), true);
-						}
-						if (gate == 7) {
-							this.attackHirudora(entity2);
-							entity2.sendStatusMessage(new TextComponentString(I18n.translateToLocal("entity.entityhirudora.name")), true);
-						}
-						if (gate == 8) {
-							int k = this.attackSekizo(itemstack, entity2);
-							if (k >= 0) {
-								entity2.sendStatusMessage(new TextComponentString(
-										I18n.translateToLocalFormatted("entity.entitysekizo.name", k+1)), true);
-							}
-						}
-					}
-
-					this.jutsuKey2Pressed = newPressed2;
-
-					boolean newPressed3 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
-					if (this.jutsuKey3Pressed && !newPressed3) {
-						if (gate == 8) {
-							if (this.yagaiCool <= 0) {
-								this.yagaiCool = 600;
-								Entity bullet = new EntityNGDragon(entity2);
-								//((EntityNGDragon) bullet).shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, 1.2F, 0.0F);
-								world.playSound(null, entity.posX, entity.posY, entity.posZ,
-										SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:yagai")),
-										SoundCategory.NEUTRAL, 2.0F, 1.0F);
-								world.spawnEntity(bullet);
-								if (!entity2.isCreative()) {
-									//ProcedureUtils.setDeathAnimations(entity, 2, 200);
-									entity2.getCooldownTracker().setCooldown(itemstack.getItem(), 200);
+							if (gate == 6) {
+								if (this.asaCool <= 0) {
+									this.asaCool = 20*8;
+									entity.world.spawnEntity(new ItemEightGates.RangedItem.AsaKujaku((EntityLivingBase) entity));
 								}
-								entity2.sendStatusMessage(new TextComponentString(I18n.translateToLocal("entity.entityngdragon.name")), true);
+								entity2.sendStatusMessage(new TextComponentString(
+										I18n.translateToLocal("entity.entityasakujaku.name")), true);
+							}
+							if (gate == 7) {
+								this.attackHirudora(entity2);
+								entity2.sendStatusMessage(new TextComponentString(I18n.translateToLocal("entity.entityhirudora.name")), true);
+							}
+							if (gate == 8) {
+								int k = this.attackSekizo(itemstack, entity2);
+								if (k >= 0) {
+									entity2.sendStatusMessage(new TextComponentString(
+											I18n.translateToLocalFormatted("entity.entitysekizo.name", k+1)), true);
+								}
 							}
 						}
+
+						this.jutsuKey2Pressed = newPressed2;
+
+						boolean newPressed3 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
+						if (this.jutsuKey3Pressed && !newPressed3) {
+							if (gate == 8) {
+								if (this.yagaiCool <= 0) {
+									this.yagaiCool = 600;
+									Entity bullet = new EntityNGDragon(entity2);
+									//((EntityNGDragon) bullet).shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, 1.2F, 0.0F);
+									world.playSound(null, entity.posX, entity.posY, entity.posZ,
+											SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:yagai")),
+											SoundCategory.NEUTRAL, 2.0F, 1.0F);
+									world.spawnEntity(bullet);
+									if (!entity2.isCreative()) {
+										//ProcedureUtils.setDeathAnimations(entity, 2, 200);
+										entity2.getCooldownTracker().setCooldown(itemstack.getItem(), 200);
+									}
+									entity2.sendStatusMessage(new TextComponentString(I18n.translateToLocal("entity.entityngdragon.name")), true);
+								}
+							}
+						}
+
+
+						this.jutsuKey3Pressed = newPressed3;
 					}
 
-
-					this.jutsuKey3Pressed = newPressed3;
 				}
 
 

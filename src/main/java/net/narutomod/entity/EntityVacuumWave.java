@@ -2,9 +2,11 @@
 package net.narutomod.entity;
 
 import net.minecraft.item.Item;
+import net.minecraft.potion.PotionEffect;
 import net.narutomod.item.ItemFuton;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemRaiton;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -90,6 +92,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
+			this.shootingEntity.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 			if (!this.world.isRemote) {
 				if (this.ticksExisted == 1) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:windblast")), 0.8f, 0.4f + this.rand.nextFloat() * 0.9f);

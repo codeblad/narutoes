@@ -2,9 +2,11 @@
 package net.narutomod.entity;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.potion.PotionEffect;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemKaton;
 import net.narutomod.item.ItemSuiton;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureAirPunch;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -56,6 +58,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 		private final float damageModifier = 0.5f;
 		private int maxLife = 20;
 		private float power;
+		private EntityLivingBase user;
 
 		public EC(World a) {
 			super(a);
@@ -65,6 +68,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			super(shooter);
 			this.power = scale;
 			this.maxLife = (int) (20+80*scale/5);
+			this.user = shooter;
 		}
 
 		public void shoot() {
@@ -81,6 +85,9 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			if (this.shootingEntity != null) {
+				if (!this.world.isRemote) {
+					this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+				}
 				if (this.ticksAlive == 1) {
 					this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:waterblast")), 0.5f, this.power / 30f);
 				} else if (this.ticksAlive > 40 && this.ticksAlive % 20 == 1) {

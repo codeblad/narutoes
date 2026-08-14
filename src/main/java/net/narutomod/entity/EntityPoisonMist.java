@@ -26,6 +26,7 @@ import net.minecraft.util.SoundEvent;
 
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.potion.PotionCorrosion;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureAirPunch;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -75,6 +76,9 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
+				if (!this.world.isRemote) {
+					this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+				}
 				if (this.ticksExisted % 5 == 1) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:windecho")), 
 					 1f, this.power * 0.2f);

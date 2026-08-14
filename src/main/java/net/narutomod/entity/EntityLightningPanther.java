@@ -2,6 +2,7 @@
 package net.narutomod.entity;
 
 import net.narutomod.item.ItemRaiton;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
@@ -240,6 +241,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:roar")), 5f, 1f);
 				}
 				if (!this.world.isRemote && owner != null) {
+					owner.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 					this.world.spawnEntity(new EntityLightningArc.Base(this.world,
 					 owner.getPositionVector().addVector(0d, this.rand.nextDouble() * 1.5d, 0d), 
 					 this.getPositionEyes(1f), 0x00000000, 0, 0f));

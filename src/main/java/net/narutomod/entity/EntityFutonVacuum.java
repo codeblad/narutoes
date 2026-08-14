@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -19,6 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.init.SoundEvents;
 
 import net.narutomod.item.ItemFuton;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureAirPunch;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.Particles;
@@ -93,6 +95,7 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
+				this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 				if (this.ticksExisted % 5 == 1) {
 					this.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, MathHelper.sqrt(this.bulletSize) * 0.81f , this.rand.nextFloat() * 0.5f + 0.8f);
 					this.airStream.execute2(this.user, this.power, this.bulletSize / 3);

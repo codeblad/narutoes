@@ -43,6 +43,7 @@ import net.narutomod.PlayerTracker;
 import net.narutomod.Particles;
 import net.narutomod.Chakra;
 //import net.narutomod.procedure.ProcedureLightSourceSetBlock;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureRenderView;
@@ -359,6 +360,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 			}
 			if (this.summoner != null) {
 				this.setPositionToSummoner();
+				this.summoner.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 				if (this.ticksExisted % 20 == 1 && !Chakra.pathway(this.summoner).consume(CHAKRA_BURN)) {
 					this.setDead();
 				}

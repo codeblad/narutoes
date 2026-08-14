@@ -1,8 +1,10 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.potion.PotionEffect;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.Particles;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -169,9 +171,15 @@ public class EntityFlameFormation extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUpdate() {
+
 			if (!this.world.isRemote && (this.user == null || !this.user.isEntityAlive() || this.ticksExisted > 20 * this.power )) {
 				this.setDead();
 			} else {
+				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().grow(0.2d))) {
+					if (entity.equals(this.user)) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
+				}
 				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this.user, this.getEntityBoundingBox().grow(0.2d))) {
 					if (this.isEntityOutside(entity)) {
 						this.applyEntityCollision(entity);

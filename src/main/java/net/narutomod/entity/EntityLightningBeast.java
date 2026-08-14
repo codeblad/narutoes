@@ -38,6 +38,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 
 import net.narutomod.item.ItemRaiton;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.potion.PotionParalysis;
 import net.narutomod.item.ItemJutsu;
@@ -197,6 +198,9 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			EntityLivingBase owner = this.getOwner();
+			if (!this.world.isRemote) {
+				owner.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+			}
 			if (!this.world.isRemote && this.ticksExisted % 4 == 0 && owner != null) {
 				this.world.spawnEntity(new EntityLightningArc.Base(this.world, owner.getPositionEyes(1f), 
 				 this.getPositionEyes(1f), 0xC00000FF, 1, 0f));

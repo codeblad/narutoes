@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -27,6 +28,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.block.material.Material;
 
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.Particles;
@@ -58,6 +60,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 		private int deathTicks;
 		private int deathTime;
 		float supapower = 1;
+		private EntityLivingBase user;
 		
 
 		public EC(World world) {
@@ -75,6 +78,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 			this.setIdlePosition();
 			this.supapower = powerIn;
 			this.duration = (int)(powerIn * 5);
+			this.user = shooter;
 		}
 
 		public EC(EntityLivingBase shooter, float powerIn, float powerBall) {
@@ -86,6 +90,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 			this.setIdlePosition();
 			this.supapower = powerBall;
 			this.duration = (int)(powerIn * 0);
+			this.user = shooter;
 			//System.out.println(this.supapower);
 		}
 
@@ -150,6 +155,9 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 			super.onUpdate();
 			if (this.duration > 0) {
 				//this.setIdlePosition();
+				if (!this.world.isRemote) {
+					this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+				}
 				if (this.duration > 1) {
 					Vec3d vec = this.shootingEntity.getLookVec();
 					for (int i = 0; i < 1; i++) {
