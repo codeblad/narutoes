@@ -1,6 +1,8 @@
 package net.narutomod.item;
 
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.*;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
@@ -724,6 +726,11 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 							this.targets.add(entity1.getUniqueID().toString());
 							float damage = 10f+3*ItemJutsu.getDmgMult(this.user);
 
+							int gate = ItemEightGates.getGatesOpened(this.user);
+							if (gate > 0) {
+								damage*=1+1f*gate/8;
+							}
+
 							Vec3d knockback = this.user.getLookVec().scale(.5).addVector(0,1,0);
 							if (entity1 instanceof EntityTailedBeast.Base) {
 								knockback = knockback.scale(0.01);
@@ -815,6 +822,11 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 							this.hit = true;
 							this.targets.add(entity1.getUniqueID().toString());
 							float damage = 15+5*ItemJutsu.getDmgMult(this.user);
+
+							int gate = ItemEightGates.getGatesOpened(this.user);
+							if (gate > 0) {
+								damage*=1+1f*gate/8;
+							}
 
 							Vec3d knockback = this.user.getLookVec().scale(10);
 							if (entity1 instanceof EntityTailedBeast.Base) {
@@ -939,7 +951,11 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						this.used = true;
 						boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
 						this.world.newExplosion(this.user, this.end.x, this.end.y, this.end.z, 10, false, flag);
-						float damage = 30f+8*ItemJutsu.getDmgMult(this.user);
+						float damage = 30f+7*ItemJutsu.getDmgMult(this.user);
+						int gate = ItemEightGates.getGatesOpened(this.user);
+						if (gate > 0) {
+							damage*=1+0.7f*gate/8;
+						}
 						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 					}
 				}
@@ -1026,7 +1042,11 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						this.target.setPositionAndUpdate(targetPoint.x,targetPoint.y, targetPoint.z);
 					}
 					if (this.ticksExisted == 12) {
-						float damage = 30f+10*ItemJutsu.getDmgMult(this.user);
+						float damage = 30f+9*ItemJutsu.getDmgMult(this.user);
+						int gate = ItemEightGates.getGatesOpened(this.user);
+						if (gate > 0) {
+							damage*=1+0.7f*gate/8;
+						}
 						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 						boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
 						this.world.newExplosion(this.user, this.start.x, this.start.y, this.start.z, 4, false, flag);
@@ -1246,6 +1266,26 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 
 		Entity gatesEntity;
 
+		public static boolean hasSlot(NBTTagCompound nbt, int targetSlot) {
+			if (nbt.hasKey("ForgeCaps", Constants.NBT.TAG_COMPOUND)) {
+				NBTTagCompound forgeCaps = nbt.getCompoundTag("ForgeCaps");
+				if (forgeCaps.hasKey("knapm:container", Constants.NBT.TAG_COMPOUND)) {
+					NBTTagCompound container = forgeCaps.getCompoundTag("knapm:container");
+					if (container.hasKey("Items", Constants.NBT.TAG_LIST)) {
+						NBTTagList items = container.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+						for (int i = 0; i < items.tagCount(); i++) {
+							NBTTagCompound itemEntry = items.getCompoundTagAt(i);
+							int slot = itemEntry.getInteger("Slot");
+							if (slot == targetSlot) {
+								return true;
+							}
+						}
+					}
+				}
+			}
+			return false;
+		}
+
 
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
@@ -1266,7 +1306,10 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				this.attackNum = 0;
 			}
 
-			if (!world.isRemote) {
+			NBTTagCompound nbt = new NBTTagCompound();
+			entity.writeToNBT(nbt);
+
+			if (!world.isRemote && !hasSlot(nbt, 3)) {
 				if (entity instanceof EntityPlayer && (((EntityPlayer)entity).getHeldItemMainhand().equals(itemstack) || ((EntityPlayer)entity).getHeldItemOffhand().equals(itemstack))) {
 					if (this.tpTime < 15 && this.attackTarget != null && this.attackTarget.getDistanceSq(entity) < 25d) {
 						this.tpTime = 200;
