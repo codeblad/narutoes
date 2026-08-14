@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.util.math.*;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -25,14 +26,10 @@ import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntitySelectors;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
@@ -141,7 +138,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			return false;
 		}
 
-		@Override
+		/*@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
 			this.mult = 1.25f*(this.power/5);
 			this.damage = 8 + (mult * (1.5f*ItemJutsu.getDmgMult(this.getOwner())));
@@ -150,7 +147,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 				damage*=1.35f;
 			}
 			return EntityLightningArc.onStruck(entityIn, ItemJutsu.causeJutsuDamage(this, this.getOwner()), damage);
-		}
+		}*/
 
 		private BlockPos findDestination() {
 			EntityLivingBase owner = this.getOwner();
@@ -205,6 +202,18 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 				this.world.spawnEntity(new EntityLightningArc.Base(this.world, owner.getPositionEyes(1f), 
 				 this.getPositionEyes(1f), 0xC00000FF, 1, 0f));
 			}
+			if (owner != null) {
+				Vec3d vec1 = this.getPositionVector().addVector(0d, 0.5d * this.height, 0d);
+				Vec3d vec2 = vec1.add(ProcedureUtils.getMotion(this));
+				AxisAlignedBB hitbox = new AxisAlignedBB(vec1,vec1).grow(5);
+				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this, hitbox)) {
+					if (entity instanceof EntityLivingBase &&  entity != owner && !entity.equals(owner)) {
+						this.mult = 1+1.25f*(this.power/5);
+						this.damage = 8 + (this.mult * (0.4f*ItemJutsu.getDmgMult(this.getOwner())));
+						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, owner),damage);
+					}
+				}
+			}
 			if (this.rand.nextInt(8) == 0) {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")),
 				  1f, this.rand.nextFloat() * 0.6f + 0.9f);
@@ -233,13 +242,13 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			}
 		}*/
 
-		@Override
+		/*@Override
 		protected void collideWithEntity(Entity entityIn) {
 			if (!entityIn.equals(this.getOwner())) {
 				this.attackEntityAsMob(entityIn);
 			}
 			super.collideWithEntity(entityIn);
-		}
+		}*/
 
 		@Override
 		protected float getWaterSlowDown() {

@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.init.SoundEvents;
 import net.narutomod.item.ItemRaiton;
 import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
@@ -47,6 +48,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 
+import java.security.acl.Owner;
 import java.util.Random;
 import net.minecraft.entity.ai.EntityFlyHelper;
 
@@ -71,6 +73,8 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 		private final float ogWidth = 1.2F;
 		private final float ogHeight = 1.75F;
 		private final double ogSpeed = 3D;
+		private boolean used = false;
+		private float power;
 		private BlockPos destPos;
 		private Vec3d startVec;
 
@@ -89,6 +93,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			this.setLocationAndAngles(player.posX, player.posY, player.posZ, player.rotationYaw, 0f);
 			this.setTamedBy(player);
 			this.setPower(powerIn);
+			this.power = powerIn;
 			Vec3d vec = player.getLookVec();
 			this.motionX = vec.x * 0.2d;
 			this.motionZ = vec.z * 0.2d;
@@ -167,20 +172,11 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 		public void addPotionEffect(PotionEffect potioneffectIn) {
 		}
 
-		@Override
+		/*@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
 			return false;
-		}
+		}*/
 
-		@Override
-		public boolean attackEntityAsMob(Entity entityIn) {
-			float damage = 20 + (0.75f*this.getPower()/8) * (2.25f*ItemJutsu.getDmgMult(this.getOwner()));
-			ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getOwner(), ItemRaiton.block);
-			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-				damage*=1.35f;
-			}
-			return EntityLightningArc.onStruck(entityIn, ItemJutsu.causeJutsuDamage(this, null), damage);
-		}
 
 		private BlockPos findDestination() {
 			EntityLivingBase owner = this.getOwner();
@@ -224,6 +220,14 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			 && this.getDistanceSq(this.startVec.x, this.startVec.y, this.startVec.z) > this.getDistanceSqToCenter(this.destPos);
 		}
 
+		private void setLightningAt(Vec3d startVec, Vec3d targetVec, float thickness, int duration) {
+			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
+					startVec, targetVec, 0x00000000, duration, 0.15f);
+			entity2.setThickness(thickness);
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.getOwner()), 0, this.getOwner());
+			this.world.spawnEntity(entity2);
+		}
+
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
@@ -246,6 +250,36 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 					 owner.getPositionVector().addVector(0d, this.rand.nextDouble() * 1.5d, 0d), 
 					 this.getPositionEyes(1f), 0x00000000, 0, 0f));
 				}
+				if (owner != null) {
+					Vec3d vec1 = this.getPositionVector().addVector(0d, 0.5d * this.height, 0d);
+					Vec3d vec2 = vec1.add(ProcedureUtils.getMotion(this));
+					AxisAlignedBB hitbox = new AxisAlignedBB(vec1,vec1).grow(8);
+					for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this, hitbox)) {
+						if (entity instanceof EntityLivingBase &&  entity != owner && !entity.equals(owner) ) {
+							if (this.used) {
+								continue;
+							}
+							this.used = true;
+							AxisAlignedBB hitbox2 = new AxisAlignedBB(vec1,vec1).grow(15);
+							for (Entity entity2 : this.world.getEntitiesWithinAABBExcludingEntity(this, hitbox2)) {
+								if (entity2 instanceof EntityLivingBase && entity2 != owner && !entity.equals(owner)) {
+									float damage = 20 + (1+1.25f*this.power/8) * (8f*ItemJutsu.getDmgMult(owner));
+									entity2.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, owner),damage);
+								}
+							}
+
+							this.playSound(SoundEvents.ENTITY_LIGHTNING_IMPACT, 2f, this.rand.nextFloat() * 0.2f + 1f);
+							this.playSound(SoundEvents.ENTITY_GENERIC_EXPLODE, 2f, this.rand.nextFloat() * 0.2f + 1f);
+							for (int i = 0; i < 15; i+=1) {
+								Vec3d lightningEnd = vec1.addVector(-15+this.rand.nextFloat()*30,-15+this.rand.nextFloat()*30,-15+this.rand.nextFloat()*30);
+								setLightningAt(vec1,lightningEnd,0.1f, (int) (10+this.rand.nextFloat()*10));
+							}
+							/*boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, owner);
+							this.world.newExplosion(owner, vec1.x, vec1.y, vec1.z, 2, false, flag);*/
+							this.setDead();
+						}
+					}
+				}
 				if (this.rand.nextInt(3) == 2) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")),
 					  1f, this.rand.nextFloat() * 0.6f + 0.9f);
@@ -258,7 +292,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		@Override
+		/*@Override
 		protected void collideWithNearbyEntities() {
 			Vec3d vec1 = this.getPositionVector().addVector(0d, 0.5d * this.height, 0d);
 			Vec3d vec2 = vec1.add(ProcedureUtils.getMotion(this));
@@ -268,15 +302,15 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 					this.collideWithEntity(entity);
 				}
 			}
-		}
+		}*/
 
 		@Override
 		protected void collideWithEntity(Entity entityIn) {
-			if (!entityIn.equals(this.getOwner())) {
+			/*if (!entityIn.equals(this.getOwner())) {
 				this.attackEntityAsMob(entityIn);
 				this.setDead();
 			}
-			super.collideWithEntity(entityIn);
+			super.collideWithEntity(entityIn);*/
 		}
 
 		@Override
