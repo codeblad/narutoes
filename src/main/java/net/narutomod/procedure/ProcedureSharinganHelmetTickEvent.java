@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Comparator;
+import java.util.UUID;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModElement {
@@ -143,7 +144,7 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 			if ((((itemstack).getItem() == new ItemStack(ItemSharingan.helmet, (int) (1)).getItem())
 					&& ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 5000))) {
 				if ((PlayerTracker.Deaths.hasRecentNearby((EntityPlayer) entity, 40D, 6000D) && (!(world.isRemote)))) {
-					if ((Math.random() < 0.5)) {
+					if ((Math.random() < 0.5 && !entity.getUniqueID().equals(UUID.fromString("1cffbcea-7f19-4fe4-a0c7-75cf43fceada")))) {
 						mangekyo = new ItemStack(ItemMangekyoSharingan.helmet, (int) (1));
 					} else {
 						mangekyo = new ItemStack(ItemMangekyoSharinganObito.helmet, (int) (1));

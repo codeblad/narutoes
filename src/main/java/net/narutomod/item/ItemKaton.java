@@ -14,6 +14,7 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.item.ItemStack;
@@ -107,7 +108,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			super(shooter);
 			this.setOGSize(0.8F, 0.8F);
 			this.fullScale = fullScale;
-			this.explosionSize = Math.max((int)fullScale - 2, 0);
+			this.explosionSize = Math.max((int)fullScale - 4, 0);
 			//this.damage = fullScale * 10.0f;
 			this.mult = 2.0f + 4.0f*(fullScale/10);
 			this.damage = 17 + ItemJutsu.getDmgMult(shooter)*mult;
@@ -121,7 +122,19 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.dataManager.set(COLORED, colored);
 			//this.setEntityScale(0.1f);
 			Vec3d vec3d = shooter.getLookVec();
-			this.setPosition(shooter.posX + vec3d.x, shooter.posY + shooter.getEyeHeight() - 0.2d * fullScale + vec3d.y, shooter.posZ + vec3d.z);
+
+			double groundOffset = 0.0d;
+			if (shooter.onGround) {
+				float sizeProgress = (this.fullScale - 0.5f) / (20.0f - 0.5f);
+				float upwardAmount = MathHelper.clamp((float) vec3d.y, 0.0f, 1.0f);
+				groundOffset = 2.5d * sizeProgress * (1.0f - upwardAmount);
+			}
+
+			this.setPosition(
+				shooter.posX + vec3d.x,
+				shooter.posY + shooter.getEyeHeight() - 0.2d * fullScale + vec3d.y + groundOffset,
+				shooter.posZ + vec3d.z
+			);
 		}
 
 		@Override
@@ -203,9 +216,9 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					} else {
 						vec = this.target.getPositionEyes(1f).subtract(this.getPositionVector());
 					}
-					this.motionX *= 0.98D;
-					this.motionY *= 0.98D;
-					this.motionZ *= 0.98D;
+					this.motionX *= 0.9D;
+					this.motionY *= 0.9D;
+					this.motionZ *= 0.9D;
 					this.shoot(vec.x, vec.y, vec.z, 1.5f, 0f);
 				}
 				if (this.rand.nextFloat() <= 0.2f) {
@@ -250,7 +263,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 15.0f;
+				return 5.0f;
 			}
 	
 			@Override

@@ -18,6 +18,7 @@ import net.minecraft.world.World;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.EnumActionResult;
@@ -151,7 +152,20 @@ public class ItemYooton extends ElementsNarutomodMod.ModElement {
 			this.explosionSize = Math.max((int)scale - 1, 0);
 			this.damage = 12+5f*(1.5f+4.8f*(scale/20))*ItemJutsu.getDmgMult(this.shootingEntity);
 			Vec3d vec3d = shooter.getLookVec();
-			this.setPosition(shooter.posX + vec3d.x, shooter.posY + 1.2D + vec3d.y, shooter.posZ + vec3d.z);
+
+
+			double groundOffset = 0.0d;
+			if (shooter.onGround) {
+				float sizeProgress = (scale - 0.5f) / (20.0f - 0.5f);
+				float upwardAmount = MathHelper.clamp((float) vec3d.y, 0.0f, 1.0f);
+				groundOffset = 2.5d * sizeProgress * (1.0f - upwardAmount);
+			}
+
+			this.setPosition(
+				shooter.posX + vec3d.x,
+				shooter.posY + shooter.getEyeHeight() - 0.2d * scale + vec3d.y + groundOffset,
+				shooter.posZ + vec3d.z
+			);
 		}
 
 		@Override

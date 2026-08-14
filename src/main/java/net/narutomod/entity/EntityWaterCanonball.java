@@ -20,6 +20,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.SoundEvent;
@@ -131,11 +132,45 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && this.ticksInAir > 100) {
 				this.setDead();
 			} else if (this.shootingEntity != null) {
+				
 				if (this.ticksAlive <= this.timeToFullscale) {
-					float f = this.fullScale * this.ticksAlive / this.timeToFullscale;
-					this.setEntityScale(f);
-					Vec3d vec = this.shootingEntity.getPositionEyes(1f).add(this.shootingEntity.getLookVec().scale((this.shootingEntity.width + this.width) * 0.5f)).subtract(0d, 0.5d * this.height + 0.2d, 0d);
-					this.setPositionAndRotation(vec.x, vec.y, vec.z, this.shootingEntity.rotationYawHead, this.shootingEntity.rotationPitch);
+						    float f = this.fullScale * this.ticksAlive / this.timeToFullscale;
+    this.setEntityScale(f);
+
+    Vec3d vec = this.shootingEntity.getPositionEyes(1f)
+        .add(this.shootingEntity.getLookVec().scale((this.shootingEntity.width + this.width) * 0.5f))
+        .subtract(0d, 0.5d * this.height + 0.2d, 0d);
+
+    // Apply ground offset using the current scale
+    Vec3d vec3d = this.shootingEntity.getLookVec();
+    double groundOffset = 0.0d;
+
+    if (this.shootingEntity.onGround) {
+        float sizeProgress = MathHelper.clamp(
+            (f - 0.5f) / (20.0f - 0.5f),
+            0.0f,
+            1.0f
+        );
+
+        float upwardAmount = MathHelper.clamp(
+            (float) vec3d.y,
+            0.0f,
+            1.0f
+        );
+
+        groundOffset = 3.8d * sizeProgress * (1.0d - upwardAmount);
+    }
+
+	vec = vec.add(new Vec3d(0d, groundOffset, 0d));
+
+    this.setPositionAndRotation(
+        vec.x,
+        vec.y,
+        vec.z,
+        this.shootingEntity.rotationYawHead,
+        this.shootingEntity.rotationPitch
+    );
+
 				} else if (!this.isLaunched()) {
 					Vec3d vec = this.shootingEntity.getLookVec();
 					this.shoot(vec.x, vec.y, vec.z, 1.2f, 0f);
@@ -174,7 +209,7 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 25.0f;
+				return 15.0f;
 			}
 	
 			@Override

@@ -245,7 +245,7 @@ public class EntityCrystalPrison extends ElementsNarutomodMod.ModElement {
 							entity1.baseDamage = 0.0f;
 						}
 					}
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*12);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*14);
 					return true;
 				}
 				return false;

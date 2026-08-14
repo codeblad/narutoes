@@ -45,7 +45,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 		private Vec3d direction;
 		private float power;
 		private EntityLivingBase user;
-		private static final float BASE_RANGE = 5.0f;
+		private static final float BASE_RANGE = 15.0f;
 
 		public EC(World world) {
 			super(world);
@@ -101,10 +101,10 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")),10f, this.rand.nextFloat() * 0.6f + 0.3f);
 					Vec3d start = this.getPositionVector();
 					
-					Vec3d end = start.add(this.user.getLookVec().normalize().scale(BASE_RANGE * this.power));
+					Vec3d end = start.add(this.user.getLookVec().normalize().scale(BASE_RANGE + (60.0f * (this.power / 15.0f))));
 					this.world.playSound(null,end.x, end.y, end.z, SoundEvents.ENTITY_LIGHTNING_IMPACT, SoundCategory.WEATHER, 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, start, end, 0x000000FF, 30, 0f, 0f, 4, 1.0d + (0.1d * this.power));
-					float damage = 9 + (2.0f + 4.0f * (this.power / 9.5f) * ItemJutsu.getDmgMult(this.user));
+					float damage = 15 + (3.8f * (this.power / 9.5f)) * ItemJutsu.getDmgMult(this.user);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemRaiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) { 
 						damage *= 1.35f;
