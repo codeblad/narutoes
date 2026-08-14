@@ -115,12 +115,10 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		private static final Map<IAttribute, AttributeModifier> buffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
 			.put(EntityPlayer.REACH_DISTANCE, new AttributeModifier(UUID.fromString("c3ee1250-8b80-4668-b58a-33af5ea73ee6"), "sagemode.reach", 2.0d, 0))
 			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(UUID.fromString("33b7fa14-828a-4964-b014-b61863526589"), "sagemode.damagespeed", 2.0d, 1))
-			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.25d, 1))
 			.build();
 			private static final Map<IAttribute, AttributeModifier> snakebuffMap = ImmutableMap.<IAttribute, AttributeModifier>builder()
 			.put(EntityPlayer.REACH_DISTANCE, new AttributeModifier(UUID.fromString("c3ee1250-8b80-4668-b58a-33af5ea73ee6"), "sagemode.reach", 2.0d, 0))
-			.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(UUID.fromString("33b7fa14-828a-4964-b014-b61863526589"), "sagemode.damagespeed", 2.2d, 1))
-			.put(SharedMonsterAttributes.MOVEMENT_SPEED, new AttributeModifier(UUID.fromString("74f3ab51-a73f-45e3-a4c4-aae6974b6414"), "sagemode.movement", 1.35d, 1))
+					.put(SharedMonsterAttributes.ATTACK_SPEED, new AttributeModifier(UUID.fromString("33b7fa14-828a-4964-b014-b61863526589"), "sagemode.damagespeed", 2.2d, 1))
 			.build();
 
 		@SideOnly(Side.CLIENT)
@@ -190,6 +188,30 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 							d = 7.0d+ItemJutsu.getNinjaMult(living)*0.8;
 						}
 					}
+
+
+					boolean hasSpeed = false;
+					PotionEffect effect = living.getActivePotionEffect(MobEffects.SPEED);
+					if (effect != null && effect.getAmplifier() > 5) {
+						hasSpeed = true;
+					}
+
+					double e = 1.2;
+
+					if (this.getSageType(itemstack) == Type.SNAKE) {
+						e = 1.3;
+					}
+					IAttributeInstance attr = living.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED);
+					if (attr.getModifier(UUID.fromString("ac15263f-d888-4201-9bfb-64f059c6cebf")) == null) {
+						if (!hasSpeed) {
+							living.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier(UUID.fromString("ac15263f-d888-4201-9bfb-64f059c6cebf"), "sagemode.movement", e, 1));
+						}
+
+					} else if (hasSpeed) {
+						living.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(UUID.fromString("ac15263f-d888-4201-9bfb-64f059c6cebf"));
+					}
+
+
 					if (living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868")) == null) {
 						living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868"), "sagemode.damage", d, 0));
 					}
@@ -211,6 +233,9 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 						}
 					}
 					living.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).removeModifier(UUID.fromString("6d6202e1-9aac-4c3d-ba0c-6684bdd58868"));
+					if (living.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).getModifier(UUID.fromString("ac15263f-d888-4201-9bfb-64f059c6cebf")) != null) {
+						living.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).removeModifier(UUID.fromString("ac15263f-d888-4201-9bfb-64f059c6cebf"));
+					}
 					/*if (entity instanceof EntityPlayer) {
 						itemstack.getTagCompound().removeTag("prevFoodStat");
 						((EntityPlayer)entity).getFoodStats().setFoodLevel(itemstack.getTagCompound().getInteger("prevFoodStat"));

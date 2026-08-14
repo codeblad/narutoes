@@ -69,23 +69,34 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 			this.user = userIn;
 			this.isWearingSteamArmor = ItemSteamArmor.isWearingFullSet(userIn);
 			if (this.isWearingSteamArmor || isKokuoAndSteam(userIn)) {
-				this.duration = (int)(power * 120f);
-				power *= 2f;
+				if (isKokuoAndSteam(userIn)) {
+					this.duration = (int)(power * 130f);
+					power*= 2f;
+				} else {
+					this.duration = (int)(power * 120f);
+					power *= 1.5f;
+				}
 			} else {
 				this.duration = (int)(power * 60f);
 			}
+
+			int strMult = (int) ((1+0.6*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.3));
+			if (isKokuoAndSteam(userIn)) {
+				strMult = (int) ((1+0.6*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.5));
+			}
+
 			this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 			this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kairikimuso")), 1f, 1f);
 
 			PotionEffect effect = userIn.getActivePotionEffect(MobEffects.STRENGTH);
 			if (!userIn.isPotionActive(PotionChakraEnhancedStrength.potion)) {
 				userIn.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, this.duration,
-						(int) ((1+0.6*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.4)), false, false));
+						strMult, false, false));
 			}
 
 			effect = userIn.getActivePotionEffect(MobEffects.SPEED);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.SPEED, this.duration, 
-			 (int)(power * 0.65f), false, false));
+			 (int)(power * 0.5f), false, false));
 			effect = userIn.getActivePotionEffect(MobEffects.JUMP_BOOST);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, this.duration, 
 			 (int)(power * 0.25f), false, false));
@@ -147,6 +158,9 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 						res = ProcedureUtils.objectEntityLookingAt(this.user, 16d, 5d, this);
 						if (res != null && res.entityHit instanceof EntityLivingBase && this.tpCool == 0) {
 							this.tpCool = 60;
+							if (isKokuoAndSteam(this.user)) {
+								this.tpCool = 50;
+							}
 							this.target = res.entityHit;
 							this.attackTime = 0;
 							this.user.rotationYaw = ProcedureUtils.getYawFromVec(this.target.getPositionVector()
@@ -159,7 +173,11 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				}
-				if (this.attackTime < 10 && this.target != null && this.target.getDistanceSq(this.user) < 25d) {
+				int limit = 10;
+				if (isKokuoAndSteam(this.user)) {
+					limit = 20;
+				}
+				if (this.attackTime < limit && this.target != null && this.target.getDistanceSq(this.user) < 25d) {
 					((EntityPlayer)this.user).attackTargetEntityWithCurrentItem(this.target);
 					ProcedureUtils.pushEntity(this.user, this.target, 15d, 1.5f);
 					this.target = null;

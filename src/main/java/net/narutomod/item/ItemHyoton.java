@@ -141,7 +141,7 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 					EnchantmentFrostWalker.freezeNearby(living, world, pos, 1);
 				}
 				if (living.ticksExisted % 20 == 3) {
-					living.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 3, false, false));
+					living.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, 4, false, false));
 					if (entity instanceof EntityPlayer && !ProcedureUtils.hasItemInInventory((EntityPlayer)entity, ItemIceSenbon.block)) {
 						ItemHandlerHelper.giveItemToPlayer((EntityPlayer)entity, new ItemStack(ItemIceSenbon.block));
 					}

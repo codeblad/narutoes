@@ -601,7 +601,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					if (this.summoner.swingProgressInt == 1 && this.summoner instanceof EntityPlayer) {
 						RayTraceResult result = ProcedureUtils.objectEntityLookingAt(this.summoner, 3d, this);
 						if (result == null || result.entityHit == null) {
-							this.tpCool = 30;
+							this.tpCool = 50;
 							result = ProcedureUtils.objectEntityLookingAt(this.summoner, 20d, 5d, this);
 							if (result != null && result.entityHit instanceof EntityLivingBase) {
 								Vec3d vec = result.entityHit.getPositionEyes(1f).subtract(this.summoner.getPositionEyes(1f)).normalize();
