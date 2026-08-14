@@ -158,7 +158,7 @@ public class ItemYooton extends ElementsNarutomodMod.ModElement {
 			if (shooter.onGround) {
 				float sizeProgress = (scale - 0.5f) / (20.0f - 0.5f);
 				float upwardAmount = MathHelper.clamp((float) vec3d.y, 0.0f, 1.0f);
-				groundOffset = 2.5d * sizeProgress * (1.0f - upwardAmount);
+				groundOffset = 3.5d * sizeProgress * (1.0f - upwardAmount);
 			}
 
 			this.setPosition(
