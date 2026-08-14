@@ -3,6 +3,7 @@ package net.narutomod.entity;
 
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.potion.PotionCorrosion;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
 import net.narutomod.ElementsNarutomodMod;
@@ -113,6 +114,7 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 			} else {
 				this.setIdlePosition();
 				if (!this.world.isRemote) {
+					this.shooter.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 					if (this.shooter != null) {
 						float f = (float)this.ticksExisted / this.maxLife;
 						f = 1.0f - f * f * 0.8f;

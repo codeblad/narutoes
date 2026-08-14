@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -27,6 +28,7 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.datasync.DataSerializers;
 
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemRanton;
@@ -94,6 +96,9 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			//super.onUpdate();
 			if (this.summoner != null && this.summoner.isEntityAlive() && this.ticksExisted <= this.duration) {
 				this.setIdlePosition();
+				if (!this.world.isRemote) {
+					this.summoner.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+				}
 				if (this.ticksExisted % 1 == 0) {
 					this.playSound(SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:electricity")), 1.0f, this.rand.nextFloat() * 0.6f + 0.6f);

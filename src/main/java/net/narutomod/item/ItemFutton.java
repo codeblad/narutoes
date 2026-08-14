@@ -40,6 +40,8 @@ import net.minecraft.init.SoundEvents;
 
 import net.narutomod.entity.EntityUnrivaledStrength;
 import net.narutomod.block.BlockAmaterasuBlock;
+import net.narutomod.potion.PotionParalysis;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureAirPunch;
 import net.narutomod.potion.PotionCorrosion;
@@ -149,6 +151,7 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			if (this.user != null) {
+				this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				this.airPunch.execute(this.user, this.power, this.farRadius);
 				if (this.ticksExisted % 15 == 2) {

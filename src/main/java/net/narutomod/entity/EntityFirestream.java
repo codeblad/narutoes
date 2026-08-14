@@ -1,9 +1,11 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.potion.PotionEffect;
 import net.narutomod.item.ItemDoton;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemKaton;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.Particles;
 import net.narutomod.entity.EntityFirestream.EC;
@@ -111,6 +113,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			//super.onUpdate();
+
 			if (!this.world.isRemote && (this.ticksExisted > this.maxLife || this.handleWaterMovement()
 			 || this.shooter == null || !this.shooter.isEntityAlive())) {
 				this.setDead();
@@ -118,6 +121,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				this.setIdlePosition();
 				if (!this.world.isRemote && this.ticksExisted > this.wait) {
 					if (this.shooter != null) {
+						this.shooter.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 						double d = (double)this.ticksExisted / this.maxLife;
 						d = 1.0d - d * d * 0.8d;
 						if (this.shooter instanceof EntityLiving && ((EntityLiving)this.shooter).getAttackTarget() != null) {

@@ -33,10 +33,7 @@ import net.minecraft.init.MobEffects;
 
 import net.narutomod.NarutomodModVariables;
 import net.narutomod.entity.*;
-import net.narutomod.potion.PotionChakraEnhancedStrength;
-import net.narutomod.potion.PotionFeatherFalling;
-import net.narutomod.potion.PotionHeaviness;
-import net.narutomod.potion.PotionParalysis;
+import net.narutomod.potion.*;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureWhenPlayerAttcked;
@@ -153,6 +150,9 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			public void onUpdate() {
 				if (this.user != null) {
 					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
+					if (!this.world.isRemote) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
 					if (this.ticksExisted<delay) {
 						EntityLightningArc.spawnAsParticle(this.world, this.posX + this.rand.nextGaussian() * 0.3d,
 								this.posY + this.rand.nextDouble() * 1.3d, this.posZ + this.rand.nextGaussian() * 0.3d,
@@ -209,7 +209,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 						this.setLightningAt(this.end.addVector(0,1,0));
 					}
 				}
-				if (this.ticksExisted > 60) {
+				if (this.ticksExisted > this.delay+10) {
 					this.setDead();
 				}
 			}
@@ -277,6 +277,9 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			public void onUpdate() {
 				if (this.user != null) {
 					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
+					if (!this.world.isRemote && !this.used) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
 					if (this.ticksExisted < delay) {
 						ProcedureUtils.setVelocity(this.user,0,0,0);
 					}
@@ -333,7 +336,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 						this.setLightningAt(this.end.subtract(0,5,0));
 					}
 				}
-				if (this.ticksExisted > 120) {
+				if (this.ticksExisted > this.delay+50) {
 					this.setDead();
 				}
 			}
@@ -400,6 +403,9 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 				}
 				if (this.user != null) {
 					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
+					if (!this.world.isRemote) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
 					if (this.ticksExisted<delay) {
 						Vec3d targetPos = this.user.getPositionVector().add(this.user.getLookVec().scale(2));
 						this.target.setPositionAndUpdate(targetPos.x,targetPos.y+2,targetPos.z);
@@ -454,7 +460,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 								.5f, this.rand.nextFloat() * 0.5f + 1.4f);
 					}
 				}
-				if (this.ticksExisted > 80) {
+				if (this.ticksExisted > delay+10) {
 					this.setDead();
 				}
 			}
@@ -531,7 +537,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 
 				this.setPosition(this.summoner.posX, this.summoner.posY, this.summoner.posZ);
 				EntityPlayer entity2 = (EntityPlayer) this.summoner;
-				if (entity2.getHeldItemMainhand().equals(stack) || entity2.getHeldItemOffhand().equals(stack)) {
+				if (!entity2.isPotionActive(PotionUsingJutsu.potion) && (entity2.getHeldItemMainhand().equals(stack) || entity2.getHeldItemOffhand().equals(stack))) {
 
 					boolean newPressed = this.summoner.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed);
 					if (this.jutsuKey1Pressed && !newPressed && this.jutsu1Cool <= 0 && Chakra.pathway(this.summoner).consume(500d)) {

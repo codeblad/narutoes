@@ -61,6 +61,7 @@ import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntityBeamBase;
 import net.narutomod.entity.EntityScalableProjectile;
 import net.narutomod.potion.PotionFlight;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureAirPunch;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureAoeCommand;
@@ -190,6 +191,7 @@ else {
 		private static final DataParameter<Float> SCALE = EntityDataManager.<Float>createKey(EntityBeam.class, DataSerializers.FLOAT);
 		private final AirPunch beam = new AirPunch();
 		private final int wait = 60;
+		private EntityLivingBase user;
 
 		public EntityBeam(World a) {
 			super(a);
@@ -200,6 +202,7 @@ else {
 			super(shooter);
 			this.setScale(scale);
 			this.isImmuneToFire = true;
+			this.user = shooter;
 			this.updatePosition();
 		}
 
@@ -242,6 +245,8 @@ else {
 				if (this.ticksAlive >= this.wait) {
 					vec3d = vec3d.scale(MathHelper.sqrt(scale) * 10f);
 				}
+
+				this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 				this.shoot(vec3d.x, vec3d.y, vec3d.z);
 				if (this.ticksAlive >= this.wait + 10) {
 					this.beam.execute2(this.shootingEntity, this.getBeamLength(), scale / 2);

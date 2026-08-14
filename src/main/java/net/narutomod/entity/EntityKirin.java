@@ -105,7 +105,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 		}
 
 		private void shoot(double x, double y, double z) {
-			this.shoot(x, y, z, 1.0f, 0f);
+			this.shoot(x, y, z, 1.2f, 0f);
 			this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:lightning_shoot")),
 			 100f, this.rand.nextFloat() * 0.4f + 0.8f);
 		}
@@ -215,7 +215,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, vec.x, vec.y, vec.z, size, flag, flag);
 				ProcedureAoeCommand.set(this.world, vec.x, vec.y, vec.z, 0.0D, 24.0D).exclude(this).exclude(this.shootingEntity)
-				 .setFire(15).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (60 + 30f*ItemJutsu.getDmgMult(this.shootingEntity)));
+				 .setFire(15).damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (60 + 31f*ItemJutsu.getDmgMult(this.shootingEntity)));
 			}
 			//this.haltMotion();
 			this.setDead();
@@ -255,7 +255,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 200.0f;
+				return 350.0f;
 			}
 	
 			@Override

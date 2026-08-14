@@ -35,6 +35,8 @@ import net.minecraft.client.Minecraft;
 
 import net.narutomod.*;
 import net.narutomod.entity.EntityBijuManager;
+import net.narutomod.potion.PotionChakraEnhancedStrength;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureUpdateworldtick;
@@ -211,6 +213,9 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		}
 
 		protected boolean executeJutsu(ItemStack stack, EntityLivingBase entity, float power) {
+			if (entity.isPotionActive(PotionUsingJutsu.potion)) {
+				return false;
+			}
 			JutsuEnum jutsuEnum = this.getCurrentJutsu(stack);
 			Chakra.Pathway pw = Chakra.pathway(entity);
 			double d = jutsuEnum.chakraUsage * power;
@@ -255,6 +260,9 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void onUsingTick(ItemStack stack, EntityLivingBase player, int timeLeft) {
+			if (player.isPotionActive(PotionUsingJutsu.potion)) {
+				timeLeft = 72000;
+			}
 			if (!player.world.isRemote && (!(player instanceof EntityPlayer) || PlayerTracker.isNinja((EntityPlayer)player))) {
 				this.getCurrentJutsu(stack).jutsu.onUsingTick(stack, player, this.getPower(stack, player, timeLeft));
 			}

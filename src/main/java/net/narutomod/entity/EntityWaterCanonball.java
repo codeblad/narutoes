@@ -71,8 +71,8 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 			super(shooter);
 			this.setOGSize(0.3125F, 0.3125F);
 			this.setEntityScale(0.1f);
-			this.fullScale = power * 4f;
-			this.explosionSize = (int)(power * 2.5f);
+			this.fullScale = power * 3.5f;
+			this.explosionSize = (int)(power * 2.0f);
 			this.mult = 0.5f+2.75f*(power/5);
 			this.damage = 7+mult*ItemJutsu.getDmgMult(this.shootingEntity)*2.5f;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter, ItemSuiton.block);

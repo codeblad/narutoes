@@ -39,7 +39,7 @@ import javax.annotation.Nullable;
 public class EntitySandGathering extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 430;
 	public static final int ENTITYID_RANGED = 431;
-	private static final float SCALE = 8f;
+	private static final float SCALE = 12f;
 
 	public EntitySandGathering(ElementsNarutomodMod instance) {
 		super(instance, 858);
@@ -56,7 +56,7 @@ public class EntitySandGathering extends ElementsNarutomodMod.ModElement {
 		private final int duration = 300;
 		private EntityLivingBase summoner;
 		private ItemJiton.SwarmTarget sandCloud;
-		private final int waitTime = 40;
+		private final int waitTime = 20;
 		private boolean riseAgain;
 		private double accelX;
 		private double accelY;
@@ -246,7 +246,7 @@ public class EntitySandGathering extends ElementsNarutomodMod.ModElement {
 					RayTraceResult res = ProcedureUtils.raytraceBlocks(entity, 150d);
 					if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK) {
 						((EC)entity1).shoot(res.hitVec.subtract(entity1.getPositionVector()));
-						ItemJutsu.setCurrentJutsuCooldown(stack, (long) (60));
+						ItemJutsu.setCurrentJutsuCooldown(stack, (long) (40));
 					}
 					return false;
 				}

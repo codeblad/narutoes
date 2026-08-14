@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -27,6 +28,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundCategory;
 
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.event.EventSphericalExplosion;
 import net.narutomod.ElementsNarutomodMod;
@@ -109,6 +111,8 @@ public class EntityC0 extends ElementsNarutomodMod.ModElement {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 			}
 			if (!this.world.isRemote) {
+
+				this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 				if (this.ticksExisted > this.startupTime ) {
 				if (this.effectEntity == null) {
 					world.playSound(null, this.user.posX, this.user.posY, this.user.posZ, net.minecraft.util.SoundEvent.REGISTRY

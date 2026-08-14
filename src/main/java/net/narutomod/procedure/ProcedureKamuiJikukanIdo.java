@@ -2,6 +2,7 @@ package net.narutomod.procedure;
 
 import net.narutomod.*;
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.world.WorldKamuiDimension;
 import net.narutomod.item.ItemMangekyoSharinganObito;
 import net.narutomod.gui.overlay.OverlayByakuganView;
@@ -92,6 +93,9 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 				chakraUsage = (double) ItemMangekyoSharinganObito.getIntangibleChakraUsage((EntityLivingBase) entity);;
 				f2 = (boolean) (((is_pressed) && ((timer) <= 20*5)) && ((chakraAmount) > (chakraUsage)));
 				if ((f2)) {
+					if (entity instanceof EntityPlayer && !entity.world.isRemote) {
+						((EntityPlayer) entity).addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
 					ProcedureUtils.purgeHarmfulEffects((EntityLivingBase) entity);
 					ProcedureOnLivingUpdate.setUntargetable(entity, 3);
 					entity.fallDistance = (float) (0);
