@@ -1,0 +1,46 @@
+{
+  "group": "narutomod",
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "0 2",
+    "345",
+    "678"
+  ],
+  "key": {
+    "0": {
+      "item": "minecraft:wool",
+      "data": 14
+    },
+    "2": {
+      "item": "minecraft:wool",
+      "data": 14
+    },
+    "3": {
+      "item": "minecraft:wool",
+      "data": 7
+    },
+    "4": {
+      "item": "minecraft:leather_chestplate"
+    },
+    "5": {
+      "item": "minecraft:wool",
+      "data": 7
+    },
+    "6": {
+      "item": "minecraft:wool",
+      "data": 14
+    },
+    "7": {
+      "item": "minecraft:wool",
+      "data": 14
+    },
+    "8": {
+      "item": "minecraft:wool",
+      "data": 14
+    }
+  },
+  "result": {
+    "item": "narutomod:narutomod:steam_armorlegs",
+    "count": 1
+  }
+}
