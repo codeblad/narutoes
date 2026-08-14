@@ -101,7 +101,7 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 					this.airStream.execute2(this.user, this.power, this.bulletSize / 3);
 				}
 			}
-			if (!this.world.isRemote && (this.ticksExisted > (this.maxDuration * 1.25) || this.user == null || !this.user.isEntityAlive())) {
+			if (!this.world.isRemote && (this.ticksExisted > (this.maxDuration * 1.4f) || this.user == null || !this.user.isEntityAlive())) {
 				this.setDead();
 			}
 		}

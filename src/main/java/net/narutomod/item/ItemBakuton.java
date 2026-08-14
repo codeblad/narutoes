@@ -221,7 +221,7 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 					// 	300,
 					// 	entity.posX, entity.posY + entity.height * 0.4, entity.posZ
 					// );
-					ItemJutsu.setCurrentJutsuCooldown(stack,1728000);
+					ItemJutsu.setCurrentJutsuCooldown(stack,24000);
 				
 				//if (ec != null) {
 					ec.setLocationAndAngles(vec.x, vec.y, vec.z, entity.rotationYaw, 0f);
