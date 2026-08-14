@@ -89,12 +89,17 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
-			if (!world.isRemote && entity instanceof EntityLivingBase) {
+			if (!world.isRemote && entity instanceof EntityLivingBase && entity.ticksExisted % 10 == 0) {
 				boolean flag = false;
 				if (entity.getEntityData().getInteger("KekkeiGenkai") == 22) {
 					flag = true;
 				}
 				this.enableJutsu(itemstack, CHAKRAMODE, flag);
+				if (!this.isAffinity(itemstack)) {
+					this.enableJutsu(itemstack, KIRIN, false);
+					this.enableJutsu(itemstack, BLACKPANTHER, false);
+				}
+
 			}
 		}
 	}

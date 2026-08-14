@@ -80,7 +80,20 @@ public class ItemSuiton extends ElementsNarutomodMod.ModElement {
 			//this.defaultCooldownMap[WATERBULLET.index] = 0;
 		}
 
+		@Override
+		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
+			super.onUpdate(itemstack, world, entity, par4, par5);
+			if (!world.isRemote && entity instanceof EntityLivingBase && entity.ticksExisted % 10 == 0) {
+				if (!this.isAffinity(itemstack)) {
+					this.enableJutsu(itemstack, HIDINGINMIST, false);
+					this.enableJutsu(itemstack, WATERDRAGON, false);
+				}
+
+			}
+		}
+
 	}
+
 
 	public static class EntityMist extends Entity implements ItemJutsu.IJutsu {
 		private static final UUID FOLLOW_MODIFIER = UUID.fromString("7c3e5536-e32d-4ef7-8cf2-e5ef57f9d48f");

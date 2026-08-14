@@ -84,7 +84,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
-			if (!world.isRemote && entity instanceof EntityPlayer && entity.ticksExisted % 10 == 3) {
+			if (!world.isRemote && entity instanceof EntityPlayer && entity.ticksExisted % 10 == 0) {
 				ItemStack stack1 = ProcedureUtils.getMatchingItemStack((EntityPlayer)entity, ItemNinjutsu.block);
 				boolean rasenshurikenEnabled = this.isJutsuEnabled(itemstack, RASENSHURIKEN);
 				boolean rasenganEnabled = stack1 != null && ((ItemNinjutsu.RangedItem)stack1.getItem())
@@ -97,6 +97,12 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 						((EntityPlayer)entity).sendStatusMessage(new TextComponentTranslation("chattext.jutsu.enabled", RASENSHURIKEN.getName()), false);
 					}
 				}
+
+				if (!this.isAffinity(itemstack)) {
+					this.enableJutsu(itemstack, RASENSHURIKEN, false);
+					this.enableJutsu(itemstack, VACWAVE, false);
+				}
+
 			}
 		}
 	}

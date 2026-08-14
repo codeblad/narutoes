@@ -87,6 +87,18 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			//this.defaultCooldownMap[GREATFIREBALL.index] = 0;
 			//this.defaultCooldownMap[1] = 0;
 		}
+
+		@Override
+		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
+			super.onUpdate(itemstack, world, entity, par4, par5);
+			if (!world.isRemote && entity instanceof EntityLivingBase && entity.ticksExisted % 10 == 0) {
+				if (!this.isAffinity(itemstack)) {
+					this.enableJutsu(itemstack, GFANNIHILATION, false);
+					this.enableJutsu(itemstack, BARRIER, false);
+				}
+
+			}
+		}
 	}
 
 	public static class EntityBigFireball extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {

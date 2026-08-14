@@ -116,7 +116,7 @@ public class EntityIcePrison extends ElementsNarutomodMod.ModElement {
 				if (!map.isEmpty()) {
 					new net.narutomod.event.EventSetBlocks(this.world, map, 0, 1200, false, false);
 				}
-				int i = this.ticksExisted % 2;
+				int i = this.ticksExisted % 1;
 				if (i == 0) {
 					this.target.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 600, 1));
 					this.tz++;

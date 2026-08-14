@@ -116,6 +116,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 
 		protected void setPower(float power) {
 			this.getDataManager().set(POWER, Float.valueOf(power));
+			power = 2;
 			this.setSize(this.ogWidth * power, this.ogHeight * power);
 		}
 
@@ -123,7 +124,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 		public void notifyDataManagerChange(DataParameter<?> key) {
 			super.notifyDataManagerChange(key);
 			if (POWER.equals(key) && this.world.isRemote) {
-				float scale = this.getPower();
+				float scale = 2;
 				this.setSize(this.ogWidth * scale, this.ogHeight * scale);
 			}
 		}
@@ -249,8 +250,6 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 					this.world.spawnEntity(new EntityLightningArc.Base(this.world,
 					 owner.getPositionVector().addVector(0d, this.rand.nextDouble() * 1.5d, 0d), 
 					 this.getPositionEyes(1f), 0x00000000, 0, 0f));
-				}
-				if (owner != null) {
 					Vec3d vec1 = this.getPositionVector().addVector(0d, 0.5d * this.height, 0d);
 					Vec3d vec2 = vec1.add(ProcedureUtils.getMotion(this));
 					AxisAlignedBB hitbox = new AxisAlignedBB(vec1,vec1).grow(8);
@@ -263,7 +262,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 							AxisAlignedBB hitbox2 = new AxisAlignedBB(vec1,vec1).grow(15);
 							for (Entity entity2 : this.world.getEntitiesWithinAABBExcludingEntity(this, hitbox2)) {
 								if (entity2 instanceof EntityLivingBase && entity2 != owner && !entity.equals(owner)) {
-									float damage = 20 + (1+1.25f*this.power/8) * (8f*ItemJutsu.getDmgMult(owner));
+									float damage = 20 + (1+1.5f*this.power/8) * (8f*ItemJutsu.getDmgMult(owner));
 									entity2.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, owner),damage);
 								}
 							}
