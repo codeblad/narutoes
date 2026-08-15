@@ -105,7 +105,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 		}
 
 		private void shoot(double x, double y, double z) {
-			this.shoot(x, y, z, 1.2f, 0f);
+			this.shoot(x, y, z, 1.05f, 0f);
 			this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:lightning_shoot")),
 			 100f, this.rand.nextFloat() * 0.4f + 0.8f);
 		}
@@ -255,7 +255,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 350.0f;
+				return 400.0f;
 			}
 	
 			@Override
