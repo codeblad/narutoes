@@ -662,6 +662,7 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 				executeTeleport(event.getEntityPlayer());
 		}
 
+		
 		@SideOnly(Side.CLIENT)
 		private static void executeTeleport(EntityPlayer player) {
 			Minecraft mc = Minecraft.getMinecraft();
@@ -685,10 +686,13 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 						ProcedureOnLivingUpdate.setUntargetable(player, 5);
 						AxisAlignedBB oldPlayerBox = player.getEntityBoundingBox();
 						player.setPosition(vec.x, vec.y, vec.z);
+					
 						ProcedureSync.EntityPositionAndRotation.sendToServer(player);
+						//	ItemKunaiHiraishin.checkKunaiPickup(player);
 						ProcedureSync.SoundEffectMessage.sendToServer(player.posX, player.posY, player.posZ, net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:swoosh")), net.minecraft.util.SoundCategory.NEUTRAL, 0.8f, player.getRNG().nextFloat() * 0.4f + 0.8f);
 						ProcedureSync.SoundEffectMessage.sendToServer(vec.x, vec.y, vec.z, net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:swoosh")), net.minecraft.util.SoundCategory.NEUTRAL, 0.8f, player.getRNG().nextFloat() * 0.4f + 0.8f);
 
+			
 						if (GuiScreen.isCtrlKeyDown()) {
 							int chakraUsageMulti = 0;
 							List<EntityLivingBase> entities = mc.world.getEntitiesWithinAABB(EntityLivingBase.class, oldPlayerBox.grow(1.0d));

@@ -76,14 +76,16 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 	public void initElements() {
 		elements.items.add(() -> new RangedItem());
 		elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCustom.class)
-				.id(new ResourceLocation("narutomod", "entitybulletkunai_hiraishin"), ENTITYID).name("entitybulletkunai_hiraishin")
+				.id(new ResourceLocation("narutomod", "entitybulletkunai_hiraishin"), ENTITYID)
+				.name("entitybulletkunai_hiraishin")
 				.tracker(64, 1, true).build());
 	}
 
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerModels(ModelRegistryEvent event) {
-		ModelLoader.setCustomModelResourceLocation(block, 0, new ModelResourceLocation("narutomod:kunai_hiraishin", "inventory"));
+		ModelLoader.setCustomModelResourceLocation(block, 0,
+				new ModelResourceLocation("narutomod:kunai_hiraishin", "inventory"));
 	}
 
 	@Override
@@ -115,7 +117,8 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
-		public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityLivingBase entityLivingBase, int timeLeft) {
+		public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityLivingBase entityLivingBase,
+				int timeLeft) {
 			if (!world.isRemote && entityLivingBase instanceof EntityPlayerMP) {
 				EntityPlayerMP entity = (EntityPlayerMP) entityLivingBase;
 				float power = 1f;
@@ -126,8 +129,9 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 				entityarrow.setIsCritical(false);
 				entityarrow.setDamage(7);
 				entityarrow.setKnockbackStrength(0);
-				world.playSound(null, entity.posX, entity.posY, entity.posZ, net.minecraft.init.SoundEvents.ENTITY_ARROW_SHOOT,
-				 SoundCategory.NEUTRAL, 1, 1f / (itemRand.nextFloat() * 0.5f + 1f) + (power / 2));
+				world.playSound(null, entity.posX, entity.posY, entity.posZ,
+						net.minecraft.init.SoundEvents.ENTITY_ARROW_SHOOT,
+						SoundCategory.NEUTRAL, 1, 1f / (itemRand.nextFloat() * 0.5f + 1f) + (power / 2));
 				if (entity.isCreative()) {
 					entityarrow.pickupStatus = EntityArrow.PickupStatus.CREATIVE_ONLY;
 				} else {
@@ -156,19 +160,21 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(stack, world, entity, par4, par5);
-			if (entity instanceof EntityPlayerMP && ((EntityPlayerMP)entity).isCreative()
-			 && (!stack.hasTagCompound() || !stack.getTagCompound().hasUniqueId("owner"))) {
-				setOwner(stack, (EntityPlayerMP)entity);
+			if (entity instanceof EntityPlayerMP && ((EntityPlayerMP) entity).isCreative()
+					&& (!stack.hasTagCompound() || !stack.getTagCompound().hasUniqueId("owner"))) {
+				setOwner(stack, (EntityPlayerMP) entity);
 			}
 			UUID ownerUuid = getOwnerUuid(stack);
 			if (ownerUuid != null) {
 				UUID lastMarkerUuid = stack.getTagCompound().hasUniqueId("lastMarkerUuid")
-				 ? stack.getTagCompound().getUniqueId("lastMarkerUuid") : null;
+						? stack.getTagCompound().getUniqueId("lastMarkerUuid")
+						: null;
 				if (!ownerUuid.equals(entity.getUniqueID())) {
 					if (lastMarkerUuid != null && !lastMarkerUuid.equals(entity.getUniqueID())) {
 						EntityHiraishin.updateServerMarkerMap(ownerUuid, lastMarkerUuid, null);
 					}
-					EntityHiraishin.MarkerData data = new EntityHiraishin.MarkerData(new Vector4d(entity.posX, entity.posY, entity.posZ, entity.dimension));
+					EntityHiraishin.MarkerData data = new EntityHiraishin.MarkerData(
+							new Vector4d(entity.posX, entity.posY, entity.posZ, entity.dimension));
 					data.name = entity.getDisplayName().getFormattedText();
 					data.targetId = entity.getEntityId();
 					EntityHiraishin.updateServerMarkerMap(ownerUuid, entity.getUniqueID(), data);
@@ -198,11 +204,12 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EntityCustom extends EntityArrow {
-		private static final DataParameter<ItemStack> ITEM = EntityDataManager.<ItemStack>createKey(EntityCustom.class, DataSerializers.ITEM_STACK);
+		private static final DataParameter<ItemStack> ITEM = EntityDataManager.<ItemStack>createKey(EntityCustom.class,
+				DataSerializers.ITEM_STACK);
 		private boolean noUpdate;
-		private int pickupDelay = 60;
+		private int pickupDelay = 21;
 		private int lastCollideTime;
-		
+
 		public EntityCustom(World a) {
 			super(a);
 		}
@@ -218,14 +225,14 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 			this.getDataManager().register(ITEM, ItemStack.EMPTY);
 		}
 
-	    public ItemStack getItem() {
-	        return (ItemStack)this.getDataManager().get(ITEM);
-	    }
-	
-	    public void setItem(ItemStack stack) {
-	        this.getDataManager().set(ITEM, stack);
-	        this.getDataManager().setDirty(ITEM);
-	    }
+		public ItemStack getItem() {
+			return (ItemStack) this.getDataManager().get(ITEM);
+		}
+
+		public void setItem(ItemStack stack) {
+			this.getDataManager().set(ITEM, stack);
+			this.getDataManager().setDirty(ITEM);
+		}
 
 		@Nullable
 		public UUID getOwnerId() {
@@ -236,7 +243,7 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 		@Nullable
 		public EntityPlayerMP getOwner() {
 			UUID uuid = this.getOwnerId();
-			//return uuid == null ? null : this.world.getPlayerEntityByUUID(uuid);
+			// return uuid == null ? null : this.world.getPlayerEntityByUUID(uuid);
 			return uuid == null ? null : ProcedureUtils.getPlayerMatchingUuid(uuid);
 		}
 
@@ -260,7 +267,7 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			if (this.inGround && this.getOwnerId() != null
-			 && (int)ReflectionHelper.getPrivateValue(EntityArrow.class, this, 12) > 1198) {
+					&& (int) ReflectionHelper.getPrivateValue(EntityArrow.class, this, 12) > 1198) {
 				ReflectionHelper.setPrivateValue(EntityArrow.class, this, 1, 12); // this.ticksInGround
 			}
 			if (!this.world.isRemote && !this.isDead) {
@@ -270,7 +277,8 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 				} else if (!this.noUpdate) {
 					Vec3d vec = this.getPositionVector();
 					Vector4d vec4d = new Vector4d(vec.x, vec.y, vec.z, this.dimension);
-					EntityHiraishin.updateServerMarkerMap(owner.getUniqueID(), this.getUniqueID(), new EntityHiraishin.MarkerData(vec4d));
+					EntityHiraishin.updateServerMarkerMap(owner.getUniqueID(), this.getUniqueID(),
+							new EntityHiraishin.MarkerData(vec4d));
 					if (this.inGround) {
 						this.noUpdate = true;
 					}
@@ -282,7 +290,7 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 		public void onCollideWithPlayer(EntityPlayer entityIn) {
 			if (!this.world.isRemote && this.inGround && this.arrowShake <= 0) {
 				if (this.timeInGround - this.lastCollideTime > 20) {
-					this.pickupDelay = 60;
+					this.pickupDelay = 21;
 				}
 				if (this.pickupDelay <= 0) {
 					super.onCollideWithPlayer(entityIn);
@@ -294,29 +302,77 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
+		private boolean isOwner(Entity entity) {
+			UUID ownerUuid = this.getOwnerId();
+			return ownerUuid != null
+					&& ownerUuid.equals(entity.getUniqueID());
+		}
+
 		@Override
 		protected void onHit(RayTraceResult result) {
-			if (result.entityHit == null || !this.world.isRemote) {
-				super.onHit(result);
+			if (!this.world.isRemote && result.entityHit != null) {
+
+				if (this.isOwner(result.entityHit)) {
+					EntityPlayerMP owner = this.getOwner();
+
+					if (owner != null) {
+						ItemStack kunai = this.getItem().copy();
+
+						if (!owner.inventory.addItemStackToInventory(kunai)) {
+							owner.dropItem(kunai, false);
+						}
+					}
+
+					this.setDead();
+					return;
+				}
 			}
+
+			super.onHit(result);
 		}
 
 		@Override
 		protected void arrowHit(EntityLivingBase living) {
+			if (this.isOwner(living)) {
+				EntityPlayerMP owner = this.getOwner();
+
+				if (owner != null) {
+					ItemStack kunai = this.getItem().copy();
+
+					if (!owner.inventory.addItemStackToInventory(kunai)) {
+						owner.dropItem(kunai, false);
+					}
+
+					this.setDead();
+				}
+
+				return;
+			}
+
 			super.arrowHit(living);
+
 			living.setArrowCountInEntity(living.getArrowCountInEntity() - 1);
+
 			if (living instanceof EntityPlayer) {
-				ItemHandlerHelper.giveItemToPlayer((EntityPlayer)living, this.getItem());
+				ItemHandlerHelper.giveItemToPlayer(
+						(EntityPlayer) living,
+						this.getItem());
 			} else {
 				EntityPlayerMP owner = this.getOwner();
+
 				if (owner != null) {
 					RayTraceResult rtr = living.getEntityBoundingBox()
-					 .calculateIntercept(this.getPositionVector(), living.getPositionVector()
-					 .addVector(0d, 0.5d * living.height, 0d));
+							.calculateIntercept(
+									this.getPositionVector(),
+									living.getPositionVector()
+											.addVector(0d, 0.5d * living.height, 0d));
+
 					if (rtr != null) {
 						rtr.entityHit = living;
 						rtr.typeOfHit = RayTraceResult.Type.ENTITY;
-						this.world.spawnEntity(new EntityHiraishin.EC(owner, rtr));
+
+						this.world.spawnEntity(
+								new EntityHiraishin.EC(owner, rtr));
 					}
 				}
 			}
@@ -350,11 +406,12 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 		public Renderer() {
 			instance = this;
 		}
-		
+
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void register() {
-			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class, renderManager -> new RenderCustom(renderManager));
+			RenderingRegistry.registerEntityRenderingHandler(EntityCustom.class,
+					renderManager -> new RenderCustom(renderManager));
 		}
 
 		@SideOnly(Side.CLIENT)
@@ -369,12 +426,15 @@ public class ItemKunaiHiraishin extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
-			public void doRender(EntityCustom entity, double x, double y, double z, float entityYaw, float partialTicks) {
+			public void doRender(EntityCustom entity, double x, double y, double z, float entityYaw,
+					float partialTicks) {
 				GlStateManager.pushMatrix();
-				GlStateManager.translate((float)x, (float)y, (float)z);
+				GlStateManager.translate((float) x, (float) y, (float) z);
 				GlStateManager.enableRescaleNormal();
 				GlStateManager.rotate(entityYaw - 90.0F, 0.0F, 1.0F, 0.0F);
-				GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, 0.0F, 0.0F, 1.0F);
+				GlStateManager.rotate(
+						entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks,
+						0.0F, 0.0F, 1.0F);
 				this.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 				if (this.renderOutlines) {
 					GlStateManager.enableColorMaterial();
