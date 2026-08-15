@@ -4,7 +4,7 @@ package net.narutomod.item;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.*;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.common.ticket.AABBTicket;
@@ -18,9 +18,6 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraft.world.World;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
 import net.minecraft.entity.player.EntityPlayer;
@@ -182,7 +179,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 
 						for (double i = 0; i < distance; i+=distance/8) {
 							Vec3d point = this.start.add(look.scale(i));
-							AxisAlignedBB hitbox = new AxisAlignedBB(point,point).grow(4);
+							AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(4);
 							for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
 								if (!(entity1 instanceof EntityLiving)) {
 									continue;
@@ -309,7 +306,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 
 
 						Vec3d point = this.end;
-						AxisAlignedBB hitbox = new AxisAlignedBB(point,point).grow(16);
+						AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(16);
 						boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
 						this.world.newExplosion(this.user, this.end.x, this.end.y, this.end.z, 6, false, flag);
 						for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
@@ -381,7 +378,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				this.user.addPotionEffect(new PotionEffect(PotionHeaviness.potion, this.delay/3, 4, false, false));
 				Vec3d point = this.user.getPositionVector().add(this.user.getLookVec().scale(4));
-				AxisAlignedBB hitbox = new AxisAlignedBB(point,point).grow(4);
+				AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(4);
 
 				for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
 					if (!(entity1 instanceof EntityLiving)) {
@@ -432,7 +429,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 								1.5f, this.rand.nextFloat() * 0.3f + .4f);
 						this.playSound(SoundEvents.ENTITY_LIGHTNING_IMPACT, 1.5f, this.rand.nextFloat() * 0.2f + 1f);
 
-						AxisAlignedBB hitbox = new AxisAlignedBB(targetPos,targetPos).grow(15);
+						AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(targetPos)).grow(15);
 						boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
 						setLightningAt(targetPos.subtract(0,8,0),targetPos.addVector(0,40,0),0.5f,40);
 						for (int i = 0; i < 12; i+=1) {
