@@ -58,7 +58,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
-		private final int wait = 20;
+		private final int wait = 30;
 		private Vec3d shootVec;
 		private float prevHeadYaw;
 		private float prevHeadPitch;
@@ -101,7 +101,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 				ProcedureUtils.Vec2f v2f = ProcedureUtils.getYawPitchFromVec(vec);
 				this.setRotation(v2f.x, v2f.y);
 			}
-			this.motionY -= this.ticksAlive <= this.wait / 2 ? 0.06d : 0.0d;
+			this.motionY -= this.ticksAlive <= this.wait / 2 ? 0.03d : 0.0d;
 		}
 
 		private void shoot(double x, double y, double z) {
