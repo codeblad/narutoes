@@ -45,6 +45,7 @@ import net.minecraft.potion.PotionEffect;
 
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.ModConfig;
 import net.narutomod.entity.*;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
@@ -68,7 +69,7 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum AMENOTEJIKARA = new ItemJutsu.JutsuEnum(4, "item.ninjutsu.amenotejikara", 'S', 50d, new Amenotejikara());
 	public static final ItemJutsu.JutsuEnum PUPPET = new ItemJutsu.JutsuEnum(5, "tooltip.ninjutsu.puppetjutsu", 'C', 0.5d, new EntityPuppet.Base.Jutsu());
 	public static final ItemJutsu.JutsuEnum BUGSWARM = new ItemJutsu.JutsuEnum(6, "bugball", 'C', 100d, new EntityKikaichu.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum INVISABILITY = new ItemJutsu.JutsuEnum(7, "tooltip.ninjutsu.hidingincamouflage", 'A', 200d, new HidingWithCamouflage());
+	public static final ItemJutsu.JutsuEnum INVISABILITY = new ItemJutsu.JutsuEnum(7, "tooltip.ninjutsu.hidingincamouflage", 'A', 150d, new HidingWithCamouflage());
 	public static final ItemJutsu.JutsuEnum TRANSFORM = new ItemJutsu.JutsuEnum(8, "transformation_jutsu", 'D', 50d, new EntityTransformationJutsu.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum HIRAISHIN = new ItemJutsu.JutsuEnum(9, "hiraishin", 'S', 10d, new EntityHiraishin.EC.Jutsu());
 
@@ -122,12 +123,21 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
-			if (!world.isRemote && entity.ticksExisted % 20 == 0
-			 && entity instanceof EntityLivingBase && INVISABILITY.jutsu.isActivated(itemstack)) {
-				if (Chakra.pathway((EntityLivingBase)entity).consume(INVISABILITY.chakraUsage)) {
+
+			if (!world.isRemote && entity.ticksExisted % 20 == 0 && entity instanceof EntityLivingBase && INVISABILITY.jutsu.isActivated(itemstack)) {
+				Chakra.Pathway chakra = Chakra.pathway((EntityLivingBase)entity);
+
+				boolean enoughChakra = chakra.consume(INVISABILITY.chakraUsage);
+
+				if (enoughChakra) {
+					enoughChakra = chakra.consume((ModConfig.CHAKRA_REGEN_RATE + 0.001f) * 6f);
+				}
+
+				if (enoughChakra) {
 					((EntityLivingBase)entity).addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, 21, 0, false, false));
 				} else {
 					HidingWithCamouflage.deactivate(itemstack);
+					((EntityLivingBase)entity).removePotionEffect(MobEffects.INVISIBILITY);
 				}
 			}
 		}

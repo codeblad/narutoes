@@ -92,7 +92,9 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			this.shootingEntity.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+			if (this.shootingEntity != null) {
+				this.shootingEntity.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+			}
 			if (!this.world.isRemote) {
 				if (this.ticksExisted == 1) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:windblast")), 0.8f, 0.4f + this.rand.nextFloat() * 0.9f);
@@ -114,12 +116,21 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 							vec = vec.subtract(this.rotationYaw, this.rotationPitch);
 				            if (Math.abs(vec.x) <= 90f && Math.abs(vec.y) <= 90f) {
 							 	entity.hurtResistantTime = 10;
-								float damage = 6+0.8f*(1+0.4f*(this.power/10))* ItemJutsu.getDmgMult(this.shootingEntity);
-								ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemFuton.block);
-								if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-									damage*=1.35f;
+								float damage = 6+0.8f*(1+0.4f*(this.power/10));
+								if (this.shootingEntity != null) {
+									damage *= ItemJutsu.getDmgMult(this.shootingEntity);
+
+									ItemStack stack = null;
+									if (this.shootingEntity instanceof EntityLivingBase) {
+										stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemFuton.block);
+									}
+
+									if (stack != null && stack.hasTagCompound() && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+										damage *= 1.35f;
+									}
+
+									entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);
 								}
-								entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);
 				            }
 						}
 					}
