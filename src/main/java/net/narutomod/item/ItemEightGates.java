@@ -708,7 +708,8 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						}
 						this.end = this.start.add(look.scale(1));
 
-						AxisAlignedBB hitbox = new AxisAlignedBB(this.end,this.end).grow(3);
+
+						AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.end)).grow(3);
 						for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
 							if (!(entity1 instanceof EntityLiving)) {
 								continue;
@@ -806,7 +807,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						if (this.ticksExisted == this.ticksExisted/2) {
 							this.targets = new ArrayList<String>();
 						}
-						AxisAlignedBB hitbox = new AxisAlignedBB(this.end,this.end).grow(6);
+						AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.end)).grow(6);
 						for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
 							if (!(entity1 instanceof EntityLiving)) {
 								continue;
@@ -877,7 +878,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				this.user = user;
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				Vec3d point = this.user.getPositionVector().add(this.user.getLookVec().scale(1));
-				AxisAlignedBB hitbox = new AxisAlignedBB(point,point).grow(3);
+				AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(3);
 
 				for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
 					if (!(entity1 instanceof EntityLiving)) {
@@ -1144,7 +1145,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 
 							for (int i = 0; i < 4; i++) {
 								this.end = this.start.add(look.scale(1+4*i));
-								AxisAlignedBB hitbox = new AxisAlignedBB(this.end,this.end).grow(5);
+								AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.end)).grow(5);
 								for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
 									if (!(entity1 instanceof EntityLiving)) {
 										continue;

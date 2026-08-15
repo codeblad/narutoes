@@ -18,6 +18,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldServer;
@@ -172,7 +173,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 				if (this.ticksExisted < 15) {
 					for (double i = 0; i < 3; i++) {
 						Vec3d point = this.start.addVector(0,1,0).add(look.scale(i));
-						AxisAlignedBB hitbox = new AxisAlignedBB(point,point).grow(2);
+						AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(2);
 						((WorldServer)this.world).spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, point.x, point.y, point.z, 1, 0d, 0d, 0d, 0d);
 						for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
 							if (!(entity1 instanceof EntityLiving)) {
@@ -245,7 +246,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 			}
 			boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
 			this.world.newExplosion(this.user, point.x, point.y, point.z, 3, false, flag);
-			AxisAlignedBB hitbox = new AxisAlignedBB(point,point).grow(5.5);
+			AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(5.5);
 			for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
 				if (!(entity1 instanceof EntityLiving)) {
 					continue;
