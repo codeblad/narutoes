@@ -183,7 +183,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			}
 			if (!this.world.isRemote) {
 				if (this.shootingEntity != null) {
-					this.shootingEntity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 20d);
+					this.shootingEntity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 5d);
 				}
 				if (result.entityHit != null && (result.entityHit.equals(this.shootingEntity)
 				 || (result.entityHit instanceof EntityBigFireball && ((EntityBigFireball)result.entityHit).shootingEntity == this.shootingEntity))) {
@@ -249,7 +249,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					this.createJutsu(entity, entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power,
 					 stack.getItem() instanceof RangedItem && ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) <= 0.5f);
 					//if (entity instanceof EntityPlayer)
-					ItemJutsu.setCurrentJutsuCooldown(stack,10);
+					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (20+(power/20)*3));
 					return true;
 				}
 				return false;

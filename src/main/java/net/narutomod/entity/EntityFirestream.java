@@ -72,10 +72,10 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			this(shooterIn.world);
 			this.shooter = shooterIn;
 			this.setIdlePosition();
-			this.width = MathHelper.clamp(widthIn,1,15);
-			this.range = MathHelper.clamp(rangeIn,45,500);
-			float mult = 1f+2f*(((float) powa)/25);
-			this.damage = 4+ItemJutsu.getDmgMult(shooterIn)*1.6f*mult;
+			this.width = MathHelper.clamp(widthIn,1,25);
+			this.range = MathHelper.clamp(rangeIn,45,700);
+			float mult = 0.75f+1.5f*(((float) powa)/25);
+			this.damage = 4F+ItemJutsu.getDmgMult(shooterIn)*1.6f*mult;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter, ItemKaton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				damage*=1.35f;
@@ -149,7 +149,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				 vec3d.x, vec3d.y, vec3d.z, this.flameColor, 2.5f, this.damage));
 			}
 			Particles.Renderer particles = new Particles.Renderer(this.world);
-			for (int i = 0; i < (int)(range * radius * 0.3d); i++) {
+			for (int i = 0; i < (int)(range * radius * 0.15d); i++) {
 				Vec3d vec3d = Vec3d.fromPitchYaw(directionPitch + (float)((this.rand.nextDouble()-0.5d) * angle * 6.0d),
 				 directionYaw + (float)((this.rand.nextDouble()-0.5d) * angle * 3.0d)).scale(range * 0.1d);
 				particles.spawnParticles(Particles.Types.FLAME, this.posX, this.posY, this.posZ, 1, 0, 0, 0,
@@ -198,7 +198,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 				SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:katon_gokamekeku")),
 				SoundCategory.NEUTRAL, 5, 1f);
-				EC ec =new EC(entity, power * 0.8, power * 2.5, power);
+				EC ec =new EC(entity, power * 0.9, power * 2.65, power);
 				ec.setFlameColor(color);
 				entity.world.spawnEntity(ec);
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
@@ -248,7 +248,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 
 			public EC createJutsu(EntityLivingBase entity, float power, int duration, int color) {
 				EC entity1 = new EC(entity, 1.5f, power*1.5, power);
-				entity1.setDamage(0.6f);
+				entity1.setDamage(0.75f);
 				entity1.wait = 0;
 				entity1.maxLife = duration;
 				entity1.setFlameColor(color);
