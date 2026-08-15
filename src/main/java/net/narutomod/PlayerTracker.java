@@ -314,7 +314,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (headstack.getItem() == ItemByakugan.helmet) {
 					if (PlayerTracker.getBattleXp((EntityPlayer) targetEntity) >= NarutomodModVariables.SAGEEXP) {
-						defMult += 25;
+						defMult += .25;
 					} else {
 						defMult += .15f;
 					}
