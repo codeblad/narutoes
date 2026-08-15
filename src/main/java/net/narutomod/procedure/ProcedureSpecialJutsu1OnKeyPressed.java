@@ -155,24 +155,6 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 					ProcedureKamuiJikukanIdo.executeProcedure($_dependencies);
 				}
 			}
-		} else if (((helmet).getItem() == new ItemStack(ItemByakugan.helmet, (int) (1)).getItem())) {
-			{
-				NBTTagCompound nbt = new NBTTagCompound();
-				entity.writeToNBT(nbt);
-
-				if (hasSlot(nbt, 2)) {
-					ProcedureUtils.sendStatusMessage((EntityPlayer) entity, "You are blindfolded.", false);
-					return;
-				}
-				Map<String, Object> $_dependencies = new HashMap<>();
-				$_dependencies.put("is_pressed", is_pressed);
-				$_dependencies.put("entity", entity);
-				$_dependencies.put("x", x);
-				$_dependencies.put("y", y);
-				$_dependencies.put("z", z);
-				$_dependencies.put("world", world);
-				ProcedureByakuganActivate.executeProcedure($_dependencies);
-			}
 		} else if (EntityBijuManager.cloakLevel((EntityPlayer) entity) == 3) {
 			EntityTailedBeast.Base biju = EntityBijuManager.getBijuOfPlayerInWorld((EntityPlayer) entity);
 			if (((is_pressed))) {

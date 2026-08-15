@@ -292,6 +292,8 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "hell_stab")));
 		sounds.put(new ResourceLocation("narutomod", "dynamic_entry"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "dynamic_entry")));
+		sounds.put(new ResourceLocation("narutomod", "mountain_crusher"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "mountain_crusher")));
 		sounds.put(new ResourceLocation("narutomod", "leaf_hurricane"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "leaf_hurricane")));
 		sounds.put(new ResourceLocation("narutomod", "primary_lotus"),

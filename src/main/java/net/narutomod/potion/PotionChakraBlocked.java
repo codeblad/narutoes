@@ -20,10 +20,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 @ElementsNarutomodMod.ModElement.Tag
-public class PotionUsingJutsu extends ElementsNarutomodMod.ModElement {
-	@GameRegistry.ObjectHolder("narutomod:using_jutsu")
+public class PotionChakraBlocked extends ElementsNarutomodMod.ModElement {
+	@GameRegistry.ObjectHolder("narutomod:chakra_blocked")
 	public static final Potion potion = null;
-	public PotionUsingJutsu(ElementsNarutomodMod instance) {
+	public PotionChakraBlocked(ElementsNarutomodMod instance) {
 		super(instance, 383);
 	}
 
@@ -35,8 +35,8 @@ public class PotionUsingJutsu extends ElementsNarutomodMod.ModElement {
 		private final ResourceLocation potionIcon;
 		public PotionCustom() {
 			super(true, -16724788);
-			setRegistryName("using_jutsu");
-			setPotionName("effect.using_jutsu");
+			setRegistryName("chakra_blocked");
+			setPotionName("effect.chakra_blocked");
 			potionIcon = new ResourceLocation("narutomod:textures/mob_effect/paralysis.png");
 		}
 
@@ -68,7 +68,7 @@ public class PotionUsingJutsu extends ElementsNarutomodMod.ModElement {
 				$_dependencies.put("world", world);
 				//ProcedureParalysisOnPotionActiveTick.executeProcedure($_dependencies);
 				if (entity instanceof  EntityPlayer) {
-					ProcedureOnLivingUpdate.disableMouseClicks((EntityPlayer) entity, 2);
+					//ProcedureOnLivingUpdate.disableMouseClicks((EntityPlayer) entity, 2);
 				}
 			}
 		}

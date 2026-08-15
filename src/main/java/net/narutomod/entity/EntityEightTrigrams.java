@@ -83,7 +83,6 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 			this.isImmuneToFire = true;
 			this.ignoreFrustumCheck = true;
 			this.setEntityInvulnerable(true);
-			this.canDie = false;
 			this.ownerPlayer = null;
 			this.effectRadius = 8d;
 			this.effectDuration = 120;
@@ -92,9 +91,6 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 		public EntityCustom(EntityLivingBase userIn) {
 			this(userIn.world);
 			this.setOwnerPlayer(userIn);
-			if (ItemIryoJutsu.POWERMODE.jutsu.isActivated(userIn)) {
-				ItemIryoJutsu.POWERMODE.jutsu.deactivate(userIn);
-			}
 			this.setLocationAndAngles(userIn.posX, userIn.posY, userIn.posZ, 0.0f, 0.0f);
 		}
 
@@ -108,63 +104,18 @@ public class EntityEightTrigrams extends ElementsNarutomodMod.ModElement {
 
 		public void setOwnerPlayer(EntityLivingBase player) {
 			this.ownerPlayer = player;
-			ProcedureSync.EntityNBTTag.setAndSync(player, JUTSUACTIVEKEY, true);
-			//player.getEntityData().setBoolean(JUTSUACTIVEKEY, true);
 		}
 
-		@Override
-		public boolean attackEntityFrom(DamageSource source, float amount) {
-			return false;
-		}
 
 		@Override
 		public void setDead() {
-			if (this.canDie) {
-				if (this.ownerPlayer != null) {
-					ProcedureSync.EntityNBTTag.removeAndSync(this.ownerPlayer, JUTSUACTIVEKEY);
-					//this.ownerPlayer.getEntityData().removeTag(JUTSUACTIVEKEY);
-				}
-				super.setDead();
-			}
+			super.setDead();
 		}
 
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (!this.world.isRemote) {
-				if (this.ticksExisted == 2) {
-					//ProcedureRenderView.setFogColor(this, this.effectRadius, true, 0.0F, 0.0F, 0.0F);
-					for (EntityPlayer player : this.world.getEntitiesWithinAABB(EntityPlayer.class, this.getEntityBoundingBox().grow(this.effectRadius))) {
-						if (!this.pMap.containsKey(player)) {
-							ProcedureRenderView.changeFog(player, 1, 100, 0, 0.0F, 0.0F, 0.0F, 0.0F);
-							//ProcedureSync.RenderDistance.sendToSelf((EntityPlayerMP)player, VIEW_DISTANCE, this);
-						}
-					}
-				}
-
-				if (this.ticksExisted > 3 && this.ticksExisted < 20)
- {
-					ProcedureAoeCommand.set(this, 0.0D, this.effectRadius).exclude(this.ownerPlayer).effect(PotionHeaviness.potion, 30, 4, true)
-					 .effect(MobEffects.WEAKNESS, 30, 255, true).effect(MobEffects.MINING_FATIGUE, 15, 5, true);
-				}
-				if (this.ownerPlayer instanceof EntityPlayer) {
-					//((EntityPlayer)this.ownerPlayer).sendStatusMessage(new TextComponentString(I18n.translateToLocal("tooltip.byakugan.jutsu2")), true);
-					if (this.ticksExisted % 40 == 4) {
-						this.ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 
-						 50, (int) (( 2 + ((ItemJutsu.getNinjaMult(this.ownerPlayer)*1.2f) * (1+3.5f*((float) this.ticksExisted /120)))/3 ))));
-						this.ownerPlayer.addPotionEffect(new PotionEffect(MobEffects.HASTE, 50, 3));
-					}
-				}
-				if (this.ticksExisted == 100) {
-					//ProcedureRenderView.setFogColor(this, 128.0D, false, 0.0F, 0.0F, 0.0F);
-					for (Map.Entry<EntityPlayer, Integer> entry : this.pMap.entrySet()) {
-						ProcedureSync.RenderDistance.sendToSelf((EntityPlayerMP)entry.getKey(), entry.getValue(), null);
-		            }
-				}
-			}
-			if (this.ticksExisted > this.effectDuration
-			 || (!this.world.isRemote && (this.ownerPlayer == null || !this.ownerPlayer.isEntityAlive()))) {
-				this.canDie = true;
+			if ( (!this.world.isRemote && (this.ownerPlayer == null || !this.ownerPlayer.isEntityAlive()))) {
 				this.setDead();
 			}
 		}

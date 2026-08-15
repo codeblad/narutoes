@@ -1,5 +1,7 @@
 package net.narutomod.item;
 
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
@@ -94,6 +96,9 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onArmorTick(World world, EntityPlayer entity, ItemStack itemstack) {
 			super.onArmorTick(world, entity, itemstack);
+			if (!world.isRemote) {
+				entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 3, false, false));
+			}
 			int x = (int) entity.posX;
 			int y = (int) entity.posY;
 			int z = (int) entity.posZ;

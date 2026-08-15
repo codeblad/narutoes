@@ -40,6 +40,7 @@ public class PotionCorrosion extends ElementsNarutomodMod.ModElement {
 			potionIcon = new ResourceLocation("narutomod:textures/mob_effect/corrosion.png");
 		}
 
+
 		@Override
 		public boolean isInstant() {
 			return false;

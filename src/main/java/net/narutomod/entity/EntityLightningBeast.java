@@ -198,9 +198,11 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote) {
 				owner.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 			}
-			if (!this.world.isRemote && this.ticksExisted % 4 == 0 && owner != null) {
-				this.world.spawnEntity(new EntityLightningArc.Base(this.world, owner.getPositionEyes(1f), 
-				 this.getPositionEyes(1f), 0xC00000FF, 1, 0f));
+			if (!this.world.isRemote && this.ticksExisted % 1 == 0 && owner != null) {
+				EntityLightningArc.Base lightning = new EntityLightningArc.Base(this.world, owner.getPositionVector().addVector(0d, this.rand.nextDouble() * 1.5d, 0d),
+						this.getPositionEyes(1f), 0xC00000FF, 1, 0f);
+				lightning.setThickness(0.02f);
+				this.world.spawnEntity(lightning);
 			}
 			if (owner != null) {
 				Vec3d vec1 = this.getPositionVector().addVector(0d, 0.5d * this.height, 0d);

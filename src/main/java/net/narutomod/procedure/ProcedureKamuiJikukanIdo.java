@@ -91,6 +91,10 @@ public class ProcedureKamuiJikukanIdo extends ElementsNarutomodMod.ModElement {
 					return;
 				}
 				chakraUsage = (double) ItemMangekyoSharinganObito.getIntangibleChakraUsage((EntityLivingBase) entity);;
+				boolean usingJutsu = ((EntityLivingBase)entity).isPotionActive(PotionUsingJutsu.potion);
+				if (usingJutsu && !ProcedureOnLivingUpdate.isUntargetable(entity)) {
+					return;
+				}
 				f2 = (boolean) (((is_pressed) && ((timer) <= 20*5)) && ((chakraAmount) > (chakraUsage)));
 				if ((f2)) {
 					if (entity instanceof EntityPlayer && !entity.world.isRemote) {

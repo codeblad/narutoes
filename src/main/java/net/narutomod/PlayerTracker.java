@@ -312,14 +312,21 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				if (headstack.getItem() == ItemSharingan.helmet ||headstack.getItem() == ItemSharingan.helmet ) {
 					defMult += .1f;
 				}
-				if (headstack.getItem() == ItemMangekyoSharinganEternal.helmet ||headstack.getItem() == ItemMangekyoSharinganObito.helmet||headstack.getItem() == ItemMangekyoSharingan.helmet   ) {
-					defMult += .15f;
+				if (headstack.getItem() == ItemByakugan.helmet) {
+					if (PlayerTracker.getBattleXp((EntityPlayer) targetEntity) >= NarutomodModVariables.SAGEEXP) {
+						defMult += 25;
+					} else {
+						defMult += .15f;
+					}
 				}
-				if (headstack.getItem() == ItemRinnegan.helmet ||headstack.getItem() == ItemTenseigan.helmet  ) {
+				if (headstack.getItem() == ItemMangekyoSharinganEternal.helmet ||headstack.getItem() == ItemMangekyoSharinganObito.helmet||headstack.getItem() == ItemMangekyoSharingan.helmet   ) {
 					defMult += .2f;
 				}
+				if (headstack.getItem() == ItemRinnegan.helmet ||headstack.getItem() == ItemTenseigan.helmet  ) {
+					defMult += .35f;
+				}
 				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
-					defMult += 0.2f;
+					defMult += 0.15f;
 				}
 				if (cheststack.getItem() == ItemRinnegan.body) {
 					defMult += 1f;
@@ -330,17 +337,17 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				if (cheststack.getItem() == ItemTenseigan.body) {
-					defMult += .35f;
+					defMult += .5f;
 				}
 				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
 				if (stackwood != null) {
 					defMult+= 0.1f;
 				}
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.8f;
+					defMult+= 0.7f;
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.2f;
+					defMult+= 0.15f;
 				}
 
 				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
