@@ -121,6 +121,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.setOGSize(0.8F, 0.8F);
 			this.fullScale = fullScale;
 			this.explosionSize = Math.max((int)fullScale - 4, 0);
+			this.isImmuneToFire = true;
 			//this.damage = fullScale * 10.0f;
 			this.mult = 2.0f + 4.0f*(fullScale/10);
 			this.damage = 17 + ItemJutsu.getDmgMult(shooter)*mult;

@@ -56,7 +56,7 @@ import net.minecraft.entity.ai.EntityFlyHelper;
 public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 409;
 	public static final int ENTITYID_RANGED = 410;
-
+	private static final int STARTUP_TIME = 10;	
 	public EntityLightningPanther(ElementsNarutomodMod instance) {
 		super(instance, 801);
 	}
@@ -203,6 +203,16 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void updateAITasks() {
 			super.updateAITasks();
+			if (this.ticksExisted < STARTUP_TIME) {
+				if (this.destPos == null) {
+					this.destPos = this.findDestination();
+				}
+
+				this.motionX = 0;
+				this.motionY = 0;
+				this.motionZ = 0;
+				return;
+			}
 			if (this.destPos != null) {
 				Vec3d vec = new Vec3d(this.destPos).subtract(this.getPositionVector()).normalize().scale(this.ogSpeed);
 				this.motionX = vec.x;
@@ -245,7 +255,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 				if (!this.world.isRemote && this.ticksExisted == 1) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:roar")), 5f, 1f);
 				}
-				if (!this.world.isRemote && owner != null) {
+				if (!this.world.isRemote && owner != null && this.ticksExisted >= STARTUP_TIME) {
 					owner.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 					this.world.spawnEntity(new EntityLightningArc.Base(this.world,
 					 owner.getPositionVector().addVector(0d, this.rand.nextDouble() * 1.5d, 0d), 

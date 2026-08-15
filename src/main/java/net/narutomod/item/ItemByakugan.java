@@ -150,6 +150,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:HakkeKusho")),
 					SoundCategory.PLAYERS, 1.0F, 1.0F);
 			this.start = this.user.getPositionVector().addVector(0,1,0);;
+			ProcedureSync.SwingMainArm.send(user);
 			for (int j = 0; j < (int) 40; j++) {
 				Vec3d a = this.start.addVector(-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2);
 				Vec3d b = this.look.normalize().scale(2+2*this.rand.nextFloat());
@@ -233,6 +234,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:mountain_crusher")),
 					SoundCategory.PLAYERS, 1.0F, 1.0F);
 			this.start = this.user.getPositionVector().addVector(0,1,0);;
+			ProcedureSync.SwingMainArm.send(user);
 			Vec3d point = this.start.addVector(0,1,0).add(look.scale(5));
 			for (int j = 0; j < (int) 400; j++) {
 				Vec3d a = point.addVector(-5+this.rand.nextFloat()*10,-5+this.rand.nextFloat()*10,-5+this.rand.nextFloat()*10);

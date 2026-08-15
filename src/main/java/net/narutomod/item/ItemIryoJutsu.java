@@ -98,8 +98,7 @@ public class ItemIryoJutsu extends ElementsNarutomodMod.ModElement {
 			if (res != null) {
 				if (res.entityHit instanceof EntityLivingBase) {
 					target = (EntityLivingBase)res.entityHit;
-				} else if ((int)res.hitVec.x == (int)entity.posX 
-				 && (int)res.hitVec.y == (int)entity.posY && (int)res.hitVec.z == (int)entity.posZ) {
+				} else if (entity.isSneaking() == true) {
 					target = entity;
 				}
 			}

@@ -216,6 +216,11 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			}
 	
 			@Override
+			public float getMinPower() {
+				return 10.0f;
+			}
+
+			@Override
 			public float getMaxPower() {
 				return 25.0f;
 			}
@@ -261,10 +266,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				return 10.0f;
 			}
 	
-			@Override
-			public float getMinPower() {
-				return 10.0f;
-			}
+
 
 			@Override
 			public float getMaxPower() {

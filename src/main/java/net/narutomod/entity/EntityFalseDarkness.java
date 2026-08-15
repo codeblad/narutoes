@@ -104,7 +104,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 					Vec3d end = start.add(this.user.getLookVec().normalize().scale(BASE_RANGE + (60.0f * (this.power / 15.0f))));
 					this.world.playSound(null,end.x, end.y, end.z, SoundEvents.ENTITY_LIGHTNING_IMPACT, SoundCategory.WEATHER, 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
 					EntityLightningArc.Base entity = new EntityLightningArc.Base(this.world, start, end, 0x000000FF, 30, 0f, 0f, 4, 1.0d + (0.1d * this.power));
-					float damage = 15 + (3.8f * (this.power / 9.5f)) * ItemJutsu.getDmgMult(this.user);
+					float damage = 15 + (3.85f * (this.power / 9.5f)) * ItemJutsu.getDmgMult(this.user);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.user, ItemRaiton.block);
 					if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) { 
 						damage *= 1.35f;
@@ -143,7 +143,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 20.0f;
+				return 15.0f;
 			}
 
 			@Override

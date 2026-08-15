@@ -141,7 +141,8 @@ public class ItemNuibariSword extends ElementsNarutomodMod.ModElement {
 				EntityCustom entityarrow = new EntityCustom(world, entity);
 				entityarrow.shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, f * 2.0f, 0);
 				entityarrow.setDamage(16);
-				world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvents.ENTITY_ARROW_SHOOT,
+				world.playSound(null, entity.posX, entity.posY, entity.posZ,
+ SoundEvents.ENTITY_ARROW_SHOOT,
 						SoundCategory.NEUTRAL, 1, 1f / (itemRand.nextFloat() * 0.5f + 1f) + f);
 				world.spawnEntity(entityarrow);
 				ItemStack newstack = new ItemStack(ItemNuibariThrown.block);
@@ -359,18 +360,24 @@ public class ItemNuibariSword extends ElementsNarutomodMod.ModElement {
 			Iterator<EntityLivingBase> iter = this.skeweredEntities.iterator();
 			while (iter.hasNext()) {
 				EntityLivingBase entity = iter.next();
+
 				int i = entity.getEntityData().getInteger(SKEWERED_TIME);
-				if (this.isTargetable(entity) && i < 300) {
-					if (!(entity instanceof EntityPlayer)) {
-						entity.getEntityData().setInteger(SKEWERED_TIME, ++i);
-					}
+
+				if (this.isTargetable(entity) && i < 80) {
+					entity.getEntityData().setInteger(SKEWERED_TIME, ++i);
+
 					double d = lastEntity.getDistance(entity);
+
 					if (d > 2d) {
-						Vec3d vec = lastEntity.getPositionVector().subtract(entity.getPositionVector())
-						 .normalize().scale(0.2d * d / 2d);
+						Vec3d vec = lastEntity.getPositionVector()
+								.subtract(entity.getPositionVector())
+								.normalize()
+								.scale(0.2d * d / 2d);
+
 						entity.addVelocity(vec.x, vec.y, vec.z);
 						entity.velocityChanged = true;
 					}
+
 					lastEntity = entity;
 				} else {
 					iter.remove();
@@ -612,7 +619,8 @@ public class ItemNuibariSword extends ElementsNarutomodMod.ModElement {
 				if ((int)ReflectionHelper.getPrivateValue(EntityArrow.class, this, 12) > 1198) { // this.ticksInGround
 					ReflectionHelper.setPrivateValue(EntityArrow.class, this, 1000, 12);
 				}
-			} else if (this.shootingEntity != null && this.getDistance(this.shootingEntity) > 50d) {
+			}
+ else if (this.shootingEntity != null && this.getDistance(this.shootingEntity) > 50d) {
 				this.motionX *= -0.4d;
 				//this.motionY *= -0.4d;
 				this.motionZ *= -0.4d;
@@ -688,7 +696,8 @@ public class ItemNuibariSword extends ElementsNarutomodMod.ModElement {
 				}
 			}
 		}
-	}*/
+	}
+*/
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {

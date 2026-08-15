@@ -62,7 +62,7 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 			this.power = powerIn*2+1;
 			this.maxDuration = (int)(powerIn * 1.5f);
 			this.bulletSize = 2.0f;
-			this.damage = 11+1.3f*(0.5f+1.65f*(powerIn/30))*ItemJutsu.getDmgMult(userIn);
+			this.damage = 13+1.3f*(0.5f+1.65f*(powerIn/30))*ItemJutsu.getDmgMult(userIn);
 			ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityLivingBase) userIn, ItemFuton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 				this.damage*=1.35f;
@@ -98,10 +98,10 @@ public class EntityFutonVacuum extends ElementsNarutomodMod.ModElement {
 				this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 				if (this.ticksExisted % 5 == 1) {
 					this.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, MathHelper.sqrt(this.bulletSize) * 0.81f , this.rand.nextFloat() * 0.5f + 0.8f);
-					this.airStream.execute2(this.user, this.power, this.bulletSize / 3);
+					this.airStream.execute2(this.user, this.power * 2.0f, this.bulletSize / 3);
 				}
 			}
-			if (!this.world.isRemote && (this.ticksExisted > (this.maxDuration * 1.4f) || this.user == null || !this.user.isEntityAlive())) {
+			if (!this.world.isRemote && (this.ticksExisted > (this.maxDuration) || this.user == null || !this.user.isEntityAlive())) {
 				this.setDead();
 			}
 		}
