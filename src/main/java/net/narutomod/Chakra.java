@@ -26,7 +26,9 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.init.MobEffects;
 
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.potion.PotionChakraBlocked;
 import net.narutomod.potion.PotionFlight;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.gui.overlay.OverlayChakraDisplay;
@@ -258,7 +260,9 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 			 || (!this.user.onGround && flight == null) || this.user.isSwingInProgress) {
 			 	this.motionlessTime = 0;
 			}
-			if (this.motionlessTime > 10 && this.user.isSneaking() && (!this.user.isAirBorne || flight != null)) {
+			//chakra regen here
+			boolean chakraBlocked = this.user.isPotionActive(PotionChakraBlocked.potion);
+			if (this.motionlessTime > 10 && this.user.isSneaking() && (!this.user.isAirBorne || flight != null) && !chakraBlocked) {
 				this.consume(-150d);
 				this.consume((-ModConfig.CHAKRA_REGEN_RATE - 0.001f )*6);
 				//* this.user.getFoodStats().getSaturationLevel()

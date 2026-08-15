@@ -63,6 +63,7 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> SCALE = EntityDataManager.createKey(EntityCustom.class, DataSerializers.FLOAT);
 		private final int matureTime = 10;
 		private float maxScale;
+		private EntityPlayer user;
 
 		public EntityCustom(World world) {
 			super(world);
@@ -79,6 +80,8 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
 			  .applyModifier(new AttributeModifier("shield.health", d + player.getMaxHealth()*2, 0));
 			this.setHealth(this.getMaxHealth());
+			this.user = player;
+			player.startRiding(this);
 		}
 
 		@Override
@@ -129,6 +132,7 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 			return Math.min((float)this.ticksExisted / (float)this.matureTime, 1.0F);
 		}
 
+
 		@Override
 		public void onLivingUpdate() {
 			EntityLivingBase summoner = this.getSummoner();
@@ -140,6 +144,13 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 				if (summoner == null || !Chakra.pathway(summoner).consume(ItemByakugan.getKaitenChakraUsage(summoner))) {
 					this.setDead();
 				} else {
+					/*for (int index0 = 0; index0 < (int) (1000); index0++) {
+						Particles.spawnParticle(world, Particles.Types.SMOKE, this.posX, this.posY + 1.4d, this.posZ, 1, 1d, 0d, 1d,
+								ProcedureUtils.rngGaussian(), 1d, ProcedureUtils.rngGaussian(), 0x10FFFFFF, 30, 0);
+					}*/
+					//ProcedureAoeCommand.set(entity, 0d, this.kaitenTime / 2).exclude(entity).knockback(3f);
+					ProcedureUtils.purgeHarmfulEffects(this.user);
+					(this.user).extinguish();
 					float maturity = this.getMaturity();
 					float scale = maturity * this.maxScale;
 					if (this.getScale() < scale) {
@@ -152,11 +163,12 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 						 0x10FFFFFF, 50 + (int)(scale * 10), (int)(8.0D / (this.rand.nextDouble() * 0.8D + 0.2D)));
 					}
 					particles.send();
+					ProcedureUtils.purgeHarmfulEffects(summoner);
+					ProcedureOnLivingUpdate.setUntargetable(summoner, 3);
+
 					if (maturity >= 0.9f) {
 						this.breakBlocks(ProcedureUtils.getNonAirBlocks(this.world, 
 						 this.getEntityBoundingBox().expand(1.0D, 1.0D, 1.0D).expand(-1.0D, 0.0D, -1.0D)));
-						ProcedureUtils.purgeHarmfulEffects(summoner);
-						ProcedureOnLivingUpdate.setUntargetable(summoner, 3);
 					}
 				}
 			}
@@ -164,13 +176,13 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		protected void collideWithNearbyEntities() {
-			if (!this.world.isRemote && this.getMaturity() >= 0.9f) {
+			if (!this.world.isRemote && this.getMaturity() >= 0.1f) {
 				EntityLivingBase summoner = this.getSummoner();
-				float damage = summoner instanceof EntityPlayer ? 10f+ItemJutsu.getDmgMult(summoner)*3f : 10F;
-				ProcedureAoeCommand.set(this.world, this.getEntityBoundingBox()).exclude(this).exclude(summoner)
+				float damage = summoner instanceof EntityPlayer ? 10f+ItemJutsu.getDmgMult(summoner)*4f : 10F;
+				ProcedureAoeCommand.set(this.world, this.getEntityBoundingBox().expand(4,8,4)).exclude(this).exclude(summoner)
 				 .damageEntities(ItemJutsu.causeJutsuDamage(this, summoner), damage);
 				for (Entity entity : ProcedureAoeCommand.getInstance().getEntitiesList()) {
-					ProcedureUtils.pushEntity(this, entity, 60.0d, 0.1F);
+					ProcedureUtils.pushEntity(this, entity, 60.0d, 0.2F);
 				}
 			}
 		}
@@ -201,7 +213,7 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void setDead() {
 			super.setDead();
-			if (!this.world.isRemote) {
+			/*if (!this.world.isRemote) {
 				EntityLivingBase summoner = this.getSummoner();
 				if (summoner instanceof EntityPlayer) {
 					double cooldown = ProcedureUtils.getCooldownModifier((EntityPlayer)summoner) * this.ticksExisted * 6;
@@ -212,10 +224,10 @@ public class EntityHakkeshoKeiten extends ElementsNarutomodMod.ModElement {
 						}
 						_stack.getTagCompound().setDouble("HakkeshoKaitenCD", NarutomodModVariables.world_tick + cooldown + 80d);
 						/*((EntityPlayer)summoner).getFoodStats()
-						 .setFoodLevel(((EntityPlayer)summoner).getFoodStats().getFoodLevel() - (this.ticksExisted / 60 + 1));*/
+						 .setFoodLevel(((EntityPlayer)summoner).getFoodStats().getFoodLevel() - (this.ticksExisted / 60 + 1));
 					}
 				}
-			}
+			}*/
 		}
 	}
 

@@ -33,6 +33,7 @@ import net.minecraft.client.renderer.entity.RenderLiving;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelBiped;
+import net.narutomod.NarutomodModVariables;
 import net.narutomod.PlayerTracker;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemMilitaryRationsPillGold;
@@ -143,7 +144,7 @@ public class EntitySlugSage extends ElementsNarutomodMod.ModElement {
                     ProcedureUtils.sendChat(player, TextFormatting.GREEN + "Slug Sage" + ": "
                             + TextFormatting.WHITE + "Why do you not have the perc on you?");
                 }
-                if (PlayerTracker.getBattleXp(player) < 7500) {
+                if (PlayerTracker.getBattleXp(player) < NarutomodModVariables.SAGEEXP) {
                     giveItem = false;
                     ProcedureUtils.sendChat(player, TextFormatting.GREEN + "Slug Sage" + ": "
                             + TextFormatting.WHITE + "You are too weak to become a sage!");

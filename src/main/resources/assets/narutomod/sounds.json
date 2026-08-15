@@ -386,6 +386,15 @@
       }
     ]
   },
+  "mountain_crusher": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:mountain_crusher",
+        "stream": false
+      }
+    ]
+  },
   "dynamic_entry": {
     "category": "master",
     "sounds": [

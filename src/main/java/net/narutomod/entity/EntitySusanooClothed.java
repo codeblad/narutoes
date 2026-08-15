@@ -360,7 +360,7 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosionSize, flag, flag);
 				ProcedureAoeCommand.set(this, 2.0D, 4.0D).exclude(this.shootingEntity)
-				  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 50+ItemJutsu.getNinjaMult(this.shootingEntity)*6.5f);
+				  .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 20+ItemJutsu.getNinjaMult(this.shootingEntity)*4f);
 				this.setDead();
 			}
 		}

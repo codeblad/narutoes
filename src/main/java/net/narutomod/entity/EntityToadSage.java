@@ -29,6 +29,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.NarutomodModVariables;
 import net.narutomod.PlayerTracker;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.item.ItemMilitaryRationsPillGold;
@@ -150,7 +151,7 @@ public class EntityToadSage extends ElementsNarutomodMod.ModElement {
                     ProcedureUtils.sendChat(player, TextFormatting.GREEN + "Toad Sage" + ": "
                             + TextFormatting.WHITE + "Why do you not have the perc on you?");
                 }
-                if (PlayerTracker.getBattleXp(player) < 7500) {
+                if (PlayerTracker.getBattleXp(player) < NarutomodModVariables.SAGEEXP) {
                     giveItem = false;
                     ProcedureUtils.sendChat(player, TextFormatting.GREEN + "Toad Sage" + ": "
                             + TextFormatting.WHITE + "You are too weak to become a sage!");
