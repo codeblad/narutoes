@@ -53,7 +53,7 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 		private EntityLivingBase shooter;
 		private float width, range;
 		private int potionAmplifier;
-		public float dmg = 2.01f;
+		public float dmg = 2.04f;
 
 		public EC(World world) {
 			super(world);
