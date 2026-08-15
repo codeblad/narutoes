@@ -269,7 +269,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 								continue;
 							}
 							this.used = true;
-							AxisAlignedBB hitbox2 = new AxisAlignedBB(vec1,vec1).grow(15);
+							AxisAlignedBB hitbox2 = new AxisAlignedBB(new BlockPos(vec1)).grow(15);
 							for (Entity entity2 : this.world.getEntitiesWithinAABBExcludingEntity(this, hitbox2)) {
 								if (entity2 instanceof EntityLivingBase && entity2 != owner && !entity.equals(owner)) {
 									float damage = 20 + (1+1.5f*this.power/8) * (8f*ItemJutsu.getDmgMult(owner));

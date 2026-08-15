@@ -176,7 +176,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 						AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(2);
 						((WorldServer)this.world).spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, point.x, point.y, point.z, 1, 0d, 0d, 0d, 0d);
 						for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
-							if (!(entity1 instanceof EntityLiving)) {
+							if (!(entity1 instanceof EntityLivingBase)) {
 								continue;
 							}
 							boolean found = false;
@@ -248,7 +248,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 			this.world.newExplosion(this.user, point.x, point.y, point.z, 3, false, flag);
 			AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(5.5);
 			for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
-				if (!(entity1 instanceof EntityLiving)) {
+				if (!(entity1 instanceof EntityLivingBase)) {
 					continue;
 				}
 				boolean found = false;
@@ -277,8 +277,6 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			if (this.user != null) {
 				this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
-				if (this.ticksExisted < 10) {
-				}
 			}
 			if (this.ticksExisted > 20) {
 				this.setDead();
@@ -551,6 +549,9 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 										((EntityLivingBase)entity).addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 									}
 									this.kaitenTime++;
+									if (this.palmsCool <= 0) {
+										this.palmsCool = 1;
+									}
 									if (this.kaitenTime > 5+20*5) {
 										this.kaitenTime = 5+20*5;
 									}
@@ -568,9 +569,10 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 							}
 
 							boolean newPressed3 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
-							if (!usingJutsu && this.jutsuKey3Pressed && !newPressed3 && this.palmsCool <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(ROKUJUYONSHO_CHAKRA_USAGE)) {
+							if (!usingJutsu && this.jutsuKey3Pressed && !newPressed3 && this.palmsCool <= 0) {
 								RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity,7,5);
-								if (result.entityHit instanceof EntityLivingBase) {
+								if (!usingJutsu && result.entityHit instanceof EntityLivingBase
+										&& Chakra.pathway((EntityLivingBase) entity).consume(ROKUJUYONSHO_CHAKRA_USAGE)) {
 									this.palmsCool = 20*20;
 									entity.world.spawnEntity(new SixtyFourPalms((EntityLivingBase) entity, (EntityLivingBase) result.entityHit));
 								}

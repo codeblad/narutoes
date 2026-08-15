@@ -181,7 +181,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 							Vec3d point = this.start.add(look.scale(i));
 							AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(4);
 							for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
-								if (!(entity1 instanceof EntityLiving)) {
+								if (!(entity1 instanceof EntityLivingBase)) {
 									continue;
 								}
 								boolean found = false;
@@ -310,7 +310,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 						boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
 						this.world.newExplosion(this.user, this.end.x, this.end.y, this.end.z, 6, false, flag);
 						for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
-							if (!(entity1 instanceof EntityLiving)) {
+							if (!(entity1 instanceof EntityLivingBase)) {
 								continue;
 							}
 							boolean found = false;
@@ -381,7 +381,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 				AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(4);
 
 				for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
-					if (!(entity1 instanceof EntityLiving)) {
+					if (!(entity1 instanceof EntityLivingBase)) {
 						continue;
 					}
 					if (this.target != null) {
@@ -439,7 +439,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 						}
 						this.world.newExplosion(this.user, targetPos.x, targetPos.y, targetPos.z, 30, false, flag);
 						for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
-							if (!(entity1 instanceof EntityLiving)) {
+							if (!(entity1 instanceof EntityLivingBase)) {
 								continue;
 							}
 							boolean found = false;
