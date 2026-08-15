@@ -145,12 +145,12 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 			return this.consume(amountIn, false);
 		}
 
-		public void consume(float percent) {
-			this.consume(percent, false);
+		public boolean consume(float percent) {
+			return this.consume(percent, false);
 		}
 
-		public void consume(float percent, boolean ignoreMax) {
-			this.consume(this.getMax() * percent, ignoreMax);
+		public boolean consume(float percent, boolean ignoreMax) {
+			return this.consume(this.getMax() * percent, ignoreMax);
 		}
 
 		public void clear() {

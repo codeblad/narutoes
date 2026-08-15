@@ -79,6 +79,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 	private static final int MIN_PLAYER_XP = 70;
 	public static final ItemJutsu.JutsuEnum BEAM = new ItemJutsu.JutsuEnum(0, "jintonbeam", 'S', MIN_PLAYER_XP*10, 800d, new EntityBeam.Jutsu());
 	public static final ItemJutsu.JutsuEnum CUBE = new ItemJutsu.JutsuEnum(1, "jintoncube", 'S', MIN_PLAYER_XP*10, 600d, new EntityCube.Jutsu());
+	private static final int FLIGHT_COOLDOWN_TICKS = 100; 
 
 	public ItemJinton(ElementsNarutomodMod instance) {
 		super(instance, 367);
@@ -143,31 +144,49 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			}
 		}*/
 
-		@Override
-		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
-			super.onUpdate(itemstack, world, entity, par4, par5);
-			if (!world.isRemote && entity instanceof EntityPlayer ) {
-				ItemStack stack = ((EntityPlayer) entity).getHeldItemMainhand();
-				ItemStack offstack = ((EntityPlayer) entity).getHeldItemOffhand();
-				Chakra.Pathway chakra = Chakra.pathway((EntityLivingBase) entity);
-				if ((stack.getItem() == ItemJinton.block || offstack.getItem() == ItemJinton.block)
-    && entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed)) {
-
-    int flightTicks = entity.getEntityData().getInteger("JintonFlightTicks");
-
-    double drain = 4D * Math.pow(1.01D, flightTicks);
-
-    if (chakra.consume(drain)) {
-        ((EntityPlayer) entity).addPotionEffect(
-            new PotionEffect(PotionFlight.potion, 10, 1, false, false)
-        );
-        entity.getEntityData().setInteger("JintonFlightTicks", flightTicks + 1);
-    }
-}
-else {
-    entity.getEntityData().setInteger("JintonFlightTicks", 0);
-}
-			}
+		@Override 
+		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) { 
+			super.onUpdate(itemstack, world, entity, par4, par5); 
+		
+			if (!world.isRemote && entity instanceof EntityPlayer) { 
+				EntityPlayer player = (EntityPlayer) entity; 
+		
+				ItemStack stack = player.getHeldItemMainhand(); 
+				ItemStack offstack = player.getHeldItemOffhand(); 
+		
+				Chakra.Pathway chakra = Chakra.pathway(player); 
+		
+				boolean flightKeyPressed = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed); 
+		
+				boolean hasJinton = stack.getItem() == ItemJinton.block || offstack.getItem() == ItemJinton.block; 
+		
+				int flightTicks = entity.getEntityData().getInteger("JintonFlightTicks"); 
+				int flightCooldown = entity.getEntityData().getInteger("JintonFlightCooldown"); 
+				boolean wasFlying = entity.getEntityData().getBoolean("JintonWasFlying"); 
+		
+				if (flightCooldown > 0) { 
+					entity.getEntityData().setInteger("JintonFlightCooldown", flightCooldown - 1); 
+				} 
+		
+				if (hasJinton && flightKeyPressed && flightCooldown <= 0) { 
+		
+					double drain = 4D * Math.pow(1.01D, flightTicks); 
+		
+					if (chakra.consume(drain)) { 
+						player.addPotionEffect(new PotionEffect(PotionFlight.potion, 10, 1, false, false)); 
+						entity.getEntityData().setInteger("JintonFlightTicks", flightTicks + 1); 
+						entity.getEntityData().setBoolean("JintonWasFlying", true); 
+					} 
+				} else { 
+		
+					if (wasFlying && !flightKeyPressed) { 
+						entity.getEntityData().setInteger("JintonFlightCooldown", 100); 
+					} 
+		
+					entity.getEntityData().setBoolean("JintonWasFlying", false); 
+					entity.getEntityData().setInteger("JintonFlightTicks", 0); 
+				} 
+			} 
 		}
 
 		@Override

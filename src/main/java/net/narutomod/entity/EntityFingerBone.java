@@ -148,15 +148,26 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 			}
 
 			public void createJutsu(EntityLivingBase entity) {
-				Vec3d vec = entity.getLookVec();
-				Vec3d vec1 = entity.getPositionVector().add(vec).addVector(0.0d, 1.6d, 0.0d);
-				EC bullet = new EC(entity);
-				bullet.setPosition(vec1.x, vec1.y, vec1.z);
-				bullet.motionX = vec.x * 0.0d;
-				bullet.motionY = vec.y * 0.0d;
-				bullet.motionZ = vec.z * 0.0d;
-				bullet.shoot(vec.x, vec.y, vec.z, 2.0f, 0.0f);
-				entity.world.spawnEntity(bullet);
+				Vec3d look = entity.getLookVec();
+				Vec3d right = new Vec3d(look.z, 0.0d, -look.x).normalize();
+				Vec3d up = look.crossProduct(right).normalize();
+
+				Vec3d vec1 = entity.getPositionVector().add(look).addVector(0.0d, 1.6d, 0.0d);
+
+				for (int i = 0; i < 5; i++) {
+					double spreadX = (i - 2) * 0.12d;
+					double spreadY = (i == 0 ? 0.08d : 0.0d);
+
+					Vec3d direction = look
+						.add(right.scale(spreadX))
+						.add(up.scale(spreadY))
+						.normalize();
+
+					EC bullet = new EC(entity);
+					bullet.setPosition(vec1.x, vec1.y, vec1.z);
+					bullet.shoot(direction.x, direction.y, direction.z, 2.0f, 0.0f);
+					entity.world.spawnEntity(bullet);
+				}
 			}
 		}
 	}

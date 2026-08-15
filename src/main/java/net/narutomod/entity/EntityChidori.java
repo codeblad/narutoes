@@ -90,6 +90,11 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 		private int ticksSinceLastSwing;
 		private int savedTicksSinceLastSwing;
 		private Entity target;
+		private boolean punchUsed;
+
+		public boolean hasPunched() {
+			return this.punchUsed;
+		}
 
 		public EC(World a) {
 			super(a);
@@ -128,6 +133,15 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 			this.summoner = entity;
 		}
 
+		private static EC getExistingChidori(EntityLivingBase entity) {
+			for (Entity existing : entity.world.getEntitiesWithinAABB(EC.class, entity.getEntityBoundingBox().grow(2d))) {
+				if (existing instanceof EC && ((EC)existing).summoner == entity && !existing.isDead) {
+					return (EC)existing;
+				}
+			}
+			return null;
+		}
+
 		private float getGrowth() {
 			return Math.min((float)this.ticksExisted / (float)this.growTime, 1.0f);
 		}
@@ -144,17 +158,30 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 			return false;
 		}
 
-		@Override
+		 @Override
 		public void setDead() {
 			super.setDead();
+
 			if (!this.world.isRemote && this.summoner != null) {
-				ProcedureSync.EntityNBTTag.removeAndSync(this.summoner, NarutomodModVariables.forceBowPose);
+				ProcedureSync.EntityNBTTag.removeAndSync(
+					this.summoner,
+					NarutomodModVariables.forceBowPose
+				);
+
 				if (this.getClass() == EC.class) {
-					ItemJutsu.IJutsuCallback.JutsuData jd = ItemRaiton.CHIDORI.jutsu.getData(this.summoner);
+					ItemJutsu.IJutsuCallback.JutsuData jd =
+						ItemRaiton.CHIDORI.jutsu.getData(this.summoner);
+
 					if (jd != null) {
 						ItemJutsu.Base item = (ItemJutsu.Base)jd.stack.getItem();
-						item.setJutsuCooldown(jd.stack, ItemRaiton.CHIDORI,
-						 (long)((float)this.ticksExisted * item.getModifier(jd.stack, this.summoner)) + 200);
+
+						item.setJutsuCooldown(
+							jd.stack,
+							ItemRaiton.CHIDORI,
+							(long)((float)this.ticksExisted
+								* item.getModifier(jd.stack, this.summoner)) + 200
+						);
+
 						jd.stack.getTagCompound().removeTag(Jutsu.ID_KEY);
 					}
 				}
@@ -204,13 +231,21 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 					}
 					if (this.target.getDistanceSq(this.summoner) < 25d) {
 						float damage = 8+(1.75f * this.damageMultiplier())*ItemJutsu.getDmgMult(this.summoner);
+
 						ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
-						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
-							damage*=1.35f;
+						if (stack != null && stack.getTagCompound() != null
+								&& stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
+							damage *= 1.35f;
 						}
-						EntityLightningArc.onStruck(this.target,
-						 ItemJutsu.causeJutsuDamage(this, this.summoner), damage);
+
+						EntityLightningArc.onStruck(
+							this.target,
+							ItemJutsu.causeJutsuDamage(this, this.summoner),
+							damage
+						);
+						this.punchUsed = true;
 						this.target = null;
+						this.setDead();
 					}
 				}
 			}
@@ -277,31 +312,55 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 			private static final String ID_KEY = "ChidoriEntityIdKey";
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				Entity entity1 = entity.world.getEntityByID(stack.getTagCompound().getInteger(ID_KEY));
-				if (!(entity instanceof EntityKageBunshin.EC) && entity1 instanceof EC) {
-					entity1.setDead();
-					entity.world.spawnEntity(new Spear(entity, CHAKRA_BURN));
-					return true;
-				} else if (!entity.isRiding()) {
+				Entity existing = entity.world.getEntityByID(stack.getTagCompound().getInteger(ID_KEY));
+
+				if (!(entity instanceof EntityKageBunshin.EC)) {
+					EC existingChidori = getExistingChidori(entity);
+
+					if (existingChidori != null) {
+						if (existingChidori instanceof Spear) {
+							return false;
+						}
+
+						existingChidori.setDead();
+						entity.world.spawnEntity(new Spear(entity, CHAKRA_BURN));
+						return true;
+					}
+				} else if (entity.isRiding()) {
+					return false;
+				}
+
+				if (!entity.isRiding()) {
 					if (ItemFuton.CHAKRAFLOW.jutsu.isActivated(entity)) {
 						ItemFuton.CHAKRAFLOW.jutsu.deactivate(entity);
 					}
 					if (ItemKaton.FLAMESLICE.jutsu.isActivated(entity)) {
 						ItemKaton.FLAMESLICE.jutsu.deactivate(entity);
 					}
+
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
-					 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:chidori")), 
-					 SoundCategory.PLAYERS, 1.0F, 1.0F);
+						SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:chidori")),
+						SoundCategory.PLAYERS, 1.0F, 1.0F);
+
 					EntityLivingBase entity2 = entity instanceof EntityKageBunshin.EC
-					 ? ((EntityKageBunshin.EC)entity).getSummoner() : entity;
-					double ninjalevel = entity2 instanceof EntityPlayer ? PlayerTracker.getNinjaLevel((EntityPlayer)entity2)
-					 : entity2 instanceof EntityNinjaMob.Base ? ((EntityNinjaMob.Base)entity2).getNinjaLevel() : 0d;
+						? ((EntityKageBunshin.EC)entity).getSummoner() : entity;
+
+					double ninjalevel = entity2 instanceof EntityPlayer
+						? PlayerTracker.getNinjaLevel((EntityPlayer)entity2)
+						: entity2 instanceof EntityNinjaMob.Base
+							? ((EntityNinjaMob.Base)entity2).getNinjaLevel()
+							: 0d;
+
 					float f = ((ItemJutsu.Base)stack.getItem()).getCurrentJutsuXpModifier(stack, entity2);
-					entity1 = new EC(entity, CHAKRA_BURN, (int)(ninjalevel * 2.5d / f));
+
+					EC entity1 = new EC(entity, CHAKRA_BURN, (int)(ninjalevel * 2.5d / f));
+
 					entity.world.spawnEntity(entity1);
 					stack.getTagCompound().setInteger(ID_KEY, entity1.getEntityId());
+
 					return true;
 				}
+
 				return false;
 			}
 
@@ -347,7 +406,7 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 		}
 
 		protected Spear(EntityLivingBase summonerIn, double chakraPerSec) {
-			super(summonerIn, chakraPerSec, 81);
+			super(summonerIn, chakraPerSec, 21);
 			if (summonerIn.isSneaking()) {
 				this.ryu = true;
 			}
