@@ -588,7 +588,7 @@ public abstract class EntityBijuManager<T extends EntityTailedBeast.Base> {
 					}
 					return;
 				}
-				if (ItemSenjutsu.isSageModeActivated(this.jinchurikiPlayer) && this.cloakXp[1] < 800 || this.tails < 9) {
+				if (ItemSenjutsu.isSageModeActivated(this.jinchurikiPlayer) && (this.cloakXp[1] < 800 || this.tails < 9 || this.jinchurikiPlayer.getEntityData().getInteger("KekkeiGenkai") != 14)) {
 					ItemSenjutsu.deactivateSageMode(this.jinchurikiPlayer);
 				}
 				double d = 5000d + Math.min(this.getCloakXp(),5000);
