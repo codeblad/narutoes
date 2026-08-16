@@ -208,7 +208,7 @@ public class EntityMeltingJutsu extends ElementsNarutomodMod.ModElement {
 				
 					//if (this.world.getGameRules().getBoolean("mobGriefing")) {
 
-						//BlockPos pos = result.typeOfHit == RayTraceResult.Type.BLOCK ? new BlockPos(result.hitVec) : new BlockPos(result.hitVec);
+						BlockPos pos = result.typeOfHit == RayTraceResult.Type.BLOCK ? new BlockPos(result.hitVec) : new BlockPos(result.hitVec);
 						//this.world.setBlockState(pos, Blocks.LAVA.getDefaultState(), 2);
 						//this.world.setBlockState(pos.west(), Blocks.LAVA.getDefaultState(), 2);
 						//this.world.setBlockState(pos.north(), Blocks.LAVA.getDefaultState(), 2);

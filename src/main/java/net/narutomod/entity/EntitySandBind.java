@@ -140,7 +140,7 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void sandFuneral() {
-			this.funeralTime = 10;
+			this.funeralTime = 20;
 		}
 
 		private boolean canFuneral() {
@@ -191,14 +191,18 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 					if (this.isTargetCaptured()) {
 						if (this.funeralTime > 0) {
 							this.sandTarget.setTarget(targetBB, 0.95f, 0.03f, false);
-							this.attackTargetEntity(this.funeralDamage+0.77f*ItemJutsu.getDmgMult(this.user));
+							this.attackTargetEntity(this.funeralDamage+0.6f*ItemJutsu.getDmgMult(this.user));
 							--this.funeralTime;
 						} else {
+							sandFuneral();
+							this.user.world.playSound(null, this.user.posX, this.user.posY, this.user.posZ,
+									net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:sabakusoso")),
+									net.minecraft.util.SoundCategory.PLAYERS, 1f, 1f);
 							this.sandTarget.setTarget(targetBB, this.getEntityBoundingBox().getAverageEdgeLength() < this.targetEntity.getEntityBoundingBox().getAverageEdgeLength() * 2.0d ? 0.0f : 0.3f, 0.0f, false);
 						}
 						this.holdTarget();
 					} else {
-						this.sandTarget.setTarget(targetBB, 2.5f, 0.03f, false);
+						this.sandTarget.setTarget(targetBB, 4f, 0.03f, false);
 					}
 				} else {
 					this.sandTarget.setTarget(gourdVec, 2f, 0.02f, true);
@@ -262,15 +266,6 @@ public class EntitySandBind extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static boolean sandFuneral(EntityLivingBase attacker) {
-		RayTraceResult res = ProcedureUtils.objectEntityLookingAt(attacker, 50, true);
-		if (res != null && res.entityHit instanceof EC && ((EC)res.entityHit).canFuneral()
-		 && Chakra.pathway(attacker).consume(50d)) {
-			attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ,
-			 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:sabakusoso")),
-			 net.minecraft.util.SoundCategory.PLAYERS, 1f, 1f);
-			((EC)res.entityHit).sandFuneral();
-			return true;
-		}
 		return false;
 	}
 }
