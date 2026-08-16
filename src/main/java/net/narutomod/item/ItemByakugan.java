@@ -383,7 +383,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					Vec3d c = this.start.addVector(0,1,0).addVector(-0.5+this.rand.nextFloat()*1,-0.5+this.rand.nextFloat()*1,-0.5+this.rand.nextFloat()*1);
 					((WorldServer)this.world).spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, c.x, c.y, c.z, 1, 0d, 0d, 0d, 0d);
 					this.target.hurtResistantTime = 10;
-					float damage = 5+(0.3f*ItemJutsu.getDmgMult(this.user));
+					float damage = 5+(0.5f*ItemJutsu.getDmgMult(this.user));
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
 							1f, 0.6f+this.rand.nextFloat()*1.2f);
@@ -464,15 +464,18 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 
 
 
-			private boolean jutsuKey1Pressed;
-			private boolean jutsuKey2Pressed;
-			private boolean jutsuKey3Pressed;
-			private int kaitenTime = 0;
-			private boolean rotating = false;
-			private int rotationCool = 0;
-			private int airCool = 0;
-			private int mountainCool = 0;
-			private int palmsCool = 0;
+
+			public void tickCooldowns(ItemStack itemStack) {
+				if (itemStack.getTagCompound() == null) {
+					itemStack.setTagCompound(new NBTTagCompound());
+				}
+				NBTTagCompound values = itemStack.getTagCompound();
+				values.setInteger("rotationCool", values.getInteger("rotationCool")-1);
+				values.setInteger("airCool", values.getInteger("airCool")-1);
+				values.setInteger("mountainCool", values.getInteger("mountainCool")-1);
+				values.setInteger("palmsCool", values.getInteger("palmsCool")-1);
+			}
+
 
 
 
@@ -483,11 +486,11 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 				if (!world.isRemote && entity instanceof EntityLivingBase) {
 					NBTTagCompound nbt = new NBTTagCompound();
 					entity.writeToNBT(nbt);
-					--this.airCool;
-					--this.mountainCool;
-					--this.palmsCool;
-					--this.rotationCool;
+
 					boolean isOwner = ProcedureUtils.isOriginalOwner((EntityPlayer) entity, itemstack);
+
+
+					tickCooldowns(itemstack);
 
 					ItemStack eye = ((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY);
 
@@ -497,6 +500,8 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					$_dependencies.put("y", (int)entity.posY);
 					$_dependencies.put("z", (int)entity.posZ);
 					$_dependencies.put("world", entity.world);
+
+					NBTTagCompound values = itemstack.getTagCompound();
 
 					if (!hasSlot(nbt,2)) {
 						boolean newPressed4 = entity.getEntityData().getBoolean(NarutomodModVariables.EYETOGGLE);
@@ -508,77 +513,83 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 
 						if (eye.getItem() == new ItemStack(ItemByakugan.helmet, (int) (1)).getItem()) {
 							boolean newPressed = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed);
-							if (!usingJutsu && this.jutsuKey1Pressed && !newPressed) {
+							if (!usingJutsu && values.getBoolean("jutsuKey1") && !newPressed) {
 								if (itemstack.hasTagCompound() && itemstack.getTagCompound().getBoolean(NarutomodModVariables.RINNESHARINGAN_ACTIVATED)) {
 									$_dependencies.put("is_pressed", newPressed);
 									ProcedureYomotsuHirasaka.executeProcedure($_dependencies);
 								} else {
 									if (entity.isSneaking()) {
-										if (this.mountainCool <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(400d)) {
-											this.mountainCool = 20*7;
+										if (values.getInteger("mountainCool") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(400d)) {
+											values.setInteger("mountainCool",20*7);
 											entity.world.spawnEntity(new ItemByakugan.MountainCrusher((EntityLivingBase) entity));
 										}
 									} else {
-										if (this.airCool <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(200d)) {
-											this.airCool = 20*3;
+										if (values.getInteger("airCool") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(200d)) {
+											values.setInteger("airCool",20*3);
 											entity.world.spawnEntity(new ItemByakugan.AirPalm((EntityLivingBase) entity));
 										}
 									}
 								}
 							}
 
-							this.jutsuKey1Pressed = newPressed;
+							values.setBoolean("jutsuKey1",newPressed);
 
 							boolean newPressed2 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
 
 
-							this.jutsuKey2Pressed = newPressed2;
-							if (this.jutsuKey2Pressed) {
-								if ( (!usingJutsu || this.rotating) &&
-										this.rotationCool <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(KAITEN_CHAKRA_USAGE)) {
+							values.setBoolean("jutsuKey2",newPressed2);
+							if (values.getBoolean("jutsuKey2")) {
+								if ( (!usingJutsu || values.getBoolean("rotating")) &&
+										(values.getInteger("rotationCool") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(KAITEN_CHAKRA_USAGE))) {
 									Entity entitySpawned = entity.getRidingEntity();
+
+
 									if (!(entity.getRidingEntity() instanceof EntityHakkeshoKeiten.EntityCustom)) {
-										this.rotating = true;
+										values.setBoolean("rotating",true);
 										world.playSound((EntityPlayer) null, (entity.posX), (entity.posY), (entity.posZ),
 												(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY
 														.getObject(new ResourceLocation("narutomod:HakkeshoKaiten")),
 												SoundCategory.NEUTRAL, (float) 1, (float) 1);
 										entity.world.spawnEntity(new EntityHakkeshoKeiten.EntityCustom((EntityPlayer) entity));
 									}
+
+
 									if (!entity.world.isRemote) {
 										((EntityLivingBase)entity).addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 									}
-									this.kaitenTime++;
-									if (this.palmsCool <= 0) {
-										this.palmsCool = 1;
+
+									values.setInteger("kaitenTime",values.getInteger("kaitenTime")+1);
+									if (values.getInteger("rotationCool") <= 0) {
+										values.setInteger("rotationCool",1);
 									}
-									if (this.kaitenTime > 5+20*5) {
-										this.kaitenTime = 5+20*5;
+									if (values.getInteger("kaitenTime") > 5+20*10) {
+										values.setInteger("kaitenTime", 5+20*10);
 									}
 								}
 							} else {
-								if (this.kaitenTime > 0) {
-									this.rotating = false;
+								if (values.getInteger("kaitenTime") > 0) {
+									values.setBoolean("rotating",false);
 									Entity entitySpawned = entity.getRidingEntity();
 									if (entitySpawned instanceof EntityHakkeshoKeiten.EntityCustom) {
 										entitySpawned.setDead();
 									}
-									this.rotationCool = Math.max(20,this.kaitenTime);
-									this.kaitenTime = 0;
+									values.setInteger("rotationCool", Math.max(20,values.getInteger("kaitenTime")));
+									values.setInteger("kaitenTime",0);
 								}
 							}
 
 							boolean newPressed3 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
-							if (!usingJutsu && this.jutsuKey3Pressed && !newPressed3 && this.palmsCool <= 0) {
+
+							if (!usingJutsu && values.getBoolean("jutsuKey3") && !newPressed3 && values.getInteger("palmsCool")  <= 0) {
 								RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity,7,5);
 								if (!usingJutsu && result.entityHit instanceof EntityLivingBase
 										&& Chakra.pathway((EntityLivingBase) entity).consume(ROKUJUYONSHO_CHAKRA_USAGE)) {
-									this.palmsCool = 20*20;
+									values.setInteger("palmsCool",20*20);
 									entity.world.spawnEntity(new SixtyFourPalms((EntityLivingBase) entity, (EntityLivingBase) result.entityHit));
 								}
 							}
 
-							this.jutsuKey3Pressed = newPressed3;
+							values.setBoolean("jutsuKey3",newPressed3);
 						}
 					}
 				}
