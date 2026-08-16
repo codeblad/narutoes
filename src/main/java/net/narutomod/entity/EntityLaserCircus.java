@@ -123,7 +123,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			 this.getPositionVector(), targetVec, 0xc00000ff, 2, 0.085f);
 			float dmgMult = 0.25f+0.75f*1/10*this.power;
 			entity2.setThickness(0.05f);
-			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 35+6.35f*dmgMult*ItemJutsu.getDmgMult(this.summoner), this.summoner);
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 35+5.85f*dmgMult*ItemJutsu.getDmgMult(this.summoner), this.summoner);
 			this.world.spawnEntity(entity2);
 		}
 
