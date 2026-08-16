@@ -72,7 +72,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> POWER = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private final float ogWidth = 1.2F;
 		private final float ogHeight = 1.75F;
-		private final double ogSpeed = 3D;
+		private final double ogSpeed = 2D;
 		private boolean used = false;
 		private float power;
 		private BlockPos destPos;
@@ -337,7 +337,7 @@ public class EntityLightningPanther extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity instanceof EntityPlayer && power >= 1.0f) {
 					entity.world.spawnEntity(new EC((EntityPlayer)entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20*8);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*12);
 					return true;
 				}
 				return false;

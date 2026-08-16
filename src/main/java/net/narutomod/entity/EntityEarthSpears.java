@@ -121,7 +121,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 	}
 
 	private static void spawnWave(World world, EntityLivingBase entity, ItemStack stack, float power, Vec3d hitVec, int wave) {
-		float sizeMultiplier = 1.0f + (wave * 0.5f);
+		float sizeMultiplier = 2.0f + (wave * 0.75f);
 		float f = MathHelper.sqrt(power * 12f / 4f) * sizeMultiplier * ((wave + 1) / ((float) maxwaves));
 
 		world.playSound(
@@ -177,12 +177,12 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends EntitySpike.Base implements ItemJutsu.IJutsu {
 
-		private final int initialDelay = 5;
-		private static final int riseTime = 4;
+		private final int initialDelay = 3;
+		private static final int riseTime = 3;
 		private static final int peakTime = 4;
-		private static final int fallTime = 6;
+		private static final int fallTime = 4;
 		private final double riseHeight = 3.0d;
-		private final float maxScale = 5.0f;
+		private final float maxScale = 6.0f;
 
 		public float damage = 5f;
 
