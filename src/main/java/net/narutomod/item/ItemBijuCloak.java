@@ -295,15 +295,33 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 		int i = getTails(stack);
 		int j = getCloakLevel(stack);
 		int k = getCloakXp(stack);
-		return i == 1  
-		 	? "narutomod:textures/bijucloak_sand.png"
-			: j == 2
-				? i == 9 && k >= 800
-					? k < 4800 
-						? "narutomod:textures/bijucloak_kurama.png"
-						: "narutomod:textures/bijucloak_kcm2.png"
-		 			: "narutomod:textures/bijucloakl2.png" 
-		 		: "narutomod:textures/bijucloakl1.png";
+		return i == 1
+    ? "narutomod:textures/bijucloak_sand.png"
+    : j == 2
+        ? k < 800
+            ? "narutomod:textures/bijucloakl1.png"
+            : k < 4800
+                ? i == 9
+                    ? "narutomod:textures/bijucloak_kurama.png"
+                    : "narutomod:textures/bijucloakl2.png"
+                : i == 2
+                    ? "narutomod:textures/bijucloak_nibi.png"
+                    : i == 3
+                        ? "narutomod:textures/bijucloak_sanbi.png"
+                        : i == 4
+                            ? "narutomod:textures/bijucloak_yonbi.png"
+                            : i == 5
+                                ? "narutomod:textures/bijucloak_gobi.png"
+                                : i == 6
+                                    ? "narutomod:textures/bijucloak_rokubi.png"
+                                    : i == 7
+                                        ? "narutomod:textures/bijucloak_nanabi.png"
+                                        : i == 8
+                                            ? "narutomod:textures/bijucloak_hachibi.png"
+                                            : i == 9
+                                                ? "narutomod:textures/bijucloak_kcm2.png"
+                                                : "narutomod:textures/bijucloakl2.png"
+        : "narutomod:textures/bijucloakl1.png";
 	}
 
 	public static void clearCloakItems(EntityPlayer player) {
