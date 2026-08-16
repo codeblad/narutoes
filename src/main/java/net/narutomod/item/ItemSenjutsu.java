@@ -305,7 +305,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 			}
 			ActionResult<ItemStack> res = super.onItemRightClick(world, entity, hand);
 			if (jutsu == SAGEMODE && res.getType() == EnumActionResult.SUCCESS && !world.isRemote) {
-				if (EntityBijuManager.cloakLevel(entity) > 0 && EntityBijuManager.getCloakXp(entity, 1) < 800 && EntityBijuManager.getTails(entity) != 9) {
+				if (EntityBijuManager.cloakLevel(entity) > 0 && EntityBijuManager.getCloakXp(entity, 1) < 800 && EntityBijuManager.getTails(entity) != 9 && entity.getEntityData().getInteger("KekkeiGenkai") != 14) {
 					entity.sendStatusMessage(new TextComponentTranslation("chattext.senjutsu.denied", 
 				 	 EntityBijuManager.getNameOfJinchurikisBiju(entity)), true);
 					return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
