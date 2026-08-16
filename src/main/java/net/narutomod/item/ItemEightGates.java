@@ -259,11 +259,6 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		private static final String SEKIZO_KEY = "sekizoPunchCount";
 		private static final String OWNER_KEY = "ownerUUID";
 		private static final String XP_KEY = "battleExperience";
-		private int attackTime = 200;
-		private int attackLimit = 120;
-		private int tpTime = 200;
-		public EntityLivingBase attackTarget;
-		private int attackNum = 0;
 		private EntityLivingBase owner;
 		// stats here
 		private final Properties GATE[] = {new Properties(0, "", 0, 0, 0, 0, 0, 0, 0, 0f, false),
@@ -298,10 +293,6 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void attackHirudora(EntityLivingBase attacker) {
-			if (this.hirudoraCool > 0) {
-				return;
-			}
-			this.hirudoraCool = 400;
 			EntityHirudora bullet = new EntityHirudora(attacker);
 			//bullet.shoot(x, y, z, 1.2F, 0.0F);
 			attacker.world.playSound(null, attacker.posX, attacker.posY, attacker.posZ,
@@ -394,12 +385,13 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
 			if (!attacker.world.isRemote) {
 				int gateOpened = (int)this.getGateOpened(itemstack);
+				NBTTagCompound values = itemstack.getTagCompound();
 				if (gateOpened >= 3) {
 						if (attacker.equals(target)) {
 							target = ProcedureUtils.objectEntityLookingAt(attacker, 18d, 5d).entityHit;
-							if (target instanceof EntityLivingBase && this.tpCool <= 0) {
-								this.tpCool = 50;
-								this.attackTarget = (EntityLivingBase) target;
+							if (target instanceof EntityLivingBase && values.getInteger("tpCool") <= 0) {
+								values.setInteger("tpCool",50);
+								values.setUniqueId("attackTarget", target.getUniqueID());
 								if (gateOpened >= 7) {
 									Vec3d vec = target.getPositionVector().subtract(attacker.getPositionVector()).normalize();
 									attacker.rotationYaw = ProcedureUtils.getYawFromVec(vec);
@@ -407,10 +399,10 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 									attacker.setPositionAndUpdate(target.posX - vec.x, target.posY - vec.y + 0.5d, target.posZ - vec.z);
 									attacker.attackTargetEntityWithCurrentItem(target);
 								} else {
-									this.tpTime = 0;
-									attacker.rotationYaw = ProcedureUtils.getYawFromVec(this.attackTarget.getPositionVector()
+									values.setInteger("tpTime",0);
+									attacker.rotationYaw = ProcedureUtils.getYawFromVec(target.getPositionVector()
 											.subtract(attacker.getPositionVector()));
-									Vec3d look = this.attackTarget.getPositionVector().subtract(attacker.getPositionVector()).normalize().scale(3);
+									Vec3d look = target.getPositionVector().subtract(attacker.getPositionVector()).normalize().scale(3);
 									ProcedureUtils.setVelocity(attacker, look.x, look.y, look.z);
 								}
 							} else {
@@ -422,20 +414,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			return super.onLeftClickEntity(itemstack, attacker, target);
 		}
 
-		public EntityLivingBase getTarget() {
-			return this.attackTarget;
-		}
 
-		public int addAttackNum2(EntityLivingBase target) {
-			if (this.attackTime >= this.attackLimit) {
-				this.attackNum = 1;
-			} else {
-				this.attackNum++;
-			}
-
-			this.attackTime = 0;
-			return this.attackNum;
-		}
 
 		public static int addAttackNum(EntityLivingBase entity, EntityLivingBase target) {
 			ItemStack stack = entity.getHeldItemMainhand();
@@ -443,34 +422,28 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				stack = entity.getHeldItemOffhand();
 			}
 			if (stack.getItem() == block) {
-				return ((RangedItem)stack.getItem()).addAttackNum2(target);
+				int num = stack.getTagCompound().getInteger("attackNum")+1;
+				if (stack.getTagCompound().getInteger("attackTime") > 120) {
+					num = 1;
+				}
+				stack.getTagCompound().setInteger("attackTime",0);
+				stack.getTagCompound().setInteger("attackNum", num);
+				return stack.getTagCompound().getInteger("attackNum");
 			}
 			return 0;
 		}
 
-		public static Entity getTarget(EntityLivingBase entity) {
+
+
+
+		public static void setTarget(EntityLivingBase entity, EntityLivingBase target) {
 			ItemStack stack = entity.getHeldItemMainhand();
 			if (stack.getItem() != block) {
 				stack = entity.getHeldItemOffhand();
 			}
 			if (stack.getItem() == block) {
-				return ((RangedItem)stack.getItem()).getTarget();
-			}
-			return null;
-		}
-
-
-		public void setTarget2(EntityLivingBase target) {
-			this.attackTarget = target;
-		}
-
-		public static void setTarget(EntityLivingBase entity) {
-			ItemStack stack = entity.getHeldItemMainhand();
-			if (stack.getItem() != block) {
-				stack = entity.getHeldItemOffhand();
-			}
-			if (stack.getItem() == block) {
-				((RangedItem)stack.getItem()).setTarget2(entity);
+				stack.getTagCompound().setUniqueId("attackTarget",target.getUniqueID());
+				//((RangedItem)stack.getItem()).setTarget2(entity);
 			}
 		}
 
@@ -485,7 +458,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					EntityLivingBase target= event.getEntityLiving();
 					if (gateOpened >= 3) {
 						if (gateOpened <= 5) {
-							setTarget(target);
+							setTarget(attacker,target);
 							int attackNum = addAttackNum(attacker,target);
 							if (attacker instanceof EntityPlayer) {
 								EntityPlayer entity2 = (EntityPlayer) attacker;
@@ -531,7 +504,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						/*ProcedureUtils.pushEntity(attacker, target, 12,
 						 0.05f * gateOpened + (!(attacker instanceof EntityPlayer) && !(target instanceof EntityPlayer) ? 1.0f : 2.0f));*/
 					}
-					setTarget(target);
+					setTarget(attacker,target);
 				}
 			}
 
@@ -610,15 +583,6 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			return stack.hasTagCompound() ? stack.getTagCompound().getInteger(XP_KEY) : 0;
 		}
 
-		float asaCool = 0;
-		float hirudoraCool = 0;
-		float yagaiCool = 0;
-		float tpCool = 0;
-		float airjump = 0;
-		float dynamicCool = 0;
-		float leafCool = 0;
-		float primaryCool = 0;
-		float hiddenCool = 0;
 
 		public static class GatesEntity extends Entity  {
 			private EntityLivingBase user;
@@ -1288,121 +1252,117 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 		}
 
 
+
+		public void tickCooldowns(ItemStack itemStack) {
+			if (itemStack.getTagCompound() == null) {
+				itemStack.setTagCompound(new NBTTagCompound());
+			}
+			NBTTagCompound values = itemStack.getTagCompound();
+			values.setInteger("dynamicCool", values.getInteger("dynamicCool")-1);
+			values.setInteger("asaCool", values.getInteger("asaCool")-1);
+			values.setInteger("hirudoraCool", values.getInteger("hirudoraCool")-1);
+			values.setInteger("yagaiCool", values.getInteger("yagaiCool")-1);
+			values.setInteger("tpCool", values.getInteger("tpCool")-1);
+			values.setInteger("airJump", values.getInteger("airJump")-1);
+			values.setInteger("leafCool", values.getInteger("leafCool")-1);
+			values.setInteger("primaryCool", values.getInteger("primaryCool")-1);
+			values.setInteger("hiddenCool", values.getInteger("hiddenCool")-1);
+			values.setInteger("attackTime", values.getInteger("attackTime")+1);
+			values.setInteger("tpTime", values.getInteger("tpTime")+1);
+			if (values.getInteger("attackTime") >= 120) {
+				values.setInteger("attackNum",0);
+			}
+		}
+
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
 
 
 
-			/*if (this.jutsuKey2Pressed && !newPressed2) {
-
-                if (gatesOpened == 8) {
-                    if (this.yagaiCool <= 0) {
-                        this.yagaiCool = 600;
-                        Entity bullet = new EntityNGDragon(entity2);
-                        //((EntityNGDragon) bullet).shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, 1.2F, 0.0F);
-                        world.playSound(null, entity.posX, entity.posY, entity.posZ,
-                                SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:yagai")),
-                                SoundCategory.NEUTRAL, 2.0F, 1.0F);
-                        world.spawnEntity(bullet);
-                        if (!entity2.isCreative()) {
-                            //ProcedureUtils.setDeathAnimations(entity, 2, 200);
-                            entity2.getCooldownTracker().setCooldown(itemstack.getItem(), 200);
-                        }
-                        entity2.sendStatusMessage(new TextComponentString(I18n.translateToLocal("entity.entityngdragon.name")), true);
-                    }
-                }
-			}*/
-
-
 			if (/* !world.isRemote && */ entity instanceof EntityLivingBase) {
 				EntityLivingBase player = (EntityLivingBase) entity;
 
-				--this.asaCool;
-				--this.hirudoraCool;
-				--this.yagaiCool;
-				--this.tpCool;
-				--this.airjump;
-				--this.dynamicCool;
-				--this.leafCool;
-				--this.primaryCool;
-				--this.hiddenCool;
-				this.attackTime++;
-				this.tpTime++;
-
-				if (this.attackTime >= this.attackLimit) {
-					this.attackNum = 0;
-				}
+				tickCooldowns(itemstack);
 
 				NBTTagCompound nbt = new NBTTagCompound();
 				entity.writeToNBT(nbt);
+				NBTTagCompound values = itemstack.getTagCompound();
 
 				if (!world.isRemote && !hasSlot(nbt, 3)) {
 					if (player instanceof EntityPlayer && (player.getHeldItemMainhand().equals(itemstack) || player.getHeldItemOffhand().equals(itemstack))) {
-						if (this.tpTime < 15 && this.attackTarget != null && this.attackTarget.getDistanceSq(entity) < 25d) {
-							this.tpTime = 200;
-							((EntityPlayer)player).attackTargetEntityWithCurrentItem(this.attackTarget);
+
+
+						EntityPlayer entity2 = (EntityPlayer) player;
+						Entity target = ProcedureUtils.getEntityFromUUID(world,values.getUniqueId("attackTarget"));
+
+						if (values.getInteger("tpTime") < 20 && target != null && target.getDistanceSq(entity) < 25d) {
+							values.setInteger("tpTime",200);
+							((EntityPlayer)player).attackTargetEntityWithCurrentItem(target);
 						}
 
-						if (player.getEntityData().getBoolean(NarutomodModVariables.EYETOGGLE) && !player.onGround && this.airjump <= 0 && this.getGateOpened(itemstack) >= 3) {
-							this.airjump = 60;
+
+						if (player.getEntityData().getBoolean(NarutomodModVariables.EYETOGGLE) && !player.onGround && values.getInteger("airJump") <= 0 && this.getGateOpened(itemstack) >= 3) {
+							values.setInteger("airJump",60);
 							Vec3d look = entity.getLookVec().scale(2);
 							ProcedureUtils.setVelocity(entity, look.x, look.y, look.z);
 						}
 
 
-						EntityPlayer entity2 = (EntityPlayer) player;
 						boolean newPressed = entity2.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed);
 						int gate = (int) this.getGateOpened(itemstack);
 						if (!entity2.isPotionActive(PotionUsingJutsu.potion)) {
-							if (this.jutsuKey1Pressed && !newPressed) {
+							if (values.getBoolean("jutsuKey1") && !newPressed) {
 								if (entity.isSneaking()) {
-									if (this.leafCool <= 0) {
-										this.leafCool = 20*8;
+									if (values.getInteger("leafCool") <= 0) {
+										values.setInteger("leafCool",20*8);
 										entity2.world.spawnEntity(new ItemEightGates.RangedItem.LeafHurricane(player));
 									}
 								} else {
-									if (this.dynamicCool <= 0) {
-										this.dynamicCool = 20*8;
+									if (values.getInteger("dynamicCool") <= 0) {
+										values.setInteger("dynamicCool",20*8);
 										entity2.world.spawnEntity(new ItemEightGates.RangedItem.DynamicEntry(player));
 									}
 								}
 							}
 
-							this.jutsuKey1Pressed = newPressed;
+							values.setBoolean("jutsuKey1",newPressed);
 
 							boolean newPressed2 = entity2.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
-							if (this.jutsuKey2Pressed && !newPressed2) {
+							if (values.getBoolean("jutsuKey2") && !newPressed2) {
 								if (gate < 6) {
 									if (!entity.isSneaking()) {
 										if (gate >= 1) {
-											if (this.primaryCool <= 0) {
-												this.primaryCool = 20*12;
+											if (values.getInteger("primaryCool") <= 0) {
+												values.setInteger("primaryCool",20*12);
 												entity2.world.spawnEntity(new ItemEightGates.RangedItem.PrimaryLotus(player));
 											}
 										}
 									} else {
 										if (gate >= 3) {
-											if (this.hiddenCool <= 0 && this.attackNum > 11 && this.attackTarget != null) {
-												this.hiddenCool = 20*10;
-												entity2.world.spawnEntity(new ItemEightGates.RangedItem.HiddenLotus(player, this.attackTarget));
-												this.attackTime = 200;
-												this.attackNum = 0;
+											if (values.getInteger("hiddenCool") <= 0 && values.getInteger("attackNum") > 11 && target instanceof EntityLivingBase) {
+												values.setInteger("hiddenCool",20*10);
+												entity2.world.spawnEntity(new ItemEightGates.RangedItem.HiddenLotus(player, (EntityLivingBase) target));
+												values.setInteger("attackTime",20*12);
+												values.setInteger("attackNum",0);
 											}
 										}
 									}
 								}
 								if (gate == 6) {
-									if (this.asaCool <= 0) {
-										this.asaCool = 20*8;
+									if (values.getInteger("asaCool") <= 0) {
+										values.setInteger("asaCool",20*9);
 										entity2.world.spawnEntity(new ItemEightGates.RangedItem.AsaKujaku(player));
+										entity2.sendStatusMessage(new TextComponentString(
+												I18n.translateToLocal("entity.entityasakujaku.name")), true);
 									}
-									entity2.sendStatusMessage(new TextComponentString(
-											I18n.translateToLocal("entity.entityasakujaku.name")), true);
 								}
 								if (gate == 7) {
-									this.attackHirudora(entity2);
-									entity2.sendStatusMessage(new TextComponentString(I18n.translateToLocal("entity.entityhirudora.name")), true);
+									if (values.getInteger("hirudoraCool") <= 0) {
+										values.setInteger("hirudoraCool",400);this.attackHirudora(entity2);
+										entity2.sendStatusMessage(new TextComponentString(I18n.translateToLocal("entity.entityhirudora.name")), true);
+									}
+
 								}
 								if (gate == 8) {
 									int k = this.attackSekizo(itemstack, entity2);
@@ -1413,13 +1373,13 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 								}
 							}
 
-							this.jutsuKey2Pressed = newPressed2;
+							values.setBoolean("jutsuKey2",newPressed2);
 
 							boolean newPressed3 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
-							if (this.jutsuKey3Pressed && !newPressed3) {
+							if (values.getBoolean("jutsuKey3") && !newPressed3) {
 								if (gate == 8) {
-									if (this.yagaiCool <= 0) {
-										this.yagaiCool = 600;
+									if (values.getInteger("yagaiCool") <= 0) {
+										values.setInteger("yagaiCool",600);
 										Entity bullet = new EntityNGDragon(entity2);
 										//((EntityNGDragon) bullet).shoot(entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, 1.2F, 0.0F);
 										world.playSound(null, entity.posX, entity.posY, entity.posZ,
@@ -1436,7 +1396,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 							}
 
 
-							this.jutsuKey3Pressed = newPressed3;
+							values.setBoolean("jutsuKey3",newPressed3);
 						}
 
 					}
