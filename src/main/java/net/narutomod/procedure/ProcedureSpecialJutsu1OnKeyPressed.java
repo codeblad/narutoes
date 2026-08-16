@@ -235,7 +235,7 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 						cd = 120;
 						if (cp.consume(800d)) {
 							biju.mouthShootingJutsu = new EntityFutonVacuum.EC.Jutsu().createJutsu(biju, (float) biju.getBijudamaMinRange(), 40);
-							((EntityFutonVacuum.EC) biju.mouthShootingJutsu).setDamage(150.0f);
+							((EntityFutonVacuum.EC) biju.mouthShootingJutsu).setDamage(60.0f);
 							((EntityFutonVacuum.EC) biju.mouthShootingJutsu).setBulletSize(40.0f);
 							biju.getEntityData().setFloat("bijuACD", world.getTotalWorldTime() + cd);
 						}

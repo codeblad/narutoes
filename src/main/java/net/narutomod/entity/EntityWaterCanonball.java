@@ -129,7 +129,7 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (!this.world.isRemote && this.ticksInAir > 100) {
+			if (!this.world.isRemote && this.ticksInAir > 40) {
 				this.setDead();
 			} else if (this.shootingEntity != null) {
 				

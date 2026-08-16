@@ -213,7 +213,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (!this.world.isRemote && (this.ticksInAir > (this.guided ? 200 : 100) || this.isInWater())) {
+			if (!this.world.isRemote && (this.ticksInAir > (this.guided ? 60 : 40) || this.isInWater())) {
 				this.setDead();
 			} else {
 				if (!this.world.isRemote && this.ticksAlive <= this.timeToFullscale) {
