@@ -62,7 +62,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 		private BlockPos destPos;
 		private Vec3d startVec;
 		private int jumpTicks;
-		private final double ogSpeed = 2.5D;
+		private final double ogSpeed = 1.5D;
 		private float damage = 5;
 		private float mult = 1;
 
@@ -211,7 +211,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this, hitbox)) {
 					if (entity instanceof EntityLivingBase &&  entity != owner && !entity.equals(owner)) {
 						this.mult = 1+1.25f*(this.power/5);
-						this.damage = 8 + (this.mult * (0.4f*ItemJutsu.getDmgMult(this.getOwner())));
+						this.damage = 8 + (this.mult * (0.8f*ItemJutsu.getDmgMult(this.getOwner())));
 						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, owner),damage);
 					}
 				}

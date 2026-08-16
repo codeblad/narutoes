@@ -241,7 +241,7 @@ public class EntityKirin extends ElementsNarutomodMod.ModElement {
 				 	entity.world.spawnEntity(new EC(entity));
 				 	if (entity instanceof EntityPlayer && !((EntityPlayer)entity).isCreative()) {
 				 		entity.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 300, 0, false, false));
-				 		ItemJutsu.setCurrentJutsuCooldown(stack, entity, 3600);
+				 		ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 45);
 				 	}
 					return true;
 				}
