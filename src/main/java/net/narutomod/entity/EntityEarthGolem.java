@@ -85,9 +85,10 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			float f = this.getScale();
 			float newPower = (1+4*(this.power/5)) * ItemJutsu.getDmgMult(this.getSummoner());
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(60.0D + 2*newPower);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).setBaseValue(16.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D + 6*newPower);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D + 0.5*newPower);
-			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(10.0D + 6.0D * f);
+			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(80.0D + 6.0D * f);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D + (f - 1F) * 0.05D);
 			super.postScaleFixup();
 			this.experienceValue = (int)(f * 10);
@@ -132,7 +133,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
 			if (source.getTrueSource() instanceof EntityLivingBase && source.getTrueSource().equals(this.getSummoner())) {
-				//this.onDeathUpdate();
+				this.onDeathUpdate();
 				return false;
 			}
 			return super.attackEntityFrom(source, amount);
@@ -219,7 +220,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
 					entity.world.spawnEntity(new EC(entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20*10);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*20);
 					return true;
 				}
 				return false;
@@ -232,7 +233,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 80.0f;
+				return 50.0f;
 			}
 	
 			@Override
