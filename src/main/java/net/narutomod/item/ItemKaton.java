@@ -124,7 +124,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.isImmuneToFire = true;
 			//this.damage = fullScale * 10.0f;
 			this.mult = 2.0f + 4.0f*(fullScale/10);
-			this.damage = 17 + ItemJutsu.getDmgMult(shooter)*mult;
+			this.damage = 16 + ItemJutsu.getDmgMult(shooter)*mult;
 			this.damage*= 1.305f; //futon chakra drain
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter,ItemKaton.block);
 			if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
@@ -276,7 +276,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 5.0f;
+				return 10.0f;
 			}
 	
 			@Override

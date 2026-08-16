@@ -56,7 +56,7 @@ public class EntityWaterCanonball extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
-		private float fullScale = 1f;
+		private float fullScale = 0.8f;
 		private final int timeToFullscale = 5;
 		private int explosionSize;
 		private float damage = 5;
