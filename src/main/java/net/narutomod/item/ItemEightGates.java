@@ -265,10 +265,10 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			new Properties(1, I18n.translateToLocal("chattext.eightgates.gate1"), 200, 0, 0, 2, 2, 0, 10, -0.25f, false),
 			new Properties(2, I18n.translateToLocal("chattext.eightgates.gate2"), 250, 0, 0, 4, 10, 0, 40, -1.25f, false),
 			new Properties(3, I18n.translateToLocal("chattext.eightgates.gate3"), 300, 20, 0x10FFFFFF, 15, 16, 1, 60, 0f, false),
-			new Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 500, 25, 0x18FFFFFF, 20, 22, 2, 60, .015f, false),
-			new Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 1000, 30, 0x20FFFFFF, 40, 26, 2, 60, .02f, false),
-			new Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 2500, 30, 0x3000FF00, 55, 35, 3, 60, .025f, false),
-			new Properties(7, I18n.translateToLocal("chattext.eightgates.gate7"), 5000, 30, 0x300000FF, 75, 45, 3, 60, .035f, false),
+			new Properties(4, I18n.translateToLocal("chattext.eightgates.gate4"), 500, 25, 0x18FFFFFF, 20, 20, 2, 60, .01f, false),
+			new Properties(5, I18n.translateToLocal("chattext.eightgates.gate5"), 1000, 30, 0x20FFFFFF, 40, 22, 2, 60, .015f, false),
+			new Properties(6, I18n.translateToLocal("chattext.eightgates.gate6"), 2500, 30, 0x3000FF00, 55, 26, 3, 60, .02f, false),
+			new Properties(7, I18n.translateToLocal("chattext.eightgates.gate7"), 5000, 30, 0x300000FF, 75, 35, 3, 60, .03f, false),
 			new Properties(8, I18n.translateToLocal("chattext.eightgates.gate8"), 9001, 30, 0x30FF0000, 150, 65, 4, 60, .066f, true)};
 
 		public RangedItem() {

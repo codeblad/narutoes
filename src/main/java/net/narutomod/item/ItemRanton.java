@@ -42,7 +42,7 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:ranton")
 	public static final Item block = null;
 	public static final int ENTITYID = 278;
-	public static final ItemJutsu.JutsuEnum CLOUD = new ItemJutsu.JutsuEnum(0, "rantoncloud", 'S', 1d, new EntityRaiunkuha.Jutsu());
+	public static final ItemJutsu.JutsuEnum CLOUD = new ItemJutsu.JutsuEnum(0, "rantoncloud", 'S', 0.5d, new EntityRaiunkuha.Jutsu());
 	public static final ItemJutsu.JutsuEnum LASERCIRCUS = new ItemJutsu.JutsuEnum(1, "laser_circus", 'S', 130d, new EntityLaserCircus.EC.Jutsu());
 
 	public ItemRanton(ElementsNarutomodMod instance) {
@@ -138,12 +138,12 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 				Particles.spawnParticle(world, Particles.Types.SMOKE, this.posX, this.posY + 0.9d, this.posZ,
 				  20, 0.4d, 0.6d, 0.4d, 0d, 0d, 0d, 0xff303030, 30, 0, 0, this.summoner.getEntityId(), 0);
 				for (EntityLivingBase entity1 : 
-				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.summoner.getEntityBoundingBox().grow(2d))) {
+				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.summoner.getEntityBoundingBox().grow(3d))) {
 					if (!entity1.equals(this.summoner) && entity1.isEntityAlive()) {
 						this.setLightningOn(entity1);
 					}
 				}
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 10d);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 15d);
 				if (res != null && res.entityHit instanceof EntityLivingBase) {
 					this.setLightningOn((EntityLivingBase)res.entityHit);
 				}
@@ -156,7 +156,7 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 			EntityLightningArc.Base entity2 = new EntityLightningArc.Base(this.world,
 			 this.getPositionVector().addVector(0d, 1d, 0d), entity.getPositionVector().addVector(0d, entity.height/2, 0d),
 			 0xc00000ff, 1, 0f);
-			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 4+0.8f*ItemJutsu.getDmgMult(this.summoner)*this.damageMultiplier, this.summoner, 0);
+			entity2.setDamage(ItemJutsu.causeJutsuDamage(this, this.summoner), 6+0.9f*ItemJutsu.getDmgMult(this.summoner)*this.damageMultiplier, this.summoner, 0);
 			this.world.spawnEntity(entity2);
 		}
 
