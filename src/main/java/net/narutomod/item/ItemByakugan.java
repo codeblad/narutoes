@@ -355,11 +355,11 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 							Vec3d vec = this.start.subtract(this.userStart).normalize();
 							this.user.rotationYaw = ProcedureUtils.getYawFromVec(vec);
 							this.user.rotationPitch = ProcedureUtils.getPitchFromVec(vec);
-							Chakra.Pathway cp = Chakra.pathway(this.target);
-							cp.consume(0.1f/64);
-							if (cp.getAmount() > cp.getMax()) {
-								cp.consume(0.05f);
-							}
+						}
+						Chakra.Pathway cp = Chakra.pathway(this.target);
+						cp.consume(0.1f/64);
+						if (cp.getAmount() > cp.getMax()) {
+							cp.consume(0.05f);
 						}
 						this.palmTracker++;
 					} else {
@@ -383,7 +383,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					Vec3d c = this.start.addVector(0,1,0).addVector(-0.5+this.rand.nextFloat()*1,-0.5+this.rand.nextFloat()*1,-0.5+this.rand.nextFloat()*1);
 					((WorldServer)this.world).spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, c.x, c.y, c.z, 1, 0d, 0d, 0d, 0d);
 					this.target.hurtResistantTime = 10;
-					float damage = 5+(0.4f*ItemJutsu.getDmgMult(this.user));
+					float damage = 5+(0.3f*ItemJutsu.getDmgMult(this.user));
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
 							1f, 0.6f+this.rand.nextFloat()*1.2f);

@@ -755,6 +755,9 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 						this.deathTotalTicks = 200;
 					}
 				}
+				if (this.isBeingRidden()) {
+					this.deathTotalTicks = 200;
+				}
 				if (jinchuriki != null && this.ticksExisted % 50 == 1) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:KamuiSFX")), 3.0F, 1.0F);
 				}

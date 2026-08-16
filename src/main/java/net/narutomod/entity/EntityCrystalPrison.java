@@ -77,7 +77,7 @@ public class EntityCrystalPrison extends ElementsNarutomodMod.ModElement {
 			this(userIn.world);
 			this.user = userIn;
 			this.maxScale = scale;
-			this.health = scale * 50.0f;
+			this.health = scale * 10.0f;
 			this.maxInGroundTime = 100;
 			//this.maxInGroundTime = (int) (60f + (scale / 5f) * 20f);
 		}
@@ -142,7 +142,7 @@ public class EntityCrystalPrison extends ElementsNarutomodMod.ModElement {
 				}
 				for (EntityLivingBase entity : this.trappedEntities.keySet()) {
 					if (!entity.equals(this.user)) {
-						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor(), 6+ItemJutsu.getDmgMult(this.shootingEntity)*0.25f);
+						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor(), 10+ItemJutsu.getDmgMult(this.shootingEntity)*0.5f);
 					}
 				}
 				this.trappedEntities.clear();
@@ -187,7 +187,7 @@ public class EntityCrystalPrison extends ElementsNarutomodMod.ModElement {
 						} else {
 							if (!entry.getKey().equals(this.user)) {
 								if (entry.getKey() instanceof EntityPlayer) {
-									ProcedureOnLivingUpdate.disableMouseClicks((EntityPlayer)entry.getKey(), 3);
+									//ProcedureOnLivingUpdate.disableMouseClicks((EntityPlayer)entry.getKey(), 3);
 								}
 								entry.getKey().rotationYaw = entry.getKey().rotationYawHead = entry.getValue().rotationYaw;
 								entry.getKey().rotationPitch = entry.getValue().rotationPitch;
