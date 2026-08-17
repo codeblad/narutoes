@@ -76,7 +76,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 				Vec3d vec3d = this.shootingEntity.getLookVec();
 				Vec3d vec3d1 = vec3d.add(this.shootingEntity.getPositionEyes(1f).subtract(0d, 0.2d, 0d));
 				this.setPositionAndRotation(vec3d1.x, vec3d1.y, vec3d1.z, this.shootingEntity.rotationYaw, this.shootingEntity.rotationPitch);
-				vec3d1 = vec3d.scale(5+this.power*1.5);
+				vec3d1 = vec3d.scale(15+this.power*1.5);
 				this.shoot(vec3d1.x, vec3d1.y, vec3d1.z);
 			}
 		}

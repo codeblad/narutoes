@@ -402,7 +402,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 									values.setInteger("tpTime",0);
 									attacker.rotationYaw = ProcedureUtils.getYawFromVec(target.getPositionVector()
 											.subtract(attacker.getPositionVector()));
-									Vec3d look = target.getPositionVector().subtract(attacker.getPositionVector()).normalize().scale(3);
+									Vec3d look = target.getPositionVector().subtract(attacker.getPositionVector()).normalize().scale(5);
 									ProcedureUtils.setVelocity(attacker, look.x, look.y, look.z);
 								}
 							} else {

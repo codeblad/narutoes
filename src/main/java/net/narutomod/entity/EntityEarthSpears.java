@@ -317,7 +317,7 @@ public class EntityEarthSpears extends ElementsNarutomodMod.ModElement {
 					pendingWaves.add(new WaveSpawn(entity, stack, power, res.hitVec, 1, 15));
 					pendingWaves.add(new WaveSpawn(entity, stack, power, res.hitVec, 2, 30));
 
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 4);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 7);
 					return true;
 				}
 

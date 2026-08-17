@@ -146,7 +146,7 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 							if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 								ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
 								//(30*20)+this.ticksExisted+this.ticksExisted/2
-								item.setJutsuCooldown(stack, ARMOR, 20*5);
+								item.setJutsuCooldown(stack, ARMOR, 20*30);
 							}
 						}
 					}

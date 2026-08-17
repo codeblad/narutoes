@@ -453,7 +453,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 				int y = (int) entity.posY;
 				int z = (int) entity.posZ;
 				if (!world.isRemote) {
-					entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 5, false, false));
+					entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 3, false, false));
 				}
 				HashMap<String, Object> $_dependencies = Maps.newHashMap();
 				$_dependencies.put("entity", entity);

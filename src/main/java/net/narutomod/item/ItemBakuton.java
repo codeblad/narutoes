@@ -251,7 +251,7 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 
 	public abstract static class ExplosiveClay extends EntityCreature implements ItemJutsu.IJutsu {
 		private EntityLivingBase owner;
-		private int lifeSpan = 600;
+		private int lifeSpan = 100;
 		private float explosionSize = 3.0f;
 		private final AIChargeAttack aiAttack = new AIChargeAttack();
 		private boolean attackTaskEnabled;
@@ -337,7 +337,7 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.FLYING_SPEED);
-			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(48D);
+			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(68D);
 		}
 
 	    @Override
@@ -420,30 +420,44 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 				Entity ec;
 				Vec3d vec = entity.getLookVec();
 				vec = entity.getPositionVector().addVector(vec.x, 1d, vec.z);
+				int amount = 1;
 				if (powerIn < 1f) {
 					return false;
 				} else if (powerIn < 2f) {
 					ec = new EntityC1.EC(entity);
-					ItemJutsu.setCurrentJutsuCooldown(stack,30);
+					amount = 3;
+					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 5);
 				} else if (powerIn < 3f) {
 					ec = new EntityC2.EC(entity);
 					ProcedureUtils.poofWithSmoke(entity.world, vec.x, vec.y, vec.z, ec.width, ec.height);
-					ItemJutsu.setCurrentJutsuCooldown(stack,40);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 10);
 				} else if (powerIn < 4f) {
 					ec = new EntityC3.EC(entity);
-					ItemJutsu.setCurrentJutsuCooldown(stack,140);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 9);
 				} else if (powerIn <= this.getMaxPower()) {
 					ec = new EntityC4.EC(entity);
 					float f = ((RangedItem)stack.getItem()).getXpRatio(stack, CLAY);
 					((EntityC4.EC)ec).setExplosionDamage(100, (int)(0.5f + ItemJutsu.getDmgMult(entity)*0.32));
-					ItemJutsu.setCurrentJutsuCooldown(stack,280);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 20);
 				} else {
 					return false;
 				}
 				//if (ec != null) {
+				if (amount > 1) {
+					for (int i = 0; i < 3; i++) {
+					ec = new EntityC1.EC(entity);
 					ec.setLocationAndAngles(vec.x, vec.y, vec.z, entity.rotationYaw, 0f);
 					ec.setRotationYawHead(entity.rotationYaw);
 					entity.world.spawnEntity(ec);
+					}
+				}
+
+					if (amount <= 1) {
+					ec.setLocationAndAngles(vec.x, vec.y, vec.z, entity.rotationYaw, 0f);
+					ec.setRotationYawHead(entity.rotationYaw);
+					entity.world.spawnEntity(ec);
+					}
+			
 				//}
 				return true;
 			}
@@ -455,7 +469,7 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 
 			@Override
 			public float getPowerupDelay() {
-				return 240.0f;
+				return 150.0f;
 			}
 
 			@Override

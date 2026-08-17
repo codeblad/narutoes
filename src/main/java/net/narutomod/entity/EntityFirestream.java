@@ -73,7 +73,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			this.shooter = shooterIn;
 			this.setIdlePosition();
 			this.width = MathHelper.clamp(widthIn,1,25);
-			this.range = MathHelper.clamp(rangeIn,45,700);
+			this.range = MathHelper.clamp(rangeIn,20,300);
 			float mult = 0.75f+1.5f*(((float) powa)/25);
 			this.damage = 4F+ItemJutsu.getDmgMult(shooterIn)*1.6f*mult;
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter, ItemKaton.block);
@@ -198,7 +198,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 				SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:katon_gokamekeku")),
 				SoundCategory.NEUTRAL, 5, 1f);
-				EC ec =new EC(entity, power * 0.9, power * 2.65, power);
+				EC ec =new EC(entity, power * 0.8, power * 2.65, power);
 				ec.setFlameColor(color);
 				entity.world.spawnEntity(ec);
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
@@ -230,7 +230,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				this.createJutsu(entity, power, (int)(power * 3f));
-				ItemJutsu.setCurrentJutsuCooldown(stack, 60);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 5);
 
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
 				return true;

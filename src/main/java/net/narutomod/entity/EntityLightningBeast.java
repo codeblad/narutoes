@@ -207,7 +207,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			if (owner != null) {
 				Vec3d vec1 = this.getPositionVector().addVector(0d, 0.5d * this.height, 0d);
 				Vec3d vec2 = vec1.add(ProcedureUtils.getMotion(this));
-				AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(vec1)).grow(5);
+				AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(vec1)).grow(7);
 				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this, hitbox)) {
 					if (entity instanceof EntityLivingBase &&  entity != owner && !entity.equals(owner)) {
 						this.mult = 1+1.25f*(this.power/5);
@@ -280,7 +280,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 50.0f;
+				return 30.0f;
 			}
 
 
