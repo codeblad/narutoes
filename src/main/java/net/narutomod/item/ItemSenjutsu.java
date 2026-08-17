@@ -250,7 +250,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 							((EntityPlayer) entity).addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 4, false, false));
 							((EntityPlayer) entity).getFoodStats().addStats(2,0);
 						//living.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 22, 0, false, false));
-						cp.consume(25d);
+						cp.consume(20d);
 					}
 				}
 				if (entity.ticksExisted % 40 == 5 && entity instanceof EntityPlayer) {

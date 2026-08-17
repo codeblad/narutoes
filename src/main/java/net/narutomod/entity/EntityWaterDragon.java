@@ -198,7 +198,7 @@ public class EntityWaterDragon extends ElementsNarutomodMod.ModElement {
 				return;
 			if (!this.world.isRemote) {
 				float size = this.getEntityScale();
-				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 5.0F * size, false,
+				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 5.0F * (size / 0.5f), false,
 				  net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 				float damage = 22+(8f*this.mult)*ItemJutsu.getDmgMult(this.shootingEntity);
 				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.shootingEntity, ItemSuiton.block);
