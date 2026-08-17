@@ -13,6 +13,7 @@ import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -52,6 +53,7 @@ import javax.annotation.Nullable;
 public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 293;
 	public static final int ENTITYID_RANGED = 294;
+	public static final String ENTITY_TAG = "shadow_imitation_entities";
 
 	public EntityShadowImitation(ElementsNarutomodMod instance) {
 		super(instance, 618);
@@ -68,6 +70,8 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Integer> TARGET_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private double chakraBurn;
 		private PlayerInput.Hook userInput = new PlayerInput.Hook();
+		private int strangleCooldown = 0;
+		private int lifetimeReduction = 0;
 
 		public EC(World world) {
 			super(world);
@@ -86,6 +90,8 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
 			this.chakraBurn = chakraUsagePerSec + Math.max(ProcedureUtils.getPunchDamage(targetIn) * 10d, 90d);
 		}
+
+		
 
 		@Override
 		public ItemJutsu.JutsuEnum.Type getJutsuType() {
@@ -154,7 +160,7 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 				if (user != null && user.isEntityAlive() && ItemJutsu.canTarget(target) && this.canTargetBeSeen()) {
 					this.setPosition(user.posX, user.posY, user.posZ);
 					if (user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed)
-					 || (this.ticksExisted >= 20*7 || this.ticksExisted % 20 == 1 && !Chakra.pathway(user).consume(this.chakraBurn))) {
+					 || (this.ticksExisted >= 20*7 - this.lifetimeReduction || this.ticksExisted % 20 == 1 && !Chakra.pathway(user).consume(this.chakraBurn))) {
 						this.setDead();
 					} else {
 						if (this.ticksExisted == 1) {
@@ -162,6 +168,16 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 							PlayerInput.Hook.haltTargetInput(target, true);
 							if (user instanceof EntityPlayer) {
 								PlayerInput.Hook.copyInputFrom((EntityPlayerMP)user, this, true);
+							}
+						}
+						if (this.strangleCooldown > 0) {
+							this.strangleCooldown--;
+						}
+
+						if (user.getEntityData().getBoolean(NarutomodModVariables.EYETOGGLE)
+								&& this.strangleCooldown <= 0) {
+							if (this.shadowStrangle()) {
+								this.strangleCooldown = 20;
 							}
 						}
 						if (this.userInput.hasNewMovementInput()) {
@@ -180,6 +196,29 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
+		public boolean shadowStrangle() {
+			EntityLivingBase user = this.getUser();
+			EntityLivingBase target = this.getTarget();
+
+			if (user == null || target == null || !target.isEntityAlive()) {
+				return false;
+			}
+			this.world.playSound(null, this.posX, this.posY, this.posZ,
+				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")), SoundCategory.PLAYERS, 1f, 1f);
+
+			float damage = 12f+2.9f*ItemJutsu.getDmgMult(user);
+
+			target.attackEntityFrom(
+				ItemJutsu.causeJutsuDamage(user, user),
+				damage
+			);
+
+			this.lifetimeReduction += 20;
+
+			return true;
+		}
+	
+
 	    public boolean canTargetBeSeen() {
 			EntityLivingBase user = this.getUser();
 			EntityLivingBase target = this.getTarget();
@@ -197,6 +236,8 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			private static final String ECENTITYID = "ShadowImitationEntityIdKey";
+
+			
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(entity, 30d);

@@ -43,15 +43,15 @@ public class ProcedureSpecialJutsu4OnKeyPressed extends ElementsNarutomodMod.Mod
 
 	public static void executeProcedure(Map<String, Object> dependencies) {
 		if (dependencies.get("is_pressed") == null) {
-			System.err.println("Failed to load dependency is_pressed for procedure SpecialJutsu3OnKeyPressed!");
+			System.err.println("Failed to load dependency is_pressed for procedure SpecialJutsu4OnKeyPressed!");
 			return;
 		}
 		if (dependencies.get("entity") == null) {
-			System.err.println("Failed to load dependency entity for procedure SpecialJutsu3OnKeyPressed!");
+			System.err.println("Failed to load dependency entity for procedure SpecialJutsu4OnKeyPressed!");
 			return;
 		}
 		if (dependencies.get("world") == null) {
-			System.err.println("Failed to load dependency world for procedure SpecialJutsu3OnKeyPressed!");
+			System.err.println("Failed to load dependency world for procedure SpecialJutsu4OnKeyPressed!");
 			return;
 		}
 		boolean is_pressed = (boolean) dependencies.get("is_pressed");
