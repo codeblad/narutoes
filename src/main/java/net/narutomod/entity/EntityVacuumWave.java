@@ -143,7 +143,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0F) {
 					entity.world.spawnEntity(new EC(entity, power * 2f + 6f, 0));
-					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (20 + 20*power/3));
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 15);
 					return true;
 				}
 				return false;
@@ -156,7 +156,7 @@ public class EntityVacuumWave extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 10.0f;
+				return 25.0f;
 			}
 	
 			@Override

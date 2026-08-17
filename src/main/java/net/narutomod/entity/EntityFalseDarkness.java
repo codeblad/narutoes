@@ -143,7 +143,7 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 15.0f;
+				return 20.0f;
 			}
 
 			@Override
