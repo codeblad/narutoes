@@ -140,14 +140,14 @@ public class ProcedureSharinganHelmetTickEvent extends ElementsNarutomodMod.ModE
 					}
 				}
 			}
-			//MANGENKYO OBTAINMENT METHOD
+			//MANGEKYO OBTAINMENT METHOD
 			if ((((itemstack).getItem() == new ItemStack(ItemSharingan.helmet, (int) (1)).getItem())
 					&& ((entity.getEntityData().getDouble((NarutomodModVariables.BATTLEXP))) >= 5000))) {
 				if ((PlayerTracker.Deaths.hasRecentNearby((EntityPlayer) entity, 40D, 6000D) && (!(world.isRemote)))) {
-					if ((Math.random() < 0.5 && !entity.getUniqueID().equals(UUID.fromString("1cffbcea-7f19-4fe4-a0c7-75cf43fceada")))) {
-						mangekyo = new ItemStack(ItemMangekyoSharingan.helmet, (int) (1));
-					} else {
+					if (entity.getEntityData().getInteger("KekkeiGenkai") == 23) {
 						mangekyo = new ItemStack(ItemMangekyoSharinganObito.helmet, (int) (1));
+					} else {
+						mangekyo = new ItemStack(ItemMangekyoSharingan.helmet, (int) (1));
 					}
 					((ItemSharingan.Base) mangekyo.getItem()).copyOwner(mangekyo, itemstack);
 					if (entity instanceof EntityPlayer) {

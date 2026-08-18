@@ -288,6 +288,8 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "chomei_flying")));
 		sounds.put(new ResourceLocation("narutomod", "deep_forest"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "deep_forest")));
+		sounds.put(new ResourceLocation("narutomod", "kamuiSFX"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "kamuiSFX")));
 		sounds.put(new ResourceLocation("narutomod", "hell_stab"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "hell_stab")));
 		sounds.put(new ResourceLocation("narutomod", "dynamic_entry"),
@@ -306,6 +308,10 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "guillotine_drop")));
 		sounds.put(new ResourceLocation("narutomod", "liger_bomb"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "liger_bomb")));
+		sounds.put(new ResourceLocation("narutomod", "new_kamui"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "new_kamui")));
+		sounds.put(new ResourceLocation("narutomod", "honoikazuchi"),
+				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "honoikazuchi")));
 		sounds.put(new ResourceLocation("narutomod", "isobu_roar"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "isobu_roar")));
 		sounds.put(new ResourceLocation("narutomod", "isobu_hurt"),
@@ -345,7 +351,6 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 		sounds.put(new ResourceLocation("narutomod", "paperflip"), new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "paperflip")));
 		sounds.put(new ResourceLocation("narutomod", "eightgatesrelease"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "eightgatesrelease")));
-		sounds.put(new ResourceLocation("narutomod", "kamui"), new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "kamui")));
 		sounds.put(new ResourceLocation("narutomod", "grill_open"),
 				new net.minecraft.util.SoundEvent(new ResourceLocation("narutomod", "grill_open")));
 	}

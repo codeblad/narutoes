@@ -150,7 +150,7 @@ public class EntityPretaShield extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onLivingUpdate() {
 			if (this.ticksExisted == 1) {
-				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kamui")), 0.6f, 1f);
+				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kamuiSFX")), 0.6f, 1f);
 			}
 			super.onLivingUpdate();
 			if (!this.world.isRemote) {

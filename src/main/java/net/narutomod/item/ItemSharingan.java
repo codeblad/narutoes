@@ -62,7 +62,7 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class Base extends ItemDojutsu.Base {
-		private boolean canDamage;
+		public boolean canDamage;
 
 		public Base(ItemArmor.ArmorMaterial material) {
 			super(material);

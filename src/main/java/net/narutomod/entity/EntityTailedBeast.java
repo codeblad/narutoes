@@ -759,7 +759,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 					this.deathTotalTicks = 200;
 				}
 				if (jinchuriki != null && this.ticksExisted % 50 == 1) {
-					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:KamuiSFX")), 3.0F, 1.0F);
+					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kamuiSFX")), 3.0F, 1.0F);
 				}
 				for (int i = 0; i < (int)(((float)this.deathTicks / this.deathTotalTicks) * 100f); i++) {
 					Particles.spawnParticle(this.world, Particles.Types.SMOKE, this.posX, this.posY + this.height * 0.5, this.posZ,

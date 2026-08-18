@@ -1,5 +1,7 @@
 package net.narutomod.item;
 
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
@@ -21,6 +23,7 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.text.translation.I18n;
 
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.*;
 import net.narutomod.world.WorldKamuiDimension;
 import net.narutomod.creativetab.TabModTab;
@@ -52,16 +55,10 @@ public class ItemMangekyoSharinganEternal extends ElementsNarutomodMod.ModElemen
 			public void onArmorTick(World world, EntityPlayer entity, ItemStack itemstack) {
 				super.onArmorTick(world, entity, itemstack);
 				if (!world.isRemote) {
-					entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 5, false, false));
+					entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 6, false, false));
 					entity.capabilities.allowFlying = entity.isCreative() || entity.dimension == WorldKamuiDimension.DIMID;
 					entity.sendPlayerAbilities();
-					if (entity.getEntityData().getBoolean("kamui_teleport")) {
-						Chakra.pathway(entity).consume(ItemMangekyoSharinganObito.getTeleportChakraUsage(entity));
-					}
-					if (entity.getEntityData().getBoolean("kamui_intangible")) {
-						Chakra.pathway(entity).consume(ItemMangekyoSharinganObito.getIntangibleChakraUsage(entity));
-						entity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 2.0d);
-					}
+
 				}
 			}
 
@@ -78,6 +75,35 @@ public class ItemMangekyoSharinganEternal extends ElementsNarutomodMod.ModElemen
 						}
 					}
 				}
+
+				if (!world.isRemote && entity instanceof EntityLivingBase) {
+
+					NBTTagCompound values = itemstack.getTagCompound();
+					ItemMangekyoSharingan.tickCooldowns(itemstack);
+
+					NBTTagCompound nbt = new NBTTagCompound();
+					entity.writeToNBT(nbt);
+
+
+					ItemStack eye = ((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY);
+					boolean usingJutsu = ((EntityLivingBase) entity).isPotionActive(PotionUsingJutsu.potion);
+					if (!ItemByakugan.hasSlot(nbt, 2) && (eye.getTagCompound() != null && !eye.getTagCompound().getBoolean("sharingan_blinded"))) {
+						if (eye.getItem() == new ItemStack(ItemMangekyoSharinganEternal.helmet, (int) (1)).getItem()  && entity instanceof EntityPlayer) {
+
+							if (entity.getEntityData().getInteger("KekkeiGenkai") == 23) {
+								ItemMangekyoSharinganObito.registerJutsu1((EntityPlayer) entity,world, itemstack, values,usingJutsu);
+								ItemMangekyoSharinganObito.registerJutsu3((EntityPlayer) entity,world, itemstack, values,usingJutsu);
+							} else {
+								ItemMangekyoSharingan.registerJutsu1((EntityPlayer) entity,world, itemstack, values,usingJutsu);
+								ItemMangekyoSharingan.registerJutsu3((EntityPlayer) entity,world, itemstack, values,usingJutsu);
+							}
+
+							ItemMangekyoSharingan.registerJutsu2((EntityPlayer) entity,world, itemstack, values,usingJutsu);
+						}
+					}
+				}
+
+
 			}
 
 			@Override
@@ -118,7 +144,7 @@ public class ItemMangekyoSharinganEternal extends ElementsNarutomodMod.ModElemen
 				return TextFormatting.RED + super.getItemStackDisplayName(stack) + TextFormatting.WHITE;
 			}
 
-			@Override
+			/*@Override
 			public boolean onJutsuKey1(boolean is_pressed, ItemStack stack, EntityPlayer entity) {
 				Map<String, Object> $_dependencies = Maps.newHashMap();
 				$_dependencies.put("is_pressed", is_pressed);
@@ -157,7 +183,7 @@ public class ItemMangekyoSharinganEternal extends ElementsNarutomodMod.ModElemen
 					ProcedureKamuiJikukanIdo.executeProcedure($_dependencies);
 				}
 				return true;
-			}
+			}*/
 
 			@Override
 			public boolean onSwitchJutsuKey(boolean is_pressed, ItemStack stack, EntityPlayer entity) {

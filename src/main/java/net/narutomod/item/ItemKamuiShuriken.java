@@ -190,7 +190,7 @@ public class ItemKamuiShuriken extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			if (this.ticksExisted % 40 == 2) {
-				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:KamuiSFX")),
+				this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kamuiSFX")),
 				 1, 1f / (this.rand.nextFloat() * 0.5f + 1f) + 0.25f);
 			}
 			if (this.inGround) {

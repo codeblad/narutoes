@@ -17,7 +17,7 @@
     "shootConstantly": false,
     "usageCount": 0,
     "actionSound": {
-      "value": "CUSTOM:KamuiSFX"
+      "value": "CUSTOM:kamui"
     },
     "hasGlow": false,
     "animation": "bow",

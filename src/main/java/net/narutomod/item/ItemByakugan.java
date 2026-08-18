@@ -356,11 +356,6 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 							this.user.rotationYaw = ProcedureUtils.getYawFromVec(vec);
 							this.user.rotationPitch = ProcedureUtils.getPitchFromVec(vec);
 						}
-						Chakra.Pathway cp = Chakra.pathway(this.target);
-						cp.consume(0.1f/64);
-						if (cp.getAmount() > cp.getMax()) {
-							cp.consume(0.05f);
-						}
 						this.palmTracker++;
 					} else {
 						if (this.counter < 5) {
@@ -387,6 +382,12 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
 							1f, 0.6f+this.rand.nextFloat()*1.2f);
+
+					Chakra.Pathway cp = Chakra.pathway(this.target);
+					cp.consume(0.1f/64);
+					if (cp.getAmount() > cp.getMax()) {
+						cp.consume(0.025f);
+					}
 				}
 				if (this.used) {
 					Vec3d look = this.user.getLookVec();

@@ -498,7 +498,11 @@ public class BlockAmaterasuBlock extends ElementsNarutomodMod.ModElement {
 		public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
 			if (!worldIn.isRemote && entityIn instanceof EntityLivingBase) {
 				int amp = this.getLevel(worldIn, pos);
-				((EntityLivingBase)entityIn).addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, 60, amp, false, false));
+				int duration = 5;
+				if (((EntityLivingBase)entityIn).isPotionActive(PotionAmaterasuFlame.potion)) {
+					duration = ((EntityLivingBase)entityIn).getActivePotionEffect(PotionAmaterasuFlame.potion).getDuration()+2;
+				}
+				((EntityLivingBase)entityIn).addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, duration, amp, false, false));
 			}
 			entityIn.setFire(500);
 		}

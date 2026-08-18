@@ -31,7 +31,7 @@ import net.narutomod.ElementsNarutomodMod;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureSusanoo extends ElementsNarutomodMod.ModElement {
-	private static final String SUMMONED_SUSANOO = "summonedSusanooID";
+	public static final String SUMMONED_SUSANOO = "summonedSusanooID";
 	public static final double BASE_CHAKRA_USAGE = 50d;
 
 	public ProcedureSusanoo(ElementsNarutomodMod instance) {
@@ -71,7 +71,11 @@ public class ProcedureSusanoo extends ElementsNarutomodMod.ModElement {
 		boolean flag = (player.isCreative() || ProcedureUtils.hasItemInInventory(player, ItemRinnegan.helmet));
 		ItemStack helmet = player.inventory.armorInventory.get(3);
 
-		player.getEntityData().setDouble("susanoo_cd", NarutomodModVariables.world_tick + susancool);
+		if (player.isCreative()) {
+			susancool = 0;
+		}
+
+		helmet.getTagCompound().setInteger("susanCD", (int) susancool);
 		if (!flag && helmet.getItem() != ItemMangekyoSharinganEternal.helmet) {
 			player.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, (int) 8, 3));
 			player.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, (int) 8, 2));

@@ -386,6 +386,24 @@
       }
     ]
   },
+  "new_kamui": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:new_kamui",
+        "stream": false
+      }
+    ]
+  },
+  "honoikazuchi": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:honoikazuchi",
+        "stream": false
+      }
+    ]
+  },
   "mountain_crusher": {
     "category": "master",
     "sounds": [
@@ -1286,11 +1304,11 @@
       }
     ]
   },
-  "kamui": {
+  "kamuiSFX": {
     "category": "master",
     "sounds": [
       {
-        "name": "narutomod:kamui_sound_efect_",
+        "name": "narutomod:kamuiSFX",
         "stream": false
       }
     ]

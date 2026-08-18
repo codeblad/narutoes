@@ -101,7 +101,7 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 				$_dependencies.put("z", z);
 				ProcedureShinraTenseiOnKeyPressed.executeProcedure($_dependencies);
 			}
-		} else if ((((helmet).getItem() == new ItemStack(ItemMangekyoSharingan.helmet, (int) (1)).getItem())
+		} /*else if ((((helmet).getItem() == new ItemStack(ItemMangekyoSharingan.helmet, (int) (1)).getItem())
 				|| ((helmet).getItem() == new ItemStack(ItemMangekyoSharinganEternal.helmet, (int) (1)).getItem()))) {
 			{
 				NBTTagCompound nbt = new NBTTagCompound();
@@ -120,8 +120,8 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 				$_dependencies.put("z", z);
 				ProcedureAmaterasu.executeProcedure($_dependencies);
 			}
-		} else if (((helmet).getItem() == new ItemStack(ItemMangekyoSharinganObito.helmet, (int) (1)).getItem())) {
-			if ((((world.provider.getDimension()) == (WorldKamuiDimension.DIMID)) && (!(entity.isSneaking())))) {
+		}*/ else if (((helmet).getItem() == new ItemStack(ItemMangekyoSharinganObito.helmet, (int) (1)).getItem())) {
+			/*if ((((world.provider.getDimension()) == (WorldKamuiDimension.DIMID)) && (!(entity.isSneaking())))) {
 				{
 					NBTTagCompound nbt = new NBTTagCompound();
 					entity.writeToNBT(nbt);
@@ -154,7 +154,7 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 					$_dependencies.put("z", z);
 					ProcedureKamuiJikukanIdo.executeProcedure($_dependencies);
 				}
-			}
+			}*/
 		} else if (EntityBijuManager.cloakLevel((EntityPlayer) entity) == 3) {
 			EntityTailedBeast.Base biju = EntityBijuManager.getBijuOfPlayerInWorld((EntityPlayer) entity);
 			if (((is_pressed))) {

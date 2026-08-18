@@ -182,8 +182,8 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 				giveJutsu(ItemFuton.block, player);
 				int num2 = randNum(player,1);
 				giveJutsu(jutsuArray[num2], player);
-			} else if (buttonID == 12) {
-				//uchiha
+			} else if (buttonID == 12 || buttonID == 23) {
+				//uchiha and friends
 				giveJutsu(ItemKaton.block, player);
 				int num2 = randNum(player,0);
 				giveJutsu(jutsuArray[num2], player);
@@ -286,7 +286,7 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 			this.buttonList.add(new GuiButton(9, this.guiLeft + 200, this.guiTop + 50, 39, 20, "loosenedcube"));
 			this.buttonList.add(new GuiButton(10, this.guiLeft + 0, this.guiTop + 75, 39, 20, "Gates"));
 			this.buttonList.add(new GuiButton(11, this.guiLeft + 50, this.guiTop + 75, 39, 20, "Hyuga"));
-			this.buttonList.add(new GuiButton(12, this.guiLeft + 100, this.guiTop + 75, 39, 20, "Uchiha"));
+			this.buttonList.add(new GuiButton(12, this.guiLeft + 100, this.guiTop + 75, 39, 20, "Amaterasu"));
 			this.buttonList.add(new GuiButton(13, this.guiLeft + 150, this.guiTop + 75, 39, 20, "Medical"));
 			this.buttonList.add(new GuiButton(14, this.guiLeft + 200, this.guiTop + 75, 39, 20, "Naruto"));
 			this.buttonList.add(new GuiButton(15, this.guiLeft + 0, this.guiTop + 100, 39, 20, "Flying Raijin"));
@@ -297,6 +297,7 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 			this.buttonList.add(new GuiButton(20, this.guiLeft + 50, this.guiTop + 125, 39, 20, "Crystal"));
 			this.buttonList.add(new GuiButton(21, this.guiLeft + 100, this.guiTop + 125, 39, 20, "Paper"));
 			this.buttonList.add(new GuiButton(22, this.guiLeft + 150, this.guiTop + 125, 39, 20, "Lightning Cloak"));
+			this.buttonList.add(new GuiButton(23, this.guiLeft + 200, this.guiTop + 125, 39, 20, "Kamui"));
 			this.buttonList.add(new GuiButton(69, this.guiLeft + 100, this.guiTop + 150, 39, 20, "Regular Dude"));
 		}
 	}
