@@ -56,7 +56,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 	public static class EC extends EntityBeamBase.Base implements ItemJutsu.IJutsu {
 		private final AirPunch stream = new AirPunch();
 		private final float damageModifier = 0.5f;
-		private int maxLife = 20;
+		private int maxLife = 40;
 		private float power;
 		private EntityLivingBase user;
 
@@ -67,7 +67,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 		public EC(EntityLivingBase shooter, float scale) {
 			super(shooter);
 			this.power = scale;
-			this.maxLife = (int) (20+80*scale/5);
+			this.maxLife = (int) (60+80*scale/5);
 			this.user = shooter;
 		}
 
@@ -76,7 +76,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 				Vec3d vec3d = this.shootingEntity.getLookVec();
 				Vec3d vec3d1 = vec3d.add(this.shootingEntity.getPositionEyes(1f).subtract(0d, 0.2d, 0d));
 				this.setPositionAndRotation(vec3d1.x, vec3d1.y, vec3d1.z, this.shootingEntity.rotationYaw, this.shootingEntity.rotationPitch);
-				vec3d1 = vec3d.scale(15+this.power*1.5);
+				vec3d1 = vec3d.scale(60+this.power*2.0);
 				this.shoot(vec3d1.x, vec3d1.y, vec3d1.z);
 			}
 		}
@@ -94,7 +94,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 					this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:waterstream")), 0.4f, this.power / 30f - this.rand.nextFloat() * 0.1f);
 				}
 				this.shoot();
-				this.stream.execute2(this.shootingEntity, (double)this.power, 0.5d);
+				this.stream.execute2(this.shootingEntity, (double)this.power * 1.75d, 1.5d);
 			}
 			if (!this.world.isRemote && (this.ticksAlive > this.maxLife || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
 				this.setDead();
@@ -120,7 +120,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 				Vec3d vec0 = EC.this.getPositionVector();
 				Vec3d vec1 = player.getLookVec();
 				Particles.Renderer particles = new Particles.Renderer(player.world);
-				for (int i = 1, j = (int)(range * 3d); i < j; i++) {
+				for (int i = 1, j = (int)(range * 5d); i < j; i++) {
 					Vec3d vec = vec0.addVector((this.rand.nextDouble()-0.5d) * 0.2d,
 					 this.rand.nextDouble() * 0.2d, (this.rand.nextDouble()-0.5d) * 0.2d);
 					Vec3d vec3d = vec1.scale(range * (this.rand.nextDouble() * 0.5d + 0.5d) * 0.4d);
@@ -133,7 +133,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
 				target.extinguish();
-				float damage = 6 + ((1.35f+2.5f*(EC.this.power/30)) * EC.this.damageModifier)*ItemJutsu.getDmgMult(player)*1.36f;
+				float damage = 6 + ((1.35f+2.65f*(EC.this.power/30)) * EC.this.damageModifier)*ItemJutsu.getDmgMult(player)*1.36f;
 				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityLivingBase) player, ItemSuiton.block);
 				if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 					damage*=1.35f;

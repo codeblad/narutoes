@@ -158,13 +158,13 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 				} else {
 					if (this.target != null) {
 						Vec3d vec = this.target.getPositionEyes(1f).subtract(this.getPositionVector()).subtract(0,this.target.getEyeHeight()/2,0);
-						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.99f : 0.975f, 0f);
+						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 1.05f : 0.99f, 0f);
 					} else {
 						this.target = this.shootingEntity instanceof EntityLiving ? ((EntityLiving)this.shootingEntity).getAttackTarget()
 						 : ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 50d, 3d, this).entityHit;
 						Vec3d vec = this.target != null ? this.target.getPositionEyes(1f).subtract(this.getPositionVector())
 						 : this.shootingEntity.getLookVec();
-						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 0.99f : 0.975f, 0f);
+						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 1.05f : 0.99f, 0f);
 					}
 					if (this.ticksAlive <= this.wait + this.mouthOpenTime) {
 						this.setMOA((float)(this.ticksAlive - this.wait) / this.mouthOpenTime);
@@ -173,7 +173,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 			}
 			this.updateLimbSwing();
 			if (!this.world.isRemote
-			 && (this.ticksInAir > 60 || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
+			 && (this.ticksInAir > 80 || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
 				this.setDead();
 			}
 		}
@@ -265,7 +265,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
-					ItemJutsu.setCurrentJutsuCooldown(stack, 100*1);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 12);
 				}
 				return power >= 1.0f ? this.createJutsu(entity, power)  : false;
 			}

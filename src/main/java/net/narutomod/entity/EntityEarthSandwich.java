@@ -79,7 +79,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 		public EC(EntityLivingBase userIn, Vec3d atVec, float heightIn) {
 			this(userIn.world);
 			heightIn /= this.ogHeight;
-			this.setScale(heightIn*1.5f);
+			this.setScale(heightIn*0.75f);
 			this.setLocationAndAngles(atVec.x, atVec.y, atVec.z, userIn.rotationYawHead, 0f);
 			this.user = userIn;
 		}
@@ -117,7 +117,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 			super.notifyDataManagerChange(key);
 			if (SCALE.equals(key) && this.world.isRemote) {
 				float scale = this.getScale();
-				this.setSize(this.ogWidth * scale, this.ogHeight * scale);
+				this.setSize(this.ogWidth * (scale * 0.75f), this.ogHeight * (scale * 0.75f));
 			}
 		}
 
@@ -173,7 +173,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 					 this.posX, this.posY, this.posZ, (int)(f * f * 6f), this.width * 0.2, 0.5d, this.width * 0.2,
 					 0.15d, Block.getIdFromBlock(Blocks.DIRT));
 				}
-				if (age > 70) {
+				if (age > 60) {
 					this.setDead();
 				}
 			}
@@ -196,7 +196,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 2f) {
-					RayTraceResult rt = ProcedureUtils.raytraceBlocks(entity, 45d);
+					RayTraceResult rt = ProcedureUtils.raytraceBlocks(entity, 60d);
 					if (rt != null && rt.typeOfHit == RayTraceResult.Type.BLOCK) {
 						if (power >= 8f) {
 							entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY

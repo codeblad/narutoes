@@ -37,7 +37,7 @@ public class ItemShoton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 471;
 	public static final ItemJutsu.JutsuEnum ARMOR = new ItemJutsu.JutsuEnum(0, "crystal_armor", 'S', 150, 10d, new EntityCrystalArmor.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum PRISON = new ItemJutsu.JutsuEnum(1, "crystal_prison", 'S', 150, 100d, new EntityCrystalPrison.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum PRISON = new ItemJutsu.JutsuEnum(1, "crystal_prison", 'S', 100, 100d, new EntityCrystalPrison.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum THORNS = new ItemJutsu.JutsuEnum(2, "crystal_thorns", 'S', 150, 15d, new EntityCrystalThorns.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum RAY = new ItemJutsu.JutsuEnum(3, "crystal_ray", 'S', 300, 500d, new EntityCrystalRay.EC.Jutsu());
 	public ItemShoton(ElementsNarutomodMod instance) {

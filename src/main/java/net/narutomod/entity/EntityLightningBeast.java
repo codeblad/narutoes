@@ -267,7 +267,7 @@ public class EntityLightningBeast extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (entity instanceof EntityPlayer && power >= 5.0f) {
 					entity.world.spawnEntity(new EC((EntityPlayer)entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack,20*10);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*16);
 					return true;
 				}
 				return false;

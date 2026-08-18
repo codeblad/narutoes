@@ -92,9 +92,9 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 						if (!net.narutomod.Chakra.pathway(user).consume(ItemKaton.FLAMESLICE.chakraUsage * 2.0d)) {
 							return;
 						}
-						this.world.spawnEntity(new EntitySweepParticle(user, 8.0f));
-						double d = ProcedureUtils.getReachDistance(user)+4;
-						float damage = (float)ProcedureUtils.getModifiedAttackDamage(user) * this.getCooledAttackStrength(user, 0.5f) + (ItemJutsu.getDmgMult(user)*0.5f*this.getCooledAttackStrength(user, 0.5f));
+						this.world.spawnEntity(new EntitySweepParticle(user, 10.0f));
+						double d = ProcedureUtils.getReachDistance(user)+6;
+						float damage = (float)ProcedureUtils.getModifiedAttackDamage(user) * this.getCooledAttackStrength(user, 5.0f) + (ItemJutsu.getDmgMult(user)*1.25f*this.getCooledAttackStrength(user, 5.0f));
 						ItemStack stack = ProcedureUtils.getMatchingItemStack(user,ItemKaton.block);
 						if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 							damage*=1.35f;
@@ -127,7 +127,7 @@ public class EntityFlameSlice extends ElementsNarutomodMod.ModElement {
 	    public float getCooledAttackStrength(EntityLivingBase entity, float adjustTicks) {
 	    	float f = (float)(1.0D / ProcedureUtils.getAttackSpeed(entity) * 20.0D);
 	        float f2 = MathHelper.clamp(((float)this.ticksSinceLastSwing + adjustTicks) / f, 0.0F, 1.0F);
-	        return 0.2F + f2 * f2 * 0.8F;
+	        return 0.2F + f2 * f2 * 1.0F;
 	    }
 
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {

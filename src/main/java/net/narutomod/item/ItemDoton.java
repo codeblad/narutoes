@@ -361,7 +361,7 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 					//this.removeTime = this.ticksExisted + 1200;
 				}
 			} else if (!this.world.isRemote && this.dieOnDone) {
-				this.removeTime = 1200;
+				this.removeTime = 600;
 				this.setDead();
 			}
 			/*if (!this.affectedList.isEmpty()) {
@@ -442,7 +442,7 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 					if (rt != null && rt.typeOfHit == RayTraceResult.Type.BLOCK) {
 						entity.world.spawnEntity(new EntityEarthWall(
 						  entity.world, rt.hitVec.x, rt.hitVec.y, rt.hitVec.z, entity.rotationYaw, (double)power));
-						ItemJutsu.setCurrentJutsuCooldown(stack, 15*1 + (int) (14f * (power/50f)));
+						ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 20);
 						return true;
 					}
 				}

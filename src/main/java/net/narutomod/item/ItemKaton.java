@@ -58,7 +58,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum GFANNIHILATION = new ItemJutsu.JutsuEnum(1, "tooltip.katon.annihilation", 'B', 60d, new EntityFirestream.EC.Jutsu1());
 	public static final ItemJutsu.JutsuEnum HIDINGINASH = new ItemJutsu.JutsuEnum(2, "hiding_in_ash", 'B', 10d, new EntityHidingInAsh.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum GREATFLAME = new ItemJutsu.JutsuEnum(3, "katonfirestream", 'C', 15d, new EntityFirestream.EC.Jutsu2());
-	public static final ItemJutsu.JutsuEnum FLAMESLICE = new ItemJutsu.JutsuEnum(4, "flame_slice", 'D', 20d, new EntityFlameSlice.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum FLAMESLICE = new ItemJutsu.JutsuEnum(4, "flame_slice", 'D', 30d, new EntityFlameSlice.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum BARRIER = new ItemJutsu.JutsuEnum(5, "flame_formation", 'B', 120d, new EntityFlameFormation.EC.Jutsu());
 
 	public ItemKaton(ElementsNarutomodMod instance) {
@@ -103,7 +103,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityBigFireball extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private static final DataParameter<Boolean> COLORED = EntityDataManager.createKey(EntityBigFireball.class, DataSerializers.BOOLEAN);
-		private float fullScale = 1f;
+		private float fullScale = 0.85f;
 		private final int timeToFullscale = 10;
 		private int explosionSize;
 		private float damage;
@@ -123,7 +123,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			this.explosionSize = Math.max((int)fullScale - 4, 0);
 			this.isImmuneToFire = true;
 			//this.damage = fullScale * 10.0f;
-			this.mult = 2.0f + 4.0f*(fullScale/10);
+			this.mult = 2.0f + 3.85f*(fullScale/10);
 			this.damage = 16 + ItemJutsu.getDmgMult(shooter)*mult;
 			this.damage*= 1.305f; //futon chakra drain
 			ItemStack stack = ProcedureUtils.getMatchingItemStack(shooter,ItemKaton.block);
@@ -217,7 +217,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 				this.setDead();
 			} else {
 				if (!this.world.isRemote && this.ticksAlive <= this.timeToFullscale) {
-					this.setEntityScale(1f + (this.fullScale - 1f) * this.ticksAlive / this.timeToFullscale);
+					this.setEntityScale(Math.max(3.5F, 1.0f + (this.fullScale - 3f) * (this.ticksAlive * 0.5f) / this.timeToFullscale));
 				}
 				if (this.guided && this.shootingEntity != null) {
 					Vec3d vec;
@@ -249,7 +249,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					this.createJutsu(entity, entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power,
 					 stack.getItem() instanceof RangedItem && ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) <= 0.5f);
 					//if (entity instanceof EntityPlayer)
-					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (60+(power/20)*3));
+					ItemJutsu.setCurrentJutsuCooldown(stack, (long) (80+(power/20)*3));
 					return true;
 				}
 				return false;

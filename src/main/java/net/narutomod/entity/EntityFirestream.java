@@ -72,7 +72,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			this(shooterIn.world);
 			this.shooter = shooterIn;
 			this.setIdlePosition();
-			this.width = MathHelper.clamp(widthIn,1,25);
+			this.width = MathHelper.clamp(widthIn,5,35);
 			this.range = MathHelper.clamp(rangeIn,20,300);
 			float mult = 0.75f+1.5f*(((float) powa)/25);
 			this.damage = 4F+ItemJutsu.getDmgMult(shooterIn)*1.6f*mult;
