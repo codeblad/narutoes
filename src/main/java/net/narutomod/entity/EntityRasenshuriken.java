@@ -143,7 +143,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 					this.setEntityScale(this.fullScale * (this.ticksAlive + 1) / this.growTime);
 					this.setPosition(this.shootingEntity.posX, this.shootingEntity.posY + this.shootingEntity.height + 0.5d, this.shootingEntity.posZ);
 				} else if (this.targetTrace == null || this.targetTrace.entityHit == null) {
-					if (this.getDistance(this.shootingEntity) < 48d) {
+					if (this.getDistance(this.shootingEntity) < 68d) {
 						RayTraceResult rt = ProcedureUtils.objectEntityLookingAt(this.shootingEntity, 50d, 3d);
 						if (!this.equals(rt.entityHit) && !this.shootingEntity.equals(rt.entityHit)) {
 							this.targetTrace = rt;
@@ -154,7 +154,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 					this.motionX *= 0.9d;
 					this.motionY *= 0.9d;
 					this.motionZ *= 0.9d;
-					this.shoot(this.targetTrace.hitVec.x - this.posX, this.targetTrace.hitVec.y - this.posY, this.targetTrace.hitVec.z - this.posZ, 0.99f, 0f);
+					this.shoot(this.targetTrace.hitVec.x - this.posX, this.targetTrace.hitVec.y - this.posY, this.targetTrace.hitVec.z - this.posZ, 1.025f, 0f);
 				}
 			}
 			if (this.fullScale >= 4.0f) {
@@ -173,13 +173,14 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			if ((result.typeOfHit == RayTraceResult.Type.BLOCK
 			  && this.world.getBlockState(result.getBlockPos()).getBlock() == BlockLightSource.block)
 			 || (result.entityHit != null && result.entityHit.equals(this.shootingEntity))
-			 || (result.typeOfHit == RayTraceResult.Type.BLOCK && this.fullScale > 1.0f && this.ticksInAir < 15)) {
+			 || (result.typeOfHit == RayTraceResult.Type.BLOCK && this.fullScale > 1.0f && this.ticksInAir < 10)) {
 				return;
 			}
 			if (!this.world.isRemote && this.shootingEntity != null) {
 				ProcedureSync.EntityNBTTag.removeAndSync(this.shootingEntity, NarutomodModVariables.forceBowPose);
 			}
 			this.setImpactTicks(1);
+			this.setPosition(result.hitVec.x, result.hitVec.y, result.hitVec.z);
 			this.haltMotion();
 			this.impactVec = result.hitVec;
 		}
@@ -191,7 +192,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 		protected void doImpactDamage() {
 			ProcedureAoeCommand.set(this.world, this.impactVec.x, this.impactVec.y, this.impactVec.z, 0d, this.width/2)
 			  .exclude(this.shootingEntity).exclude(EntityTruthSeekerBall.EntityCustom.class).resetHurtResistanceTime()
-			  .damageEntities(this.damageSource, (10+ (1+4.5f*(this.fullScale/5)) * ItemJutsu.getDmgMult(this.shootingEntity)*0.095f) * this.impactDamageMultiplier )
+			  .damageEntities(this.damageSource, (10+ (1+4.0f*(this.fullScale/5)) * ItemJutsu.getDmgMult(this.shootingEntity)*0.095f) * this.impactDamageMultiplier )
 			  .motion(0d, 0d, 0d);
 		}
 
@@ -288,7 +289,7 @@ public class EntityRasenshuriken extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if ((stack.getItem() == ItemFuton.block && power >= 0.1f) || (stack.getItem() == ItemSenjutsu.block && power >= 2.0f)) {
 					EC.create(entity, power, stack.getItem() == ItemSenjutsu.block);
-					ItemJutsu.setCurrentJutsuCooldown(stack,20*2);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*30);
 					return true;
 				}
 				return false;

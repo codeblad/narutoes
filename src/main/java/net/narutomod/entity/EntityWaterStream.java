@@ -56,7 +56,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 	public static class EC extends EntityBeamBase.Base implements ItemJutsu.IJutsu {
 		private final AirPunch stream = new AirPunch();
 		private final float damageModifier = 0.5f;
-		private int maxLife = 40;
+		private int maxLife = 20;
 		private float power;
 		private EntityLivingBase user;
 
@@ -67,7 +67,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 		public EC(EntityLivingBase shooter, float scale) {
 			super(shooter);
 			this.power = scale;
-			this.maxLife = (int) (60+80*scale/5);
+			this.maxLife = (int) (20+80*scale/5);
 			this.user = shooter;
 		}
 
@@ -76,7 +76,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 				Vec3d vec3d = this.shootingEntity.getLookVec();
 				Vec3d vec3d1 = vec3d.add(this.shootingEntity.getPositionEyes(1f).subtract(0d, 0.2d, 0d));
 				this.setPositionAndRotation(vec3d1.x, vec3d1.y, vec3d1.z, this.shootingEntity.rotationYaw, this.shootingEntity.rotationPitch);
-				vec3d1 = vec3d.scale(60+this.power*2.0);
+				vec3d1 = vec3d.scale(15+this.power*2.0);
 				this.shoot(vec3d1.x, vec3d1.y, vec3d1.z);
 			}
 		}
@@ -120,7 +120,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 				Vec3d vec0 = EC.this.getPositionVector();
 				Vec3d vec1 = player.getLookVec();
 				Particles.Renderer particles = new Particles.Renderer(player.world);
-				for (int i = 1, j = (int)(range * 5d); i < j; i++) {
+				for (int i = 1, j = (int)(range * 3d); i < j; i++) {
 					Vec3d vec = vec0.addVector((this.rand.nextDouble()-0.5d) * 0.2d,
 					 this.rand.nextDouble() * 0.2d, (this.rand.nextDouble()-0.5d) * 0.2d);
 					Vec3d vec3d = vec1.scale(range * (this.rand.nextDouble() * 0.5d + 0.5d) * 0.4d);
@@ -145,7 +145,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected EntityItem processAffectedBlock(Entity player, BlockPos pos, EnumFacing facing) {
 				EntityItem ret = super.processAffectedBlock(player, pos, facing);
-				if ((ret != null || this.rand.nextFloat() < 0.025f) && player.world.isAirBlock(pos.up())) {
+				if ((ret != null || this.rand.nextFloat() < 0.015f) && player.world.isAirBlock(pos.up())) {
 					new net.narutomod.event.EventSetBlocks(player.world, ImmutableMap.of(pos.up(),
 					 Blocks.FLOWING_WATER.getDefaultState().withProperty(BlockLiquid.LEVEL, Integer.valueOf(1))),
 					 0, 10, false, false);

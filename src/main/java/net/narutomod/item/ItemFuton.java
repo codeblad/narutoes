@@ -41,12 +41,12 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 	public static final Item block = null;
 	public static final int ENTITYID = 132;
 	public static final int ENTITY2ID = 10132;
-	public static final ItemJutsu.JutsuEnum CHAKRAFLOW = new ItemJutsu.JutsuEnum(0, "futonchakraflow", 'D', 150d, new ChakraFlow.Jutsu());
-	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(1, "rasenshuriken", 'S', 1250d, new EntityRasenshuriken.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum VACUUMS = new ItemJutsu.JutsuEnum(2, "futon_vacuum", 'B', 55d, new EntityFutonVacuum.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHAKRAFLOW = new ItemJutsu.JutsuEnum(0, "futonchakraflow", 'D', 25d, new ChakraFlow.Jutsu());
+	public static final ItemJutsu.JutsuEnum RASENSHURIKEN = new ItemJutsu.JutsuEnum(1, "rasenshuriken", 'S', 1000d, new EntityRasenshuriken.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum VACUUMS = new ItemJutsu.JutsuEnum(2, "futon_vacuum", 'B', 30d, new EntityFutonVacuum.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum BIGBLOW = new ItemJutsu.JutsuEnum(3, "futon_great_breakthrough", 'C', 5d, new EntityFutonGreatBreakthrough.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum WINDBLADE = new ItemJutsu.JutsuEnum(4, "wind_blade", 'A', 65d, new EntityWindBlade.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum VACWAVE = new ItemJutsu.JutsuEnum(5, "vacuum_wave", 'B', 55d, new EntityVacuumWave.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum WINDBLADE = new ItemJutsu.JutsuEnum(4, "wind_blade", 'A', 80d, new EntityWindBlade.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum VACWAVE = new ItemJutsu.JutsuEnum(5, "vacuum_wave", 'B', 100d, new EntityVacuumWave.EC.Jutsu());
 
 	public ItemFuton(ElementsNarutomodMod instance) {
 		super(instance, 376);
@@ -140,7 +140,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 			super.addEffects();
 			EntityLivingBase user = this.getUser();
 			if (user != null && this.ticksExisted % 10 == 0) {
-				user.addPotionEffect(new PotionEffect(PotionReach.potion, 12, 0, false, false));
+				user.addPotionEffect(new PotionEffect(PotionReach.potion, 12, 3, false, false));
 			}
 		}
 
