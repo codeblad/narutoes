@@ -81,7 +81,7 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 			this(userIn.world);
 			this.setSummoner(userIn);
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(Math.max(userIn.getMaxHealth() * 3f, 20.0f));
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(Math.max(userIn.getMaxHealth() * 3.3f, 20.0f));
 			this.setHealth(this.getMaxHealth());
 			userIn.getEntityData().setInteger(ENTITYID_KEY, this.getEntityId());
 			//if (userIn.isPotionActive(MobEffects.STRENGTH)) {
@@ -146,7 +146,7 @@ public class EntityCrystalArmor extends ElementsNarutomodMod.ModElement {
 							if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 								ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
 								//(30*20)+this.ticksExisted+this.ticksExisted/2
-								item.setJutsuCooldown(stack, ARMOR, 20*30);
+								item.setJutsuCooldown(stack, ARMOR, 20*25);
 							}
 						}
 					}

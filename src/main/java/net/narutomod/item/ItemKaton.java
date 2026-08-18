@@ -232,7 +232,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					this.motionX *= 0.9D;
 					this.motionY *= 0.9D;
 					this.motionZ *= 0.9D;
-					this.shoot(vec.x, vec.y, vec.z, 1.5f, 0f);
+					this.shoot(vec.x, vec.y, vec.z, 1.01f, 0f);
 				}
 				if (this.rand.nextFloat() <= 0.2f) {
 					//this.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1, this.rand.nextFloat() + 0.5f);
@@ -265,7 +265,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 
 			public void createJutsu(EntityLivingBase entity, double x, double y, double z, float power, boolean isGuided, boolean colored) {
 				EntityBigFireball entityarrow = new EntityBigFireball(entity, power, isGuided, colored);
-				entityarrow.shootPrecise(x, y, z, 1.15f);
+				entityarrow.shootPrecise(x, y, z, 1.01f);
 				entity.world.spawnEntity(entityarrow);
 			}
 

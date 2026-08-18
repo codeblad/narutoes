@@ -155,8 +155,8 @@ public class EntityFingerBone extends ElementsNarutomodMod.ModElement {
 				Vec3d vec1 = entity.getPositionVector().add(look).addVector(0.0d, 1.6d, 0.0d);
 
 				for (int i = 0; i < 5; i++) {
-					double spreadX = (i - 2) * 0.12d;
-					double spreadY = (i == 0 ? 0.08d : 0.0d);
+					double spreadX = (entity.getRNG().nextDouble() - 0.5d) * 0.16d;
+					double spreadY = (entity.getRNG().nextDouble() - 0.5d) * 0.16d;
 
 					Vec3d direction = look
 						.add(right.scale(spreadX))
