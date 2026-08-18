@@ -103,7 +103,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 					this.playSound(SoundEvent.REGISTRY
 					 .getObject(new ResourceLocation("narutomod:electricity")), 1.0f, this.rand.nextFloat() * 0.6f + 0.6f);
 				}
-				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 40d+this.ticksExisted*2);
+				RayTraceResult res = ProcedureUtils.objectEntityLookingAt(this.summoner, 20d+this.ticksExisted);
 				if (res != null) {
 					this.setLightningAt(res.hitVec);
 				}
