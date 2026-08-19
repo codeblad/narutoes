@@ -104,6 +104,7 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 	public static class EC extends EntityClone.Base implements ItemJutsu.IJutsu {
 		private static final DataParameter<Boolean> IGNITED = EntityDataManager.<Boolean>createKey(EC.class, DataSerializers.BOOLEAN);
 		private final int fuse = 30;
+		private final int slowtime = 20;
 		private int ignitionTime;
 		private boolean exploded;
 
@@ -163,7 +164,7 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 		public boolean attackEntityAsMob(Entity entityIn) {
 			this.ignite();
 			if (entityIn instanceof EntityLivingBase) {
-				((EntityLivingBase)entityIn).addPotionEffect(new PotionEffect(PotionHeaviness.potion, this.fuse, 3, false, false));
+				((EntityLivingBase)entityIn).addPotionEffect(new PotionEffect(PotionHeaviness.potion, this.slowtime, 2, false, false));
 			}
 			return super.attackEntityAsMob(entityIn);
 		}
@@ -234,7 +235,7 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (!entity.isSneaking()) {
 					this.createJutsu(entity);
-					ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20*8);
 					return true;
 				} else {
 					for (EC clone : entity.world.getEntities(EC.class, EntitySelectors.IS_ALIVE)) {
@@ -248,7 +249,7 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 
 			public static EC createJutsu(EntityLivingBase entity) {
 				EC entity1 = new EC(entity);
-				if (entity.getRevengeTarget() != null) {
+				/*if (entity.getRevengeTarget() != null) {
 					EntityLivingBase attacker = entity.getRevengeTarget();
 					List<BlockPos> list = ProcedureUtils.getAllAirBlocks(entity.world, attacker.getEntityBoundingBox().grow(16d, 8d, 16d));
 					list.sort(new ProcedureUtils.BlockposSorter(entity.getPosition()));
@@ -266,8 +267,8 @@ public class EntityExplosiveClone extends ElementsNarutomodMod.ModElement {
 								break;
 							}
 						}
-					}
-				} else {
+					}*/
+					{
 					entity.world.playSound(null, entity.posX, entity.posY, entity.posZ, SoundEvent.REGISTRY
 					  .getObject(new ResourceLocation("narutomod:kagebunshin")), SoundCategory.NEUTRAL, 1.0F, 1.0F);
 				}

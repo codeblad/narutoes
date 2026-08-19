@@ -173,7 +173,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 					 this.posX, this.posY, this.posZ, (int)(f * f * 6f), this.width * 0.2, 0.5d, this.width * 0.2,
 					 0.15d, Block.getIdFromBlock(Blocks.DIRT));
 				}
-				if (age > 60) {
+				if (age > 50) {
 					this.setDead();
 				}
 			}
@@ -206,7 +206,7 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 							 .getObject(new ResourceLocation("narutomod:jutsu")), SoundCategory.NEUTRAL, 1, 1f);
 						}
 						entity.world.spawnEntity(new EC(entity, rt.hitVec, power));
-						ItemJutsu.setCurrentJutsuCooldown(stack, 20*14);
+						ItemJutsu.setCurrentJutsuCooldown(stack, 20*18);
 						return true;
 					}
 				}
