@@ -1,6 +1,7 @@
 
 package net.narutomod.item;
 
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -58,14 +59,16 @@ import net.narutomod.PlayerRender;
 import net.narutomod.PlayerTracker;
 import net.narutomod.ElementsNarutomodMod;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:bakuton")
 	public static final Item block = null;
 	public static final int ENTITYID = 230;
-	public static final ItemJutsu.JutsuEnum JIRAIKEN = new ItemJutsu.JutsuEnum(0, "tooltip.bakuton.jiraiken", 'S', 150, 30d, new Jiraiken());
+	public static final ItemJutsu.JutsuEnum JIRAIKEN = new ItemJutsu.JutsuEnum(0, "tooltip.bakuton.jiraiken", 'S', 150, 90d, new Jiraiken());
 	public static final ItemJutsu.JutsuEnum CLAY = new ItemJutsu.JutsuEnum(1, "c_1", 'S', 200, 200d, new ExplosiveClay.Jutsu());
 	public static final ItemJutsu.JutsuEnum CLONE = new ItemJutsu.JutsuEnum(2, "explosive_clone", 'S', 200, 500d, new EntityExplosiveClone.EC.Jutsu());
 public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3, "c0", 'S', 200, 500d, new C0());
@@ -119,13 +122,13 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 		@Override
 		public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
 			super.onUpdate(itemstack, world, entity, par4, par5);
-			if (entity.ticksExisted % 10 == 2 && entity instanceof EntityLivingBase && JIRAIKEN.jutsu.isActivated(itemstack)) {
+			/*if (entity.ticksExisted % 10 == 2 && entity instanceof EntityLivingBase && JIRAIKEN.jutsu.isActivated(itemstack)) {
 				((EntityLivingBase)entity).addPotionEffect(new PotionEffect(
 				 PotionChakraEnhancedStrength.potion, 12, (int)(5+(1+2*((Jiraiken)JIRAIKEN.jutsu).getPower(itemstack)/20)*(ItemJutsu.getDmgMult(entity)*1.5)), false, false));
-			} 
+			} */
 		}
 
-		@Override
+		/*@Override
 		public boolean onLeftClickEntity(ItemStack itemstack, EntityPlayer attacker, Entity target) {
 			if (attacker.equals(target)) {
 				target = ProcedureUtils.objectEntityLookingAt(attacker, 50d, 3d, ExplosiveClay.class).entityHit;
@@ -134,7 +137,7 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 				attacker.setRevengeTarget((EntityLivingBase)target);
 			}
 			return super.onLeftClickEntity(itemstack, attacker, target);
-		}
+		}*/
 
 		@SideOnly(Side.CLIENT)
 		@Override
@@ -152,12 +155,56 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 			if (!stack.hasTagCompound()) {
 				stack.setTagCompound(new NBTTagCompound());
 			}
-			boolean flag = !entity.isPotionActive(PotionChakraEnhancedStrength.potion);
+
+			/*boolean flag = !entity.isPotionActive(PotionChakraEnhancedStrength.potion);
 			stack.getTagCompound().setBoolean("isJiraikenActivated", flag);
-			stack.getTagCompound().setFloat("JiraikenPower", powerIn);
+			stack.getTagCompound().setFloat("JiraikenPower", powerIn);*/
 			//this.power = powerIn;
 			//return this.activated = !entity.isPotionActive(PotionChakraEnhancedStrength.potion);
-			return flag;
+			Vec3d start = entity.getPositionVector().addVector(0,1,0);
+			entity.world.playSound(null, start.x, start.y,start.z,
+					(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:jiraiken")),
+					SoundCategory.PLAYERS, 2F, 1.0F);
+			Vec3d look = entity.getLookVec();
+			Vec3d point = start.add(look.scale(2));
+			boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(entity.world, entity);
+			entity.world.newExplosion(entity, point.x,point.y,point.z ,3f, false, flag);
+			float strength = 1+powerIn;
+			List<String> targets = new ArrayList<String>();
+			for (int i = 0; i < 2; i++) {
+				point = point.add(look.scale(0.5+powerIn));
+				entity.world.newExplosion(entity, point.x,point.y,point.z ,strength, false, flag);
+				Vec3d a = point.addVector(-powerIn/2*entity.world.rand.nextFloat()*powerIn,-powerIn/2*entity.world.rand.nextFloat()*powerIn,-powerIn/2*entity.world.rand.nextFloat()*powerIn);
+				for (int x = 0; x < 25; x++) {
+					Particles.spawnParticle(entity.world, Particles.Types.SMOKE, a.x, a.y, a.z,
+							1, 1d, 0d, 1d, look.x*0.1,look.y*0.1,look.z*0.1, 0x64FFFFFF, 50, 0);
+				}
+				if (!entity.world.isRemote) {
+					AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(powerIn-1);
+					for (Entity entity1 : entity.world.getEntitiesWithinAABBExcludingEntity(entity, hitbox)) {
+						if (!(entity1 instanceof EntityLivingBase)) {
+							continue;
+						}
+						boolean found = false;
+						for (String enemy: targets) {
+							if (Objects.equals(enemy, entity1.getUniqueID().toString())) {
+								found = true;
+							}
+						}
+						if (found) {
+							continue;
+						}
+						targets.add(entity1.getUniqueID().toString());
+						float mult = 0.5f +	2f*(powerIn/10);
+						float damage = 10+(5f*mult*ItemJutsu.getDmgMult(entity));
+						ProcedureUtils.setVelocity(entity1, look.x*2, look.y*2, look.z*2);
+						entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(entity, entity),damage);
+
+					}
+				}
+			}
+			ItemJutsu.setCurrentJutsuCooldown(stack,20*3);
+			return true;
 		}
 
 		@Override
@@ -172,12 +219,12 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 
 		@Override
 		public float getBasePower() {
-			return 0.2f;
+			return 1f;
 		}
 
 		@Override
 		public float getPowerupDelay() {
-			return 40.0f;
+			return 20.0f;
 		}
 
 		@Override

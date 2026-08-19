@@ -404,6 +404,15 @@
       }
     ]
   },
+  "jiraiken": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "narutomod:jiraiken",
+        "stream": false
+      }
+    ]
+  },
   "mountain_crusher": {
     "category": "master",
     "sounds": [

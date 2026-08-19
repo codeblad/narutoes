@@ -1,6 +1,9 @@
 
 package net.narutomod.item;
 
+import net.minecraft.util.*;
+import net.minecraft.util.math.*;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -17,16 +20,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import net.minecraft.world.World;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Item;
@@ -42,6 +35,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentFrostWalker;
 import net.minecraft.nbt.NBTTagCompound;
 
+import net.narutomod.Particles;
 import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.entity.EntitySpike;
 import net.narutomod.entity.EntityIceSpear;
@@ -52,7 +46,9 @@ import net.narutomod.creativetab.TabModTab;
 import net.narutomod.EntityTracker;
 import net.narutomod.ElementsNarutomodMod;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemHyoton extends ElementsNarutomodMod.ModElement {
@@ -168,10 +164,118 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
+	public static class IceSphere extends Entity  {
+		private EntityLivingBase user;
+		private Vec3d look;
+		private Vec3d start;
+		private int lifeTime = 20;
+		private double power;
+		List<String> targets = new ArrayList<String>();
+		private RayTraceResult rtr;
+
+		public IceSphere(World worldIn) {
+			super(worldIn);
+			this.setSize(0.01f, 0.01f);
+			this.isImmuneToFire = true;
+		}
+
+
+		public IceSphere(EntityLivingBase user, double power, RayTraceResult rtr) {
+			this(user.world);
+			this.user = user;
+			this.look = this.user.getLookVec();
+			this.start = this.user.getPositionVector().addVector(0,1,0);
+			this.setPosition(this.start.x,this.start.y,this.start.z);
+			this.lifeTime = 50;
+			this.power = power;
+			this.rtr = rtr;
+			double distance = this.getDistance(rtr.hitVec.x,rtr.hitVec.y,rtr.hitVec.z);
+			for (double i = 0;i < distance; i+=0.5) {
+				Vec3d point = this.start.add(this.look.scale(i));
+				Particles.spawnParticle(this.world, Particles.Types.SMOKE, point.x, point.y, point.z,
+						1, 0, 0d, 0, 0,0,0, 0x64B8F7FF, 30, 0);
+				Particles.spawnParticle(this.world, Particles.Types.SMOKE, point.x, point.y, point.z,
+						1, 0, 0d, 0, 0,0,0, 0xFFFFFFFF, 10, 0);
+			}
+		}
+
+
+		@Override
+		protected void entityInit() {
+		}
+
+		@Override
+		public void onUpdate() {
+			if (this.user != null && !this.world.isRemote) {
+				if (this.ticksExisted == 5) {
+					this.world.playSound(null, this.rtr.hitVec.x, this.rtr.hitVec.y, this.rtr.hitVec.z,
+							net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:spiked")),
+							net.minecraft.util.SoundCategory.NEUTRAL, 5f, this.user.getRNG().nextFloat() * 0.4f + 0.8f);
+					for (int i = 0; i < 60; i++) {
+						EntityIceSpike entity1 = new EntityIceSpike(this.user);
+						entity1.damage = 0;
+						Vec3d vec = this.rtr.hitVec;
+						entity1.setNoGravity(true);
+						entity1.maxScale = (float) (1+this.power/3);
+						entity1.setLocationAndAngles(vec.x, vec.y, vec.z, this.user.getRNG().nextFloat() * 360f, this.user.getRNG().nextFloat() * 360f);
+						entity1.life = this.lifeTime;
+						this.world.spawnEntity(entity1);
+					}
+					int smokeSize = (int) (15+this.power*2);
+					for (int i = 0; i < 120; i++) {
+						Vec3d point = this.rtr.hitVec.addVector(-this.power/2+this.rand.nextFloat()*this.power,-this.power/2+this.rand.nextFloat()*this.power,-this.power/2+this.rand.nextFloat()*this.power);
+						Particles.spawnParticle(this.world, Particles.Types.SMOKE, point.x, point.y, point.z,
+								1, 1d, 0d, 1d, 0,0,0, 0x64B8F7FF, smokeSize, 0);
+					}
+					AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.rtr.hitVec)).grow(1+this.power*0.8f);
+					for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
+						if (!(entity1 instanceof EntityLivingBase)) {
+							continue;
+						}
+						boolean found = false;
+						for (String enemy: this.targets) {
+							if (Objects.equals(enemy, entity1.getUniqueID().toString())) {
+								found = true;
+							}
+						}
+						if (found) {
+							continue;
+						}
+						this.targets.add(entity1.getUniqueID().toString());
+						float damage = (float) (15+(5f*ItemJutsu.getDmgMult(this.user)*(0.75+2*this.power/25)));
+						entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
+
+					}
+				}
+			}
+			if (this.ticksExisted > this.lifeTime) {
+				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot_small")),
+						1.2f, this.rand.nextFloat() * 0.4f + 0.8f);
+				for (int i = 0; i < 20+this.power*2; i++) {
+					Vec3d point = this.rtr.hitVec.addVector(-this.power/2+this.rand.nextFloat()*this.power,-this.power/2+this.rand.nextFloat()*this.power,-this.power/2+this.rand.nextFloat()*this.power);
+					EntityIceSpear.EC shard = EntityIceSpear.EC.spawnShatteredShard(this.world, point.x,point.y,point.z,
+							(this.rand.nextDouble()-0.5d) * 0.05d, 0d, (this.rand.nextDouble()-0.5d) * 0.05d);
+					shard.baseImpactDamage = 0;
+				}
+				this.setDead();
+			}
+		}
+
+		@Override
+		protected void readEntityFromNBT(NBTTagCompound compound) {
+		}
+
+		@Override
+		protected void writeEntityToNBT(NBTTagCompound compound) {
+		}
+
+	}
+
 	public static class EntityIceSpike extends EntitySpike.Base implements ItemJutsu.IJutsu {
-		private final int growTime = 10;
-		private final float maxScale = 3.0f;
-		private float damage = 20.0f;
+		public int growTime = 5;
+		public float maxScale = 3.0f;
+		public float damage = 20.0f;
+		public int life = 50;
 		private EntityLivingBase user;
 
 		public EntityIceSpike(World worldIn) {
@@ -193,14 +297,19 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
+			if (!this.world.isRemote && this.ticksExisted > this.life) {
+				this.setDead();
+			}
 			if (!this.world.isRemote && this.ticksAlive <= this.growTime) {
 				this.setEntityScale(MathHelper.clamp(this.maxScale * (float)this.ticksAlive / this.growTime, 0.0f, this.maxScale));
-				for (EntityLivingBase entity : 
-				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
-					if (!entity.equals(this.user)) {
-						entity.getEntityData().setBoolean("TempData_disableKnockback", true);
-						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),
-						 this.damage);
+				if (this.damage > 0) {
+					for (EntityLivingBase entity :
+							this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
+						if (!entity.equals(this.user)) {
+							entity.getEntityData().setBoolean("TempData_disableKnockback", true);
+							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),
+									this.damage);
+						}
 					}
 				}
 			}
@@ -209,33 +318,17 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				World world = entity.world;
 				Vec3d vec3d = entity.getPositionEyes(1f);
-				Vec3d vec3d2 = vec3d.add(entity.getLookVec().scale(30d));
-				RayTraceResult res = world.rayTraceBlocks(vec3d, vec3d2, false, true, true);
-				if (res != null && res.typeOfHit == RayTraceResult.Type.BLOCK) {
-					world.playSound(null, res.hitVec.x, res.hitVec.y, res.hitVec.z,
-					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:spiked")),
-					 net.minecraft.util.SoundCategory.NEUTRAL, 5f, entity.getRNG().nextFloat() * 0.4f + 0.8f);
-					float f = MathHelper.sqrt(power * 30f / 5f);
-					for (int i = 0; i < Math.round(power); i++) {
-						EntityIceSpike entity1 = new EntityIceSpike(entity);
-						entity1.damage = 18+5.0f*(1+3.0f*(1/100))*ItemJutsu.getDmgMult(entity);
-						Vec3d vec = res.hitVec.addVector((entity.getRNG().nextDouble() - 0.5d) * f, 0d, (entity.getRNG().nextDouble() - 0.5d) * f);
-						for (; !world.getBlockState(new BlockPos(vec)).isTopSolid(); vec = vec.subtract(0d, 1d, 0d));
-						for (; world.getBlockState(new BlockPos(vec).up()).isTopSolid(); vec = vec.addVector(0d, 1d, 0d));
-						entity1.setLocationAndAngles(vec.x, vec.y + 0.5d, vec.z, entity.getRNG().nextFloat() * 360f, (entity.getRNG().nextFloat() - 0.5f) * 60f);
-						world.spawnEntity(entity1);
-					}
-					ItemJutsu.setCurrentJutsuCooldown(stack,20*1);
-					return true;
-				}
-				return false;
+				RayTraceResult rtr = ProcedureUtils.objectEntityLookingAt(entity, 30);
+
+				entity.world.spawnEntity(new IceSphere(entity,power,rtr));
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
+				return true;
 			}
 
 			@Override
 			public float getPowerupDelay() {
-				return 2.5f;
+				return 10f;
 			}
 	
 			@Override

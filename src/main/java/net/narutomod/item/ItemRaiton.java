@@ -372,24 +372,16 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 				this.world.spawnEntity(entity2);
 			}
 
-			public LigerBomb(EntityLivingBase user) {
+			public LigerBomb(EntityLivingBase user, EntityLivingBase target) {
 				this(user.world);
 				this.user = user;
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				this.user.addPotionEffect(new PotionEffect(PotionHeaviness.potion, this.delay/3, 4, false, false));
 				Vec3d point = this.user.getPositionVector().add(this.user.getLookVec().scale(4));
 				AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(4);
+				this.target = target;
+				this.target.addPotionEffect(new PotionEffect(PotionParalysis.potion, this.delay+10, 1, false, false));
 
-				for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
-					if (!(entity1 instanceof EntityLivingBase)) {
-						continue;
-					}
-					if (this.target != null) {
-						continue;
-					}
-					this.target = (EntityLivingBase) entity1;
-					this.target.addPotionEffect(new PotionEffect(PotionParalysis.potion, this.delay+10, 1, false, false));
-				}
 			}
 
 
@@ -556,9 +548,12 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					this.jutsuKey2Pressed = newPressed2;
 
 					boolean newPressed3 = this.summoner.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
-					if (this.jutsuKey3Pressed && !newPressed3 && this.jutsu3Cool <= 0 && Chakra.pathway(this.summoner).consume(800d)) {
-						this.jutsu3Cool = 20*10;
-						this.summoner.world.spawnEntity(new LigerBomb(this.summoner));
+					if (this.jutsuKey3Pressed && !newPressed3 && this.jutsu3Cool <= 0) {
+						RayTraceResult result = ProcedureUtils.objectEntityLookingAt(this.summoner,6,5);
+						if (Chakra.pathway(this.summoner).consume(800d) && result.entityHit instanceof EntityLivingBase) {
+							this.jutsu3Cool = 20*10;
+							this.summoner.world.spawnEntity(new LigerBomb(this.summoner, (EntityLivingBase) result.entityHit));
+						}
 					}
 					this.jutsuKey3Pressed = newPressed3;
 

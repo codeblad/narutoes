@@ -837,24 +837,16 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			}
 
 
-			public PrimaryLotus(EntityLivingBase user) {
+			public PrimaryLotus(EntityLivingBase user, EntityLivingBase target) {
 				this(user.world);
 				this.user = user;
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				Vec3d point = this.user.getPositionVector().add(this.user.getLookVec().scale(1));
 				AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(3);
 
-				for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
-					if (!(entity1 instanceof EntityLivingBase)) {
-						continue;
-					}
-					if (this.target != null) {
-						continue;
-					}
-					this.target = (EntityLivingBase) entity1;
-
-				}
+				this.target = target;
 			}
+
 
 
 			@Override
@@ -1334,8 +1326,11 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 									if (!entity.isSneaking()) {
 										if (gate >= 1) {
 											if (values.getInteger("primaryCool") <= 0) {
-												values.setInteger("primaryCool",20*12);
-												entity2.world.spawnEntity(new ItemEightGates.RangedItem.PrimaryLotus(player));
+												RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity,5,5);
+												if (result.entityHit instanceof EntityLivingBase) {
+													values.setInteger("primaryCool",20*12);
+													entity2.world.spawnEntity(new ItemEightGates.RangedItem.PrimaryLotus(player, (EntityLivingBase) result.entityHit));
+												}
 											}
 										}
 									} else {

@@ -1,6 +1,10 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.*;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -12,10 +16,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 //import net.minecraft.util.DamageSource;
@@ -25,10 +26,18 @@ import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 
+import net.narutomod.Particles;
+import net.narutomod.item.ItemByakugan;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.potion.PotionUsingJutsu;
+import net.narutomod.procedure.ProcedureSync;
+import net.narutomod.procedure.ProcedureUtils;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityIceSpear extends ElementsNarutomodMod.ModElement {
@@ -76,7 +85,7 @@ public class EntityIceSpear extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Float> RAND_YAW = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 		private static final DataParameter<Float> RAND_PITCH = EntityDataManager.<Float>createKey(EC.class, DataSerializers.FLOAT);
 
-		float baseImpactDamage = 10.0f;
+		public float baseImpactDamage = 10.0f;
 		
 		public EC(World world) {
 			super(world);
@@ -127,9 +136,8 @@ public class EntityIceSpear extends ElementsNarutomodMod.ModElement {
 		protected void onImpact(RayTraceResult result) {
 			if (!this.world.isRemote 
 			 && result.entityHit instanceof EntityLivingBase && !result.entityHit.equals(this.shootingEntity)) {
-				result.entityHit.hurtResistantTime = 10;
 				if (result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setProjectile(), this.baseImpactDamage)) {
-					((EntityLivingBase)result.entityHit).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 200, 1));
+					//((EntityLivingBase)result.entityHit).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 80, 1));
 					this.setDead();
 				} else if (!result.entityHit.noClip) {
 					this.motionX *= -0.1d;
@@ -141,10 +149,84 @@ public class EntityIceSpear extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
+		public static class IceSpearMove extends Entity  {
+			private EntityLivingBase user;
+			private Vec3d look;
+			private Vec3d start;
+			private int lifeTime = 20;
+			private double power;
+			List<String> targets = new ArrayList<String>();
+
+			public IceSpearMove(World worldIn) {
+				super(worldIn);
+				this.setSize(0.01f, 0.01f);
+				this.isImmuneToFire = true;
+			}
+
+
+			public IceSpearMove(EntityLivingBase user, double power) {
+				this(user.world);
+				this.user = user;
+				this.look = this.user.getLookVec();
+				this.start = this.user.getPositionVector().addVector(0,1,0);
+				this.setPosition(this.start.x,this.start.y,this.start.z);
+				this.lifeTime = (int) (10+power*2);
+				this.power = power;
+			}
+
+
+			@Override
+			protected void entityInit() {
+			}
+
+			@Override
+			public void onUpdate() {
+				if (this.user != null) {
+					this.start = this.user.getPositionVector().addVector(0,1,0);
+					this.setPosition(this.start.x,this.start.y,this.start.z);
+					float area = (float) (2+3*(this.power/20));
+					int count = (int) (3+6*(this.power/20));
+					if (!this.world.isRemote) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
+					world.playSound(null, this.start.x, this.start.y, this.start.z, SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot_small")),
+							SoundCategory.NEUTRAL, 0.5f, world.rand.nextFloat() * 0.4f + 0.8f);
+					for (double i = 0; i < count; i++) {
+						this.look = this.user.getLookVec();
+						Vec3d point = this.user.getPositionEyes(1).add(this.look.scale(2));
+						point = point.addVector(-area+this.rand.nextFloat()*area*2,-area*.3+this.rand.nextFloat()*area*.6,-area+this.rand.nextFloat()*area*2);
+						EC spear = new EC(this.user);
+						spear.setEntityScale(0.5f);
+						spear.setPositionAndUpdate(point.x,point.y,point.z);
+						spear.shoot(this.look.x,this.look.y,this.look.z, 1.4f, 0);
+						spear.setNoGravity(true);
+						float mult = (float) (1+0.5*(this.power/20));
+						spear.baseImpactDamage = 10f+(ItemJutsu.getDmgMult(this.user)*3f*mult);
+
+						Particles.spawnParticle(this.world, Particles.Types.SMOKE, point.x, point.y, point.z,
+								1, 1d, 0d, 1d, 0,0,0, 0x64B8F7FF, 35, 0);
+						this.user.world.spawnEntity(spear);
+					}
+				}
+				if (this.ticksExisted > this.lifeTime) {
+					this.setDead();
+				}
+			}
+
+			@Override
+			protected void readEntityFromNBT(NBTTagCompound compound) {
+			}
+
+			@Override
+			protected void writeEntityToNBT(NBTTagCompound compound) {
+			}
+
+		}
+
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				Vec3d vec = entity.getLookVec();
+				/*Vec3d vec = entity.getLookVec();
 				Vec3d vec1 = entity.getPositionEyes(1f).add(vec.scale(1.5d));
 				double d = MathHelper.sqrt(power);
 				for (int i = 0; i < (int)(power * 2f); i++) {
@@ -153,8 +235,9 @@ public class EntityIceSpear extends ElementsNarutomodMod.ModElement {
 					Vec3d vec3 = vec2.add(vec);
 					EC entity1 = this.createJutsu(entity.world, entity, vec2.x, vec2.y, vec2.z, vec3.x, vec3.y, vec3.z, 1.4f, 0.05f);
 					entity1.baseImpactDamage = (4f+((2.0f*ItemJutsu.getDmgMult(entity)*(0.5f+1*(power/50)))));
-				}
-				ItemJutsu.setCurrentJutsuCooldown(stack, 20*2);
+				}*/
+				entity.world.spawnEntity(new IceSpearMove(entity,power));
+				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (20*3+power*4));
 				return true;
 			}
 
@@ -193,7 +276,7 @@ public class EntityIceSpear extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getMaxPower() {
-				return 50.0f;
+				return 20.0f;
 			}
 		}
 

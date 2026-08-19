@@ -118,11 +118,13 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 				if (summoner != null && summoner.isPotionActive(MobEffects.INVISIBILITY)) {
 					summoner.removePotionEffect(MobEffects.INVISIBILITY);
 				}
-				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getSummoner(), ItemHyoton.block);
-				if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
-					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
-					//(30*20)+this.ticksExisted+this.ticksExisted/2
-					item.setJutsuCooldown(stack, ICEDOME, 20*10);
+				if (summoner != null) {
+					ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getSummoner(), ItemHyoton.block);
+					if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
+						ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
+						//(30*20)+this.ticksExisted+this.ticksExisted/2
+						item.setJutsuCooldown(stack, ICEDOME, 20*12);
+					}
 				}
 			}
 		}
@@ -167,9 +169,10 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 					if (entity.isEntityAlive() && !summoner.isOnSameTeam(entity)) {
 						double d0 = (this.rand.nextDouble()-0.5d) * this.width;
 						double d1 = (this.rand.nextDouble()-0.5d) * this.width;
-						new EntityIceSpear.EC.Jutsu().createJutsu(this.world, summoner, this.posX + d0 * 0.8d,
+						EntityIceSpear.EC a = new EntityIceSpear.EC.Jutsu().createJutsu(this.world, summoner, this.posX + d0 * 0.8d,
 						 this.posY + this.height - 1.6d, this.posZ + d1 * 0.8d, entity.posX, entity.posY + entity.height/2,
-						 entity.posZ, 0.95f, 0.25f);
+						 entity.posZ, 1.2f, 0.25f);
+						a.baseImpactDamage = (4+(3f*ItemJutsu.getDmgMult(this.getSummoner())));
 					}
 				}
 				--this.shootSpearsTime;
@@ -191,7 +194,7 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 		}
 
 		public void shootSpears() {
-			this.shootSpearsTime = 100;
+			this.shootSpearsTime = 40;
 		}
 
 		@Override
@@ -332,8 +335,12 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (!entity.isRiding()) {
-					this.createJutsu(entity, entity.posX, entity.posY - 0.1d, entity.posZ);
-					return true;
+					RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity,20,3);
+					if (result.entityHit instanceof EntityLivingBase) {
+						this.createJutsu(entity, result.entityHit.posX, result.entityHit.posY-0.25d, result.entityHit.posZ);
+						return true;
+					}
+					return false;
 				} else if (entity.getRidingEntity() instanceof EC) {
 					((EC)entity.getRidingEntity()).shootSpears();
 					return true;

@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
@@ -22,6 +23,8 @@ import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.block.state.IBlockState;
 
+import net.narutomod.item.ItemHyoton;
+import net.narutomod.potion.PotionHeaviness;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
@@ -106,39 +109,28 @@ public class EntityIcePrison extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			if (this.user != null && ItemJutsu.canTarget(this.target)) {
-				this.target.setPositionAndUpdate(this.posX, this.posY + 0.5d, this.posZ);
-				Map<BlockPos, IBlockState> map = Maps.newHashMap();
-				for (BlockPos pos : this.tpos) {
-					if (pos != null && this.world.isAirBlock(pos)) {
-						map.put(pos, Blocks.ICE.getDefaultState());
+				if (!this.world.isRemote) {
+					this.target.setPositionAndUpdate(this.posX, this.posY + 0.1d, this.posZ);
+					this.target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20*6, 2));
+					if (this.ticksExisted < 10) {
+						for (int i = 0; i < 3; i++) {
+							ItemHyoton.EntityIceSpike entity1 = new ItemHyoton.EntityIceSpike(this.user);
+							entity1.damage = 0;
+							Vec3d vec = this.getPositionVector().addVector(-this.radius+this.rand.nextFloat()*this.radius*2,this.tHeight*this.rand.nextFloat(),-this.radius+this.rand.nextFloat()*this.radius*2);
+							entity1.setNoGravity(true);
+							entity1.maxScale = 1F+this.tHeight;
+							entity1.setLocationAndAngles(vec.x, vec.y, vec.z, this.user.getRNG().nextFloat() * 360f, this.user.getRNG().nextFloat() * 45f);
+							entity1.growTime = 20;
+							entity1.life = 20*4;
+							this.world.spawnEntity(entity1);
+						}
 					}
 				}
-				if (!map.isEmpty()) {
-					new net.narutomod.event.EventSetBlocks(this.world, map, 0, 1200, false, false);
-				}
-				int i = this.ticksExisted % 1;
-				if (i == 0) {
-					this.target.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 600, 1));
-					this.tz++;
-					if (this.tz > (int) Math.round(this.tr / 1.41421356D)) {
-						this.tz = 0;
-						++this.tr;
-					}
-					if (this.tr > this.radius) {
-						this.tr = 0;
-						this.ty++;
-					}
-					if (this.ty > this.tHeight) {
-						this.setDead();
-						return;
-					}
-					this.tx = (int) Math.round(Math.sqrt(this.tr * this.tr - this.tz * this.tz));
-				}
-				this.tpos[0] = this.blockpos.add(this.plist[0][i].getX() * this.tx, this.ty, this.plist[0][i].getZ() * this.tz);
-				this.tpos[1] = this.blockpos.add(this.plist[0][i].getX() * this.tz, this.ty, this.plist[0][i].getZ() * this.tx);
-				this.tpos[2] = this.tpos[0].add(this.plist[1][i]);
+
 				//this.tpos[3] = this.tpos[0].add(this.plist[2][i]);
-			} else if (!this.world.isRemote) {
+			}
+			if (this.ticksExisted > 20*4) {
+
 				this.setDead();
 			}
 		}
@@ -160,7 +152,7 @@ public class EntityIcePrison extends ElementsNarutomodMod.ModElement {
 					 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot")),
 					 net.minecraft.util.SoundCategory.NEUTRAL, 1f, entity.getRNG().nextFloat() * 0.4f + 0.8f);
 					entity.world.spawnEntity(new EC(entity, (EntityLivingBase)result.entityHit));
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20*3);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*12);
 					return true;
 				}
 				return false;
