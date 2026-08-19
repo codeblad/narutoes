@@ -53,6 +53,7 @@ import net.minecraft.client.Minecraft;
 
 import net.narutomod.Chakra;
 import net.narutomod.Particles;
+import net.narutomod.PlayerTracker;
 import net.narutomod.entity.*;
 import net.narutomod.gui.overlay.OverlayByakuganView;
 import net.narutomod.potion.PotionChakraBlocked;
@@ -454,7 +455,13 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 				int y = (int) entity.posY;
 				int z = (int) entity.posZ;
 				if (!world.isRemote) {
-					entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 3, false, false));
+					if (PlayerTracker.getBattleXp((EntityPlayer) entity) >= NarutomodModVariables.SAGEEXP) {
+						entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 5, false, false));
+					}
+					else {
+						entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 4, false, false));
+					}
+					
 				}
 				HashMap<String, Object> $_dependencies = Maps.newHashMap();
 				$_dependencies.put("entity", entity);

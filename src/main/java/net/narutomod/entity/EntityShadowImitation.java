@@ -9,6 +9,7 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraft.world.World;
@@ -233,7 +234,7 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 
 	this.setPosition(user.posX, user.posY, user.posZ);
 
-	double radius = Math.min(this.ticksExisted * 0.35D, 5.0D);
+	double radius = Math.min(this.ticksExisted * 0.35D, 6.0D);
 
 	if (this.ticksExisted > 25) {
 		this.setDead();
@@ -306,24 +307,58 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 		}
 	}
 }
+	@Override
+	public void setDead() {
+		super.setDead();
 
-		@Override
-		public void setDead() {
-			super.setDead();
-			if (!this.world.isRemote) {
-				EntityLivingBase user = this.getUser();
-				EntityLivingBase target = this.getTarget();
-				if (!this.isAOE() && user instanceof EntityPlayerMP) {
-					PlayerInput.Hook.copyInputFrom((EntityPlayerMP)user, this, false);
-				}
-				if (target != null) {
-					PlayerInput.Hook.haltTargetInput(target, false);
-				}
-				if (user != null) {
-					Jutsu.removeEntity(user, this.getEntityId());
-				}
+		if (!this.world.isRemote) {
+			EntityLivingBase user = this.getUser();
+			EntityLivingBase target = this.getTarget();
+
+			if (!this.isAOE()
+					&& user instanceof EntityPlayerMP
+					&& user.isEntityAlive()) {
+				PlayerInput.Hook.copyInputFrom(
+					(EntityPlayerMP) user,
+					this,
+					false
+				);
+			}
+
+			if (target != null) {
+				PlayerInput.Hook.haltTargetInput(target, false);
+			}
+
+			if (user != null) {
+				Jutsu.removeEntity(user, this.getEntityId());
 			}
 		}
+	}
+
+	@SubscribeEvent
+public void onLivingDeath(LivingDeathEvent event) {
+    EntityLivingBase entity = event.getEntityLiving();
+
+    if (entity == null || entity.world.isRemote) {
+        return;
+    }
+
+    int[] intarray = entity.getEntityData().getIntArray(Jutsu.ECENTITYID);
+
+    if (intarray.length > 0) {
+        int[] entities = intarray.clone();
+
+        for (int i = 0; i < entities.length; i++) {
+            Entity entity1 = entity.world.getEntityByID(entities[i]);
+
+            if (entity1 instanceof EC && !entity1.isDead) {
+                entity1.setDead();
+            }
+        }
+
+        entity.getEntityData().removeTag(Jutsu.ECENTITYID);
+    }
+}
 
 		@Override
 		public void onUpdate() {
@@ -779,8 +814,7 @@ public class RenderCustom extends Render<EC> {
 
 		double radius =
 			Math.min(
-				(entity.ticksExisted + partialTicks) * 0.35D,
-				5.0D
+				(entity.ticksExisted + partialTicks) * 0.35D, 6.0D
 			);
 
 		if (radius <= 0.0D) {

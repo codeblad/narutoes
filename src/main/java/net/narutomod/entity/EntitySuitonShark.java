@@ -150,7 +150,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 					this.setWaitPosition();
 				}
 				if (this.ticksAlive <= this.wait) {
-					this.setEntityScale(this.fullScale * MathHelper.clamp((float)this.ticksAlive / this.wait, 0.2F, 1.0F));
+					this.setEntityScale(this.fullScale * MathHelper.clamp((float) MathHelper.clamp(this.ticksAlive, 0, this.wait) / this.wait, 0.2F, 1.0F));
 					if (this.world instanceof WorldServer) {
 						((WorldServer)this.world).spawnParticle(EnumParticleTypes.WATER_WAKE, this.posX, this.posY + this.height/2, this.posZ, 
 						  2, this.width/2, this.height/2, this.width/2, 0);
@@ -167,7 +167,7 @@ public class EntitySuitonShark extends ElementsNarutomodMod.ModElement {
 						this.shoot(vec.x, vec.y, vec.z, this.isInWater() ? 1.05f : 0.99f, 0f);
 					}
 					if (this.ticksAlive <= this.wait + this.mouthOpenTime) {
-						this.setMOA((float)(this.ticksAlive - this.wait) / this.mouthOpenTime);
+						this.setMOA((float)(MathHelper.clamp(this.ticksAlive, 0, this.wait)  - this.wait) / this.mouthOpenTime);
 					}
 				}
 			}
