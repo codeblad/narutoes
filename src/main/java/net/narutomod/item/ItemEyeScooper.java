@@ -102,10 +102,10 @@ public class ItemEyeScooper extends ElementsNarutomodMod.ModElement {
 		@Override
 		public ItemStack onItemUseFinish(ItemStack itemstack, World world, EntityLivingBase entityLivingBase) {
 			if (!world.isRemote && entityLivingBase instanceof EntityPlayerMP) {
-				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entityLivingBase,6,5);
+				RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entityLivingBase,6,3);
 				if (result.entityHit instanceof  EntityPlayerMP) {
 					EntityPlayerMP entity = (EntityPlayerMP) result.entityHit;
-					if (entity.getHealth() < entity.getMaxHealth()*0.25f) {
+					if (entity.getHealth() < entity.getMaxHealth()*0.1f) {
 						ItemStack stack = ProcedureUtils.getMatchingItemStack(entity, ItemByakugan.helmet);
 						if (stack != null) {
 							(entity).dropItem(stack.copy(), true, true);
