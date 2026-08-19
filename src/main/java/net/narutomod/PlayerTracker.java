@@ -314,7 +314,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (headstack.getItem() == ItemByakugan.helmet) {
 					if (PlayerTracker.getBattleXp((EntityPlayer) targetEntity) >= NarutomodModVariables.SAGEEXP) {
-						defMult += .25;
+						defMult += .275;
 					} else {
 						defMult += .15f;
 					}
@@ -339,10 +339,10 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				if (cheststack.getItem() == ItemTenseigan.body) {
 					defMult += .5f;
 				}
-				ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
-				if (stackwood != null) {
-					defMult+= 0.1f;
-				}
+				// ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
+				// if (stackwood != null) {
+				// 	defMult+= 0.1f;
+				// } Unethical
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
 					defMult+= 0.7f;
 				}
