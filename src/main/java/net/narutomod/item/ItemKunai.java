@@ -45,7 +45,8 @@ import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 
 import java.util.Map;
-import java.util.HashMap;
+import java.util.HashMap;
+
 import com.google.common.collect.Multimap;
 
 @ElementsNarutomodMod.ModElement.Tag
