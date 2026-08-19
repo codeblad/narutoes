@@ -308,57 +308,38 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 	}
 }
 	@Override
-	public void setDead() {
-		super.setDead();
-
-		if (!this.world.isRemote) {
-			EntityLivingBase user = this.getUser();
-			EntityLivingBase target = this.getTarget();
-
-			if (!this.isAOE()
-					&& user instanceof EntityPlayerMP
-					&& user.isEntityAlive()) {
-				PlayerInput.Hook.copyInputFrom(
-					(EntityPlayerMP) user,
-					this,
-					false
-				);
-			}
-
-			if (target != null) {
-				PlayerInput.Hook.haltTargetInput(target, false);
-			}
-
-			if (user != null) {
-				Jutsu.removeEntity(user, this.getEntityId());
-			}
-		}
-	}
-
-	@SubscribeEvent
-public void onLivingDeath(LivingDeathEvent event) {
-    EntityLivingBase entity = event.getEntityLiving();
-
-    if (entity == null || entity.world.isRemote) {
+public void setDead() {
+    if (this.isDead) {
         return;
     }
 
-    int[] intarray = entity.getEntityData().getIntArray(Jutsu.ECENTITYID);
+    if (!this.world.isRemote) {
+        EntityLivingBase user = this.getUser();
+        EntityLivingBase target = this.getTarget();
 
-    if (intarray.length > 0) {
-        int[] entities = intarray.clone();
+        if (!this.isAOE()
+                && user instanceof EntityPlayerMP
+                && user.isEntityAlive()) {
 
-        for (int i = 0; i < entities.length; i++) {
-            Entity entity1 = entity.world.getEntityByID(entities[i]);
-
-            if (entity1 instanceof EC && !entity1.isDead) {
-                entity1.setDead();
-            }
+            PlayerInput.Hook.copyInputFrom(
+                (EntityPlayerMP) user,
+                this,
+                false
+            );
         }
 
-        entity.getEntityData().removeTag(Jutsu.ECENTITYID);
+        if (target != null) {
+            PlayerInput.Hook.haltTargetInput(target, false);
+        }
+
+        if (user != null) {
+            Jutsu.removeEntity(user, this.getEntityId());
+        }
     }
+
+    super.setDead();
 }
+
 
 		@Override
 		public void onUpdate() {
@@ -622,6 +603,31 @@ public void onLivingDeath(LivingDeathEvent event) {
 		}
 
 		public static class PlayerHook {
+			
+		@SubscribeEvent
+		public void onLivingDeath(LivingDeathEvent event) {
+			EntityLivingBase entity = event.getEntityLiving();
+
+			if (entity == null || entity.world.isRemote) {
+				return;
+			}
+
+			int[] intarray = entity.getEntityData().getIntArray(Jutsu.ECENTITYID);
+
+			if (intarray.length > 0) {
+				int[] entities = intarray.clone();
+
+				for (int i = 0; i < entities.length; i++) {
+					Entity entity1 = entity.world.getEntityByID(entities[i]);
+
+					if (entity1 instanceof EC && !entity1.isDead) {
+						entity1.setDead();
+					}
+				}
+
+				entity.getEntityData().removeTag(Jutsu.ECENTITYID);
+			}
+		}
 			@SubscribeEvent
 			public void onChangeDimension(EntityTravelToDimensionEvent event) {
 				Entity entity = event.getEntity();

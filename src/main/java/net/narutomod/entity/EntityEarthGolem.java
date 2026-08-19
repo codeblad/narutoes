@@ -88,7 +88,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).setBaseValue(16.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D + 6*newPower);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D + 0.5*newPower);
-			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(80.0D + 6.0D * f);
+			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(10.0D + 6.0D * f);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D + (f - 1F) * 0.05D);
 			super.postScaleFixup();
 			this.experienceValue = (int)(f * 10);
@@ -196,7 +196,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 	    			this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:rocks")), 1.0F, 0.8F);
 	    		}
 	    		if (age <= this.growTime) {
-					for (int i = 0; i < (int)(this.getScale() * 20); i++) {
+					for (int i = 0; i < (int)(this.getScale() * 12); i++) {
 						this.world.spawnParticle(EnumParticleTypes.BLOCK_DUST, this.posX, this.posY, this.posZ,
 						 (this.rand.nextDouble()-0.5d) * this.width * 0.25d, 0.15d,
 						 (this.rand.nextDouble()-0.5d) * this.width * 0.25d, Block.getIdFromBlock(Blocks.DIRT));

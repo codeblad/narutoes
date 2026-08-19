@@ -111,8 +111,12 @@ public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 					player.getEntityData().setInteger(ProcedureSusanoo.SUMMONED_SUSANOO, entityCustom.getEntityId());
 				}
 			} else {
-				player.sendStatusMessage(new TextComponentString(net.minecraft.client.resources.I18n.format("cooldown: ") +
-						String.format("%.2f",  values.getInteger("susanCD")/ 20.0D)), true);
+				player.sendStatusMessage(
+					new TextComponentString(
+						"cooldown: " + String.format("%.2f", values.getInteger("susanCD") / 20.0D)
+					),
+					true
+				);
 			}
 		} else {
 			Entity entitySpawned = world.getEntityByID(ProcedureSusanoo.getSummonedSusanooId(player));
