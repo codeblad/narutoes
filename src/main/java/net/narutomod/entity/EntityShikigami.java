@@ -161,7 +161,6 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 						if (ball >= 30) {
 							user.getEntityData().setFloat("paperstunCD", (float) (NarutomodModVariables.world_tick+20*25));
 						}
-						EntityPlayer player = (EntityPlayer) user;
 						if (this.jutsuKey2Pressed && !newPressed) {
 							if (cooldown < NarutomodModVariables.world_tick) {
 								if ( chakra.getAmount() >= this.chakraUsage*4) {
@@ -178,7 +177,11 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 									}
 								}
 							} else {
-								player.sendStatusMessage(new TextComponentString("cooldown: " + (cooldown-NarutomodModVariables.world_tick)/20), true);
+								if (user instanceof EntityPlayer) {
+									EntityPlayer player = (EntityPlayer) user;
+									player.sendStatusMessage(new TextComponentString("cooldown: " + (cooldown-NarutomodModVariables.world_tick)/20), true);
+								}
+
 							}
 						}
 

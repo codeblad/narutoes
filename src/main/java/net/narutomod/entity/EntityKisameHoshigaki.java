@@ -66,6 +66,8 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.block.BlockLiquid;
 
 import net.narutomod.block.BlockWaterStill;
+import net.narutomod.item.ItemBijuSpawner;
+import net.narutomod.item.ItemKunai;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemSamehada;
 import net.narutomod.item.ItemAkatsukiRobe;
@@ -226,11 +228,15 @@ public class EntityKisameHoshigaki extends ElementsNarutomodMod.ModElement {
 			return cls != EntityCustom.class;
 		}
 
+
 		@Override
 		protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source) {
 			if (!this.isClone()) {
 				this.entityDropItem(this.getHeldItemMainhand(), 0f);
 				this.entityDropItem(this.getItemFromInventory(0), 0f);
+				if (this.rand.nextFloat() <= ModConfig.BIJUSPAWNER_CHANCE) {
+					this.entityDropItem(new ItemStack(ItemBijuSpawner.block, 1), 0.0f);
+				}
 			}
 		}
 
@@ -248,7 +254,8 @@ public class EntityKisameHoshigaki extends ElementsNarutomodMod.ModElement {
 				if (source == DamageSource.DROWN) {
 					return false;
 				}
-				if (source instanceof EntityDamageSource && !((EntityDamageSource)source).getIsThornsDamage() && !source.isUnblockable()) {
+				if (source instanceof EntityDamageSource
+ && !((EntityDamageSource)source).getIsThornsDamage() && !source.isUnblockable()) {
 					if (this.getHeldItemMainhand().isEmpty()) {
 						this.swapWithInventory(EntityEquipmentSlot.MAINHAND, 0);
 					}
@@ -394,7 +401,8 @@ public class EntityKisameHoshigaki extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void removeTrackingPlayer(EntityPlayerMP player) {
-			super.removeTrackingPlayer(player);
+			super.removeTrackingPlayer(player);
+
 			if (this.bossInfo.getPlayers().contains(player)) {
 				this.bossInfo.removePlayer(player);
 			}

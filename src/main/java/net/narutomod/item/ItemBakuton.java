@@ -473,19 +473,27 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 				} else if (powerIn < 2f) {
 					ec = new EntityC1.EC(entity);
 					amount = 3;
-					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 5);
+					if (stack!= null) {
+						ItemJutsu.setCurrentJutsuCooldown(stack,20 * 5);
+					}
 				} else if (powerIn < 3f) {
 					ec = new EntityC2.EC(entity);
 					ProcedureUtils.poofWithSmoke(entity.world, vec.x, vec.y, vec.z, ec.width, ec.height);
-					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 10);
+					if (stack!= null) {
+						ItemJutsu.setCurrentJutsuCooldown(stack,20 * 10);
+					}
 				} else if (powerIn < 4f) {
 					ec = new EntityC3.EC(entity);
-					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 9);
+					if (stack!= null) {
+						ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 9);
+					}
 				} else if (powerIn <= this.getMaxPower()) {
 					ec = new EntityC4.EC(entity);
 					float f = ((RangedItem)stack.getItem()).getXpRatio(stack, CLAY);
 					((EntityC4.EC)ec).setExplosionDamage(100, (int)(0.5f + ItemJutsu.getDmgMult(entity)*0.32));
-					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 20);
+					if (stack!= null) {
+						ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 20);
+					}
 				} else {
 					return false;
 				}

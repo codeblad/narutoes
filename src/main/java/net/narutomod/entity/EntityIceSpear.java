@@ -130,6 +130,9 @@ public class EntityIceSpear extends ElementsNarutomodMod.ModElement {
 				this.rotationYaw += this.getRandYaw();
 				this.rotationPitch += this.getRandPitch();
 			}
+			if (this.ticksExisted > 20*5) {
+				this.setDead();
+			}
 		}
 
 		@Override

@@ -21,11 +21,6 @@
         },
         {
           "type": "item",
-          "name": "narutomod:bijuspawner",
-          "weight": 1
-        },
-        {
-          "type": "item",
           "name": "narutomod:scroll_chidori",
           "weight": 10
         },

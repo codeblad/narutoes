@@ -1,6 +1,7 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.util.EntitySelectors;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -72,8 +73,8 @@ public class EntityWhiteZetsu extends ElementsNarutomodMod.ModElement {
 	public void init(FMLInitializationEvent event) {
 		int i = MathHelper.clamp(ModConfig.SPAWN_WEIGHT_WHITEZETSU, 0, 20);
 		// white zetsu spawning here
-		boolean canSpawn = false;
-		if (false) {
+		boolean canSpawn = true;
+		if (i > 0) {
 			EntityRegistry.addSpawn(EntityCustom.class, i, 1, 1, EnumCreatureType.MONSTER, 
 				Biomes.EXTREME_HILLS, Biomes.FOREST, Biomes.TAIGA, Biomes.SWAMPLAND, Biomes.BEACH, Biomes.JUNGLE,
 				Biomes.BIRCH_FOREST, Biomes.ROOFED_FOREST, Biomes.REDWOOD_TAIGA, Biomes.SAVANNA, Biomes.MESA,
@@ -98,10 +99,10 @@ public class EntityWhiteZetsu extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
-			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(30.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6D);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D);
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10D);
 		}
 
 		@Override
@@ -157,12 +158,13 @@ public class EntityWhiteZetsu extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source) {
-			if (this.rand.nextFloat() <= 0.1f) {
+
+			if (this.rand.nextFloat() <= ModConfig.ZETSUFLESH_CHANCE) {
 				this.entityDropItem(new ItemStack(ItemWhiteZetsuFlesh.block, 1), 0.0f);
 			}
-			if (this.rand.nextFloat() >= 0.6f) {
+			/*if (this.rand.nextFloat() >= 0.6f) {
 				this.entityDropItem(this.kunaiStack, 0.0f);
-			}
+			}*/
 		}
 
 		@Override
@@ -228,34 +230,42 @@ public class EntityWhiteZetsu extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-	    protected boolean isValidLightLevel() {
-	        BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
-	        if (this.world.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
-	            return false;
-	        } else {
-	            int i = this.world.getLightFromNeighbors(blockpos);
-	            if (this.world.isThundering()) {
-	                int j = this.world.getSkylightSubtracted();
-	                this.world.setSkylightSubtracted(10);
-	                i = this.world.getLightFromNeighbors(blockpos);
-	                this.world.setSkylightSubtracted(j);
-	            }
-	            return i <= this.rand.nextInt(8);
-	        }
-	    }
+		protected boolean isValidLightLevel() {
+			BlockPos blockpos = new BlockPos(this.posX, this.getEntityBoundingBox().minY, this.posZ);
+			if (this.world.getLightFor(EnumSkyBlock.SKY, blockpos) > this.rand.nextInt(32)) {
+				return false;
+			} else {
+				int i = this.world.getLightFromNeighbors(blockpos);
+				if (this.world.isThundering()) {
+					int j = this.world.getSkylightSubtracted();
+					this.world.setSkylightSubtracted(10);
+					i = this.world.getLightFromNeighbors(blockpos);
+					this.world.setSkylightSubtracted(j);
+				}
+				return i <= this.rand.nextInt(8);
+			}
+		}
 
 		@Override
 		public boolean getCanSpawnHere() {
+			//return false;
+
+			if (!this.world.getEntities(EntityCustom.class, EntitySelectors.IS_ALIVE).isEmpty()) {
+				return false;
+			}
+			if (this.world.getDifficulty() != EnumDifficulty.PEACEFUL
+					&& (this.world.getVillageCollection().getNearestVillage(new BlockPos(this), 24) != null || this.isValidLightLevel())
+					&& super.getCanSpawnHere()
+			&& (int)this.posY >= this.world.getSeaLevel() && this.world.canSeeSky(this.getPosition())) {
+				return true;
+			}
 			return false;
-			/*return this.world.getDifficulty() != EnumDifficulty.PEACEFUL
-			 && (this.world.getVillageCollection().getNearestVillage(new BlockPos(this), 24) != null || this.isValidLightLevel())
-			 && super.getCanSpawnHere() && false;*/
 		}
 
 		@Override
 		protected boolean shouldDespawn() {
-			return true;
-			//return this.world.getDifficulty() == EnumDifficulty.PEACEFUL || this.getHealth() <= 0.0f && true;
+			//return true;
+			return this.world.getDifficulty() == EnumDifficulty.PEACEFUL || this.getHealth() <= 0.0f;
 		}
 
 		@Override

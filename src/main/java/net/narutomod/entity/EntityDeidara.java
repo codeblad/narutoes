@@ -236,7 +236,7 @@ public class EntityDeidara extends ElementsNarutomodMod.ModElement {
 			return false;
 			/*return super.getCanSpawnHere() && (int)this.posY >= this.world.getSeaLevel() && this.world.canSeeSky(this.getPosition())
 			 && this.world.getEntities(EntityCustom.class, EntitySelectors.IS_ALIVE).isEmpty()
-			 && !EntityNinjaMob.SpawnData.spawnedRecentlyHere(this, 36000);
+			 && !EntityNinjaMob.SpawnData.spawnedRecentlyHere(this, 36000);*/
 			 //&& this.world.getEntitiesWithinAABB(EntityCustom.class, this.getEntityBoundingBox().grow(128.0D)).isEmpty();*/
 			 //&& this.rand.nextInt(5) == 0;
 		}

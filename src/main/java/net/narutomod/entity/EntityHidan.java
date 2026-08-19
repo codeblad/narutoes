@@ -1,10 +1,7 @@
 
 package net.narutomod.entity;
 
-import net.narutomod.item.ItemAkatsukiRobe;
-import net.narutomod.item.ItemScytheHidan;
-import net.narutomod.item.ItemScytheHidanThrown;
-import net.narutomod.item.ItemSpearRetractable;
+import net.narutomod.item.*;
 import net.narutomod.potion.PotionHeaviness;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.ModConfig;
@@ -349,6 +346,14 @@ public class EntityHidan extends ElementsNarutomodMod.ModElement {
 		public net.minecraft.util.SoundEvent getDeathSound() {
 			return SoundEvents.ENTITY_ILLAGER_DEATH;
 		}
+
+		@Override
+		protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source) {
+			if (this.rand.nextFloat() <= ModConfig.BIJUSPAWNER_CHANCE) {
+				this.entityDropItem(new ItemStack(ItemBijuSpawner.block, 1), 0.0f);
+			}
+		}
+
 
 		@Override
 		public boolean getCanSpawnHere() {

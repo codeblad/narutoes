@@ -57,6 +57,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.nbt.NBTTagCompound;
 
+import net.narutomod.item.*;
 import net.narutomod.potion.PotionAmaterasuFlame;
 import net.narutomod.potion.PotionParalysis;
 import net.narutomod.entity.EntitySusanooClothed;
@@ -65,12 +66,6 @@ import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureBasicNinjaSkills;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
-import net.narutomod.item.ItemSharingan;
-import net.narutomod.item.ItemMangekyoSharingan;
-import net.narutomod.item.ItemInton;
-import net.narutomod.item.ItemKunai;
-import net.narutomod.item.ItemKaton;
-import net.narutomod.item.ItemAkatsukiRobe;
 import net.narutomod.ModConfig;
 import net.narutomod.ElementsNarutomodMod;
 
@@ -239,6 +234,9 @@ public class EntityItachi extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source) {
 			this.entityDropItem(new ItemStack(ItemKunai.block, 1), 0.0f);
+			if (this.rand.nextFloat() <= ModConfig.BIJUSPAWNER_CHANCE) {
+				this.entityDropItem(new ItemStack(ItemBijuSpawner.block, 1), 0.0f);
+			}
 			if (this.isReal) {
 			/*ItemStack stack = this.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 				if (stack.getItem() != ItemMangekyoSharingan.helmet) {

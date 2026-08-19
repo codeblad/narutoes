@@ -6,9 +6,7 @@ import net.narutomod.NarutomodModVariables;
 import net.narutomod.Chakra;
 import net.narutomod.ModConfig;
 import net.narutomod.Particles;
-import net.narutomod.item.ItemAkatsukiRobe;
-import net.narutomod.item.ItemJutsu;
-import net.narutomod.item.ItemNinjutsu;
+import net.narutomod.item.*;
 import net.narutomod.procedure.ProcedureAoeCommand;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.procedure.ProcedureUtils;
@@ -246,12 +244,18 @@ public class EntityKonan extends ElementsNarutomodMod.ModElement {
 		}
 
 		@Override
+		protected void dropLoot(boolean wasRecentlyHit, int lootingModifier, DamageSource source) {
+			if (this.rand.nextFloat() <= ModConfig.BIJUSPAWNER_CHANCE) {
+				this.entityDropItem(new ItemStack(ItemBijuSpawner.block, 1), 0.0f);
+			}
+		}
+
+		@Override
 		public boolean getCanSpawnHere() {
-			return false;
-			/*return super.getCanSpawnHere() && (int)this.posY >= this.world.getSeaLevel() && this.world.canSeeSky(this.getPosition())
+			return super.getCanSpawnHere() && (int)this.posY >= this.world.getSeaLevel() && this.world.canSeeSky(this.getPosition())
 			 && this.world.getEntities(EntityCustom.class, EntitySelectors.IS_ALIVE).isEmpty()
 			 && !EntityNinjaMob.SpawnData.spawnedRecentlyHere(this, 36000)
-			 && this.world.isRaining();*/
+			 && this.world.isRaining();
 		}
 
 		@Override

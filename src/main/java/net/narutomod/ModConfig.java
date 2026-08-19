@@ -41,6 +41,13 @@ public class ModConfig extends ElementsNarutomodMod.ModElement {
 	@Config.Comment("White zetsu's spawn weight (0~20). 0 to stop spawning.")
 	public static int SPAWN_WEIGHT_WHITEZETSU = 10;
 
+	@Config.Comment("zetsu flesh spawn chance (0~1). default 0.1")
+	public static double ZETSUFLESH_CHANCE = 0.05;
+
+	@Config.Comment("akatsuki biju spawner drop chance (0~1). default 0.1")
+	public static double BIJUSPAWNER_CHANCE = 0.1;
+
+
 	@Config.Comment("Whether or not bosses are aggressive on sight")
 	public static boolean AGGRESSIVE_BOSSES = false;
 
