@@ -94,7 +94,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 					this.playSound(net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:waterstream")), 0.4f, this.power / 30f - this.rand.nextFloat() * 0.1f);
 				}
 				this.shoot();
-				this.stream.execute2(this.shootingEntity, (double)this.power * 1.75d, 1.5d);
+				this.stream.execute2(this.shootingEntity, (double)this.power * 1.5d, 1.0d);
 			}
 			if (!this.world.isRemote && (this.ticksAlive > this.maxLife || this.shootingEntity == null || !this.shootingEntity.isEntityAlive())) {
 				this.setDead();
@@ -133,7 +133,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
 				target.extinguish();
-				float damage = 6 + ((1.35f+2.65f*(EC.this.power/30)) * EC.this.damageModifier)*ItemJutsu.getDmgMult(player)*1.36f;
+				float damage = 6 + ((1.35f+2.6f*(EC.this.power/30)) * EC.this.damageModifier)*ItemJutsu.getDmgMult(player)*1.36f;
 				ItemStack stack = ProcedureUtils.getMatchingItemStack((EntityLivingBase) player, ItemSuiton.block);
 				if (stack != null && stack.getTagCompound() != null && stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {
 					damage*=1.35f;
@@ -164,7 +164,7 @@ public class EntityWaterStream extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 5.0f) {
 					this.createJutsu(entity, power, (int) (10+70*power/30));
-					ItemJutsu.setCurrentJutsuCooldown(stack,(int) (50+70*power/30));
+					ItemJutsu.setCurrentJutsuCooldown(stack,(int) (120+70*power/30));
 					return true;
 				}
 				return false;
