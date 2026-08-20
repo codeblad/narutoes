@@ -172,7 +172,7 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 			float strength = 1+powerIn;
 			List<String> targets = new ArrayList<String>();
 			for (int i = 0; i < 2; i++) {
-				point = point.add(look.scale(0.5 + (powerIn * 0.75f)));
+				point = point.add(look.scale(0.5 + (powerIn * 0.6f)));
 				entity.world.newExplosion(entity, point.x,point.y,point.z ,strength, false, flag);
 				Vec3d a = point.addVector(-powerIn/2*entity.world.rand.nextFloat()*powerIn,-powerIn/2*entity.world.rand.nextFloat()*powerIn,-powerIn/2*entity.world.rand.nextFloat()*powerIn);
 				for (int x = 0; x < 25; x++) {
@@ -196,14 +196,14 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 						}
 						targets.add(entity1.getUniqueID().toString());
 						float mult = 0.5f +	2f*(powerIn/10);
-						float damage = 10+(6.35f*mult*ItemJutsu.getDmgMult(entity));
+						float damage = 10+(6.0f*mult*ItemJutsu.getDmgMult(entity));
 						ProcedureUtils.setVelocity(entity1, look.x*2, look.y*2, look.z*2);
 						entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(entity, entity),damage);
 
 					}
 				}
 			}
-			ItemJutsu.setCurrentJutsuCooldown(stack,20*4);
+			ItemJutsu.setCurrentJutsuCooldown(stack,20*5);
 			return true;
 		}
 
