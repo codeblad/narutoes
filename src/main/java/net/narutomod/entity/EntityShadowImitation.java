@@ -9,6 +9,7 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.common.MinecraftForge;
 
@@ -328,9 +329,9 @@ public void setDead() {
             );
         }
 
-        if (target != null) {
-            PlayerInput.Hook.haltTargetInput(target, false);
-        }
+        if (target != null && target.isEntityAlive()) {
+			PlayerInput.Hook.haltTargetInput(target, false);
+		}
 
         if (user != null) {
             Jutsu.removeEntity(user, this.getEntityId());
@@ -605,29 +606,38 @@ public void setDead() {
 		public static class PlayerHook {
 			
 		@SubscribeEvent
-		public void onLivingDeath(LivingDeathEvent event) {
-			EntityLivingBase entity = event.getEntityLiving();
+		public void onLivingDamage(LivingDamageEvent event) {
+			EntityLivingBase target = event.getEntityLiving();
 
-			if (entity == null || entity.world.isRemote) {
+			if (target == null || target.world.isRemote) {
 				return;
 			}
 
-			int[] intarray = entity.getEntityData().getIntArray(Jutsu.ECENTITYID);
+			float damage = event.getAmount();
 
-			if (intarray.length > 0) {
-				int[] entities = intarray.clone();
-
-				for (int i = 0; i < entities.length; i++) {
-					Entity entity1 = entity.world.getEntityByID(entities[i]);
-
-					if (entity1 instanceof EC && !entity1.isDead) {
-						entity1.setDead();
-					}
-				}
-
-				entity.getEntityData().removeTag(Jutsu.ECENTITYID);
+			if (target.getHealth() - damage > 0.0F) {
+				return;
 			}
+
+			int[] intarray = target.getEntityData().getIntArray(Jutsu.ECENTITYID);
+
+			if (intarray.length <= 0) {
+				return;
+			}
+
+			int[] entities = intarray.clone();
+
+			for (int i = 0; i < entities.length; i++) {
+				Entity entity = target.world.getEntityByID(entities[i]);
+
+				if (entity instanceof EC && !entity.isDead) {
+					entity.setDead();
+				}
+			}
+
+			target.getEntityData().removeTag(Jutsu.ECENTITYID);
 		}
+
 			@SubscribeEvent
 			public void onChangeDimension(EntityTravelToDimensionEvent event) {
 				Entity entity = event.getEntity();

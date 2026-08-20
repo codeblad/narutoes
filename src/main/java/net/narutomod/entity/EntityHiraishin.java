@@ -134,6 +134,22 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 		 .canActivateJutsu(stack, ItemNinjutsu.HIRAISHIN, player) == EnumActionResult.SUCCESS;
 	}
 
+	private static final String TELEPORT_DEBOUNCE = "HiraishinTeleportDebounce";
+
+	private static boolean isTeleportDebounced(Entity entity) {
+		if (entity == null) {
+			return true;
+		}
+		return entity.getEntityData().getLong(TELEPORT_DEBOUNCE) > entity.world.getTotalWorldTime();
+	}
+
+	private static void setTeleportDebounce(Entity entity, int ticks) {
+		if (entity == null) {
+			return;
+		}
+		entity.getEntityData().setLong(TELEPORT_DEBOUNCE, entity.world.getTotalWorldTime() + ticks);
+	}
+
 	public static class MarkerData {
 		public UUID uuid; //target UUID
 		public int targetId = -1; //target entity ID (for client retrieval)
@@ -209,6 +225,7 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 		private void setTargetUuid(@Nullable UUID uuid) {
 			this.dataManager.set(TARGET_UUID, Optional.fromNullable(uuid));
 		}
+
 
 		@Nullable
 		public UUID getTargetUuid() {
@@ -667,6 +684,9 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 		private static void executeTeleport(EntityPlayer player) {
 			Minecraft mc = Minecraft.getMinecraft();
 			if (PlayerTracker.isNinja(player) && !clientMarkerList.isEmpty() && mc.gameSettings.thirdPersonView == 0 && canUseJutsu(player)) {
+				if (EntityHiraishin.isTeleportDebounced(player)) {
+					return;
+				}
 				Vec3d vec1 = player.getPositionEyes(1f);
 				for (MarkerData data : clientMarkerList.values()) {
 					Vector4d vec4d = data.vec;
@@ -686,6 +706,7 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 						ProcedureOnLivingUpdate.setUntargetable(player, 5);
 						AxisAlignedBB oldPlayerBox = player.getEntityBoundingBox();
 						player.setPosition(vec.x, vec.y, vec.z);
+						setTeleportDebounce(player, 2);
 					
 						ProcedureSync.EntityPositionAndRotation.sendToServer(player);
 						//	ItemKunaiHiraishin.checkKunaiPickup(player);
@@ -697,13 +718,14 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 							int chakraUsageMulti = 0;
 							List<EntityLivingBase> entities = mc.world.getEntitiesWithinAABB(EntityLivingBase.class, oldPlayerBox.grow(1.0d));
 							for (EntityLivingBase entity : entities) {
-								System.out.println(entity);
-								if (entity != null) {
-									ProcedureOnLivingUpdate.setUntargetable(entity, 5);
-									entity.setPosition(vec.x, vec.y, vec.z);
-									ProcedureSync.EntityPositionAndRotation.sendToServer(entity);
-									chakraUsage += 2;
+								if (entity == null || isTeleportDebounced(entity)) {
+									continue;
 								}
+								ProcedureOnLivingUpdate.setUntargetable(entity, 5);
+								entity.setPosition(vec.x, vec.y, vec.z);
+								setTeleportDebounce(entity, 2);
+								ProcedureSync.EntityPositionAndRotation.sendToServer(entity);
+								chakraUsage += 2;
 							}
 							if (chakraUsageMulti > 0)
 								chakraUsage *= chakraUsageMulti;

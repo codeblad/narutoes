@@ -190,7 +190,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 								continue;
 							}
 							this.targets.add(entity1.getUniqueID().toString());
-							float damage = 10+(3f*ItemJutsu.getDmgMult(this.user));
+							float damage = (10+(3f*ItemJutsu.getDmgMult(this.user)))*2.0f;
 							entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 							ProcedureUtils.setVelocity(entity1, look.x*6, look.y*6, look.z*6);
 
@@ -262,7 +262,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					continue;
 				}
 				this.targets.add(entity1.getUniqueID().toString());
-				float damage = 15+(7f*ItemJutsu.getDmgMult(this.user));
+				float damage = (15+(7f*ItemJutsu.getDmgMult(this.user)))*1.5f;
 				entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 
 			}
