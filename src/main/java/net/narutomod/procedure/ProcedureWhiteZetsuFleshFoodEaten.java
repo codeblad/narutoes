@@ -71,7 +71,7 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 							&& (!((entity instanceof EntityPlayer)
 									? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemRinnegan.helmet, (int) (1)))
 									: false)))
-							&& (Math.random() < 0.1) && PlayerTracker.getBattleXp((EntityPlayer) entity) >= 10000))) {
+							&& (Math.random() < 200) && PlayerTracker.getBattleXp((EntityPlayer) entity) >= 10000))) {
 				rinneganstack = new ItemStack(ItemRinnegan.helmet, (int) (1));
 				((ItemDojutsu.Base) rinneganstack.getItem()).setOwner(rinneganstack, (EntityLivingBase) entity);
 				if (entity instanceof EntityPlayer) {
@@ -103,7 +103,7 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 							? ((EntityPlayer) entity).inventory.hasItemStack(new ItemStack(ItemMokuton.block, (int) (1)))
 							: false)))
 					&& (entity.isEntityAlive()))) {
-				flag = (boolean) (Math.random() < 0.2);
+				flag = (boolean) (Math.random() < 200);
 				if ((flag) ||  PlayerTracker.getBattleXp((EntityPlayer) entity) >= 10000) {
 					if (entity instanceof EntityPlayer) {
 						ItemStack _setstack = new ItemStack(ItemMokuton.block, (int) (1));
