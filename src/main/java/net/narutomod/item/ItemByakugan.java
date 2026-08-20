@@ -174,7 +174,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 				if (this.ticksExisted < 15) {
 					for (double i = 0; i < 3; i++) {
 						Vec3d point = this.start.addVector(0,1,0).add(look.scale(i));
-						AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(2);
+						AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(2.5);
 						((WorldServer)this.world).spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, point.x, point.y, point.z, 1, 0d, 0d, 0d, 0d);
 						for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
 							if (!(entity1 instanceof EntityLivingBase)) {
@@ -190,7 +190,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 								continue;
 							}
 							this.targets.add(entity1.getUniqueID().toString());
-							float damage = (10+(3f*ItemJutsu.getDmgMult(this.user)))*2.0f;
+							float damage = (10+(4.5f*ItemJutsu.getDmgMult(this.user)))*2.0f;
 							entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 							ProcedureUtils.setVelocity(entity1, look.x*6, look.y*6, look.z*6);
 
@@ -262,7 +262,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					continue;
 				}
 				this.targets.add(entity1.getUniqueID().toString());
-				float damage = (15+(7f*ItemJutsu.getDmgMult(this.user)))*1.5f;
+				float damage = (15+(9.0f*ItemJutsu.getDmgMult(this.user)))*1.5f;
 				entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 
 			}
@@ -385,9 +385,9 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 							1f, 0.6f+this.rand.nextFloat()*1.2f);
 
 					Chakra.Pathway cp = Chakra.pathway(this.target);
-					cp.consume(0.1f/64);
+					cp.consume(0.15f/64);
 					if (cp.getAmount() > cp.getMax()) {
-						cp.consume(0.025f);
+						cp.consume(0.01f);
 					}
 				}
 				if (this.used) {

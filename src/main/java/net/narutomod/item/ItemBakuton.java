@@ -68,7 +68,7 @@ public class ItemBakuton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:bakuton")
 	public static final Item block = null;
 	public static final int ENTITYID = 230;
-	public static final ItemJutsu.JutsuEnum JIRAIKEN = new ItemJutsu.JutsuEnum(0, "tooltip.bakuton.jiraiken", 'S', 150, 90d, new Jiraiken());
+	public static final ItemJutsu.JutsuEnum JIRAIKEN = new ItemJutsu.JutsuEnum(0, "tooltip.bakuton.jiraiken", 'S', 150, 65d, new Jiraiken());
 	public static final ItemJutsu.JutsuEnum CLAY = new ItemJutsu.JutsuEnum(1, "c_1", 'S', 200, 200d, new ExplosiveClay.Jutsu());
 	public static final ItemJutsu.JutsuEnum CLONE = new ItemJutsu.JutsuEnum(2, "explosive_clone", 'S', 200, 500d, new EntityExplosiveClone.EC.Jutsu());
 public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3, "c0", 'S', 200, 500d, new C0());
@@ -172,7 +172,7 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 			float strength = 1+powerIn;
 			List<String> targets = new ArrayList<String>();
 			for (int i = 0; i < 2; i++) {
-				point = point.add(look.scale(0.5+powerIn));
+				point = point.add(look.scale(0.5 + (powerIn * 0.75f)));
 				entity.world.newExplosion(entity, point.x,point.y,point.z ,strength, false, flag);
 				Vec3d a = point.addVector(-powerIn/2*entity.world.rand.nextFloat()*powerIn,-powerIn/2*entity.world.rand.nextFloat()*powerIn,-powerIn/2*entity.world.rand.nextFloat()*powerIn);
 				for (int x = 0; x < 25; x++) {
@@ -196,14 +196,14 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 						}
 						targets.add(entity1.getUniqueID().toString());
 						float mult = 0.5f +	2f*(powerIn/10);
-						float damage = 10+(5f*mult*ItemJutsu.getDmgMult(entity));
+						float damage = 10+(6.35f*mult*ItemJutsu.getDmgMult(entity));
 						ProcedureUtils.setVelocity(entity1, look.x*2, look.y*2, look.z*2);
 						entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(entity, entity),damage);
 
 					}
 				}
 			}
-			ItemJutsu.setCurrentJutsuCooldown(stack,20*3);
+			ItemJutsu.setCurrentJutsuCooldown(stack,20*4);
 			return true;
 		}
 
@@ -224,7 +224,7 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 
 		@Override
 		public float getPowerupDelay() {
-			return 20.0f;
+			return 10.0f;
 		}
 
 		@Override
