@@ -1,16 +1,19 @@
 
 package net.narutomod.entity;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.*;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.Chakra;
 import net.narutomod.NarutomodModVariables;
+import net.narutomod.Particles;
 import net.narutomod.block.BlockExplosiveTag;
-import net.narutomod.item.ItemJutsu;
-import net.narutomod.item.ItemNinjutsu;
-import net.narutomod.item.ItemScrollShikigami;
+import net.narutomod.item.*;
 import net.narutomod.potion.PotionFlight;
+import net.narutomod.potion.PotionHeaviness;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -24,9 +27,6 @@ import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.EntityPlayer;
@@ -51,6 +51,12 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.network.play.server.SPacketChangeGameState;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import static net.narutomod.item.ItemMokuton.GOLEM;
+import static net.narutomod.item.ItemNinjutsu.SHIKIGAMI;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityShikigami extends ElementsNarutomodMod.ModElement {
@@ -74,8 +80,13 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 		protected static final String ENTITYID_KEY = "ShikigamiWingsEntityId";
 		private final int waitTime = 50;
 		private double chakraUsage;
+		private boolean jutsuKey1Pressed;
 		private boolean jutsuKey2Pressed;
 		private boolean jutsuKey3Pressed;
+		float jutsu1Cool = 0;
+		float jutsu2Cool = 0;
+		float jutsu3Cool = 0;
+		float jutsu4Cool = 0;
 		private boolean isShooting;
 		private EntityPaperBind.EC bindEntity;
 		
@@ -115,7 +126,142 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 					user.getEntityData().removeTag(ENTITYID_KEY);
 				}
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:paperflip")), 0.6f, 0.8f);
+				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getSummoner(), ItemNinjutsu.block);
+				if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
+					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
+					//(30*20)+this.ticksExisted+this.ticksExisted/2
+					item.setJutsuCooldown(stack, SHIKIGAMI, 20 * 5);
+				}
 			}
+		}
+
+		public static class PaperBarrage extends Entity  {
+			private EntityLivingBase user;
+			private Vec3d start;
+			private Vec3d end;
+			private int dist = 35;
+			private int delay = 15;
+			List<String> targets = new ArrayList<String>();
+			private final int lifeTime = 20*3;
+
+			public PaperBarrage(World worldIn) {
+				super(worldIn);
+				this.setSize(0.01f, 0.01f);
+				this.isImmuneToFire = true;
+			}
+
+			public PaperBarrage(EntityLivingBase user) {
+				this(user.world);
+				this.user = user;
+				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
+			}
+
+
+			@Override
+			protected void entityInit() {
+			}
+
+			@Override
+			public void onUpdate() {
+				if (this.user != null) {
+					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
+					if (!this.world.isRemote) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+
+						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:paperflip")), 0.5f, this.rand.nextFloat() * 0.4f + 0.9f);
+						Vec3d shootvec = this.user.getLookVec();
+						for (int i = 0; i < 6; i++) {
+							Vec3d vec = this.getPositionVector().addVector(-5+this.rand.nextFloat()*10,-1+this.rand.nextFloat()*2,-5+this.rand.nextFloat()*10);
+							EntityPaperArrow entityarrow = new EntityPaperArrow(this.user);
+							entityarrow.setPosition(vec.x, vec.y, vec.z);
+							entityarrow.setDamage(5f+0.8*ItemJutsu.getDmgMult(this.user));
+							entityarrow.shoot(shootvec.x, shootvec.y, shootvec.z, 3.5f, 0);
+							this.world.spawnEntity(entityarrow);
+						}
+					}
+
+				}
+				if (this.ticksExisted > this.lifeTime) {
+					this.setDead();
+				}
+			}
+
+			@Override
+			protected void readEntityFromNBT(NBTTagCompound compound) {
+			}
+
+			@Override
+			protected void writeEntityToNBT(NBTTagCompound compound) {
+			}
+
+		}
+
+		public static class ExplosivePlanes extends Entity  {
+			private EntityLivingBase user;
+			private Vec3d start;
+			private Vec3d end;
+			private int dist = 35;
+			private int delay = 15;
+			List<String> targets = new ArrayList<String>();
+			private final int lifeTime = 10*3;
+
+			public ExplosivePlanes(World worldIn) {
+				super(worldIn);
+				this.setSize(0.01f, 0.01f);
+				this.isImmuneToFire = true;
+			}
+
+			public ExplosivePlanes(EntityLivingBase user) {
+				this(user.world);
+				this.user = user;
+				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
+			}
+
+
+			@Override
+			protected void entityInit() {
+			}
+
+			@Override
+			public void onUpdate() {
+				if (this.user != null) {
+					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
+					if (!this.world.isRemote) {
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+
+						if (this.ticksExisted == 1 || this.ticksExisted%10 ==0) {
+							this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:paperflip")), 0.5f, this.rand.nextFloat() * 0.4f + 0.9f);
+							Vec3d shootvec = this.user.getLookVec();
+							if (user instanceof EntityLiving && ((EntityLiving)user).getAttackTarget() != null) {
+								shootvec = ((EntityLiving)user).getAttackTarget().getPositionEyes(1f).subtract(user.getPositionEyes(1f));
+								shootvec = shootvec.addVector(0, MathHelper.sqrt(shootvec.x * shootvec.x + shootvec.z * shootvec.z) * 0.1d, 0);
+							}
+							for (int i = 0; i < 3; i++) {
+								Vec3d vec = this.getPositionVector().addVector(-2+this.rand.nextFloat()*4,-1+this.rand.nextFloat()*2,-2+this.rand.nextFloat()*4);
+								EntityPaperArrow entityarrow = new EntityPaperArrow(this.user);
+								entityarrow.user = this.user;
+								entityarrow.setPosition(vec.x, vec.y, vec.z);
+								entityarrow.setDamage(1);
+								entityarrow.shoot(shootvec.x, shootvec.y, shootvec.z, 3f, 0);
+								this.world.spawnEntity(entityarrow);
+							}
+						}
+					}
+
+				}
+				if (this.ticksExisted > this.lifeTime) {
+					this.setDead();
+				}
+			}
+
+			@Override
+			protected void readEntityFromNBT(NBTTagCompound compound) {
+			}
+
+			@Override
+			protected void writeEntityToNBT(NBTTagCompound compound) {
+			}
+
 		}
 
 		@Override
@@ -125,6 +271,10 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 			if (user != null && user.isEntityAlive()) {
 				this.setPosition(user.posX, user.posY, user.posZ);
 				if (!this.world.isRemote) {
+					--this.jutsu1Cool;
+					--this.jutsu2Cool;
+					--this.jutsu3Cool;
+					--this.jutsu4Cool;
 					if (this.ticksExisted < this.waitTime && this.rand.nextFloat() < 0.6667f) {
 						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:paperflip")), 0.8f, this.rand.nextFloat() * 0.4f + 0.9f);
 					}
@@ -135,66 +285,59 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 							this.setDead();
 						}
 					}
-					Chakra.Pathway chakra = Chakra.pathway(user);
-					this.isShooting = this.ticksExisted > this.waitTime
-					 && user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed) && chakra.consume(this.chakraUsage * 0.1d);
-					if (this.isShooting) {
-						this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:paperflip")), 0.5f, this.rand.nextFloat() * 0.4f + 0.9f);
-						Vec3d shootvec = user.getLookVec();
-						if (user instanceof EntityLiving && ((EntityLiving)user).getAttackTarget() != null) {
-							shootvec = ((EntityLiving)user).getAttackTarget().getPositionEyes(1f).subtract(user.getPositionEyes(1f));
-							shootvec = shootvec.addVector(0, MathHelper.sqrt(shootvec.x * shootvec.x + shootvec.z * shootvec.z) * 0.1d, 0);
-						}
-						for (int i = 0; i < 3; i++) {
-							Vec3d vec = new Vec3d((this.rand.nextFloat()-0.5f) * 5f, 0.8f + this.rand.nextFloat() * 0.4f, 0.0f)
-							 .rotateYaw(-(float)Math.toRadians(user.renderYawOffset)).add(user.getPositionVector());
-							EntityPaperArrow entityarrow = new EntityPaperArrow(user);
-							entityarrow.setPosition(vec.x, vec.y, vec.z);
-							entityarrow.shoot(shootvec.x, shootvec.y, shootvec.z, 3.5f, 1f+0.5f*ItemJutsu.getDmgMult(user));
-							this.world.spawnEntity(entityarrow);
-						}
-					}
+
 					if (this.ticksExisted > this.waitTime) {
-						boolean newPressed = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
-						float cooldown = user.getEntityData().getFloat("paperstunCD");
-						double ball = (cooldown-NarutomodModVariables.world_tick)/20;
-						if (ball >= 30) {
-							user.getEntityData().setFloat("paperstunCD", (float) (NarutomodModVariables.world_tick+20*25));
-						}
-						if (this.jutsuKey2Pressed && !newPressed) {
-							if (cooldown < NarutomodModVariables.world_tick) {
-								if ( chakra.getAmount() >= this.chakraUsage*4) {
-									RayTraceResult targetRT = user instanceof EntityLiving && ((EntityLiving)user).getAttackTarget() != null
-											? new RayTraceResult(((EntityLiving)user).getAttackTarget())
-											: ProcedureUtils.objectEntityLookingAt(user, 30d, 3d, true, true, EntityShikigami.EC.class);
-									if (targetRT != null && targetRT.entityHit != null) {
-										EntityPaperBind.EC entity1 = EntityPaperBind.EC.Jutsu.createJutsu(user, targetRT.entityHit);
-										if (entity1 != null) {
-											chakra.consume(this.chakraUsage*4);
-											this.bindEntity = entity1;
-											user.getEntityData().setFloat("paperstunCD", (float) (NarutomodModVariables.world_tick+20*15));
-										}
+
+						if (!user.isPotionActive(PotionUsingJutsu.potion)) {
+							boolean newPressed = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed);
+							if (this.jutsuKey1Pressed && !newPressed ) {
+
+								if (!user.isSneaking()) {
+									if (this.jutsu1Cool <= 0 && Chakra.pathway(user).consume(350d)) {
+										this.jutsu1Cool = 20*13;
+										user.world.spawnEntity(new PaperBarrage(user));
+									}
+								} else {
+									if (this.jutsu4Cool <= 0 && Chakra.pathway(user).consume(500d)) {
+										this.jutsu4Cool = 20*13;
+										user.world.spawnEntity(new ExplosivePlanes(user));
 									}
 								}
-							} else {
-								if (user instanceof EntityPlayer) {
-									EntityPlayer player = (EntityPlayer) user;
-									player.sendStatusMessage(new TextComponentString("cooldown: " + (cooldown-NarutomodModVariables.world_tick)/20), true);
-								}
-
 							}
+							this.jutsuKey1Pressed = newPressed;
+
+							boolean newPressed2 = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
+							Chakra.Pathway chakra = Chakra.pathway(user);
+							if (this.jutsuKey2Pressed && !newPressed2 && this.jutsu2Cool <= 0 && (chakra.getAmount() >= 500)) {
+								RayTraceResult targetRT = user instanceof EntityLiving && ((EntityLiving)user).getAttackTarget() != null
+										? new RayTraceResult(((EntityLiving)user).getAttackTarget())
+										: ProcedureUtils.objectEntityLookingAt(user, 30d, 3d, true, true, EntityShikigami.EC.class);
+								if (targetRT != null && targetRT.entityHit != null) {
+									EntityPaperBind.EC entity1 = EntityPaperBind.EC.Jutsu.createJutsu(user, targetRT.entityHit);
+									if (entity1 != null) {
+										chakra.consume(500d);
+										this.bindEntity = entity1;
+										if (user instanceof EntityLivingBase) {
+											user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 20*5, 1, false, false));
+										}
+										this.jutsu2Cool = 20*25;
+										user.getEntityData().setFloat("paperstunCD", (float) (NarutomodModVariables.world_tick+20*15));
+									}
+								}
+							}
+							this.jutsuKey2Pressed = newPressed2;
+
+
+							boolean newPressed3 = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
+							if (this.jutsuKey3Pressed && !newPressed3 && chakra.getAmount() >= 100 ) {
+								chakra.consume(100d);
+								ItemStack scroll = new ItemStack(BlockExplosiveTag.block,1);
+								ItemHandlerHelper.giveItemToPlayer((EntityPlayer) user,scroll);
+							}
+							this.jutsuKey3Pressed = newPressed3;
 						}
 
-						this.jutsuKey2Pressed = newPressed;
 
-
-						boolean newPressed2 = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
-						if (this.jutsuKey3Pressed && !newPressed2 && chakra.getAmount() >= 100 ) {
-							chakra.consume(100d);
-							ItemStack scroll = new ItemStack(BlockExplosiveTag.block,1);
-							ItemHandlerHelper.giveItemToPlayer((EntityPlayer) user,scroll);
-						}
-						this.jutsuKey3Pressed = newPressed2;
 					}
 				}
 			} else if (!this.world.isRemote) {
@@ -229,7 +372,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 			 	Entity entity1 = entity.world.getEntityByID(entity.getEntityData().getInteger(ENTITYID_KEY));
 				if (!(entity1 instanceof EC)) {
-					this.createJutsu(entity, ItemNinjutsu.SHIKIGAMI.chakraUsage);
+					this.createJutsu(entity, SHIKIGAMI.chakraUsage);
 					return true;
 				} else {
 					entity1.setDead();
@@ -253,6 +396,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 		public EntityPaperArrow(World a) {
 			super(a);
 		}
+		public EntityLivingBase user;
 
 		public EntityPaperArrow(EntityLivingBase shooter) {
 			super(shooter.world, shooter);
@@ -266,13 +410,27 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 		@Override
 		protected void onHit(RayTraceResult raytraceResultIn) {
 			Entity entity = raytraceResultIn.entityHit;
+			if (this.user != null) {
+				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
+				Vec3d point = this.getPositionVector();
+				this.world.newExplosion(this, point.x, point.y, point.z, 4, false, flag);
+				AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(4);
+				for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
+					if (!(entity1 instanceof EntityLivingBase)) {
+						continue;
+					}
+					float damage = 5+(4f*ItemJutsu.getDmgMult(this.user));
+					entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
+
+				}
+			}
 			if (entity != null) {
 				float f = MathHelper.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
 				int i = MathHelper.ceil((double)f * this.getDamage());
 				if (this.getIsCritical()) {
 					i += this.rand.nextInt(i / 2 + 2);
 				}
-				entity.hurtResistantTime = 10;
+				//entity.hurtResistantTime = 10;
 				if (entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), (float)i)) {
 					if (this.shootingEntity != null && entity != this.shootingEntity && entity instanceof EntityPlayer && this.shootingEntity instanceof EntityPlayerMP) {
 						((EntityPlayerMP)this.shootingEntity).connection.sendPacket(new SPacketChangeGameState(6, 0.0F));
@@ -299,11 +457,12 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
-			if (!this.world.isRemote && this.timeInGround > 40) {
+			if (!this.world.isRemote && this.timeInGround > 40 || this.ticksExisted > 180) {
 				this.setDead();
 			}
 		}
 	}
+
 
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {

@@ -140,6 +140,10 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 					((EntityLivingBase)entity).removePotionEffect(MobEffects.INVISIBILITY);
 				}
 			}
+
+			if (entity.getEntityData().getInteger("KekkeiGenkai") != 21) {
+				this.enableJutsu(itemstack, SHIKIGAMI, false);
+			}
 		}
 
 		@Override

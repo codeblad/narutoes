@@ -300,6 +300,7 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 			this.buttonList.add(new GuiButton(22, this.guiLeft + 150, this.guiTop + 125, 39, 20, "Lightning Cloak"));
 			this.buttonList.add(new GuiButton(23, this.guiLeft + 200, this.guiTop + 125, 39, 20, "Kamui"));
 			this.buttonList.add(new GuiButton(69, this.guiLeft + 100, this.guiTop + 150, 39, 20, "Regular Dude"));
+
 		}
 	}
 }

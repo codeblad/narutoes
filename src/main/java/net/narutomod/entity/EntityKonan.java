@@ -212,7 +212,7 @@ public class EntityKonan extends ElementsNarutomodMod.ModElement {
 			}
 			Entity attacker = source.getTrueSource();
 			if (!this.world.isRemote && !this.isAIDisabled() && source != ProcedureUtils.SPECIAL_DAMAGE
-			 && attacker instanceof EntityLivingBase && this.rand.nextInt(4) != 0
+			 && attacker instanceof EntityLivingBase && this.rand.nextInt(8) != 0
 			 && Chakra.pathway(this).consume(ItemNinjutsu.REPLACEMENT.chakraUsage)) {
 				this.setRevengeTarget((EntityLivingBase)attacker);
 				ProcedureOnLivingUpdate.setUntargetable(this, 5);

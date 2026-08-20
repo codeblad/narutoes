@@ -1,6 +1,7 @@
 package net.narutomod.item;
 
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.*;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -868,7 +869,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						ProcedureUtils.setVelocity(this.user, 0,1,0);
 						Vec3d tpos = this.user.getPositionVector().add(this.user.getLookVec().scale(0.75));
 						this.target.setPositionAndUpdate(tpos.x,tpos.y+3,tpos.z);
-						this.target.addPotionEffect(new PotionEffect(PotionParalysis.potion, 5, 1, false, false));
+						this.target.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 						if (this.ticksExisted%7 == 0 || this.ticksExisted == 1) {
 							Vec3d pos = this.target.getPositionVector();
 							boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
@@ -883,7 +884,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 								4f, 1f);
 					}
 					if (this.ticksExisted > 21 && this.ticksExisted < 21+40 && !this.landed) {
-						this.target.addPotionEffect(new PotionEffect(PotionParalysis.potion, 5, 1, false, false));
+						this.target.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 						this.start = this.user.getPositionVector();
 						Vec3d look = this.user.getLookVec();
 						if (true) {
@@ -964,7 +965,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 							1,0,0,0, 0, 0,
 							0, 0x10FFFFFF, 0, 0);
 				}
-				this.target.addPotionEffect(new PotionEffect(PotionParalysis.potion, 20, 1, false, false));
+				this.target.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 20, 1, false, false));
 			}
 
 

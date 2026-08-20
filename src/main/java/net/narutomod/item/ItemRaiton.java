@@ -404,7 +404,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 						Vec3d targetPos = this.user.getPositionVector().add(this.user.getLookVec().scale(2));
 						this.target.setPositionAndUpdate(targetPos.x,targetPos.y+2,targetPos.z);
 						if (this.target instanceof EntityPlayer) {
-							ProcedureOnLivingUpdate.disableMouseClicks((EntityPlayer) this.target, 10);
+							this.target.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 						}
 					}
 					if (this.ticksExisted == delay-15) {
