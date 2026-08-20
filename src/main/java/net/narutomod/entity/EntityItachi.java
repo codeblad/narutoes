@@ -1,9 +1,6 @@
 
 package net.narutomod.entity;
 
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -27,7 +24,6 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.EntitySelectors;
-import net.minecraft.util.EnumHand;
 import net.minecraft.item.ItemStack;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.entity.ai.EntityAIWander;
@@ -51,20 +47,12 @@ import net.minecraft.client.model.ModelBiped;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.entity.RenderBiped;
-import net.minecraft.client.renderer.entity.RenderLiving;
-import net.minecraft.client.Minecraft;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.nbt.NBTTagCompound;
 
 import net.narutomod.item.*;
 import net.narutomod.potion.PotionAmaterasuFlame;
-import net.narutomod.potion.PotionParalysis;
-import net.narutomod.entity.EntitySusanooClothed;
-import net.narutomod.entity.EntityCrow;
 import net.narutomod.procedure.ProcedureUtils;
-import net.narutomod.procedure.ProcedureBasicNinjaSkills;
-import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureOnLivingUpdate;
 import net.narutomod.ModConfig;
 import net.narutomod.ElementsNarutomodMod;

@@ -252,6 +252,7 @@ public class GuiScrollKG extends ElementsNarutomodMod.ModElement {
 
 			super.handleButtonAction(player, buttonID);
 
+			player.closeScreen();
 			/*if (stack != null) {
 			}*/
 		}

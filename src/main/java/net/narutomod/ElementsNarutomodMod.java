@@ -527,6 +527,8 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				return new GuiScrollVacuumWaveGui.GuiContainerMod(world, x, y, z, player);
 			if (id == GuiScrollKG.GUIID)
 				return new GuiScrollKG.GuiContainerMod(world, x, y, z, player);
+			if (id == GuiScrollBiju.GUIID)
+				return new GuiScrollBiju.GuiContainerMod(world, x, y, z, player);
 			if (id == GuiScrollShikigamiGui.GUIID)
 				return new GuiScrollShikigamiGui.GuiContainerMod(world, x, y, z, player);
 			if (id == GuiScrollMultiCloneGui.GUIID)
@@ -640,6 +642,8 @@ public class ElementsNarutomodMod implements IFuelHandler, IWorldGenerator {
 				return new GuiScrollVacuumWaveGui.GuiWindow(world, x, y, z, player);
 			if (id == GuiScrollKG.GUIID)
 				return new GuiScrollKG.GuiWindow(world, x, y, z, player);
+			if (id == GuiScrollBiju.GUIID)
+				return new GuiScrollBiju.GuiWindow(world, x, y, z, player);
 			if (id == GuiScrollShikigamiGui.GUIID)
 				return new GuiScrollShikigamiGui.GuiWindow(world, x, y, z, player);
 			if (id == GuiScrollMultiCloneGui.GUIID)
