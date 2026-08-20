@@ -182,7 +182,7 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 					entity.world.spawnEntity(new EC(entity));
 					return true;
 				} else {
-					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*8);
+					ItemJutsu.setCurrentJutsuCooldown(stack, entity, 20*20);
 					return ((EC)entity1).shootRay();
 				}
 			}

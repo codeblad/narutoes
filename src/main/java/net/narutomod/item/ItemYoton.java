@@ -100,13 +100,13 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 		public EntityBiggerMe(EntityLivingBase user, float scaleIn) {
 			super(user);
 			//this.setScale(1f);
-			this.scale = scaleIn;
+			this.scale = (scaleIn * 0.5f);
 			this.stepHeight = scaleIn * this.height / 3.0F;
 			this.setNoAI(true);
 			float ratio = 1+2f*(scaleIn/20);
 			double d = MathHelper.sqrt((3d * scaleIn * scaleIn) + (this.height * this.height));
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("biggerme.reach", d*1.25, 0));
-			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("biggerme.damage", (10+ItemJutsu.getNinjaMult(user)*1.65)*ratio, 0));
+			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).applyModifier(new AttributeModifier("biggerme.damage", (10+ItemJutsu.getNinjaMult(user)*1.3)*ratio, 0));
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(user.getHealth() * scaleIn);
 			this.setHealth(this.getMaxHealth());
 
@@ -230,7 +230,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getBasePower() {
-				return 2.0f;
+				return 1.0f;
 			}
 	
 			@Override
@@ -240,7 +240,7 @@ public class ItemYoton extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getMaxPower() {
-				return 40.0f;
+				return 20.0f;
 			}
 		}
 	}
