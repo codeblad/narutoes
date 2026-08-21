@@ -227,7 +227,7 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 						Particles.spawnParticle(this.world, Particles.Types.SMOKE, point.x, point.y, point.z,
 								1, 1d, 0d, 1d, 0,0,0, 0x64B8F7FF, smokeSize, 0);
 					}
-					AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.rtr.hitVec)).grow(1+this.power*0.25f);
+					AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.rtr.hitVec)).grow(1+this.power*0.3f);
 					for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
 						if (!(entity1 instanceof EntityLivingBase)) {
 							continue;

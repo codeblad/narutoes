@@ -93,7 +93,7 @@ public class EntitySusanooClothed extends ElementsNarutomodMod.ModElement {
 			//this.setFlameColor(0x20b83dba);
 			if (this.hasLegs()) {
 				this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("susanoo.reachExtension", 3.0D, 0));
-				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier("susanoo.speedboost", 0.5D, 0));
+				this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier("susanoo.speedboost", 0.25D, 0));
 			}
 			float ratio = 1;
 			if (!(entity instanceof EntityPlayer)) {

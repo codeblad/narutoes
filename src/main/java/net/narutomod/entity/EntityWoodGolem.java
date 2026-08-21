@@ -118,7 +118,7 @@ public class EntityWoodGolem extends ElementsNarutomodMod.ModElement {
 			this.getAttributeMap().registerAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
 			this.getAttributeMap().registerAttribute(EntityPlayer.REACH_DISTANCE);
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).setBaseValue(20.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D);
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.45D);
 			this.getEntityAttribute(EntityLivingBase.SWIM_SPEED).setBaseValue(0.6D);
 			this.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 9999999, 20, false, false));
 		}
