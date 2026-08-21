@@ -385,9 +385,9 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 							1f, 0.6f+this.rand.nextFloat()*1.2f);
 
 					Chakra.Pathway cp = Chakra.pathway(this.target);
-					cp.consume(0.15f/64);
+					cp.consume(0.2f/64);
 					if (cp.getAmount() > cp.getMax()) {
-						cp.consume(0.01f);
+						cp.consume(0.005f);
 					}
 				}
 				if (this.used) {
