@@ -316,7 +316,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					if (PlayerTracker.getBattleXp((EntityPlayer) targetEntity) >= NarutomodModVariables.SAGEEXP) {
 						defMult += .35;
 					} else {
-						defMult += .15f;
+						defMult += .2f;
 					}
 				}
 				if (headstack.getItem() == ItemMangekyoSharinganEternal.helmet ||headstack.getItem() == ItemMangekyoSharinganObito.helmet||headstack.getItem() == ItemMangekyoSharingan.helmet   ) {

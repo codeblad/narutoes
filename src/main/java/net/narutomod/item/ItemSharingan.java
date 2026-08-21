@@ -97,7 +97,7 @@ public class ItemSharingan extends ElementsNarutomodMod.ModElement {
 		public void onArmorTick(World world, EntityPlayer entity, ItemStack itemstack) {
 			super.onArmorTick(world, entity, itemstack);
 			if (!world.isRemote) {
-				entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 3, false, false));
+				entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 4, false, false));
 			}
 			int x = (int) entity.posX;
 			int y = (int) entity.posY;

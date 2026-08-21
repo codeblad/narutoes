@@ -101,7 +101,7 @@ public class EntitySusanooWinged extends ElementsNarutomodMod.ModElement {
 			this.isWingExtending = false;
 			float ratio = player.getEntityData().getFloat("susanratio");
 			this.getEntityAttribute(EntityPlayer.REACH_DISTANCE).applyModifier(new AttributeModifier("susanoo.reachExtension", 12.0D, 0));
-			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier("susanoo.speedboost", 0.65D, 0));
+			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).applyModifier(new AttributeModifier("susanoo.speedboost", 0.3D, 0));
 			float health = (20+ (80*(ItemJutsu.getDmgMult(player)/63))) * PlayerTracker.getDefense(player);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health*3.0+500);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(30.0D+ItemJutsu.getDmgMult(player)*4.5);

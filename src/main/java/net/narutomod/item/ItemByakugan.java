@@ -457,7 +457,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 				int z = (int) entity.posZ;
 				if (!world.isRemote) {
 					if (PlayerTracker.getBattleXp((EntityPlayer) entity) >= NarutomodModVariables.SAGEEXP) {
-						entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 5, false, false));
+						entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 8, false, false));
 					}
 					else {
 						entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 2, 4, false, false));
