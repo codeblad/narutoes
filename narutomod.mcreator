@@ -2233,6 +2233,36 @@
       "registry_name": "chakra_regeneration"
     },
     {
+      "name": "ChakraSaturationOnPotionActiveTick",
+      "type": "procedure",
+      "sortid": 1997,
+      "compiles": true,
+      "locked_code": false,
+      "ids": {},
+      "registry_name": "chakra_saturation_on_potion_active_tick",
+      "metadata": {
+        "dependencies": [
+          {
+            "name": "entity",
+            "type": "entity"
+          },
+          {
+            "name": "amplifier",
+            "type": "number"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ChakraSaturation",
+      "type": "potion",
+      "sortid": 1997,
+      "compiles": true,
+      "locked_code": false,
+      "ids": {},
+      "registry_name": "chakra_saturation"
+    },
+    {
       "name": "MRPGRecipe",
       "type": "recipe",
       "sortid": 403,
@@ -9746,6 +9776,7 @@
       "item.kabutowari_hammer.name": "Kabutowari Hammer",
       "entity.kakuzu.name": "Kakuzu",
       "potion.effect.chakra_regeneration": "Chakra Regeneration",
+      "potion.effect.chakra_saturation": "Chakra Saturation",
       "item.ninjutsu.amenotejikara": "Amenotejikara",
       "subtitles.swoosh": "",
       "entity.unrivaled_strength.name": "Unrivaled Strength",
@@ -9811,6 +9842,7 @@
       "entity.entity80gods.name": "Eighty Gods Vacuum Fists",
       "item.chakra_blades.name": "Chakra Blades",
       "effect.chakra_regeneration": "Chakra ++",
+      "effect.chakra_saturation": "Saturation ++",
       "item.ninja_armor_jiraiyahelmet.name": "Jiraiya Forehead Protector",
       "tooltip.bakuton.jiraiken": "Landmine Fist",
       "advancements.shikotsumyaku_acquired.descr": "Shikotsumyaku (Skeletal control) is a kekkei genkai which gives its wielder the ability to manipulate their own bones.",

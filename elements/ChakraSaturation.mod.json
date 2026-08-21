@@ -1,0 +1,22 @@
+{
+  "_fv": 18,
+  "_type": "potion",
+  "definition": {
+    "name": "Chakra Saturation",
+    "effectName": "Saturation ++",
+    "icon": "military_rations_pill.png",
+    "color": {
+      "value": -16424788,
+      "falpha": 0.0
+    },
+    "isInstant": false,
+    "isBad": false,
+    "isBenefitical": true,
+    "registerPotionType": false,
+    "renderStatusInInventory": true,
+    "renderStatusInHUD": true,
+    "onActiveTick": {
+      "name": "ChakraSaturationOnPotionActiveTick"
+    }
+  }
+}

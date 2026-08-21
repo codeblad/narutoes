@@ -329,8 +329,9 @@ public void setDead() {
             );
         }
 
-        if (target != null && target.isEntityAlive()) {
+        if (target != null) {
 			PlayerInput.Hook.haltTargetInput(target, false);
+			this.userInput = new PlayerInput.Hook();
 		}
 
         if (user != null) {
@@ -340,7 +341,6 @@ public void setDead() {
 
     super.setDead();
 }
-
 
 		@Override
 		public void onUpdate() {

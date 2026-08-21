@@ -20,6 +20,7 @@ import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.Chakra;
 import net.narutomod.potion.PotionChakraRegeneration;
+import net.narutomod.potion.PotionChakraSaturation;
 
 import java.util.List;
 import net.minecraft.util.EnumHand;
@@ -85,7 +86,7 @@ public class ItemMilitaryRationsPillGold extends ElementsNarutomodMod.ModElement
 			if (!world.isRemote) {
 				Chakra.pathway(entity).consume(-500d, true);
 				entity.addPotionEffect(new PotionEffect(PotionChakraRegeneration.potion, 200, 0));
-				entity.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 4800, 0));
+				entity.addPotionEffect(new PotionEffect(PotionChakraSaturation.potion, 24000, 0));
 				entity.getCooldownTracker().setCooldown(block, 5200);
 			}
 		}

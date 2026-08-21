@@ -1,7 +1,7 @@
 package net.narutomod.procedure;
 
 import net.narutomod.ElementsNarutomodMod;
-
+import net.narutomod.potion.PotionChakraSaturation;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 import net.minecraft.potion.PotionEffect;
@@ -27,7 +27,7 @@ public class ProcedureIchirakuRamenFoodEaten extends ElementsNarutomodMod.ModEle
 		}
 		Entity entity = (Entity) dependencies.get("entity");
 		if (entity instanceof EntityLivingBase)
-			((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.SATURATION, (int) 500, (int) 0, (false), (false)));
+			((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionChakraSaturation.potion, 12000, 0));
 		if (entity instanceof EntityPlayer) {
 			ItemStack _setstack = new ItemStack(Items.BOWL, (int) (1));
 			_setstack.setCount(1);

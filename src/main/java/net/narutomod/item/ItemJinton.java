@@ -170,8 +170,8 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 		
 				if (hasJinton && flightKeyPressed && flightCooldown <= 0) { 
 		
-					double drain = 4D * Math.pow(1.01D, flightTicks); 
-		
+					double drain = 0.75D * Math.pow(1.01D, flightTicks); 
+					//double drain = 1.5D;
 					if (chakra.consume(drain)) { 
 						player.addPotionEffect(new PotionEffect(PotionFlight.potion, 10, 1, false, false)); 
 						entity.getEntityData().setInteger("JintonFlightTicks", flightTicks + 1); 
@@ -300,7 +300,7 @@ public class ItemJinton extends ElementsNarutomodMod.ModElement {
 			protected void attackEntityFrom(Entity player, Entity target) {
 				/*double d = this.getFarRadius(0) / target.getEntityBoundingBox().getAverageEdgeLength() * 0.2d;
 				float f = target instanceof EntityLivingBase ? ((EntityLivingBase)target).getMaxHealth() * (float)d : Float.MAX_VALUE;*/
-				float f = 5+( 5.0f* (2f+7f*(this.power/10f)) * ItemJutsu.getDmgMult(player)/20 );
+				float f = 5+( 5.0f* (2f+7f*(this.power/5f)) * ItemJutsu.getDmgMult(player)/20 );
 				attackEntityWithJutsu(EntityBeam.this, player, target, f);
 			}
 

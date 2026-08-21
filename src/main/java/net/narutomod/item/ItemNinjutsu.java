@@ -141,9 +141,9 @@ public class ItemNinjutsu extends ElementsNarutomodMod.ModElement {
 				}
 			}
 
-			if (entity.getEntityData().getInteger("KekkeiGenkai") != 21) {
-				this.enableJutsu(itemstack, SHIKIGAMI, false);
-			}
+			// if (entity.getEntityData().getInteger("KekkeiGenkai") != 21) {
+			// 	this.enableJutsu(itemstack, SHIKIGAMI, false);
+			// }
 		}
 
 		@Override

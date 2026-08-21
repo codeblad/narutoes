@@ -175,7 +175,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 							EntityPaperArrow entityarrow = new EntityPaperArrow(this.user);
 							entityarrow.setPosition(vec.x, vec.y, vec.z);
 							entityarrow.setDamage(5f+0.8*ItemJutsu.getDmgMult(this.user));
-							entityarrow.shoot(shootvec.x, shootvec.y, shootvec.z, 3.5f, 0);
+							entityarrow.shoot(shootvec.x, shootvec.y, shootvec.z, 4f, 0);
 							this.world.spawnEntity(entityarrow);
 						}
 					}
@@ -421,7 +421,6 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 					}
 					float damage = 5+(4f*ItemJutsu.getDmgMult(this.user));
 					entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
-
 				}
 			}
 			if (entity != null) {

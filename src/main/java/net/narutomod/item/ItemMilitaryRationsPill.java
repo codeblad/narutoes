@@ -23,6 +23,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.init.MobEffects;
 
 import net.narutomod.potion.PotionChakraRegeneration;
+import net.narutomod.potion.PotionChakraSaturation;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.Chakra;
@@ -84,7 +85,7 @@ public class ItemMilitaryRationsPill extends ElementsNarutomodMod.ModElement {
 			if (!world.isRemote) {
 				Chakra.pathway(entity).consume(-200d, true);
 				entity.addPotionEffect(new PotionEffect(PotionChakraRegeneration.potion, 100, 0));
-				entity.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 1200, 0));
+				entity.addPotionEffect(new PotionEffect(PotionChakraSaturation.potion, 6000, 0));
 				entity.getCooldownTracker().setCooldown(block, 1800);
 			}
 		}
