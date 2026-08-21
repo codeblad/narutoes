@@ -55,7 +55,7 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:hyoton")
 	public static final Item block = null;
 	public static final int ENTITYID = 219;
-	public static final ItemJutsu.JutsuEnum KILLSPIKES = new ItemJutsu.JutsuEnum(0, "ice_spike", 'S', 150, 40d, new EntityIceSpike.Jutsu());
+	public static final ItemJutsu.JutsuEnum KILLSPIKES = new ItemJutsu.JutsuEnum(0, "ice_spike", 'S', 150, 30d, new EntityIceSpike.Jutsu());
 	public static final ItemJutsu.JutsuEnum ICESPEARS = new ItemJutsu.JutsuEnum(1, "ice_spear", 'S', 150, 30d, new EntityIceSpear.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum ICEDOME = new ItemJutsu.JutsuEnum(2, "ice_dome", 'S', 200, 400d, new EntityIceDome.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum ICEPRISON = new ItemJutsu.JutsuEnum(3, "ice_prison", 'S', 150, 150d, new EntityIcePrison.EC.Jutsu());
@@ -216,7 +216,7 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 						entity1.damage = 0;
 						Vec3d vec = this.rtr.hitVec;
 						entity1.setNoGravity(true);
-						entity1.maxScale = (float) (1+this.power/3);
+						entity1.maxScale = (float) (1+this.power/5);
 						entity1.setLocationAndAngles(vec.x, vec.y, vec.z, this.user.getRNG().nextFloat() * 360f, this.user.getRNG().nextFloat() * 360f);
 						entity1.life = this.lifeTime;
 						this.world.spawnEntity(entity1);
@@ -227,7 +227,7 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 						Particles.spawnParticle(this.world, Particles.Types.SMOKE, point.x, point.y, point.z,
 								1, 1d, 0d, 1d, 0,0,0, 0x64B8F7FF, smokeSize, 0);
 					}
-					AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.rtr.hitVec)).grow(1+this.power*0.8f);
+					AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.rtr.hitVec)).grow(1+this.power*0.25f);
 					for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
 						if (!(entity1 instanceof EntityLivingBase)) {
 							continue;
