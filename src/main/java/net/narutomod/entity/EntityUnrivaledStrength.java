@@ -46,6 +46,15 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 		 .name("unrivaled_strength").tracker(64, 3, true).build());
 	}
 
+
+	public static boolean isKokuoAndSteam(EntityLivingBase user) {
+		boolean isJin = EntityBijuManager.isJinchurikiOf((EntityPlayer) user, EntityFiveTails.EntityCustom.class);
+		if (isJin && user.getEntityData().getInteger("KekkeiGenkai") == 0) {
+			return true;
+		}
+		return false;
+	}
+
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private EntityLivingBase user;
 		private int duration;
@@ -59,31 +68,27 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 			this.isImmuneToFire = true;
 		}
 
-		public boolean isKokuoAndSteam(EntityLivingBase user) {
-			EntityBijuManager.isJinchurikiOf((EntityPlayer) user, EntityFiveTails.EntityCustom.class);
-			return false;
-		}
 
 		public EC(EntityLivingBase userIn, float power) {
 			this(userIn.world);
 			this.user = userIn;
 			this.isWearingSteamArmor = ItemSteamArmor.isWearingFullSet(userIn);
-			if (this.isWearingSteamArmor || isKokuoAndSteam(userIn)) {
+
+			int strMult = (int) ((0.5+0.5*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.5));
+			if (this.isWearingSteamArmor || (isKokuoAndSteam(userIn) && EntityBijuManager.cloakLevel((EntityPlayer) this.user) > 0)) {
 				if (isKokuoAndSteam(userIn)) {
 					this.duration = (int)(power * 130f);
-					power*= 2f;
+					strMult = (int) ((0.5+0.5*(power/20))*(ItemJutsu.getNinjaMult(userIn)*1.1));
+					power*=2.65f;
 				} else {
 					this.duration = (int)(power * 120f);
-					power *= 1.5f;
+					strMult = (int) ((0.5+0.5*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.7));
+					power*=1.4f;
 				}
 			} else {
 				this.duration = (int)(power * 60f);
 			}
 
-			int strMult = (int) ((1+0.6*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.3));
-			if (isKokuoAndSteam(userIn)) {
-				strMult = (int) ((1+0.6*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.5));
-			}
 
 			this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 			this.playSound((SoundEvent)SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:kairikimuso")), 1f, 1f);
@@ -173,7 +178,7 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 						}
 					}
 				}
-				int limit = 10;
+				int limit = 15;
 				if (isKokuoAndSteam(this.user)) {
 					limit = 20;
 				}

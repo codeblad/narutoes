@@ -85,7 +85,7 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 				}
 				this.airPunch.execute(this.user, this.power, this.power * 0.25d);
 			}
-			if (!this.world.isRemote && this.ticksExisted > (int)this.power * 2) {
+			if (!this.world.isRemote && this.ticksExisted > (int)10+this.power * 2) {
 				this.setDead();
 			}
 		}
@@ -123,9 +123,17 @@ public class EntityPoisonMist extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
 				if (target instanceof EntityLivingBase) {
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, (int) (80+80*(power/20)), (int) (8+ItemJutsu.getDmgMult(player)*0.6)));
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.POISON, (int) (40+100*(power/20)), 4));
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, (int) (40+100*(power/20)), 2));
+					int duration = 5;
+					EntityLivingBase target2 = (EntityLivingBase) target;
+					if (target2.isPotionActive(PotionCorrosion.potion)) {
+						duration = target2.getActivePotionEffect(PotionCorrosion.potion).getDuration()+4;
+					}
+					if (duration > 20*3) {
+						duration = 20*3;
+					}
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, duration, (int) (8+ItemJutsu.getDmgMult(player)*0.35)));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.POISON, duration, 4));
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, duration, 2));
 				}
 			}
 
