@@ -376,11 +376,11 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					}else if (gates == 3) {
 						defMult+= 1.25*((float) gates /6);
 					}else if (gates < 7) {
-						defMult+= 1.35*((float) gates /6);
+						defMult+= 1.3*((float) gates /6);
 					} else if (gates == 7) {
-						defMult+= 1.75;
+						defMult+= 1.55;
 					} else if (gates == 8) {
-						defMult+= 2.5;
+						defMult+= 2.0;
 					}
 				}
 				if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
