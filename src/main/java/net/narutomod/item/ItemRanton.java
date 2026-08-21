@@ -42,8 +42,8 @@ public class ItemRanton extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:ranton")
 	public static final Item block = null;
 	public static final int ENTITYID = 278;
-	public static final ItemJutsu.JutsuEnum CLOUD = new ItemJutsu.JutsuEnum(0, "rantoncloud", 'S', 2.5d, new EntityRaiunkuha.Jutsu());
-	public static final ItemJutsu.JutsuEnum LASERCIRCUS = new ItemJutsu.JutsuEnum(1, "laser_circus", 'S', 130d, new EntityLaserCircus.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum CLOUD = new ItemJutsu.JutsuEnum(0, "rantoncloud", 'S', 1.0d, new EntityRaiunkuha.Jutsu());
+	public static final ItemJutsu.JutsuEnum LASERCIRCUS = new ItemJutsu.JutsuEnum(1, "laser_circus", 'S', 100d, new EntityLaserCircus.EC.Jutsu());
 
 	public ItemRanton(ElementsNarutomodMod instance) {
 		super(instance, 597);
