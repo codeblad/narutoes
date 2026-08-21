@@ -40,6 +40,7 @@ import net.minecraft.init.SoundEvents;
 
 import net.narutomod.entity.EntityUnrivaledStrength;
 import net.narutomod.block.BlockAmaterasuBlock;
+import net.narutomod.potion.PotionAmaterasuFlame;
 import net.narutomod.potion.PotionParalysis;
 import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
@@ -126,8 +127,13 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 			this.user = userIn;
 			this.power = 10+powerIn;
 			this.farRadius = 4+width;
-			this.damagePerSec = (int) (4+0.85*ItemJutsu.getDmgMult(userIn));
-			this.duration = (int)(15+powerIn * powerIn * 0.3f);
+			float mult = 1+0.25f*powerIn/30;
+			this.damagePerSec = (int) (4+0.95*ItemJutsu.getDmgMult(userIn)*mult);
+			if (EntityUnrivaledStrength.isKokuoAndSteam(userIn)) {
+				this.damagePerSec = (int) (this.damagePerSec*1.5);
+			}
+			this.duration = (int)(20+powerIn);
+
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
 		}
 
@@ -198,7 +204,14 @@ public class ItemFutton extends ElementsNarutomodMod.ModElement {
 				if (target instanceof EntityLivingBase) {
 					target.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1f, this.rand.nextFloat() + 0.5f);
 					((EntityLivingBase)target).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 20, 3));
-					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, 160, EntityBoilingMist.this.damagePerSec));
+					int duration = 5;
+					if (((EntityLivingBase)target).isPotionActive(PotionCorrosion.potion)) {
+						duration = ((EntityLivingBase)target).getActivePotionEffect(PotionCorrosion.potion).getDuration()+3;
+					}
+					if (duration > 20*4) {
+						duration = 20*4;
+					}
+					((EntityLivingBase)target).addPotionEffect(new PotionEffect(PotionCorrosion.potion, duration, EntityBoilingMist.this.damagePerSec));
 				}
 			}
 

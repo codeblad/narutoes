@@ -341,12 +341,14 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 			//entity.addPotionEffect(new PotionEffect(MobEffects.SATURATION, 5, 0, false, false));
 			int d = (int) (10+ItemJutsu.getNinjaMult(entity)*0.75);
 			if (level == 2) {
-				d = (int) (15+ItemJutsu.getNinjaMult(entity)*2);
+				d = (int) (15+ItemJutsu.getNinjaMult(entity)*1.8);
 			}
-			entity.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 22, d, false, false));
-			entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, level * 5, false, false));
-			entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 5, false, false));
-			entity.addPotionEffect(new PotionEffect(PotionReach.potion, 22, level - 1, false, false));
+			if (!entity.isPotionActive(MobEffects.STRENGTH)) {
+				entity.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 22, d, false, false));
+				entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, level * 5, false, false));
+				entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 5, false, false));
+				entity.addPotionEffect(new PotionEffect(PotionReach.potion, 22, level - 1, false, false));
+			}
 			if (entity.getHealth() < entity.getMaxHealth() && entity.getHealth() > 0.0f) {
 				entity.heal((float)level * 0.175f);
 			}
@@ -357,7 +359,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 				entity.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 22, 2, false, false));
 			}*/
 		}
-		if (!entity.world.isRemote && entity instanceof EntityPlayer) {
+		if (!entity.world.isRemote && entity instanceof EntityPlayer && (!entity.isPotionActive(MobEffects.STRENGTH))) {
 			NBTTagCompound compound = entity.getEntityData().hasKey("lungeAttackData") ? entity.getEntityData().getCompoundTag("lungeAttackData") : new NBTTagCompound();
 			int attackTime = compound.getInteger("attackTime");
 			Entity target = compound.hasKey("targetId") ? entity.world.getEntityByID(compound.getInteger("targetId")) : null;

@@ -2,6 +2,7 @@
 package net.narutomod.entity;
 
 import net.narutomod.item.ItemJutsu;
+import net.narutomod.potion.PotionAmaterasuFlame;
 import net.narutomod.potion.PotionCorrosion;
 import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
@@ -240,7 +241,14 @@ public class EntityAcidScattering extends ElementsNarutomodMod.ModElement {
 					if (!this.world.isRemote && this.ecEntity != null) {
 						this.hitEntity.getEntityData().setBoolean("TempData_disableKnockback", true);
 						this.hitEntity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, shooter), ecEntity.dmg);
-						this.hitEntity.addPotionEffect(new PotionEffect(PotionCorrosion.potion, 100, (int) ecEntity.potionAmplifier, false, false));
+						int duration = 5;
+						if (this.hitEntity.isPotionActive(PotionCorrosion.potion)) {
+							duration = this.hitEntity.getActivePotionEffect(PotionCorrosion.potion).getDuration()+8;
+						}
+						if (duration > 20*5) {
+							duration = 20*5;
+						}
+						this.hitEntity.addPotionEffect(new PotionEffect(PotionCorrosion.potion, duration, (int) ecEntity.potionAmplifier, false, false));
 					}
 				}
 			} else {

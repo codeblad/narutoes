@@ -35,7 +35,7 @@ public class ProcedureCorrosionOnPotionActiveTick extends ElementsNarutomodMod.M
 		World world = (World) dependencies.get("world");
 		double amp = 0;
 		amp = (double) (amplifier);
-		entity.attackEntityFrom(ProcedureUtils.CORROSION, (float) amp + 1f);
+		entity.attackEntityFrom(ProcedureUtils.CORROSION.setDamageBypassesArmor(), (float) amp + 1f);
 		Particles.spawnParticle(world, Particles.Types.SMOKE, entity.posX, entity.posY + entity.height * 0.5, entity.posZ, 10, entity.width * 0.3,
 				entity.height * 0.3, entity.width * 0.3, 0d, 0d, 0d, 0x20FFFFFF);
 		if ((Math.random() <= 0.5)) {
