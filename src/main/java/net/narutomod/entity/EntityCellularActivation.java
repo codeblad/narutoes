@@ -42,7 +42,7 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
-		private static final int WAIT_PER_FULL_CHARGE = 100;
+		private static final int WAIT_PER_FULL_CHARGE = 200;
 		private static final int HEAL_DURATION = 10;
 		private final double chakraBurn = ItemIryoJutsu.MEDMODE.chakraUsage;
 		private EntityLivingBase user;
@@ -223,12 +223,17 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return WAIT_PER_FULL_CHARGE;
+				return 50;
 			}
 
 			@Override
 			public float getMaxPower() {
 				return 10.0f;
+			}
+						
+			@Override
+			public float getMinPower() {
+				return 2.0f;
 			}
 		}
 	}

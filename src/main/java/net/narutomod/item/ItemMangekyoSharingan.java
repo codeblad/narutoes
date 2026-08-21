@@ -322,8 +322,15 @@ public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 					this.targets.add(entity1.getUniqueID().toString());
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
 							1f, 0.6f+this.rand.nextFloat()*1.2f);
-					float damage = 15+(10f*ItemJutsu.getDmgMult(this.user));
+					float damage = 14+(10f*ItemJutsu.getDmgMult(this.user));
 					entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor(),damage);
+					double strength = (double) 2+ItemJutsu.getDmgMult(user)*1.5;
+					EntityLivingBase target = (EntityLivingBase) entity1;
+					int duration = 10;
+					if (target.isPotionActive(PotionAmaterasuFlame.potion)) {
+						duration = target.getActivePotionEffect(PotionAmaterasuFlame.potion).getDuration()+duration;
+					}
+					target.addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, duration, (int) strength, (false), (false)));
 
 				}
 			}

@@ -93,7 +93,7 @@ public class ItemIryoJutsu extends ElementsNarutomodMod.ModElement {
 	public static class HealingJutsu implements ItemJutsu.IJutsuCallback {
 		@Override
 		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-			if (entity.motionX != 0.0D || entity.motionY != 0.0D || entity.motionZ != 0.0D) {
+			if (Math.abs(entity.motionX) > 0.01D || Math.abs(entity.motionZ) > 0.01D) {
 				return false;
 			}
 
