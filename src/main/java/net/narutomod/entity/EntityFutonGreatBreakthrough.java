@@ -59,7 +59,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		public static final float MAX_RANGE = 50.0f;
-		private int duration = 40;
+		private int duration = 5;
 		private EntityLivingBase user;
 		private float power;
 
@@ -96,7 +96,9 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 				this.shoot(this.power, this.power * 0.5d, canfly);
 				if (canfly && Chakra.pathway(this.user).consume(ItemFuton.BIGBLOW.chakraUsage * this.power * 0.0025d)) {
 					//++this.duration;
-					ProcedureUtils.addVelocity(this.user, Vec3d.fromPitchYaw(this.user.rotationPitch, this.user.rotationYawHead).scale(-0.08-(0.04*this.power/32)));
+					Vec3d vel = this.user.getLookVec().scale(-0.5-this.power/25);
+					ProcedureUtils.setVelocity(this.user,vel.x,vel.y,vel.z);
+					//ProcedureUtils.addVelocity(this.user, Vec3d.fromPitchYaw(this.user.rotationPitch, this.user.rotationYawHead).scale(-0.08-(0.04*this.power/32)));
 				}
 			}
 			if (!this.world.isRemote && this.ticksExisted > this.duration) {
@@ -110,7 +112,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 			int particleMaxAge = 16;
 			int particleColor = 0x40FFFFFF;
 			if (!inAir) {
-				for (int i = 0; i < 5; i++) {
+				for (int i = 0; i < 10; i++) {
 					Vec3d vec1 = vec0.scale((this.rand.nextDouble()*0.7d+0.3d) * range * 0.2d);
 					double d = vec1.lengthVector() / range;
 					this.world.spawnEntity(new EntityWindParticle(this, vec.x, vec.y, vec.z,
@@ -157,7 +159,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= this.getBasePower()) {
 					entity.world.spawnEntity(new EC(entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 12);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 8);
 					return true;
 				}
 				return false;
@@ -238,7 +240,7 @@ public class EntityFutonGreatBreakthrough extends ElementsNarutomodMod.ModElemen
 			shooter.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 			if (res != null && shooter != null) {
 				if (res.entityHit != null) {
-					ProcedureUtils.pushEntity(shooter, res.entityHit, this.getRange(), 6.0F);
+					ProcedureUtils.pushEntity(shooter, res.entityHit, this.getRange(), 0.5f+this.getRange()/75f);
 				} else if (this.world.isRemote) {
 					IBlockState blockstate = this.world.getBlockState(res.getBlockPos());
 					if (this.canRaiseDustList.contains(blockstate.getMaterial())) {
