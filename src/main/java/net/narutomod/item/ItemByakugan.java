@@ -379,7 +379,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					Vec3d c = this.start.addVector(0,1,0).addVector(-0.5+this.rand.nextFloat()*1,-0.5+this.rand.nextFloat()*1,-0.5+this.rand.nextFloat()*1);
 					((WorldServer)this.world).spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, c.x, c.y, c.z, 1, 0d, 0d, 0d, 0d);
 					this.target.hurtResistantTime = 10;
-					float damage = 5+(0.5f*ItemJutsu.getDmgMult(this.user));
+					float damage = 7+(0.5f*ItemJutsu.getDmgMult(this.user));
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
 							1f, 0.6f+this.rand.nextFloat()*1.2f);
@@ -396,6 +396,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					if (!this.world.isRemote) {
 						this.user.addPotionEffect(new PotionEffect(PotionChakraBlocked.potion, 8*20, 0, false, false));
 						this.target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20*5, 3, false, false));
+						this.target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 20 * 5, 4, false, false));
 					}
 				}
 				this.user.setPositionAndUpdate(this.userStart.x, this.userStart.y, this.userStart.z);
