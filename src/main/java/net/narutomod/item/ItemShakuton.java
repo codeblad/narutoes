@@ -58,7 +58,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 269;
 	public static final ItemJutsu.JutsuEnum ORB = new ItemJutsu.JutsuEnum(0, "scorchorb", 'S', 150, 150d, new EntityScorchBall.Jutsu());
 	public static final ItemJutsu.JutsuEnum SHOOT = new ItemJutsu.JutsuEnum(1, "tooltip.shakuton.scorchkill", 'S', 200, 100d, new SetOrbTarget());
-	public static final ItemJutsu.JutsuEnum BLAST = new ItemJutsu.JutsuEnum(2, "tooltip.shakuton.scorchblast", 'S', 250, 50d, new SuperSteamBlast());
+	public static final ItemJutsu.JutsuEnum BLAST = new ItemJutsu.JutsuEnum(2, "tooltip.shakuton.scorchblast", 'S', 250, 500d, new SuperSteamBlast());
 	public static final ItemJutsu.JutsuEnum HEATWAVE = new ItemJutsu.JutsuEnum(2, "tooltip.shakuton.scorchheatwave", 'S', 250, 130d, new EntityScorchBall.Jutsu2());
 	public ItemShakuton(ElementsNarutomodMod instance) {
 		super(instance, 589);
@@ -522,9 +522,31 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				new net.narutomod.event.EventSphericalExplosion(this.world, this.shootingEntity,
 				 (int)this.posX, (int)this.posY + 5, (int)this.posZ, (int)this.maxScale, 0, 0.3333f);
-				ProcedureAoeCommand.set(this, 0d, this.maxScale)
-				 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 20f+ItemJutsu.getDmgMult(this.shootingEntity)*(5+15*this.maxScale/30));
+				List<String> targets = new ArrayList<String>();
+				AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.getPositionVector())).grow(2+this.maxScale);
+				for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
+					if (!(entity1 instanceof EntityLivingBase)) {
+						continue;
+					}
+					boolean found = false;
+					for (String enemy: targets) {
+						if (Objects.equals(enemy, entity1.getUniqueID().toString())) {
+							found = true;
+						}
+					}
+					if (found) {
+						continue;
+					}
+					float mult = (float) (0.5+1.5*(this.maxScale/30));
+					float damage = 20f+ItemJutsu.getDmgMult(this.shootingEntity)*mult;
+
+					entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
+				}
+
+				//ProcedureAoeCommand.set(this, 0d, this.maxScale);
 				//this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.maxScale * 5f, flag, flag);
+
+
 				int p1 = (int) (15+this.maxScale*3);
 				int p2 = (int) (30+this.maxScale*7);
 				Particles.spawnParticle(this.world, Particles.Types.SMOKE, this.posX, this.posY, this.posZ, p1,
