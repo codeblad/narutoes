@@ -206,11 +206,11 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
-
 			public float getBasePower() {
 				return 1.0f;
 			}
 
+			@Override
 			public float getPowerupDelay() {
 				return 20.0f;
 			}
@@ -256,7 +256,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				return entity1;
 			}
 
-
+			@Override
 			public float getBasePower() {
 				return 1.0f;
 			}

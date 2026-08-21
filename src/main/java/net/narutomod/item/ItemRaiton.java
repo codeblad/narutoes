@@ -550,7 +550,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					boolean newPressed3 = this.summoner.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
 					if (this.jutsuKey3Pressed && !newPressed3 && this.jutsu3Cool <= 0) {
 						RayTraceResult result = ProcedureUtils.objectEntityLookingAt(this.summoner,6,5);
-						if (Chakra.pathway(this.summoner).consume(800d) && result.entityHit instanceof EntityLivingBase) {
+						if (result.entityHit instanceof EntityLivingBase && Chakra.pathway(this.summoner).consume(800d)) {
 							this.jutsu3Cool = 20*10;
 							this.summoner.world.spawnEntity(new LigerBomb(this.summoner, (EntityLivingBase) result.entityHit));
 						}

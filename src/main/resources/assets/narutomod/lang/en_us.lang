@@ -439,6 +439,7 @@ tooltip.eightgates.opengates=[SHIFT] + [Right Click] to open gates
 entity.kankuro.name=Kankuro
 chattext.tentails.sealedintoplayer=Sealing %s into %s's body
 tooltip.shakuton.scorchblast=Super Steam Blast
+tooltip.shakuton.scorchheatwave=Scorch Heat Wave
 subtitles.isobu_roar=
 item.asuracanon.name=Asura Canon
 tooltip.6psenjutsu.rasenshuriken=Truth Seeking Rasenshuriken
