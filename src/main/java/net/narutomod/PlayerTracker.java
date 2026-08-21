@@ -310,17 +310,17 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				ItemStack cheststack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 				ItemStack headstack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 				if (headstack.getItem() == ItemSharingan.helmet ||headstack.getItem() == ItemSharingan.helmet ) {
-					defMult += .1f;
+					defMult += .2f;
 				}
 				if (headstack.getItem() == ItemByakugan.helmet) {
 					if (PlayerTracker.getBattleXp((EntityPlayer) targetEntity) >= NarutomodModVariables.SAGEEXP) {
-						defMult += .275;
+						defMult += .35;
 					} else {
 						defMult += .15f;
 					}
 				}
 				if (headstack.getItem() == ItemMangekyoSharinganEternal.helmet ||headstack.getItem() == ItemMangekyoSharinganObito.helmet||headstack.getItem() == ItemMangekyoSharingan.helmet   ) {
-					defMult += .2f;
+					defMult += .35f;
 				}
 				if (headstack.getItem() == ItemRinnegan.helmet ||headstack.getItem() == ItemTenseigan.helmet  ) {
 					defMult += .35f;
