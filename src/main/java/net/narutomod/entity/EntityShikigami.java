@@ -101,7 +101,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 			this.setSummoner(userIn);
 			this.chakraUsage = chakraUsageIn;
 			this.setPosition(userIn.posX, userIn.posY, userIn.posZ);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(Math.max(userIn.getMaxHealth() * 15f, 20.0f));
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(Math.max(userIn.getMaxHealth() * 7.5f, 20.0f));
 			this.setHealth(this.getMaxHealth());
 			userIn.getEntityData().setInteger(ENTITYID_KEY, this.getEntityId());
 		}
@@ -130,7 +130,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 				if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
 					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
 					//(30*20)+this.ticksExisted+this.ticksExisted/2
-					item.setJutsuCooldown(stack, SHIKIGAMI, 20 * 5);
+					item.setJutsuCooldown(stack, SHIKIGAMI, 20 * 30);
 				}
 			}
 		}
