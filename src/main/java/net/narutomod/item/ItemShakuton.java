@@ -309,7 +309,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 								float damage = 2+0.5f*ItemJutsu.getDmgMult(this.user)*(1+3*this.power/10);
 
 								entity1.hurtResistantTime = 10;
-								entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
+								entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor().setDamageIsAbsolute(),damage);
 								Particles.spawnParticle(this.world, Particles.Types.SMOKE, entity1.posX, entity1.posY, entity1.posZ, 10,
 										entity1.width, entity1.height, entity1.width, 0d, 0d, 0d, 0x40FFFFFF, 15);
 							}
@@ -484,7 +484,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 							if (this.targetTime > 0) {
 								dmg = 10f+4.5f*ItemJutsu.getDmgMult(this.shootingEntity);
 							}
-							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity),dmg);
+							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setDamageBypassesArmor().setDamageIsAbsolute(),dmg);
 							this.scorchEffects(entity.posX, entity.posY+entity.height/2, entity.posZ, entity.width/2, entity.height/2);
 						}
 					}
@@ -540,7 +540,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 					float mult = (float) (0.5+1.5*(this.maxScale/30));
 					float damage = 20f+ItemJutsu.getDmgMult(this.shootingEntity)*mult;
 
-					entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
+					entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor().setDamageIsAbsolute(),damage);
 				}
 
 				//ProcedureAoeCommand.set(this, 0d, this.maxScale);

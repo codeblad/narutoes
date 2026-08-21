@@ -51,7 +51,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 129;
 	public static final int ENTITY2ID = 10129;
 	public static final ItemJutsu.JutsuEnum CHIDORI = new ItemJutsu.JutsuEnum(0, "chidori", 'A', EntityChidori.CHAKRA_USAGE, new EntityChidori.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum CHAKRAMODE = new ItemJutsu.JutsuEnum(1, "raitonchakramode", 'B', 15d, new EntityChakraMode.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHAKRAMODE = new ItemJutsu.JutsuEnum(1, "raitonchakramode", 'B', 5d, new EntityChakraMode.Jutsu());
 	public static final ItemJutsu.JutsuEnum CHASINGDOG = new ItemJutsu.JutsuEnum(2, "lightning_beast", 'C', 100d, new EntityLightningBeast.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum GIAN = new ItemJutsu.JutsuEnum(3, "false_darkness", 'B', 50d, new EntityFalseDarkness.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum KIRIN = new ItemJutsu.JutsuEnum(4, "kirin", 'S', 2000d, new EntityKirin.EC.Jutsu());
@@ -116,7 +116,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 			private Vec3d start;
 			private Vec3d end;
 			private int dist = 35;
-			private int delay = 15;
+			private int delay = 10;
 			List<String> targets = new ArrayList<String>();
 
 			public HellStab(World worldIn) {
@@ -282,10 +282,10 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					if (!this.world.isRemote && !this.used) {
 						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 					}
-					if (this.ticksExisted < delay) {
+					if (this.ticksExisted < this.delay) {
 						ProcedureUtils.setVelocity(this.user,0,0,0);
 					}
-					if (this.ticksExisted > delay && this.ticksExisted < delay+10 && !this.landed) {
+					if (this.ticksExisted > this.delay && this.ticksExisted < this.delay+10 && !this.landed) {
 						this.start = this.user.getPositionVector();
 						Vec3d look = this.user.getLookVec();
 						if (true) {
@@ -293,7 +293,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 						}
 						RayTraceResult rtr = ProcedureUtils.raytraceLook(this.user,new Vec3d(look.x,-1,look.z),14);
 						if (rtr.typeOfHit == RayTraceResult.Type.BLOCK) {
-							landed = true;
+							this.landed = true;
 						}
 						this.end = rtr.hitVec;
 						this.user.setPositionAndUpdate(this.end.x,this.end.y,this.end.z);
@@ -444,7 +444,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 								continue;
 							}
 							this.targets.add(entity1.getUniqueID().toString());
-							float damage = 16f+28f*ItemJutsu.getDmgMult(this.user);
+							float damage = 16f+20f*ItemJutsu.getDmgMult(this.user);
 							entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 
 						}
@@ -551,7 +551,7 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					if (this.jutsuKey3Pressed && !newPressed3 && this.jutsu3Cool <= 0) {
 						RayTraceResult result = ProcedureUtils.objectEntityLookingAt(this.summoner,6,5);
 						if (result.entityHit instanceof EntityLivingBase && Chakra.pathway(this.summoner).consume(800d)) {
-							this.jutsu3Cool = 20*10;
+							this.jutsu3Cool = 20*15;
 							this.summoner.world.spawnEntity(new LigerBomb(this.summoner, (EntityLivingBase) result.entityHit));
 						}
 					}

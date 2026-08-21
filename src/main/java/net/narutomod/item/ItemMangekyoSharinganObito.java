@@ -280,7 +280,7 @@ public class ItemMangekyoSharinganObito extends ElementsNarutomodMod.ModElement 
 					float distance = this.getDistance(entity1);
 					float mult = Math.max(0.1f,1-distance/maxDistance);
 					damage *= mult;
-					entity1.attackEntityFrom(DamageSource.OUT_OF_WORLD.setDamageIsAbsolute(),damage);
+					entity1.attackEntityFrom(DamageSource.OUT_OF_WORLD.setDamageBypassesArmor().setDamageIsAbsolute(),damage);
 
 				}
 				for (EntityLivingBase entity : this.trapped) {
