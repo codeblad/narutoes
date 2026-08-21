@@ -206,7 +206,6 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 		private float power = 1;
 		private Vec3d start;
 		List<String> targets = new ArrayList<String>();
-		EntityScorch2 ball;
 		private final int startup = 15;
 		private final int duration = 15;
 
@@ -617,37 +616,6 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 		}
 	}
 
-	public static class EntityScorch2 extends EntityScalableProjectile.Base {
-		private final float inititalScale = 0.5f;
-		public EntityLivingBase user;
-
-
-		public EntityScorch2(EntityLivingBase shooter) {
-			super(shooter);
-			this.setEntityScale(this.inititalScale);
-			this.setPosition(shooter.posX, shooter.posY + shooter.height, shooter.posZ);
-		}
-
-
-
-
-		@Override
-		public void onUpdate() {
-			super.onUpdate();
-
-			if (this.shootingEntity == null || this.ticksExisted > 20*10) {
-				this.setDead();
-			}
-
-		}
-
-		@Override
-		protected void onImpact(RayTraceResult param1RayTraceResult) {
-
-		}
-
-
-	}
 
 	public static class SuperSteamBlast implements ItemJutsu.IJutsuCallback {
 		@Override
@@ -676,50 +644,6 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 			RenderingRegistry.registerEntityRenderingHandler(EntityScorchBall.class, renderManager -> {
 				return new RenderCustom(renderManager);
 			});
-			RenderingRegistry.registerEntityRenderingHandler(EntityScorch2.class, renderManager -> {
-				return new RenderCustom2(renderManager);
-			});
-		}
-
-		@SideOnly(Side.CLIENT)
-		public class RenderCustom2 extends Render<EntityScorch2> {
-			private final ResourceLocation texture = new ResourceLocation("narutomod:textures/fireball2.png");
-
-			public RenderCustom2(RenderManager renderManager) {
-				super(renderManager);
-				shadowSize = 0.1f;
-			}
-
-			@Override
-			public void doRender(EntityScorch2 entity, double x, double y, double z, float entityYaw, float partialTicks) {
-				GlStateManager.pushMatrix();
-				this.bindEntityTexture(entity);
-				float scale = entity.getEntityScale();
-				GlStateManager.translate(x, y + 0.5d * scale, z);
-				GlStateManager.enableRescaleNormal();
-				GlStateManager.scale(scale, scale, scale);
-				Tessellator tessellator = Tessellator.getInstance();
-				BufferBuilder bufferbuilder = tessellator.getBuffer();
-				GlStateManager.rotate(180F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-				GlStateManager.rotate((float)(this.renderManager.options.thirdPersonView == 2 ? -1 : 1) * -this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-				GlStateManager.rotate(9f * (partialTicks + entity.ticksExisted), 0.0F, 0.0F, 1.0F);
-				GlStateManager.disableLighting();
-				OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240.0F, 240.0F);
-				bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_NORMAL);
-				bufferbuilder.pos(-0.5D, -0.5D, 0.0D).tex(0.0D, 1.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
-				bufferbuilder.pos(0.5D, -0.5D, 0.0D).tex(1.0D, 1.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
-				bufferbuilder.pos(0.5D, 0.5D, 0.0D).tex(1.0D, 0.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
-				bufferbuilder.pos(-0.5D, 0.5D, 0.0D).tex(0.0D, 0.0D).normal(0.0F, 1.0F, 0.0F).endVertex();
-				tessellator.draw();
-				GlStateManager.enableLighting();
-				GlStateManager.disableRescaleNormal();
-				GlStateManager.popMatrix();
-			}
-
-			@Override
-			protected ResourceLocation getEntityTexture(EntityScorch2 entity) {
-				return this.texture;
-			}
 		}
 
 		@SideOnly(Side.CLIENT)

@@ -135,8 +135,9 @@ public class EntityCrystalRay extends ElementsNarutomodMod.ModElement {
 				if (user != null) {
 					user.getEntityData().removeTag(ENTITYID_KEY);
 					ItemStack stack = ProcedureUtils.getMatchingItemStack(user, ItemShoton.block);
+					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
 					if (stack != null) {
-						ItemJutsu.setJutsuCooldown(stack, user, ItemShoton.RAY, 1800);
+						item.setJutsuCooldown(stack, ItemShoton.RAY, 1800);
 					}
 				}
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_shoot_small")),
