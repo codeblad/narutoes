@@ -256,13 +256,12 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 				this.user = user;
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				if (this.user.onGround) {
-					Vec3d look = user.getLookVec();
+					//Vec3d look = user.getLookVec();
 					RayTraceResult rtr = ProcedureUtils.raytraceLook(this.user,new Vec3d(0,1,0),20);
 					this.end = rtr.hitVec;
 					this.user.setPositionAndUpdate(this.end.x,this.end.y,this.end.z);
 					this.user.setVelocity(0,0,0);
 				} else {
-					this.air = true;
 					this.delay = 0;
 				}
 				this.ogStart = this.user.getPositionVector();
@@ -281,9 +280,9 @@ public class ItemRaiton extends ElementsNarutomodMod.ModElement {
 					this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
 					if (!this.world.isRemote && !this.used) {
 						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
-					}
-					if (this.ticksExisted < this.delay) {
-						ProcedureUtils.setVelocity(this.user,0,0,0);
+						if (this.ticksExisted < this.delay) {
+							ProcedureUtils.setVelocity(this.user,0,0,0);
+						}
 					}
 					if (this.ticksExisted > this.delay && this.ticksExisted < this.delay+10 && !this.landed) {
 						this.start = this.user.getPositionVector();
