@@ -59,7 +59,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 	public static final ItemJutsu.JutsuEnum ORB = new ItemJutsu.JutsuEnum(0, "scorchorb", 'S', 150, 150d, new EntityScorchBall.Jutsu());
 	public static final ItemJutsu.JutsuEnum SHOOT = new ItemJutsu.JutsuEnum(1, "tooltip.shakuton.scorchkill", 'S', 200, 100d, new SetOrbTarget());
 	public static final ItemJutsu.JutsuEnum BLAST = new ItemJutsu.JutsuEnum(2, "tooltip.shakuton.scorchblast", 'S', 250, 500d, new SuperSteamBlast());
-	public static final ItemJutsu.JutsuEnum HEATWAVE = new ItemJutsu.JutsuEnum(2, "tooltip.shakuton.scorchheatwave", 'S', 250, 130d, new EntityScorchBall.Jutsu2());
+	public static final ItemJutsu.JutsuEnum HEATWAVE = new ItemJutsu.JutsuEnum(3, "tooltip.shakuton.scorchheatwave", 'S', 250, 130d, new EntityScorchBall.Jutsu2());
 	public ItemShakuton(ElementsNarutomodMod instance) {
 		super(instance, 589);
 	}
