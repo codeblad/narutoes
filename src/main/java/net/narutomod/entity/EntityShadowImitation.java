@@ -41,6 +41,7 @@ import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
@@ -604,58 +605,87 @@ public void setDead() {
 		}
 
 		public static class PlayerHook {
-			
-		@SubscribeEvent
-		public void onLivingDamage(LivingDamageEvent event) {
-			EntityLivingBase target = event.getEntityLiving();
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onLivingDamage(LivingDamageEvent event) {
+		EntityLivingBase victim = event.getEntityLiving();
 
-			if (target == null || target.world.isRemote) {
-				return;
+		if (victim == null || victim.world.isRemote) {
+			return;
+		}
+		if (victim.getHealth() <= event.getAmount()) {
+			releaseShadowImitation(victim);
+		}
+	}
+
+	/**
+	 * Fallback for deaths which do not pass through a normal
+	 * lethal LivingDamageEvent.
+	 */
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
+	public void onLivingDeath(LivingDeathEvent event) {
+		EntityLivingBase victim = event.getEntityLiving();
+
+		if (victim == null || victim.world.isRemote) {
+			return;
+		}
+
+		releaseShadowImitation(victim);
+	}
+
+	private void releaseShadowImitation(EntityLivingBase victim) {
+		int[] intarray =
+			victim.getEntityData().getIntArray(Jutsu.ECENTITYID);
+		java.util.List<EC> shadows =
+			victim.world.getEntitiesWithinAABB(
+				EC.class,
+				victim.getEntityBoundingBox().grow(64.0D)
+			);
+
+		for (EC shadow : shadows) {
+			if (shadow != null
+					&& !shadow.isDead
+					&& !shadow.isAOE()
+					&& shadow.getTarget() == victim) {
+				shadow.setDead();
 			}
-
-			float damage = event.getAmount();
-
-			if (target.getHealth() - damage > 0.0F) {
-				return;
-			}
-
-			int[] intarray = target.getEntityData().getIntArray(Jutsu.ECENTITYID);
-
-			if (intarray.length <= 0) {
-				return;
-			}
-
-			int[] entities = intarray.clone();
-
-			for (int i = 0; i < entities.length; i++) {
-				Entity entity = target.world.getEntityByID(entities[i]);
+		}
+		if (intarray.length > 0) {
+			for (int i = 0; i < intarray.length; i++) {
+				Entity entity =
+					victim.world.getEntityByID(intarray[i]);
 
 				if (entity instanceof EC && !entity.isDead) {
-					entity.setDead();
+					((EC) entity).setDead();
 				}
 			}
 
-			target.getEntityData().removeTag(Jutsu.ECENTITYID);
+			victim.getEntityData().removeTag(Jutsu.ECENTITYID);
 		}
+	}
 
-			@SubscribeEvent
-			public void onChangeDimension(EntityTravelToDimensionEvent event) {
-				Entity entity = event.getEntity();
-				if (entity instanceof EntityLivingBase) {
-					int[] intarray = entity.getEntityData().getIntArray(Jutsu.ECENTITYID);
-					if (intarray.length > 0) {
-						for (int i = 0; i < intarray.length; i++) {
-							Entity entity1 = entity.world.getEntityByID(intarray[i]);
-							if (entity1 instanceof EC) {
-								entity1.setDead();
-							}
-						}
-						entity.getEntityData().removeTag(Jutsu.ECENTITYID);
-						//event.setCanceled(true);
+	@SubscribeEvent
+	public void onChangeDimension(EntityTravelToDimensionEvent event) {
+		Entity entity = event.getEntity();
+
+		if (entity instanceof EntityLivingBase) {
+			int[] intarray =
+				entity.getEntityData().getIntArray(Jutsu.ECENTITYID);
+
+			if (intarray.length > 0) {
+				for (int i = 0; i < intarray.length; i++) {
+					Entity entity1 =
+						entity.world.getEntityByID(intarray[i]);
+
+					if (entity1 instanceof EC) {
+						entity1.setDead();
 					}
 				}
+
+				entity.getEntityData().removeTag(Jutsu.ECENTITYID);
 			}
 		}
+	}
+}
 	}
 
 	@Override
