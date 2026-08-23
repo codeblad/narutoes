@@ -55,9 +55,9 @@ public class ItemTenseiganChakraMode extends ElementsNarutomodMod.ModElement {
 	@GameRegistry.ObjectHolder("narutomod:tenseigan_chakra_mode")
 	public static final Item block = null;
 	public static final int ENTITYID = 339;
-	public static final ItemJutsu.JutsuEnum CHAKRAORBS = new ItemJutsu.JutsuEnum(0, "tenseigangun", 'S', 50d, new EntityOrbs.Jutsu());
-	public static final ItemJutsu.JutsuEnum SILVERBLAST = new ItemJutsu.JutsuEnum(1, "tensei_baku_silver", 'S', 15d, new EntityTenseiBakuSilver.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum GOLDBLAST = new ItemJutsu.JutsuEnum(2, "tensei_baku_gold", 'S', 15d, new EntityTenseiBakuGold.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum CHAKRAORBS = new ItemJutsu.JutsuEnum(0, "tenseigangun", 'S', 100d, new EntityOrbs.Jutsu());
+	public static final ItemJutsu.JutsuEnum SILVERBLAST = new ItemJutsu.JutsuEnum(1, "tensei_baku_silver", 'S', 10d, new EntityTenseiBakuSilver.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum GOLDBLAST = new ItemJutsu.JutsuEnum(2, "tensei_baku_gold", 'S', 10d, new EntityTenseiBakuGold.EC.Jutsu());
 
 	public ItemTenseiganChakraMode(ElementsNarutomodMod instance) {
 		super(instance, 695);
@@ -147,7 +147,7 @@ public class ItemTenseiganChakraMode extends ElementsNarutomodMod.ModElement {
 						}
 						if (stack1.getItem() == ItemTenseigan.body && stack2.getItem() == ItemTenseigan.legs
 								&& (stack1.getItemDamage() >= stack1.getMaxDamage() || stack2.getItemDamage() >= stack2.getMaxDamage())) {
-							livingEntity.getCooldownTracker().setCooldown(block, 3600);
+							livingEntity.getCooldownTracker().setCooldown(block, 1200);
 							stack1.shrink(1);
 							stack2.shrink(1);
 							itemstack.getTagCompound().setInteger("ChestArmorDamage", 0);
@@ -165,7 +165,7 @@ public class ItemTenseiganChakraMode extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityOrbs extends EntityScalableProjectile.Base implements ItemJutsu.IJutsu {
 		private final int explosionSize = 5;
-		private final float damage = 50.0F;
+		private final float damage = 80.0F;
 
 		public EntityOrbs(World a) {
 			super(a);
@@ -197,13 +197,13 @@ public class ItemTenseiganChakraMode extends ElementsNarutomodMod.ModElement {
 						return;
 					}
 					if (result.entityHit instanceof EntityLivingBase) {
-						Chakra.pathway((EntityLivingBase) result.entityHit).consume(0.2F);
+						Chakra.pathway((EntityLivingBase) result.entityHit).consume(0.05F);
 					}
 				}
 				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosionSize, false, flag);
 				ProcedureAoeCommand.set(this, 0.0D, 3.0D).exclude(this.shootingEntity)
-						.damageEntities(DamageSource.causeIndirectMagicDamage(this, this.shootingEntity), this.damage+ItemJutsu.getDmgMult(this.shootingEntity)*2);
+						.damageEntities(DamageSource.causeIndirectMagicDamage(this, this.shootingEntity).setDamageIsAbsolute().setDamageBypassesArmor(), this.damage+ItemJutsu.getDmgMult(this.shootingEntity)*3);
 				this.setDead();
 			}
 		}
@@ -226,6 +226,8 @@ public class ItemTenseiganChakraMode extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void onUpdate() {
 			super.onUpdate();
+			Vec3d vel = this.getLookVec().scale(6);
+			this.setVelocity(vel.x,vel.y,vel.z);
 			if (this.ticksExisted == 5) {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:throwpunch")),
 						0.1F, this.rand.nextFloat() * 0.6f + 0.5f);
@@ -239,12 +241,13 @@ public class ItemTenseiganChakraMode extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				this.createJutsu(entity, entity.getLookVec().x, entity.getLookVec().y, entity.getLookVec().z, power);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 5);
 				return true;
 			}
 
 			public void createJutsu(EntityLivingBase entity, double x, double y, double z, float power) {
 				EntityOrbs entityarrow = new EntityOrbs(entity);
-				entityarrow.shoot(x, y, z, 0.95f, 0);
+				entityarrow.shoot(x, y, z, 1.2f, 0);
 				entity.world.spawnEntity(entityarrow);
 			}
 		}

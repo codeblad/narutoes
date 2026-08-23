@@ -1,5 +1,6 @@
 package net.narutomod.procedure;
 
+import net.minecraft.nbt.NBTTagCompound;
 import net.narutomod.PlayerTracker;
 import net.narutomod.item.*;
 import net.narutomod.ElementsNarutomodMod;
@@ -45,6 +46,20 @@ public class ProcedureWhiteZetsuFleshFoodEaten extends ElementsNarutomodMod.ModE
 		ItemStack rinneganstack = ItemStack.EMPTY;
 		boolean flag = false;
 		if ((!(world.isRemote))) {
+
+
+			//Tenseigan Cloak
+
+			ItemStack eye = ((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY);
+			if (eye.getItem() == new ItemStack(ItemTenseigan.helmet, (int) (1)).getItem()) {
+				if (!eye.hasTagCompound()) {
+					eye.setTagCompound(new NBTTagCompound());
+				}
+				eye.getTagCompound().setInteger("ZetsuFlesh",eye.getTagCompound().getInteger("ZetsuFlesh")+1);
+				return;
+			}
+
+
 			if (ItemSharingan.isWearingMangekyo((EntityLivingBase) entity)) {
 				float dmg = (float) ((Math.random() * 110) + 10);
 				entity.attackEntityFrom(DamageSource.STARVE, dmg);

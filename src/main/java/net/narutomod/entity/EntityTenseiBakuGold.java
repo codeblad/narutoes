@@ -94,7 +94,7 @@ public class EntityTenseiBakuGold extends ElementsNarutomodMod.ModElement {
 		public void onUpdate() {
 			super.onUpdate();
 			if (!this.world.isRemote) {
-				if (this.shootingEntity == null || this.ticksAlive > 100 + this.growTime) {
+				if (this.shootingEntity == null || this.ticksAlive > 50 + this.growTime) {
 					this.setDead();
 				} else {
 					if (this.ticksAlive == 1 && this.shootingEntity instanceof EntityLivingBase) {
@@ -119,7 +119,7 @@ public class EntityTenseiBakuGold extends ElementsNarutomodMod.ModElement {
 			@Override
 			protected void attackEntityFrom(Entity player, Entity target) {
 				target.hurtResistantTime = 10;
-				float dmg = 5+ItemJutsu.getDmgMult(player)*0.125f*(1+2*(EC.this.power/200));
+				float dmg = 5+ItemJutsu.getDmgMult(player)*0.4f*(0.25f+1.75f*(EC.this.power/200));
 				target.attackEntityFrom(DamageSource.causeIndirectMagicDamage(EC.this, player), dmg);
 			}
 
@@ -152,7 +152,7 @@ public class EntityTenseiBakuGold extends ElementsNarutomodMod.ModElement {
 				entity.world.playSound(null, entity.posX, entity.posY + 2.0d, entity.posZ,
 				 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:laser")),
 				 net.minecraft.util.SoundCategory.PLAYERS, 4.0f, 1.0f);
-				ItemJutsu.setCurrentJutsuCooldown(stack,600);
+				ItemJutsu.setCurrentJutsuCooldown(stack,300);
 				return true;
 			}
 
@@ -163,7 +163,7 @@ public class EntityTenseiBakuGold extends ElementsNarutomodMod.ModElement {
 	
 			@Override
 			public float getPowerupDelay() {
-				return 5.0f;
+				return 2.0f;
 			}
 	
 			@Override

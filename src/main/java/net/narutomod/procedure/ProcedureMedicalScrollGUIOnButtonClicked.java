@@ -162,7 +162,22 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 									.isDone()
 							: false*/))
 					{
-						{
+
+						newstack = new ItemStack(ItemTenseigan.helmet, (int) (1));
+						((ItemDojutsu.Base)newstack.getItem()).setOwner(newstack, owner);
+						if (entity instanceof EntityPlayerMP) {
+							Container _current = ((EntityPlayerMP) entity).openContainer;
+							if (_current instanceof Supplier) {
+								Object invobj = ((Supplier) _current).get();
+								if (invobj instanceof Map) {
+									ItemStack _setstack = (newstack);
+									_setstack.setCount(1);
+									((Slot) ((Map) invobj).get((int) (2))).putStack(_setstack);
+									_current.detectAndSendChanges();
+								}
+							}
+						}
+						/*{
 							ItemStack _stack = (stack0);
 							if (!_stack.hasTagCompound())
 								_stack.setTagCompound(new NBTTagCompound());
@@ -186,7 +201,7 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 									_stack.setTagCompound(new NBTTagCompound());
 								_stack.getTagCompound().setDouble((NarutomodModVariables.tenseiganEvolvedTime), (TenseiganEvolvedTime));
 							}
-						}
+						}*/
 						if (entity instanceof EntityPlayerMP) {
 							Container _current = ((EntityPlayerMP) entity).openContainer;
 							if (_current instanceof Supplier) {

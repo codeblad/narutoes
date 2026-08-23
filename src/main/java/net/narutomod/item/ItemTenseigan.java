@@ -1,6 +1,12 @@
 
 package net.narutomod.item;
 
+import net.minecraft.init.MobEffects;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.*;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -12,7 +18,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.item.ItemStack;
@@ -33,21 +38,25 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.util.ITooltipFlag;
 
+import net.narutomod.*;
+import net.narutomod.entity.EntityHakkeshoKeiten;
 import net.narutomod.entity.EntityKingOfHell;
 import net.narutomod.entity.EntityPretaShield;
 import net.narutomod.entity.EntityTenTails;
+import net.narutomod.event.SpecialEvent;
 import net.narutomod.gui.GuiNinjaScroll;
+import net.narutomod.potion.PotionChakraBlocked;
+import net.narutomod.potion.PotionFlight;
+import net.narutomod.potion.PotionHeaviness;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.*;
 import net.narutomod.creativetab.TabModTab;
-import net.narutomod.ElementsNarutomodMod;
 
-import java.util.Map;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import javax.annotation.Nullable;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Maps;
+
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
@@ -62,9 +71,458 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 		super(instance, 692);
 	}
 
+
+	public static class AirPush extends Entity  {
+		private EntityLivingBase user;
+		private Vec3d look;
+		private Vec3d start;
+		List<String> targets = new ArrayList<String>();
+
+		public AirPush(World worldIn) {
+			super(worldIn);
+			this.setSize(0.01f, 0.01f);
+			this.isImmuneToFire = true;
+		}
+
+
+		public AirPush(EntityLivingBase user) {
+			this(user.world);
+			this.user = user;
+			this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
+			this.look = this.user.getLookVec();
+			this.start = this.user.getPositionVector().addVector(0,1,0);;
+			ProcedureSync.SwingMainArm.send(user);
+			for (int j = 0; j < (int) 40; j++) {
+				Vec3d a = this.start.addVector(-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2);
+				Vec3d b = this.look.normalize().scale(2+2*this.rand.nextFloat());
+				Particles.spawnParticle(this.world, Particles.Types.SMOKE, a.x, a.y, a.z,
+						1, 1d, 0d, 1d, b.x,b.y,b.z, 0x64FFFFFF, 50, 0);
+			}
+
+			for (double i = 0; i < 40; i++) {
+				Vec3d point = this.start.addVector(0,1,0).add(look.scale(i*1.5));
+				AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(point)).grow(2.5);
+				//((WorldServer)this.world).spawnParticle(EnumParticleTypes.EXPLOSION_LARGE, point.x, point.y, point.z, 1, 0d, 0d, 0d, 0d);
+				boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
+				this.world.newExplosion(this.user, point.x, point.y, point.z, 2, false, flag);
+				/*new net.narutomod.event.EventSphericalExplosion(this.world, this.user,
+						(int) point.x,(int) point.y,(int) point.z, 1, 0, 0);*/
+				for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
+					if (!(entity1 instanceof EntityLivingBase)) {
+						continue;
+					}
+					boolean found = false;
+					for (String enemy: this.targets) {
+						if (Objects.equals(enemy, entity1.getUniqueID().toString())) {
+							found = true;
+						}
+					}
+					if (found) {
+						continue;
+					}
+					this.targets.add(entity1.getUniqueID().toString());
+
+					float damage = (10+(4.5f*ItemJutsu.getDmgMult(this.user)))*3.0f;
+					entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
+					ProcedureUtils.setVelocity(entity1, look.x*8, look.y*8, look.z*8);
+
+				}
+			}
+
+
+			this.user.world.playSound(null, this.user.posX, this.user.posY, this.user.posZ,
+					(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:BanshoTenin")),
+					SoundCategory.PLAYERS, 1.0F, 1.0F);
+
+		}
+
+
+		@Override
+		protected void entityInit() {
+		}
+
+		@Override
+		public void onUpdate() {
+			if (this.user != null) {
+				this.setPosition(this.user.posX, this.user.posY+1, this.user.posZ);
+				if (this.ticksExisted < 15) {
+
+					//this.start = this.start.add(look.scale(3));
+				}
+			}
+			if (this.ticksExisted > 20) {
+				this.setDead();
+			}
+		}
+
+		@Override
+		protected void readEntityFromNBT(NBTTagCompound compound) {
+		}
+
+		@Override
+		protected void writeEntityToNBT(NBTTagCompound compound) {
+		}
+
+	}
+
+	public static class GravityWell extends Entity  {
+		private EntityLivingBase user;
+		private Vec3d look;
+		private Vec3d start;
+		List<String> targets = new ArrayList<String>();
+		List<EntityLivingBase> trapped = new ArrayList<>();
+
+		public GravityWell(World worldIn) {
+			super(worldIn);
+			this.setSize(0.01f, 0.01f);
+			this.isImmuneToFire = true;
+		}
+
+
+		public GravityWell(EntityLivingBase user) {
+			this(user.world);
+			this.user = user;
+			this.look = this.user.getLookVec();
+			RayTraceResult result = ProcedureUtils.objectEntityLookingAt(user, 20d, true);
+			this.start = result.hitVec;
+			this.setPosition(this.start.x, this.start.y, this.start.z);
+			if (!this.world.isRemote) {
+				this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 20, 1, false, false));
+			}
+		}
+
+
+		@Override
+		protected void entityInit() {
+		}
+
+		@Override
+		public void onUpdate() {
+			if (this.user != null) {
+				this.setPosition( this.start.x, this.start.y, this.start.z);
+
+				int maxDistance = 12;
+				if (this.ticksExisted <= 20) {
+					for (int j = 0; j < (int) 300; j++) {
+						Vec3d a = this.start.addVector(0,1,0);
+						Vec3d b = a.addVector(-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2);
+						b = b.subtract(a).normalize();
+						Vec3d c = a.add(b.scale(maxDistance));
+						Particles.spawnParticle(this.world, Particles.Types.SMOKE, c.x, c.y, c.z,
+								1, 0,0,0, 0,0,0, 0xFFFFFFFF, 100, 5);
+					}
+				}
+				if (this.ticksExisted <= 20 && (this.ticksExisted == 1 || this.ticksExisted%10 == 0)) {
+
+
+					for (int j = 0; j < (int) 50; j++) {
+						Vec3d a = this.start.addVector((double) -maxDistance+this.rand.nextFloat()*maxDistance*2,(double) -maxDistance+this.rand.nextFloat()*maxDistance*2,(double) -maxDistance+this.rand.nextFloat()*maxDistance*2);
+						Vec3d b = start.subtract(a).normalize().scale(0.5+0.5*this.rand.nextFloat());
+						Particles.spawnParticle(this.world, Particles.Types.SMOKE, a.x, a.y, a.z,
+								1, 1d, 0d, 1d, b.x,b.y,b.z, 0x64FFFFFF, 30, 10);
+					}
+					this.user.world.playSound(null, this.start.x, this.start.y, this.start.z,
+							(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:BanshoTenin")),
+							SoundCategory.PLAYERS, 1.0F, 1.0F);
+
+
+					AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.start)).grow(maxDistance);
+					for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
+						if (!(entity1 instanceof EntityLivingBase)) {
+							continue;
+						}
+						boolean found = false;
+						for (String enemy: this.targets) {
+							if (Objects.equals(enemy, entity1.getUniqueID().toString())) {
+								found = true;
+							}
+						}
+						if (found) {
+							continue;
+						}
+						this.targets.add(entity1.getUniqueID().toString());
+						this.trapped.add((EntityLivingBase) entity1);
+						//float damage = 15+(10f*ItemJutsu.getDmgMult(this.user));
+
+					}
+				}
+
+				for (EntityLivingBase entity : this.trapped) {
+					entity.setPositionAndUpdate(this.posX,this.posY,this.posZ);
+				}
+
+				if (this.ticksExisted > 20 && this.ticksExisted < 30) {
+					int it = this.ticksExisted-20;
+					for (int j = 0; j < (int) 200-6*it; j++) {
+						Vec3d a = this.start.addVector(0,1,0);
+						Vec3d b = a.addVector(-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2);
+						b = b.subtract(a).normalize();
+						Vec3d c = a.add(b.scale(maxDistance-it));
+						Particles.spawnParticle(this.world, Particles.Types.SMOKE, c.x, c.y, c.z,
+								1, 0,0,0, 0,0,0, 0xFFFFFFFF, 100, 1);
+					}
+				}
+
+				if (this.ticksExisted == 30) {
+					boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
+					this.world.newExplosion(this.user, this.start.x, this.start.y, this.start.z, 10, false, flag);
+					for (EntityLivingBase entity : this.trapped) {
+						float damage = (10 + (9f * ItemJutsu.getDmgMult(this.user)));
+						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user), damage);
+					}
+					this.setDead();
+				}
+			}
+			if (this.ticksExisted > 50) {
+				this.setDead();
+			}
+		}
+
+		@Override
+		protected void readEntityFromNBT(NBTTagCompound compound) {
+		}
+
+		@Override
+		protected void writeEntityToNBT(NBTTagCompound compound) {
+		}
+
+	}
+
+	public static class Denial extends Entity  {
+		private EntityLivingBase user;
+		private Vec3d look;
+		private Vec3d start;
+		private final int startup = 40;
+		List<String> targets = new ArrayList<String>();
+
+		public Denial(World worldIn) {
+			super(worldIn);
+			this.setSize(0.01f, 0.01f);
+			this.isImmuneToFire = true;
+		}
+
+
+		public Denial(EntityLivingBase user) {
+			this(user.world);
+			this.user = user;
+			this.look = this.user.getLookVec();
+			this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
+			ProcedureWhenPlayerAttcked.setInvulnerable(user, 60);
+			this.user.world.playSound(null, this.user.posX, this.user.posY, this.user.posZ,
+					(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:windblast")),
+					SoundCategory.PLAYERS, 2.0F, 0.8F);
+		}
+
+
+		@Override
+		protected void entityInit() {
+		}
+
+		@Override
+		public void onUpdate() {
+			if (this.user != null) {
+				this.setPosition( this.user.posX, this.user.posY, this.user.posZ);
+				float size = 3;
+				if (this.ticksExisted < startup) {
+					if (!this.world.isRemote) {
+						this.user.addPotionEffect(new PotionEffect(PotionFlight.potion, 2, 1, false, false));
+						this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
+					for (int j = 0; j < (int) 500; j++) {
+						Vec3d a = this.user.getPositionVector().addVector(0,1,0);
+						Vec3d b = a.addVector(-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2);
+						b = b.subtract(a).normalize();
+						Vec3d c = a.add(b.scale(size));
+						Particles.spawnParticle(this.world, Particles.Types.SMOKE, c.x, c.y, c.z,
+								1, 0,0,0, 0,0,0, 0xFFFFFFFF, 100, 1);
+					}
+					AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.user.getPositionVector())).grow(size);
+					for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
+
+						if (entity1 instanceof ItemJutsu.IJutsu && !(entity1 instanceof EntityLivingBase)) {
+							entity1.setDead();
+						}
+
+						if (!(entity1 instanceof EntityLivingBase)) {
+							continue;
+						}
+						Vec3d lookVec = entity1.getPositionVector().subtract(this.user.getPositionVector()).normalize().scale(0.5);
+						//this.targets.add(entity1.getUniqueID().toString());
+						float damage = 5+(3f*ItemJutsu.getDmgMult(this.user));
+						entity1.setVelocity(0,0,0);
+						ProcedureUtils.setVelocity(entity1, lookVec.x,lookVec.y,lookVec.z);
+						entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
+					}
+				}
+				if (this.ticksExisted == startup) {
+					size = 15;
+					this.user.world.playSound(null, this.user.posX, this.user.posY, this.user.posZ,
+							(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:BanshoTenin")),
+							SoundCategory.PLAYERS, 1.0F, 1.0F);
+
+					for (int j = 0; j < (int) 150; j++) {
+						Vec3d a = this.user.getPositionVector().addVector(0,1,0);
+						Vec3d b = a.addVector(-size/2+this.rand.nextFloat()*size,-size/2+this.rand.nextFloat()*size,-size/2+this.rand.nextFloat()*size);
+						Vec3d c = b.subtract(a).normalize().scale(3+2*this.rand.nextFloat());
+						Particles.spawnParticle(this.world, Particles.Types.SMOKE, a.x, a.y, a.z,
+								1, 0,0,0, c.x,c.y,c.z, 0x64FFFFFF, 50, 0);
+					}
+					//SpecialEvent.setSphericalExplosionEvent(this.user.world, (int) this.user.posX, (int) this.user.posY, (int) this.user.posZ, (int) size/3, this.user);
+					ProcedureUtils.purgeHarmfulEffects(this.user);
+					this.user.extinguish();
+
+					AxisAlignedBB hitbox = new AxisAlignedBB(new BlockPos(this.user.getPositionVector())).grow(size);
+					for (Entity entity1 : this.world.getEntitiesWithinAABBExcludingEntity(this.user, hitbox)) {
+
+						if (entity1 instanceof ItemJutsu.IJutsu && !(entity1 instanceof EntityLivingBase)) {
+							entity1.setDead();
+						}
+
+						if (!(entity1 instanceof EntityLivingBase)) {
+							continue;
+						}
+						/*boolean found = false;
+						for (String enemy: this.targets) {
+							if (Objects.equals(enemy, entity1.getUniqueID().toString())) {
+								found = true;
+							}
+						}
+						if (found) {
+							continue;
+						}*/
+						Vec3d lookVec = entity1.getPositionVector().subtract(this.user.getPositionVector()).normalize().scale(10);
+						//this.targets.add(entity1.getUniqueID().toString());
+						float damage = 5+(6f*ItemJutsu.getDmgMult(this.user));
+						ProcedureUtils.setVelocity(entity1, lookVec.x,lookVec.y,lookVec.z);
+						entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
+					}
+				}
+
+			}
+			if (this.ticksExisted > startup) {
+				this.setDead();
+			}
+		}
+
+		@Override
+		protected void readEntityFromNBT(NBTTagCompound compound) {
+		}
+
+		@Override
+		protected void writeEntityToNBT(NBTTagCompound compound) {
+		}
+
+	}
+
+	public static class Drain extends Entity  {
+		private EntityLivingBase user;
+		private EntityLivingBase target;
+		private Vec3d start;
+		private Vec3d end;
+		private Vec3d look;
+		private final int startup = 20;
+
+		public Drain(World worldIn) {
+			super(worldIn);
+			this.setSize(0.01f, 0.01f);
+			this.isImmuneToFire = true;
+		}
+
+
+		public Drain(EntityLivingBase user, EntityLivingBase target) {
+			this(user.world);
+			this.user = user;
+			this.target = target;
+			this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
+			this.start = this.user.getPositionVector();
+			this.end = this.target.getPositionVector();
+
+			this.user.world.playSound(null, this.user.posX, this.user.posY, this.user.posZ,
+					(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:BanshoTenin")),
+					SoundCategory.PLAYERS, 1.0F, 1.0F);
+		}
+
+
+		@Override
+		protected void entityInit() {
+		}
+
+		@Override
+		public void onUpdate() {
+			if (this.target == null || this.user == null) {
+				this.setDead();
+				return;
+			}
+			if (this.ticksExisted <= this.startup+25) {
+				if (!this.world.isRemote) {
+					this.user.addPotionEffect(new PotionEffect(PotionFlight.potion, 2, 1, false, false));
+					this.user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					this.target.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+				}
+				this.start = this.user.getPositionVector().addVector(0,0.5,0).add(this.user.getLookVec().scale(1));
+				this.setPosition( this.user.posX, this.user.posY, this.user.posZ);
+
+
+
+				if (this.ticksExisted < startup) {
+					this.look = this.end.subtract(this.start).normalize();
+					double distance = this.start.distanceTo(this.end);
+					Vec3d point = this.start.add(this.look.scale(distance-distance*this.ticksExisted/startup));
+					this.target.setPositionAndUpdate(point.x,point.y,point.z);
+				} else {
+					this.target.setPositionAndUpdate(this.start.x, this.start.y, this.start.z);
+				}
+
+				for (int j = 0; j < (int) 300; j++) {
+					Vec3d a = this.target.getPositionVector().addVector(0,1,0);
+					Vec3d b = a.addVector(-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2,-1+this.rand.nextFloat()*2);
+					b = b.subtract(a).normalize();
+					Vec3d c = a.add(b.scale(2));
+					Particles.spawnParticle(this.world, Particles.Types.SMOKE, c.x, c.y, c.z,
+							1, 0,0,0, 0,0,0, 0xFFFFFFFF, 80, 1);
+				}
+
+				if (this.ticksExisted >= startup+5) {
+					this.target.hurtResistantTime = 10;
+					float damage = 2 + (0.75f * ItemJutsu.getDmgMult(this.user));
+					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor().setDamageIsAbsolute(), damage);
+					Chakra.Pathway cp = Chakra.pathway(this.target);
+					cp.consume(0.25f / 20);
+					if (cp.getAmount() > cp.getMax()) {
+						cp.consume(0.02f);
+					}
+				}
+			}
+			if (this.ticksExisted == this.startup+20) {
+				Vec3d look = this.user.getLookVec();
+				this.user.world.playSound(null, this.user.posX, this.user.posY, this.user.posZ,
+						(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:BanshoTenin")),
+						SoundCategory.PLAYERS, 1.0F, 1.0F);
+				ProcedureUtils.setVelocity(this.target, look.x*4, look.y*4+1, look.z*4);
+				if (!this.world.isRemote) {
+					this.target.addPotionEffect(new PotionEffect(PotionChakraBlocked.potion, 8*20, 0, false, false));
+					this.target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20*5, 3, false, false));
+					this.target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 20 * 5, 4, false, false));
+				}
+			}
+			if (this.ticksExisted > startup+20) {
+				this.setDead();
+			}
+		}
+
+		@Override
+		protected void readEntityFromNBT(NBTTagCompound compound) {
+		}
+
+		@Override
+		protected void writeEntityToNBT(NBTTagCompound compound) {
+		}
+
+	}
+
 	@Override
 	public void initElements() {
-		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("TENSEIGAN", "narutomod:sasuke_", 200, new int[]{2, 10, 10, 10}, 0,
+		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("TENSEIGAN", "narutomod:sasuke_", 500, new int[]{2, 10, 10, 10}, 0,
 		 net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:dojutsu")), 2.0f);
 
 		elements.items.add(() -> new ItemRinnegan.Base(enuma) {
@@ -74,8 +532,117 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 			}
 
 			@Override
+			public boolean onJutsuKey1(boolean is_pressed, ItemStack stack, EntityPlayer entity) {
+				return false;
+			}
+
+			@Override
+			public boolean onJutsuKey2(boolean is_pressed, ItemStack stack, EntityPlayer entity) {
+				return false;
+			}
+
+			@Override
+			public boolean onJutsuKey3(boolean is_pressed, ItemStack stack, EntityPlayer entity) {
+				return false;
+			}
+
+			@Override
+			public boolean onSwitchJutsuKey(boolean is_pressed, ItemStack stack, EntityPlayer entity) {
+				return false;
+			}
+
+			public void tickCooldowns(ItemStack itemStack) {
+				if (itemStack.getTagCompound() == null) {
+					itemStack.setTagCompound(new NBTTagCompound());
+				}
+				NBTTagCompound values = itemStack.getTagCompound();
+				values.setInteger("airPushCD", values.getInteger("airPushCD")-1);
+				values.setInteger("gravWellCD", values.getInteger("gravWellCD")-1);
+				values.setInteger("denialCD", values.getInteger("denialCD")-1);
+				values.setInteger("drainCD", values.getInteger("drainCD")-1);
+			}
+
+
+			@Override
+			public void onUpdate(ItemStack itemstack, World world, Entity entity, int par4, boolean par5) {
+				super.onUpdate(itemstack, world, entity, par4, par5);
+				if (!world.isRemote && entity instanceof EntityLivingBase) {
+					NBTTagCompound nbt = new NBTTagCompound();
+					entity.writeToNBT(nbt);
+
+					boolean isOwner = ProcedureUtils.isOriginalOwner((EntityPlayer) entity, itemstack);
+
+
+					tickCooldowns(itemstack);
+
+					ItemStack eye = ((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY);
+
+					Map<String, Object> $_dependencies = Maps.newHashMap();
+					$_dependencies.put("entity", entity);
+					$_dependencies.put("x", (int) entity.posX);
+					$_dependencies.put("y", (int) entity.posY);
+					$_dependencies.put("z", (int) entity.posZ);
+					$_dependencies.put("world", entity.world);
+
+					NBTTagCompound values = itemstack.getTagCompound();
+
+					if (!ItemByakugan.hasSlot(nbt, 2)) {
+						boolean newPressed4 = entity.getEntityData().getBoolean(NarutomodModVariables.EYETOGGLE);
+						$_dependencies.put("is_pressed", newPressed4);
+						ProcedureByakuganActivate.executeProcedure($_dependencies);
+					}
+					boolean usingJutsu = ((EntityLivingBase) entity).isPotionActive(PotionUsingJutsu.potion);
+					if (!ItemByakugan.hasSlot(nbt, 2)) {
+
+						if (eye.getItem() == new ItemStack(ItemTenseigan.helmet, (int) (1)).getItem()) {
+							boolean newPressed = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed);
+							if (!usingJutsu && values.getBoolean("jutsuKey1") && !newPressed) {
+								if (entity.isSneaking()) {
+									if (values.getInteger("gravWellCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(750d)) {
+										values.setInteger("gravWellCD", 20 * 13);
+										entity.world.spawnEntity(new GravityWell((EntityLivingBase) entity));
+									}
+								} else {
+									if (values.getInteger("airPushCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(350d)) {
+										values.setInteger("airPushCD", 20 * 4);
+										entity.world.spawnEntity(new AirPush((EntityLivingBase) entity));
+									}
+								}
+
+							}
+
+							values.setBoolean("jutsuKey1", newPressed);
+
+							boolean newPressed2 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
+							if (!usingJutsu && values.getBoolean("jutsuKey2") && !newPressed) {
+								if (values.getInteger("denialCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(800d)) {
+									values.setInteger("denialCD", 20 * 15);
+									entity.world.spawnEntity(new Denial((EntityLivingBase) entity));
+								}
+
+							}
+
+							values.setBoolean("jutsuKey2", newPressed2);
+
+							boolean newPressed3 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
+
+							if (!usingJutsu && values.getBoolean("jutsuKey3") && !newPressed3 && values.getInteger("drainCD") <= 0) {
+								RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity,30,5);
+								if (result.entityHit instanceof EntityLivingBase && Chakra.pathway((EntityLivingBase) entity).consume(800d)) {
+									values.setInteger("drainCD", 20 * 15);
+									entity.world.spawnEntity(new Drain((EntityLivingBase) entity, (EntityLivingBase) result.entityHit));
+								}
+							}
+
+							values.setBoolean("jutsuKey3", newPressed3);
+						}
+					}
+				}
+			}
+
+			@Override
 			public void onUpdatePost(EntityPlayer player) {
-				if (!player.world.isRemote && player.ticksExisted % 20 == 3) {
+				/*if (!player.world.isRemote && player.ticksExisted % 20 == 3) {
 					ItemStack helmetStack = player.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
 					GuiNinjaScroll.enableJutsu(player, (ItemJutsu.Base)ItemYoton.block, ItemYoton.SEALING9D, helmetStack.getItem() == helmet);
 					GuiNinjaScroll.enableJutsu(player, (ItemJutsu.Base)ItemYoton.block,
@@ -86,7 +653,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 							player.getRidingEntity().setDead();
 						}
 					}
-				}
+				}*/
 			}
 			
 			@SideOnly(Side.CLIENT)
@@ -200,12 +767,14 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 		}.setUnlocalizedName("tenseiganlegs").setRegistryName("tenseiganlegs").setCreativeTab(null));
 	}
 
+
 	public static boolean isWearing(EntityLivingBase player) {
 		return player.getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() == helmet;
 	}
 
 	public static boolean canUseChakraMode(ItemStack stack, EntityPlayer player) {
-		return stack.hasTagCompound() && stack.getTagCompound().getDouble("ByakuganCount") >= 5.0d;
+		return stack.hasTagCompound() //&& stack.getTagCompound().getDouble("ByakuganCount") >= 5.0d
+				&& stack.getTagCompound().getInteger("ZetsuFlesh") >= 3 && PlayerTracker.getBattleXp(player) >= 10000;
 	}
 
 	public static boolean isWearingFullArmor(EntityLivingBase entity) {

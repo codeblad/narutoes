@@ -174,7 +174,7 @@ public class EntityTenseiBakuSilver extends ElementsNarutomodMod.ModElement {
 					 vec1.z + (EC.this.rand.nextDouble()-0.5d) * this.getFarRadius(0) * 0.15d,
 					 0x80C0C0C0, 90 + EC.this.rand.nextInt(20), (int)(16.0D / (EC.this.rand.nextDouble()*0.8D+0.2D)));
 				}
-				for (int i = 1, j = (int)(this.getRange(0) * 5); i <= j; i++) {
+				for (int i = 1, j = (int)(this.getRange(0) * 2); i <= j; i++) {
 					Vec3d vec1 = vec0.scale((double)i * this.getRange(0) / j * 0.2d);
 					particles.spawnParticles(Particles.Types.WHIRLPOOL, vec.x, vec.y, vec.z, 1,
 					 0d, 0d, 0d, vec1.x, vec1.y, vec1.z, 0x40C0C0C0, 20 + (int)((float)i/j * this.getFarRadius(0) * 25), 20);
@@ -222,7 +222,7 @@ public class EntityTenseiBakuSilver extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power));
-				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (power*4+20));
+				ItemJutsu.setCurrentJutsuCooldown(stack, (long) (power*4+20*3));
 				return true;
 			}
 
