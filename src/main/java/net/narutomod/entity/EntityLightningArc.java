@@ -281,15 +281,26 @@ public class EntityLightningArc extends ElementsNarutomodMod.ModElement {
 				this.setPosition(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 			}
 			if (this.damageAmount > 0f) {
-				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(this.excludeEntity, this.getEntityBoundingBox()
-				  .expand(this.ogEndVec.x - this.posX, this.ogEndVec.y - this.posY, this.ogEndVec.z - this.posZ).grow(this.growth))) {
-					if (entity.getEntityBoundingBox().grow(this.growth).calculateIntercept(this.getPositionVector(), this.ogEndVec) != null) {
-						if (this.resetHurtResistantTime) {
-							entity.hurtResistantTime = 10;
-						}
-						onStruck(entity, this.damageSource, this.damageAmount, this.paralysisTicks, true);
+				for (Entity entity : this.world.getEntitiesWithinAABBExcludingEntity(
+					this.excludeEntity,
+					this.getEntityBoundingBox()
+						.expand(this.ogEndVec.x - this.posX,
+								this.ogEndVec.y - this.posY,
+								this.ogEndVec.z - this.posZ)
+						.grow(this.growth))) {
+
+				if (entity instanceof EntityLivingBase
+						&& entity.getEntityBoundingBox().grow(this.growth)
+							.calculateIntercept(this.getPositionVector(), this.ogEndVec) != null) {
+
+					if (this.resetHurtResistantTime) {
+						entity.hurtResistantTime = 10;
 					}
+
+					onStruck(entity, this.damageSource, this.damageAmount,
+							this.paralysisTicks, true);
 				}
+			}
 			}
 			if (!this.world.isRemote) {
 				int i = this.getLifeSpan();

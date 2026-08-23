@@ -57,8 +57,8 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 		private int attackTimer;
 		private int nextStepDistance;
 		private int deathTicks;
-		float power;
-		
+		private float power;
+
 		public EC(World w) {
 			super(w);
 			this.setOGSize(1f, 2.875f);
@@ -70,8 +70,8 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			super(summonerIn);
 			this.setOGSize(1f, 2.875f);
 			this.isImmuneToFire = true;
-			this.power = size;
 			this.setScale(size);
+			this.power = size;
 			this.setLocationAndAngles(summonerIn.posX + summonerIn.getLookVec().x, summonerIn.posY, summonerIn.posZ + summonerIn.getLookVec().z, summonerIn.rotationYaw, 0f);
 		}
 
@@ -88,11 +88,11 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).setBaseValue(16.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(50.0D + 6*newPower);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D + 0.5*newPower);
-			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(10.0D + 6.0D * f);
+			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D + (f - 1F) * 0.05D);
 			super.postScaleFixup();
 			this.experienceValue = (int)(f * 10);
-			this.stepHeight = this.height * 0.33333f;
+			this.stepHeight = this.height * 0.3333f;
 		}
 
 		@Override
@@ -130,14 +130,14 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			return this.getScale() >= 2.0f && this.getPassengers().size() < 1;
 		}
 
-		@Override
-		public boolean attackEntityFrom(DamageSource source, float amount) {
-			if (source.getTrueSource() instanceof EntityLivingBase && source.getTrueSource().equals(this.getSummoner())) {
-				//this.onDeathUpdate();
-				return false;
-			}
-			return super.attackEntityFrom(source, amount);
-		}
+		// @Override
+		// public boolean attackEntityFrom(DamageSource source, float amount) {
+		// 	if (source.getTrueSource() instanceof EntityLivingBase && source.getTrueSource().equals(this.getSummoner())) {
+		// 		this.onDeathUpdate();
+		// 		return false;
+		// 	}
+		// 	return super.attackEntityFrom(source, amount);
+		// }
 
 		@Override
 		public boolean attackEntityAsMob(Entity entityIn) {
@@ -196,14 +196,14 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 	    			this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:rocks")), 1.0F, 0.8F);
 	    		}
 	    		if (age <= this.growTime) {
-					for (int i = 0; i < (int)(this.getScale() * 12); i++) {
+					for (int i = 0; i < (int)(this.getScale() * 8); i++) {
 						this.world.spawnParticle(EnumParticleTypes.BLOCK_DUST, this.posX, this.posY, this.posZ,
 						 (this.rand.nextDouble()-0.5d) * this.width * 0.25d, 0.15d,
 						 (this.rand.nextDouble()-0.5d) * this.width * 0.25d, Block.getIdFromBlock(Blocks.DIRT));
 					}
 	    		}
 	    		float f = this.distanceWalkedOnStepModified * this.ogHeight / this.height;
-	    		if (f > this.nextStepDistance  && !this.world.isAirBlock(new BlockPos(this.posX, this.posY - 3.0d, this.posZ))) {
+	    		if (f > this.nextStepDistance && !this.world.isAirBlock(new BlockPos(this.posX, this.posY - 0.2d, this.posZ))) {
 	    			this.nextStepDistance = (int)f + 1;
 	    			if (!this.isInWater()) {
 	    				this.playSound(SoundEvents.ENTITY_IRONGOLEM_STEP, 1f, 1);

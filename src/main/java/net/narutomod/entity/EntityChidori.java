@@ -230,8 +230,8 @@ public class EntityChidori extends ElementsNarutomodMod.ModElement {
 						this.launchAtTarget((EntityLivingBase)this.target);
 					}
 					if (this.target.getDistanceSq(this.summoner) < 25d) {
-						float damage = 8+(1.75f * this.damageMultiplier())*ItemJutsu.getDmgMult(this.summoner);
-
+						//float damage = 8+(1.75f * this.damageMultiplier())*ItemJutsu.getDmgMult(this.summoner);
+						float damage = (11f+2.4f*ItemJutsu.getDmgMult(this.summoner))*3.5f;			
 						ItemStack stack = ProcedureUtils.getMatchingItemStack(this.summoner, ItemRaiton.block);
 						if (stack != null && stack.getTagCompound() != null
 								&& stack.getTagCompound().getBoolean("IsNatureAffinityKey")) {

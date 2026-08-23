@@ -285,7 +285,7 @@ public class ItemKibaBlades extends ElementsNarutomodMod.ModElement {
 			if (this.summoner != null) {
 				this.setPositionToSummoner();
 			}
-			if (!this.world.isRemote && (this.summoner == null || !this.isHoldingWeapon(EnumHand.MAIN_HAND))) {
+			if (!this.world.isRemote && (this.summoner == null || (!this.isHoldingWeapon(EnumHand.MAIN_HAND) && !this.isHoldingWeapon(EnumHand.OFF_HAND)))) {
 				this.setDead();
 			} else if (this.rand.nextFloat() < 0.01f) {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:electricity")),

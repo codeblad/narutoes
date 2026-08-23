@@ -35,8 +35,9 @@ import net.minecraft.potion.PotionEffect;
 import net.narutomod.entity.EntityBijuManager;
 import net.narutomod.entity.EntityNinjaMob;
 import net.narutomod.item.*;
+import net.narutomod.potion.PotionChakraSaturation;
+import net.narutomod.potion.PotionCombatTag;
 import net.narutomod.entity.EntitySummonAnimal;
-import net.narutomod.item.ItemIryoJutsu;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.procedure.ProcedureUtils;
 
@@ -305,6 +306,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			float amount = event.getAmount();
 			//I PUT DEFENSE IN HERE LOOK FOR DEFENSE HERE DAMAGE REDUCER DEFENSE MODIFIER
 			if (targetEntity instanceof EntityPlayer) {
+
 				float defMult = 1;
 
 				ItemStack cheststack = ((EntityPlayer) targetEntity).getItemStackFromSlot(EntityEquipmentSlot.CHEST);
@@ -393,6 +395,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					newAmount = amount;
 				}
 				event.setAmount(newAmount);
+					
 			    }
 
 			if (!targetEntity.equals(sourceEntity) && targetEntity.getEntityData().getBoolean("TESTDUMMY") == true) {
@@ -437,6 +440,10 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				if (summoner != null) {
 					sourceEntity = summoner;
 				}
+			}
+			if (targetEntity instanceof EntityPlayer && sourceEntity instanceof EntityPlayer && !targetEntity.equals(sourceEntity) && !targetEntity.world.isRemote) {
+				//targetEntity.equals(sourceEntity)
+				((EntityLivingBase)targetEntity).addPotionEffect(new PotionEffect(PotionCombatTag.potion, 1200, 0, true, false));
 			}
 			if (!targetEntity.equals(sourceEntity) && sourceEntity instanceof EntityLivingBase && amount > 0f) {
 				/*if (this.isOffCooldown(targetEntity) && targetEntity instanceof EntityPlayer && amount < ((EntityPlayer)targetEntity).getHealth()) {

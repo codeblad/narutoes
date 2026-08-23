@@ -1,4 +1,3 @@
-
 package net.narutomod.entity;
 
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -56,7 +55,7 @@ import javax.annotation.Nullable;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
-	public static final int ENTITYID = 293;
+	public static final int ENTITYID = 293;	
 	public static final int ENTITYID_RANGED = 294;
 	public static final String ENTITY_TAG = "shadow_imitation_entities";
 
@@ -75,11 +74,18 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Integer> USER_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private static final DataParameter<Integer> TARGET_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
 		private static final DataParameter<Boolean> AOE = EntityDataManager.<Boolean>createKey(EC.class, DataSerializers.BOOLEAN);
+		private static final DataParameter<Boolean> STITCH = EntityDataManager.<Boolean>createKey(EC.class, DataSerializers.BOOLEAN);
+		private static final DataParameter<Integer> POSSESSION_ID = EntityDataManager.<Integer>createKey(EC.class, DataSerializers.VARINT);
+
+		private int stitchHitTimer = 0;
 		private double chakraBurn;
 		private PlayerInput.Hook userInput = new PlayerInput.Hook();
 		private int strangleCooldown = 0;
+		private int stitchCooldown = 0;
 		private int lifetimeReduction = 0;
-		private boolean stitched = false;
+		private double stitchLockX;
+		private double stitchLockY;
+		private double stitchLockZ;
 
 		public EC(World world) {
 			super(world);
@@ -109,6 +115,17 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			this.chakraBurn = chakraUsagePerSec
 				+ Math.max(ProcedureUtils.getPunchDamage(targetIn) * 10d, 90d);
 		}
+
+		public EC(EntityLivingBase userIn, EntityLivingBase targetIn, EC possession) {
+			this(userIn.world);
+			this.setUser(userIn);
+			this.setTarget(targetIn);
+			this.setAOE(false);
+			this.setStitch(true);
+			this.setPossession(possession);
+			this.setPosition(targetIn.posX, targetIn.posY, targetIn.posZ);
+			this.chakraBurn = 1000d;
+		}
 		
 
 		@Override
@@ -121,6 +138,8 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			this.getDataManager().register(USER_ID, Integer.valueOf(-1));
 			this.getDataManager().register(TARGET_ID, Integer.valueOf(-1));
 			this.getDataManager().register(AOE, Boolean.valueOf(false));
+			this.getDataManager().register(STITCH, Boolean.valueOf(false));
+			this.getDataManager().register(POSSESSION_ID, Integer.valueOf(-1));
 		}
 
 		private void setUser(@Nullable EntityLivingBase entity) {
@@ -135,6 +154,39 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			return this.getDataManager().get(AOE).booleanValue();
 		}
 
+		private void setStitch(boolean value) {
+			this.getDataManager().set(STITCH, Boolean.valueOf(value));
+		}
+
+		private boolean isStitch() {
+			return this.getDataManager().get(STITCH).booleanValue();
+		}
+
+		private void setPossession(@Nullable EC entity) {
+			this.getDataManager().set(POSSESSION_ID, Integer.valueOf(entity != null ? entity.getEntityId() : -1));
+		}
+
+		static boolean isStitched(EntityLivingBase target) {
+			java.util.List<EC> entities = target.world.getEntitiesWithinAABB(
+				EC.class,
+				target.getEntityBoundingBox().grow(0.5d)
+			);
+
+			for (EC entity : entities) {
+				if (entity.isStitch() && entity.getTarget() == target && !entity.isDead) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		@Nullable
+		private EC getPossession() {
+			Entity entity = this.world.getEntityByID(((Integer)this.getDataManager().get(POSSESSION_ID)).intValue());
+			return entity instanceof EC ? (EC)entity : null;
+		}
+
 		@Nullable
 		private EntityLivingBase getUser() {
 			Entity entity = this.world.getEntityByID(((Integer)this.getDataManager().get(USER_ID)).intValue());
@@ -145,13 +197,114 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			this.getDataManager().set(TARGET_ID, Integer.valueOf(entity != null ? entity.getEntityId() : -1));
 		}
 
+		private Vec3d[] getStitchPoints(EntityLivingBase target) {
+			Vec3d[] points = new Vec3d[6];
+
+			for (int i = 0; i < 6; i++) {
+				double angle = Math.PI * 2d * i / 6d;
+				double x = target.posX + Math.cos(angle) * 1.5d;
+				double z = target.posZ + Math.sin(angle) * 1.5d;
+
+				Vec3d start = new Vec3d(x, target.posY + 3d, z);
+				Vec3d end = new Vec3d(x, target.posY - 4d, z);
+
+				RayTraceResult result = this.world.rayTraceBlocks(
+					start,
+					end,
+					false,
+					true,
+					false
+				);
+
+				if (result != null && result.typeOfHit == RayTraceResult.Type.BLOCK) {
+					points[i] = result.hitVec;
+				} else {
+					points[i] = new Vec3d(x, target.posY, z);
+				}
+			}
+
+			return points;
+		}
+		
 		@Nullable
 		private EntityLivingBase getTarget() {
 			Entity entity = this.world.getEntityByID(((Integer)this.getDataManager().get(TARGET_ID)).intValue());
 			return entity instanceof EntityLivingBase ? (EntityLivingBase)entity : null;
 		}
+
+				private void updateStitch(EntityLivingBase user) {
+			EntityLivingBase target = this.getTarget();
+			EC possession = this.getPossession();
+
+			if (user == null || target == null || !target.isEntityAlive()
+					|| possession == null || possession.isDead) {
+				this.setDead();
+				return;
+			}
+
+			if (this.ticksExisted == 1) {
+				this.stitchLockX = target.posX;
+				this.stitchLockY = target.posY;
+				this.stitchLockZ = target.posZ;
+
+				possession.lifetimeReduction -= 40;
+
+				if (!Chakra.pathway(user).consume(1000d)) {
+					this.setDead();
+					return;
+				}
+
+				PlayerInput.Hook.haltTargetInput(target, true);
+			}
+
+			target.setPosition(
+				this.stitchLockX,
+				this.stitchLockY,
+				this.stitchLockZ
+			);
+
+			target.prevPosX = this.stitchLockX;
+			target.prevPosY = this.stitchLockY;
+			target.prevPosZ = this.stitchLockZ;
+
+			target.lastTickPosX = this.stitchLockX;
+			target.lastTickPosY = this.stitchLockY;
+			target.lastTickPosZ = this.stitchLockZ;
+
+			target.motionX = 0d;
+			target.motionY = 0d;
+			target.motionZ = 0d;
+			target.velocityChanged = true;
+
+			if (this.ticksExisted <= 10 && this.ticksExisted % 2 == 1) {
+				this.stitchHitTimer++;
+
+				float damage = 5.0f + 1.75f * ItemJutsu.getDmgMult(user);
+
 		
 
+				target.attackEntityFrom(
+					ItemJutsu.causeJutsuDamage(user, user),
+					damage
+				);
+
+				target.hurtResistantTime = 0;
+
+				this.world.playSound(
+					null,
+					target.posX,
+					target.posY,
+					target.posZ,
+					SoundEvent.REGISTRY.getObject(
+						new ResourceLocation("narutomod:bonecrack")
+					),
+					SoundCategory.PLAYERS,
+					0.5f,
+					1.15f + this.stitchHitTimer * 0.03f
+				);
+			}
+		}
+		
 
 		@Override
 		public void handlePacket(@Nullable PlayerInput.Hook.MovementPacket movementPacket, @Nullable PlayerInput.Hook.MousePacket mousePacket) {
@@ -163,191 +316,198 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-	private void applyShadowToEntitiesOnBlock(BlockPos blockPos, EntityLivingBase user) {
-	AxisAlignedBB blockBox = new AxisAlignedBB(
-		blockPos.getX(),
-		blockPos.getY() + 0.001D,
-		blockPos.getZ(),
-		blockPos.getX() + 1.0D,
-		blockPos.getY() + 1.01D,
-		blockPos.getZ() + 1.0D
-	);
+		private void applyShadowToEntitiesOnBlock(BlockPos blockPos, EntityLivingBase user) {
+			AxisAlignedBB blockBox = new AxisAlignedBB(
+				blockPos.getX(),
+				blockPos.getY() + 0.001D,
+				blockPos.getZ(),
+				blockPos.getX() + 1.0D,
+				blockPos.getY() + 1.01D,
+				blockPos.getZ() + 1.0D
+			);
 
-	java.util.List<EntityLivingBase> entities =
-		this.world.getEntitiesWithinAABB(
-			EntityLivingBase.class,
-			blockBox
-		);
+			java.util.List<EntityLivingBase> entities =
+				this.world.getEntitiesWithinAABB(
+					EntityLivingBase.class,
+					blockBox
+				);
 
-	for (EntityLivingBase target : entities) {
+			for (EntityLivingBase target : entities) {
 
-		if (target == user) {
-			continue;
+				if (target == user) {
+					continue;
+				}
+
+				if (!target.isEntityAlive()) {
+					continue;
+				}
+
+				if (!target.onGround) {
+					continue;
+				}
+
+				if (!ItemJutsu.canTarget(target)) {
+					continue;
+				}
+
+				double feetY = target.getEntityBoundingBox().minY;
+
+				if (Math.abs(feetY - (blockPos.getY() + 1.0D)) > 0.15D) {
+					continue;
+				}
+
+				if (target.getEntityBoundingBox().maxX <= blockPos.getX()
+						|| target.getEntityBoundingBox().minX >= blockPos.getX() + 1.0D
+						|| target.getEntityBoundingBox().maxZ <= blockPos.getZ()
+						|| target.getEntityBoundingBox().minZ >= blockPos.getZ() + 1.0D) {
+					continue;
+				}
+
+				if (Jutsu.intarrayContains(
+						this.world,
+						user.getEntityData().getIntArray(Jutsu.ECENTITYID),
+						target.getEntityId())) {
+					continue;
+				}
+
+				EC possession = new EC(
+					user,
+					target,
+					ItemInton.SHADOW_IMITATION.chakraUsage
+				);
+
+				this.world.spawnEntity(possession);
+
+				Jutsu.addEntity(user, possession);
+			}
 		}
 
-		if (!target.isEntityAlive()) {
-			continue;
-		}
-
-		if (!target.onGround) {
-			continue;
-		}
-
-		if (!ItemJutsu.canTarget(target)) {
-			continue;
-		}
-
-		double feetY = target.getEntityBoundingBox().minY;
-
-		if (Math.abs(feetY - (blockPos.getY() + 1.0D)) > 0.15D) {
-			continue;
-		}
-
-		if (target.getEntityBoundingBox().maxX <= blockPos.getX()
-				|| target.getEntityBoundingBox().minX >= blockPos.getX() + 1.0D
-				|| target.getEntityBoundingBox().maxZ <= blockPos.getZ()
-				|| target.getEntityBoundingBox().minZ >= blockPos.getZ() + 1.0D) {
-			continue;
-		}
-
-		if (Jutsu.intarrayContains(
-				this.world,
-				user.getEntityData().getIntArray(Jutsu.ECENTITYID),
-				target.getEntityId())) {
-			continue;
-		}
-
-		EC possession = new EC(
-			user,
-			target,
-			ItemInton.SHADOW_IMITATION.chakraUsage
-		);
-
-		this.world.spawnEntity(possession);
-
-		Jutsu.addEntity(user, possession);
-	}
-}
 		private void updateAOE(EntityLivingBase user) {
-	if (user == null || !user.isEntityAlive()) {
-		this.setDead();
-		return;
-	}
-
-	this.setPosition(user.posX, user.posY, user.posZ);
-
-	double radius = Math.min(this.ticksExisted * 0.35D, 6.0D);
-
-	if (this.ticksExisted > 25) {
-		this.setDead();
-		return;
-	}
-
-	if (this.ticksExisted % 20 == 1) {
-		if (!Chakra.pathway(user).consume(this.chakraBurn)) {
-			this.setDead();
-			return;
-		}
-	}
-
-	if (this.ticksExisted == 1) {
-		this.playSound(
-			SoundEvent.REGISTRY.getObject(
-				new ResourceLocation("narutomod:shadow_sfx")
-			),
-			1f,
-			1f
-		);
-	}
-
-	double previousRadius = Math.max(0.0D, radius - 0.35D);
-
-	int minX = MathHelper.floor(user.posX - radius);
-	int maxX = MathHelper.floor(user.posX + radius);
-	int minZ = MathHelper.floor(user.posZ - radius);
-	int maxZ = MathHelper.floor(user.posZ + radius);
-
-	int centerY = MathHelper.floor(user.posY);
-
-	for (int x = minX; x <= maxX; x++) {
-		for (int z = minZ; z <= maxZ; z++) {
-
-			double dx = (x + 0.5D) - user.posX;
-			double dz = (z + 0.5D) - user.posZ;
-
-			double distanceSq = dx * dx + dz * dz;
-
-			if (distanceSq > radius * radius) {
-				continue;
+			if (user == null || !user.isEntityAlive()) {
+				this.setDead();
+				return;
 			}
 
-			if (distanceSq <= previousRadius * previousRadius) {
-				continue;
+			this.setPosition(user.posX, user.posY, user.posZ);
+
+			double radius = Math.min(this.ticksExisted * 0.35D, 6.0D);
+
+			if (this.ticksExisted > 25) {
+				this.setDead();
+				return;
 			}
 
-			for (int y = centerY + 3; y >= centerY - 4; y--) {
-
-				BlockPos blockPos = new BlockPos(x, y, z);
-				IBlockState state = this.world.getBlockState(blockPos);
-
-				if (state.getRenderType() == EnumBlockRenderType.INVISIBLE) {
-					continue;
+			if (this.ticksExisted % 20 == 1) {
+				if (!Chakra.pathway(user).consume(this.chakraBurn)) {
+					this.setDead();
+					return;
 				}
+			}
 
-				if (!state.isFullCube()) {
-					continue;
+			if (this.ticksExisted == 1) {
+				this.playSound(
+					SoundEvent.REGISTRY.getObject(
+						new ResourceLocation("narutomod:shadow_sfx")
+					),
+					1f,
+					1f
+				);
+			}
+
+			double previousRadius = Math.max(0.0D, radius - 0.35D);
+
+			int minX = MathHelper.floor(user.posX - radius);
+			int maxX = MathHelper.floor(user.posX + radius);
+			int minZ = MathHelper.floor(user.posZ - radius);
+			int maxZ = MathHelper.floor(user.posZ + radius);
+
+			int centerY = MathHelper.floor(user.posY);
+
+			for (int x = minX; x <= maxX; x++) {
+				for (int z = minZ; z <= maxZ; z++) {
+
+					double dx = (x + 0.5D) - user.posX;
+					double dz = (z + 0.5D) - user.posZ;
+
+					double distanceSq = dx * dx + dz * dz;
+
+					if (distanceSq > radius * radius) {
+						continue;
+					}
+
+					if (distanceSq <= previousRadius * previousRadius) {
+						continue;
+					}
+
+					for (int y = centerY + 3; y >= centerY - 4; y--) {
+
+						BlockPos blockPos = new BlockPos(x, y, z);
+						IBlockState state = this.world.getBlockState(blockPos);
+
+						if (state.getRenderType() == EnumBlockRenderType.INVISIBLE) {
+							continue;
+						}
+
+						if (!state.isFullCube()) {
+							continue;
+						}
+
+						if (!this.world.isAirBlock(blockPos.up())) {
+							continue;
+						}
+
+						this.applyShadowToEntitiesOnBlock(blockPos, user);
+
+						break;
+					}
 				}
-
-				if (!this.world.isAirBlock(blockPos.up())) {
-					continue;
-				}
-
-				this.applyShadowToEntitiesOnBlock(blockPos, user);
-
-				break;
 			}
 		}
-	}
-}
-	@Override
-public void setDead() {
-    if (this.isDead) {
-        return;
-    }
 
-    if (!this.world.isRemote) {
-        EntityLivingBase user = this.getUser();
-        EntityLivingBase target = this.getTarget();
+		@Override
+		public void setDead() {
+			if (this.isDead) {
+				return;
+			}
 
-        if (!this.isAOE()
-                && user instanceof EntityPlayerMP
-                && user.isEntityAlive()) {
+			if (!this.world.isRemote) {
+				EntityLivingBase user = this.getUser();
+				EntityLivingBase target = this.getTarget();
 
-            PlayerInput.Hook.copyInputFrom(
-                (EntityPlayerMP) user,
-                this,
-                false
-            );
-        }
+				if (!this.isAOE()
+						&& user instanceof EntityPlayerMP
+						&& user.isEntityAlive()) {
 
-        if (target != null) {
-			PlayerInput.Hook.haltTargetInput(target, false);
-			this.userInput = new PlayerInput.Hook();
+					PlayerInput.Hook.copyInputFrom(
+						(EntityPlayerMP) user,
+						this,
+						false
+					);
+				}
+
+				if (target != null) {
+					PlayerInput.Hook.haltTargetInput(target, false);
+					this.userInput = new PlayerInput.Hook();
+				}
+
+				if (user != null) {
+					Jutsu.removeEntity(user, this.getEntityId());
+				}
+			}
+
+			super.setDead();
 		}
-
-        if (user != null) {
-            Jutsu.removeEntity(user, this.getEntityId());
-        }
-    }
-
-    super.setDead();
-}
 
 		@Override
 		public void onUpdate() {
 			EntityLivingBase user = this.getUser();
 
 			if (!this.world.isRemote) {
+				if (this.isStitch()) {
+					this.updateStitch(user);
+					return;
+				}
+
 				if (this.isAOE()) {
 					this.updateAOE(user);
 					return;
@@ -393,11 +553,25 @@ public void setDead() {
 							this.strangleCooldown--;
 						}
 
-						if (user.getEntityData().getBoolean(NarutomodModVariables.EYETOGGLE)
+						if (this.stitchCooldown > 0) {
+							this.stitchCooldown--;
+						}
+
+						if (!user.isSneaking()
+								&& user.getEntityData().getBoolean(NarutomodModVariables.EYETOGGLE)
 								&& this.strangleCooldown <= 0) {
 
 							if (this.shadowStrangle()) {
 								this.strangleCooldown = 20;
+							}
+						}
+
+						if (user.isSneaking()
+								&& user.getEntityData().getBoolean(NarutomodModVariables.EYETOGGLE)
+								&& this.stitchCooldown <= 0) {
+
+							if (this.shadowStitch()) {
+								this.stitchCooldown = 300;
 							}
 						}
 
@@ -423,10 +597,25 @@ public void setDead() {
 			if (user == null || target == null || !target.isEntityAlive()) {
 				return false;
 			}
-			this.world.playSound(null, this.posX, this.posY, this.posZ,
-				 SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bonecrack")), SoundCategory.PLAYERS, 1f, 1f);
 
-			float damage = 12f+2.9f*ItemJutsu.getDmgMult(user);
+			if (isStitched(target)) {
+				return false;
+			}
+
+			this.world.playSound(
+				null,
+				this.posX,
+				this.posY,
+				this.posZ,
+				SoundEvent.REGISTRY.getObject(
+					new ResourceLocation("narutomod:bonecrack")
+				),
+				SoundCategory.PLAYERS,
+				1f,
+				1f
+			);
+
+			float damage = 12f + 2.9f * ItemJutsu.getDmgMult(user);
 
 			target.attackEntityFrom(
 				ItemJutsu.causeJutsuDamage(user, user),
@@ -437,14 +626,57 @@ public void setDead() {
 
 			return true;
 		}
-	
 
-	    public boolean canTargetBeSeen() {
+		public boolean shadowStitch() {
 			EntityLivingBase user = this.getUser();
 			EntityLivingBase target = this.getTarget();
-	        return this.world.rayTraceBlocks(user.getPositionEyes(1f), target.getPositionEyes(1f), false, true, false) == null
-	         || this.world.rayTraceBlocks(user.getPositionEyes(1f), target.getPositionVector().addVector(0d, 0.2d, 0d), false, true, false) == null;
-	    }
+
+			if (user == null || target == null || !target.isEntityAlive()) {
+				return false;
+			}
+
+			if (isStitched(target)) {
+				return false;
+			}
+
+			if (!ItemJutsu.canTarget(target)) {
+				return false;
+			}
+
+			if (!this.canTargetBeSeen()) {
+				return false;
+			}
+
+			EC stitch = new EC(
+				user,
+				target,
+				this
+			);
+
+			this.world.spawnEntity(stitch);
+
+			return true;
+		}
+
+		public boolean canTargetBeSeen() {
+			EntityLivingBase user = this.getUser();
+			EntityLivingBase target = this.getTarget();
+
+			return this.world.rayTraceBlocks(
+					user.getPositionEyes(1f),
+					target.getPositionEyes(1f),
+					false,
+					true,
+					false
+				) == null
+				|| this.world.rayTraceBlocks(
+					user.getPositionEyes(1f),
+					target.getPositionVector().addVector(0d, 0.2d, 0d),
+					false,
+					true,
+					false
+				) == null;
+		}
 
 		@Override
 		protected void readEntityFromNBT(NBTTagCompound compound) {
@@ -457,8 +689,6 @@ public void setDead() {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			private static final String ECENTITYID = "ShadowImitationEntityIdKey";
 
-			
-			
 			private static void addEntity(EntityLivingBase user, EC entity) {
 				int[] oldintarray = user.getEntityData().getIntArray(ECENTITYID);
 
@@ -476,110 +706,145 @@ public void setDead() {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 
-			if (entity.isSneaking()) {
+				int[] oldintarray =
+					entity.getEntityData().getIntArray(ECENTITYID);
 
-			int[] oldintarray =
-				entity.getEntityData().getIntArray(ECENTITYID);
+				if (entity.isSneaking()) {
 
-			for (int i = 0; i < oldintarray.length; i++) {
-				Entity existing = entity.world.getEntityByID(oldintarray[i]);
+					for (int i = 0; i < oldintarray.length; i++) {
+						Entity existing = entity.world.getEntityByID(oldintarray[i]);
 
-				if (existing instanceof EC && ((EC) existing).isAOE()) {
-					return false;
+						if (existing instanceof EC && ((EC) existing).isAOE()) {
+							return false;
+						}
+					}
+
+					EC shadowAOE = new EC(
+						entity,
+						ItemInton.SHADOW_IMITATION.chakraUsage
+					);
+
+					entity.addPotionEffect(
+						new PotionEffect(
+							PotionHeaviness.potion,
+							24,
+							4,
+							false,
+							false
+						)
+					);
+
+					entity.world.spawnEntity(shadowAOE);
+
+					addEntity(entity, shadowAOE);
+
+					return true;
 				}
-			}
 
-			EC shadowAOE = new EC(
-				entity,
-				ItemInton.SHADOW_IMITATION.chakraUsage
-			);
-			//apply heaviness
-			entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 24, 4, false, false));
+				RayTraceResult res =
+					ProcedureUtils.objectEntityLookingAt(entity, 30d);
 
-			entity.world.spawnEntity(shadowAOE);
+				if (res != null && res.entityHit instanceof EntityLivingBase) {
 
-			addEntity(entity, shadowAOE);
+					if (res.entityHit.onGround && entity.onGround) {
 
-			return true;
-		}
-			RayTraceResult res =
-				ProcedureUtils.objectEntityLookingAt(entity, 30d);
+						if (!intarrayContains(
+								entity.world,
+								oldintarray,
+								res.entityHit.getEntityId())) {
 
-			if (res != null && res.entityHit instanceof EntityLivingBase) {
+							EC entity1 = new EC(
+								entity,
+								(EntityLivingBase) res.entityHit,
+								ItemInton.SHADOW_IMITATION.chakraUsage
+							);
 
-				if (res.entityHit.onGround && entity.onGround) {
+							entity.world.spawnEntity(entity1);
 
-					int[] oldintarray =
-						entity.getEntityData().getIntArray(ECENTITYID);
+							addEntity(entity, entity1);
 
-					if (!intarrayContains(
-							entity.world,
-							oldintarray,
-							res.entityHit.getEntityId())) {
-
-						EC entity1 = new EC(
-							entity,
-							(EntityLivingBase) res.entityHit,
-							ItemInton.SHADOW_IMITATION.chakraUsage
-						);
-
-						entity.world.spawnEntity(entity1);
-
-						addEntity(entity, entity1);
-
-						return true;
+							return true;
+						}
 					}
 				}
-			}
 
-			return false;
-		}
+				return false;
+			}
 
 			private static boolean intarrayContains(World world, int[] intarray, int i) {
 				for (int j = 0; j < intarray.length; j++) {
 					Entity entity = world.getEntityByID(intarray[j]);
+
 					if (entity instanceof EC) {
 						EntityLivingBase target = ((EC)entity).getTarget();
+
 						if (target != null && target.getEntityId() == i) {
 							return true;
 						}
 					}
 				}
+
 				return false;
 			}
 
 			public static void removeEntity(EntityLivingBase user, int entityId) {
-				int[] oldintarray = user.getEntityData().getIntArray(ECENTITYID);
-				if (oldintarray.length > 1) {
-					int[] newintarray = new int[oldintarray.length - 1];
-					for (int i = 0, j = 0; j < oldintarray.length; j++) {
-						if (oldintarray[j] != entityId) {
-							newintarray[i++] = oldintarray[j];
-						}
-					}
-					user.getEntityData().setIntArray(ECENTITYID, newintarray);
-				} else {
-					user.getEntityData().removeTag(ECENTITYID);
+			int[] oldintarray = user.getEntityData().getIntArray(ECENTITYID);
+
+			if (oldintarray.length == 0) {
+				return;
+			}
+
+			int count = 0;
+
+			for (int i = 0; i < oldintarray.length; i++) {
+				if (oldintarray[i] != entityId) {
+					count++;
 				}
 			}
 
+			if (count == oldintarray.length) {
+				return;
+			}
+
+			if (count == 0) {
+				user.getEntityData().removeTag(ECENTITYID);
+				return;
+			}
+
+			int[] newintarray = new int[count];
+			int index = 0;
+
+			for (int i = 0; i < oldintarray.length; i++) {
+				if (oldintarray[i] != entityId) {
+					newintarray[index++] = oldintarray[i];
+				}
+			}
+
+			user.getEntityData().setIntArray(ECENTITYID, newintarray);
+		}
+
 			private String intarrayTargets2String(World world, int[] intarray) {
 				String s = "[";
+
 				for (int i = 0; i < intarray.length; i++) {
 					Entity entity = world.getEntityByID(intarray[i]);
+
 					if (entity instanceof EC) {
 						if (i > 0) {
 							s += ", ";
 						}
+
 						s += ((EC)entity).getTarget().getEntityId();
 					}
 				}
+
 				return s + "]";
 			}
 
 			@Override
 			public boolean isActivated(EntityLivingBase entity) {
-				int[] intarray = entity.getEntityData().getIntArray(ECENTITYID);
+				int[] intarray =
+					entity.getEntityData().getIntArray(ECENTITYID);
 
 				if (intarray.length == 0) {
 					return false;
@@ -588,7 +853,8 @@ public void setDead() {
 				boolean active = false;
 
 				for (int i = 0; i < intarray.length; i++) {
-					Entity entity1 = entity.world.getEntityByID(intarray[i]);
+					Entity entity1 =
+						entity.world.getEntityByID(intarray[i]);
 
 					if (entity1 instanceof EC && !entity1.isDead) {
 						active = true;
@@ -605,87 +871,86 @@ public void setDead() {
 		}
 
 		public static class PlayerHook {
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onLivingDamage(LivingDamageEvent event) {
-		EntityLivingBase victim = event.getEntityLiving();
+			@SubscribeEvent(priority = EventPriority.HIGHEST)
+			public void onLivingDamage(LivingDamageEvent event) {
+				EntityLivingBase victim = event.getEntityLiving();
 
-		if (victim == null || victim.world.isRemote) {
-			return;
-		}
-		if (victim.getHealth() <= event.getAmount()) {
-			releaseShadowImitation(victim);
-		}
-	}
+				if (victim == null || victim.world.isRemote) {
+					return;
+				}
 
-	/**
-	 * Fallback for deaths which do not pass through a normal
-	 * lethal LivingDamageEvent.
-	 */
-	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onLivingDeath(LivingDeathEvent event) {
-		EntityLivingBase victim = event.getEntityLiving();
-
-		if (victim == null || victim.world.isRemote) {
-			return;
-		}
-
-		releaseShadowImitation(victim);
-	}
-
-	private void releaseShadowImitation(EntityLivingBase victim) {
-		int[] intarray =
-			victim.getEntityData().getIntArray(Jutsu.ECENTITYID);
-		java.util.List<EC> shadows =
-			victim.world.getEntitiesWithinAABB(
-				EC.class,
-				victim.getEntityBoundingBox().grow(64.0D)
-			);
-
-		for (EC shadow : shadows) {
-			if (shadow != null
-					&& !shadow.isDead
-					&& !shadow.isAOE()
-					&& shadow.getTarget() == victim) {
-				shadow.setDead();
-			}
-		}
-		if (intarray.length > 0) {
-			for (int i = 0; i < intarray.length; i++) {
-				Entity entity =
-					victim.world.getEntityByID(intarray[i]);
-
-				if (entity instanceof EC && !entity.isDead) {
-					((EC) entity).setDead();
+				if (victim.getHealth() <= event.getAmount()) {
+					releaseShadowImitation(victim);
 				}
 			}
 
-			victim.getEntityData().removeTag(Jutsu.ECENTITYID);
-		}
-	}
+			@SubscribeEvent(priority = EventPriority.HIGHEST)
+			public void onLivingDeath(LivingDeathEvent event) {
+				EntityLivingBase victim = event.getEntityLiving();
 
-	@SubscribeEvent
-	public void onChangeDimension(EntityTravelToDimensionEvent event) {
-		Entity entity = event.getEntity();
+				if (victim == null || victim.world.isRemote) {
+					return;
+				}
 
-		if (entity instanceof EntityLivingBase) {
-			int[] intarray =
-				entity.getEntityData().getIntArray(Jutsu.ECENTITYID);
+				releaseShadowImitation(victim);
+			}
 
-			if (intarray.length > 0) {
-				for (int i = 0; i < intarray.length; i++) {
-					Entity entity1 =
-						entity.world.getEntityByID(intarray[i]);
+			private void releaseShadowImitation(EntityLivingBase victim) {
+				int[] intarray =
+					victim.getEntityData().getIntArray(Jutsu.ECENTITYID);
 
-					if (entity1 instanceof EC) {
-						entity1.setDead();
+				java.util.List<EC> shadows =
+					victim.world.getEntitiesWithinAABB(
+						EC.class,
+						victim.getEntityBoundingBox().grow(64.0D)
+					);
+
+				for (EC shadow : shadows) {
+					if (shadow != null
+							&& !shadow.isDead
+							&& !shadow.isAOE()
+							&& shadow.getTarget() == victim) {
+						shadow.setDead();
 					}
 				}
 
-				entity.getEntityData().removeTag(Jutsu.ECENTITYID);
+				if (intarray.length > 0) {
+					for (int i = 0; i < intarray.length; i++) {
+						Entity entity =
+							victim.world.getEntityByID(intarray[i]);
+
+						if (entity instanceof EC && !entity.isDead) {
+							((EC) entity).setDead();
+						}
+					}
+
+					victim.getEntityData().removeTag(Jutsu.ECENTITYID);
+				}
+			}
+
+			@SubscribeEvent
+			public void onChangeDimension(EntityTravelToDimensionEvent event) {
+				Entity entity = event.getEntity();
+
+				if (entity instanceof EntityLivingBase) {
+					int[] intarray =
+						entity.getEntityData().getIntArray(Jutsu.ECENTITYID);
+
+					if (intarray.length > 0) {
+						for (int i = 0; i < intarray.length; i++) {
+							Entity entity1 =
+								entity.world.getEntityByID(intarray[i]);
+
+							if (entity1 instanceof EC) {
+								entity1.setDead();
+							}
+						}
+
+						entity.getEntityData().removeTag(Jutsu.ECENTITYID);
+					}
+				}
 			}
 		}
-	}
-}
 	}
 
 	@Override
@@ -702,493 +967,804 @@ public void setDead() {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public void register() {
-			RenderingRegistry.registerEntityRenderingHandler(EC.class, renderManager -> new RenderCustom(renderManager));
-		}
-
-		@SideOnly(Side.CLIENT)
-public class RenderCustom extends Render<EC> {
-	private final ResourceLocation texture =
-		new ResourceLocation("narutomod:textures/black.png");
-
-	public RenderCustom(RenderManager renderManagerIn) {
-		super(renderManagerIn);
-	}
-
-	@Override
-	public boolean shouldRender(EC entity, ICamera camera,
-			double camX, double camY, double camZ) {
-		return true;
-	}
-
-	@Override
-	public void doRender(EC entity, double x, double y, double z,
-			float entityYaw, float partialTicks) {
-
-		if (entity.isAOE()) {
-			renderAOEShadow(entity, partialTicks);
-		} else {
-			renderNormalShadow(entity, partialTicks);
+			RenderingRegistry.registerEntityRenderingHandler(
+				EC.class,
+				renderManager -> new RenderCustom(renderManager)
+			);
 		}
 	}
 
-	private void renderNormalShadow(EC entity, float partialTicks) {
-		EntityLivingBase user = entity.getUser();
-		EntityLivingBase target = entity.getTarget();
+	@SideOnly(Side.CLIENT)
+	public static class RenderCustom extends Render<EC> {
+		private final ResourceLocation texture =
+			new ResourceLocation("narutomod:textures/black.png");
 
-		if (user == null || target == null) {
-			return;
+		public RenderCustom(RenderManager renderManagerIn) {
+			super(renderManagerIn);
 		}
 
-		double d0 = user.lastTickPosX
-			+ (user.posX - user.lastTickPosX) * partialTicks;
+		@Override
+		public boolean shouldRender(
+				EC entity,
+				ICamera camera,
+				double camX,
+				double camY,
+				double camZ) {
+			return true;
+		}
 
-		double d1 = user.lastTickPosY
-			+ (user.posY - user.lastTickPosY) * partialTicks;
+		private void renderLine(Vec3d from, Vec3d to) {
+			Vec3d vec3d = to.subtract(from);
 
-		double d2 = user.lastTickPosZ
-			+ (user.posZ - user.lastTickPosZ) * partialTicks;
+			float yaw =
+				(float)(
+					MathHelper.atan2(vec3d.x, vec3d.z)
+					* (180d / Math.PI)
+				);
 
-		double d3 = target.lastTickPosX
-			+ (target.posX - target.lastTickPosX) * partialTicks;
+			float pitch =
+				(float)(
+					-MathHelper.atan2(
+						vec3d.y,
+						MathHelper.sqrt(
+							vec3d.x * vec3d.x
+							+ vec3d.z * vec3d.z
+						)
+					)
+					* (180d / Math.PI)
+				);
 
-		double d4 = target.lastTickPosY
-			+ (target.posY - target.lastTickPosY) * partialTicks;
+			GlStateManager.pushMatrix();
+			GlStateManager.disableTexture2D();
+			GlStateManager.glLineWidth(2.0f);
 
-		double d5 = target.lastTickPosZ
-			+ (target.posZ - target.lastTickPosZ) * partialTicks;
+			GlStateManager.translate(
+				from.x - this.renderManager.viewerPosX,
+				from.y - this.renderManager.viewerPosY,
+				from.z - this.renderManager.viewerPosZ
+			);
 
-		int i0 = MathHelper.floor(d0);
-		int i1 = MathHelper.floor(Math.min(d1, d4)) - 10;
-		int i2 = MathHelper.floor(d2);
+			GlStateManager.rotate(
+				yaw,
+				0.0F,
+				1.0F,
+				0.0F
+			);
 
-		int i3 = MathHelper.floor(d3);
-		int i4 = MathHelper.floor(Math.max(d1, d4)) + 1;
-		int i5 = MathHelper.floor(d5);
+			GlStateManager.rotate(
+				pitch,
+				1.0F,
+				0.0F,
+				0.0F
+			);
 
-		World world = this.renderManager.world;
+			GlStateManager.disableLighting();
 
-		this.renderManager.renderEngine.bindTexture(this.texture);
+			Tessellator tessellator =
+				Tessellator.getInstance();
 
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(
-			GlStateManager.SourceFactor.SRC_ALPHA,
-			GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
-		);
+			BufferBuilder bufferbuilder =
+				tessellator.getBuffer();
 
-		GlStateManager.depthMask(false);
+			bufferbuilder.begin(
+				1,
+				DefaultVertexFormats.POSITION_COLOR
+			);
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferbuilder = tessellator.getBuffer();
+			bufferbuilder.pos(
+				0.0D,
+				0.0D,
+				0.0D
+			).color(
+				0,
+				0,
+				0,
+				180
+			).endVertex();
 
-		bufferbuilder.begin(
-			7,
-			DefaultVertexFormats.POSITION_TEX_COLOR
-		);
+			bufferbuilder.pos(
+				0.0D,
+				0.0D,
+				vec3d.lengthVector()
+			).color(
+				0,
+				0,
+				0,
+				180
+			).endVertex();
 
-		for (BlockPos blockpos :
-			BlockPos.getAllInBoxMutable(
-				new BlockPos(i0, i1, i2),
-				new BlockPos(i3, i4, i5))) {
+			tessellator.draw();
 
-			IBlockState blockstate =
-				world.getBlockState(blockpos);
+			GlStateManager.enableLighting();
+			GlStateManager.enableTexture2D();
+			GlStateManager.popMatrix();
+		}
 
-			if (blockstate.getRenderType()
-					!= EnumBlockRenderType.INVISIBLE
-					&& blockstate.isFullCube()) {
+				private void renderStitch(EC entity, float partialTicks) {
+			EntityLivingBase target =
+				entity.getTarget();
 
-				AxisAlignedBB axisalignedbb =
-					blockstate.getBoundingBox(world, blockpos)
-						.offset(blockpos);
+			if (target == null) {
+				return;
+			}
 
-				if (blockpos.distanceSqToCenter(
-						d0, d1, d2)
+			double targetX =
+				target.lastTickPosX
+					+ (target.posX - target.lastTickPosX)
+						* partialTicks;
+
+			double targetY =
+				target.lastTickPosY
+					+ (target.posY - target.lastTickPosY)
+						* partialTicks;
+
+			double targetZ =
+				target.lastTickPosZ
+					+ (target.posZ - target.lastTickPosZ)
+						* partialTicks;
+
+			double width = target.width * 0.5d;
+			double height = target.height;
+
+			Vec3d[] targetPoints = new Vec3d[] {
+				new Vec3d(targetX - width, targetY + height * 0.75d, targetZ),
+				new Vec3d(targetX + width, targetY + height * 0.75d, targetZ),
+				new Vec3d(targetX, targetY + height * 0.9d, targetZ),
+				new Vec3d(targetX - width, targetY + height * 0.35d, targetZ),
+				new Vec3d(targetX + width, targetY + height * 0.35d, targetZ),
+				new Vec3d(targetX, targetY + height * 0.08d, targetZ)
+			};
+
+			Vec3d[] points =
+				entity.getStitchPoints(target);
+
+			for (int i = 0; i < points.length; i++) {
+				if (points[i] != null) {
+					this.renderLine(
+						targetPoints[i],
+						points[i].addVector(
+							0d,
+							0.02d,
+							0d
+						)
+					);
+				}
+			}
+		}
+
+		@Override
+		public void doRender(
+				EC entity,
+				double x,
+				double y,
+				double z,
+				float entityYaw,
+				float partialTicks) {
+
+			if (entity.isAOE()) {
+				renderAOEShadow(
+					entity,
+					partialTicks
+				);
+			} else if (entity.isStitch()) {
+				renderStitch(
+					entity,
+					partialTicks
+				);
+			} else {
+				renderNormalShadow(
+					entity,
+					partialTicks
+				);
+			}
+		}
+
+		private void renderNormalShadow(
+				EC entity,
+				float partialTicks) {
+
+			EntityLivingBase user =
+				entity.getUser();
+
+			EntityLivingBase target =
+				entity.getTarget();
+
+			if (user == null || target == null) {
+				return;
+			}
+
+			double d0 =
+				user.lastTickPosX
+				+ (user.posX - user.lastTickPosX)
+					* partialTicks;
+
+			double d1 =
+				user.lastTickPosY
+				+ (user.posY - user.lastTickPosY)
+					* partialTicks;
+
+			double d2 =
+				user.lastTickPosZ
+				+ (user.posZ - user.lastTickPosZ)
+					* partialTicks;
+
+			double d3 =
+				target.lastTickPosX
+				+ (target.posX - target.lastTickPosX)
+					* partialTicks;
+
+			double d4 =
+				target.lastTickPosY
+				+ (target.posY - target.lastTickPosY)
+					* partialTicks;
+
+			double d5 =
+				target.lastTickPosZ
+				+ (target.posZ - target.lastTickPosZ)
+					* partialTicks;
+
+			int i0 =
+				MathHelper.floor(d0);
+
+			int i1 =
+				MathHelper.floor(
+					Math.min(d1, d4)
+				) - 10;
+
+			int i2 =
+				MathHelper.floor(d2);
+
+			int i3 =
+				MathHelper.floor(d3);
+
+			int i4 =
+				MathHelper.floor(
+					Math.max(d1, d4)
+				) + 1;
+
+			int i5 =
+				MathHelper.floor(d5);
+
+			World world =
+				this.renderManager.world;
+
+			this.renderManager.renderEngine.bindTexture(
+				this.texture
+			);
+
+			GlStateManager.enableBlend();
+
+			GlStateManager.blendFunc(
+				GlStateManager.SourceFactor.SRC_ALPHA,
+				GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
+			);
+
+			GlStateManager.depthMask(false);
+
+			Tessellator tessellator =
+				Tessellator.getInstance();
+
+			BufferBuilder bufferbuilder =
+				tessellator.getBuffer();
+
+			bufferbuilder.begin(
+				7,
+				DefaultVertexFormats.POSITION_TEX_COLOR
+			);
+
+			for (BlockPos blockpos :
+				BlockPos.getAllInBoxMutable(
+					new BlockPos(i0, i1, i2),
+					new BlockPos(i3, i4, i5)
+				)) {
+
+				IBlockState blockstate =
+					world.getBlockState(blockpos);
+
+				if (blockstate.getRenderType()
+						!= EnumBlockRenderType.INVISIBLE
+						&& blockstate.isFullCube()) {
+
+					AxisAlignedBB axisalignedbb =
+						blockstate.getBoundingBox(
+							world,
+							blockpos
+						).offset(blockpos);
+
+					if (blockpos.distanceSqToCenter(
+							d0,
+							d1,
+							d2
+						)
 						< 0.25d
 							* entity.ticksExisted
 							* entity.ticksExisted
 
-					&& axisalignedbb
-						.expand(
-							0.0d,
-							(double)i4 - axisalignedbb.maxY,
-							0.0d
-						)
-						.calculateIntercept(
-							new Vec3d(d0, d1, d2),
-							new Vec3d(d3, d4, d5)
-						) != null) {
+						&& axisalignedbb
+							.expand(
+								0.0d,
+								(double)i4
+									- axisalignedbb.maxY,
+								0.0d
+							)
+							.calculateIntercept(
+								new Vec3d(d0, d1, d2),
+								new Vec3d(d3, d4, d5)
+							) != null) {
 
-					renderBlockShadow(
-						bufferbuilder,
-						axisalignedbb
-					);
+						renderBlockShadow(
+							bufferbuilder,
+							axisalignedbb
+						);
+					}
 				}
 			}
-		}
 
-		tessellator.draw();
+			tessellator.draw();
 
-		GlStateManager.color(
-			1.0F, 1.0F, 1.0F, 1.0F
-		);
-
-		GlStateManager.disableBlend();
-		GlStateManager.depthMask(true);
-	}
-
-	private void renderAOEShadow(EC entity, float partialTicks) {
-		EntityLivingBase user = entity.getUser();
-
-		if (user == null) {
-			return;
-		}
-
-		double userX =
-			user.lastTickPosX
-			+ (user.posX - user.lastTickPosX)
-			* partialTicks;
-
-		double userY =
-			user.lastTickPosY
-			+ (user.posY - user.lastTickPosY)
-			* partialTicks;
-
-		double userZ =
-			user.lastTickPosZ
-			+ (user.posZ - user.lastTickPosZ)
-			* partialTicks;
-
-		double radius =
-			Math.min(
-				(entity.ticksExisted + partialTicks) * 0.35D, 6.0D
+			GlStateManager.color(
+				1.0F,
+				1.0F,
+				1.0F,
+				1.0F
 			);
 
-		if (radius <= 0.0D) {
-			return;
+			GlStateManager.disableBlend();
+			GlStateManager.depthMask(true);
 		}
 
-		World world = this.renderManager.world;
+		private void renderAOEShadow(
+				EC entity,
+				float partialTicks) {
 
-		int minX = MathHelper.floor(userX - radius);
-		int maxX = MathHelper.floor(userX + radius);
+			EntityLivingBase user =
+				entity.getUser();
 
-		int minZ = MathHelper.floor(userZ - radius);
-		int maxZ = MathHelper.floor(userZ + radius);
+			if (user == null) {
+				return;
+			}
 
-		int centerY = MathHelper.floor(userY);
+			double userX =
+				user.lastTickPosX
+				+ (user.posX - user.lastTickPosX)
+					* partialTicks;
 
-		this.renderManager.renderEngine.bindTexture(this.texture);
+			double userY =
+				user.lastTickPosY
+				+ (user.posY - user.lastTickPosY)
+					* partialTicks;
 
-		GlStateManager.enableBlend();
+			double userZ =
+				user.lastTickPosZ
+				+ (user.posZ - user.lastTickPosZ)
+					* partialTicks;
 
-		GlStateManager.blendFunc(
-			GlStateManager.SourceFactor.SRC_ALPHA,
-			GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
-		);
+			double radius =
+				Math.min(
+					(entity.ticksExisted + partialTicks)
+						* 0.35D,
+					6.0D
+				);
 
-		GlStateManager.depthMask(false);
+			if (radius <= 0.0D) {
+				return;
+			}
 
-		Tessellator tessellator = Tessellator.getInstance();
-		BufferBuilder bufferbuilder = tessellator.getBuffer();
+			World world =
+				this.renderManager.world;
 
-		bufferbuilder.begin(
-			7,
-			DefaultVertexFormats.POSITION_TEX_COLOR
-		);
+			int minX =
+				MathHelper.floor(
+					userX - radius
+				);
 
-		for (int blockX = minX;
-				blockX <= maxX;
-				blockX++) {
+			int maxX =
+				MathHelper.floor(
+					userX + radius
+				);
 
-			for (int blockZ = minZ;
-					blockZ <= maxZ;
-					blockZ++) {
+			int minZ =
+				MathHelper.floor(
+					userZ - radius
+				);
 
-				double dx =
-					(blockX + 0.5D) - userX;
+			int maxZ =
+				MathHelper.floor(
+					userZ + radius
+				);
 
-				double dz =
-					(blockZ + 0.5D) - userZ;
+			int centerY =
+				MathHelper.floor(userY);
 
-				if (dx * dx + dz * dz
-						> radius * radius) {
-					continue;
-				}
+			this.renderManager.renderEngine.bindTexture(
+				this.texture
+			);
 
-				for (int y = centerY + 3;
-						y >= centerY - 4;
-						y--) {
+			GlStateManager.enableBlend();
 
-					BlockPos blockPos =
-						new BlockPos(
-							blockX,
-							y,
-							blockZ
+			GlStateManager.blendFunc(
+				GlStateManager.SourceFactor.SRC_ALPHA,
+				GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA
+			);
+
+			GlStateManager.depthMask(false);
+
+			Tessellator tessellator =
+				Tessellator.getInstance();
+
+			BufferBuilder bufferbuilder =
+				tessellator.getBuffer();
+
+			bufferbuilder.begin(
+				7,
+				DefaultVertexFormats.POSITION_TEX_COLOR
+			);
+
+			for (int blockX = minX;
+					blockX <= maxX;
+					blockX++) {
+
+				for (int blockZ = minZ;
+						blockZ <= maxZ;
+						blockZ++) {
+
+					double dx =
+						(blockX + 0.5D) - userX;
+
+					double dz =
+						(blockZ + 0.5D) - userZ;
+
+					if (dx * dx + dz * dz
+							> radius * radius) {
+						continue;
+					}
+
+					for (int y = centerY + 3;
+							y >= centerY - 4;
+							y--) {
+
+						BlockPos blockPos =
+							new BlockPos(
+								blockX,
+								y,
+								blockZ
+							);
+
+						IBlockState blockstate =
+							world.getBlockState(
+								blockPos
+							);
+
+						if (blockstate.getRenderType()
+								== EnumBlockRenderType.INVISIBLE) {
+							continue;
+						}
+
+						if (!blockstate.isFullCube()) {
+							continue;
+						}
+
+						if (!world.isAirBlock(
+								blockPos.up())) {
+							continue;
+						}
+
+						AxisAlignedBB box =
+							blockstate
+								.getBoundingBox(
+									world,
+									blockPos
+								)
+								.offset(blockPos);
+
+						renderShadowTop(
+							bufferbuilder,
+							box
 						);
 
-					IBlockState blockstate =
-						world.getBlockState(blockPos);
-
-					if (blockstate.getRenderType()
-							== EnumBlockRenderType.INVISIBLE) {
-						continue;
+						break;
 					}
-
-					if (!blockstate.isFullCube()) {
-						continue;
-					}
-
-					if (!world.isAirBlock(
-							blockPos.up())) {
-						continue;
-					}
-
-					AxisAlignedBB box =
-						blockstate
-							.getBoundingBox(
-								world,
-								blockPos
-							)
-							.offset(blockPos);
-
-					renderShadowTop(
-						bufferbuilder,
-						box
-					);
-
-					break;
 				}
 			}
+
+			tessellator.draw();
+
+			GlStateManager.color(
+				1.0F,
+				1.0F,
+				1.0F,
+				1.0F
+			);
+
+			GlStateManager.disableBlend();
+			GlStateManager.depthMask(true);
 		}
 
-		tessellator.draw();
+		private void renderShadowTop(
+				BufferBuilder bufferbuilder,
+				AxisAlignedBB box) {
 
-		GlStateManager.color(
-			1.0F, 1.0F, 1.0F, 1.0F
-		);
+			double minX =
+				box.minX - this.renderManager.viewerPosX;
 
-		GlStateManager.disableBlend();
-		GlStateManager.depthMask(true);
-	}
+			double maxX =
+				box.maxX - this.renderManager.viewerPosX;
 
-	private void renderShadowTop(
-			BufferBuilder bufferbuilder,
-			AxisAlignedBB box) {
+			double minY =
+				box.maxY - this.renderManager.viewerPosY
+				+ 0.01D;
 
-		double minX =
-			box.minX - this.renderManager.viewerPosX;
+			double minZ =
+				box.minZ - this.renderManager.viewerPosZ;
 
-		double maxX =
-			box.maxX - this.renderManager.viewerPosX;
+			double maxZ =
+				box.maxZ - this.renderManager.viewerPosZ;
 
-		double minY =
-			box.maxY - this.renderManager.viewerPosY
-			+ 0.01D;
+			bufferbuilder.pos(
+					minX,
+					minY,
+					minZ
+				)
+				.tex(0.0D, 1.0D)
+				.color(
+					1.0F,
+					1.0F,
+					1.0F,
+					0.5F
+				)
+				.endVertex();
 
-		double minZ =
-			box.minZ - this.renderManager.viewerPosZ;
+			bufferbuilder.pos(
+					minX,
+					minY,
+					maxZ
+				)
+				.tex(0.0D, 0.0D)
+				.color(
+					1.0F,
+					1.0F,
+					1.0F,
+					0.5F
+				)
+				.endVertex();
 
-		double maxZ =
-			box.maxZ - this.renderManager.viewerPosZ;
+			bufferbuilder.pos(
+					maxX,
+					minY,
+					maxZ
+				)
+				.tex(1.0D, 0.0D)
+				.color(
+					1.0F,
+					1.0F,
+					1.0F,
+					0.5F
+				)
+				.endVertex();
 
-		bufferbuilder.pos(
-				minX, minY, minZ)
-			.tex(0.0D, 1.0D)
-			.color(
-				1.0F,
-				1.0F,
-				1.0F,
-				0.5F
-			)
-			.endVertex();
+			bufferbuilder.pos(
+					maxX,
+					minY,
+					minZ
+				)
+				.tex(1.0D, 1.0D)
+				.color(
+					1.0F,
+					1.0F,
+					1.0F,
+					0.5F
+				)
+				.endVertex();
+		}
 
-		bufferbuilder.pos(
-				minX, minY, maxZ)
-			.tex(0.0D, 0.0D)
-			.color(
-				1.0F,
-				1.0F,
-				1.0F,
-				0.5F
-			)
-			.endVertex();
+		private void renderBlockShadow(
+				BufferBuilder bufferbuilder,
+				AxisAlignedBB box) {
 
-		bufferbuilder.pos(
-				maxX, minY, maxZ)
-			.tex(1.0D, 0.0D)
-			.color(
-				1.0F,
-				1.0F,
-				1.0F,
-				0.5F
-			)
-			.endVertex();
+			double d6 =
+				box.minX - this.renderManager.viewerPosX;
 
-		bufferbuilder.pos(
-				maxX, minY, minZ)
-			.tex(1.0D, 1.0D)
-			.color(
-				1.0F,
-				1.0F,
-				1.0F,
-				0.5F
-			)
-			.endVertex();
-	}
+			double d7 =
+				box.maxX - this.renderManager.viewerPosX;
 
-	private void renderBlockShadow(
-			BufferBuilder bufferbuilder,
-			AxisAlignedBB box) {
+			double d8 =
+				box.minY - this.renderManager.viewerPosY;
 
-		double d6 =
-			box.minX - this.renderManager.viewerPosX;
+			double d9 =
+				box.maxY - this.renderManager.viewerPosY;
 
-		double d7 =
-			box.maxX - this.renderManager.viewerPosX;
+			double d10 =
+				box.minZ - this.renderManager.viewerPosZ;
 
-		double d8 =
-			box.minY - this.renderManager.viewerPosY;
+			double d11 =
+				box.maxZ - this.renderManager.viewerPosZ;
 
-		double d9 =
-			box.maxY - this.renderManager.viewerPosY;
+			float alpha = 0.5F;
 
-		double d10 =
-			box.minZ - this.renderManager.viewerPosZ;
+			bufferbuilder.pos(
+					d6,
+					d9 + 0.01D,
+					d10
+				)
+				.tex(0.0D, 1.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		double d11 =
-			box.maxZ - this.renderManager.viewerPosZ;
+			bufferbuilder.pos(
+					d6,
+					d9 + 0.01D,
+					d11
+				)
+				.tex(0.0D, 0.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		float alpha = 0.5F;
+			bufferbuilder.pos(
+					d7,
+					d9 + 0.01D,
+					d11
+				)
+				.tex(1.0D, 0.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d6, d9 + 0.01D, d10)
-			.tex(0.0D, 1.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d7,
+					d9 + 0.01D,
+					d10
+				)
+				.tex(1.0D, 1.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d6, d9 + 0.01D, d11)
-			.tex(0.0D, 0.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d7 + 0.01D,
+					d9,
+					d10
+				)
+				.tex(0.0D, 1.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d7, d9 + 0.01D, d11)
-			.tex(1.0D, 0.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d7 + 0.01D,
+					d9,
+					d11
+				)
+				.tex(0.0D, 0.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d7, d9 + 0.01D, d10)
-			.tex(1.0D, 1.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d7 + 0.01D,
+					d8,
+					d11
+				)
+				.tex(1.0D, 0.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
+			bufferbuilder.pos(
+					d7 + 0.01D,
+					d8,
+					d10
+				)
+				.tex(1.0D, 1.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d7 + 0.01D, d9, d10)
-			.tex(0.0D, 1.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d6 - 0.01D,
+					d8,
+					d10
+				)
+				.tex(0.0D, 1.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d7 + 0.01D, d9, d11)
-			.tex(0.0D, 0.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d6 - 0.01D,
+					d8,
+					d11
+				)
+				.tex(0.0D, 0.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d7 + 0.01D, d8, d11)
-			.tex(1.0D, 0.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d6 - 0.01D,
+					d9,
+					d11
+				)
+				.tex(1.0D, 0.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d7 + 0.01D, d8, d10)
-			.tex(1.0D, 1.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d6 - 0.01D,
+					d9,
+					d10
+				)
+				.tex(1.0D, 1.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d6 - 0.01D, d8, d10)
-			.tex(0.0D, 1.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d7,
+					d8,
+					d11 + 0.01D
+				)
+				.tex(0.0D, 1.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d6 - 0.01D, d8, d11)
-			.tex(0.0D, 0.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d7,
+					d9,
+					d11 + 0.01D
+				)
+				.tex(0.0D, 0.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d6 - 0.01D, d9, d11)
-			.tex(1.0D, 0.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d6,
+					d9,
+					d11 + 0.01D
+				)
+				.tex(1.0D, 0.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d6 - 0.01D, d9, d10)
-			.tex(1.0D, 1.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d6,
+					d8,
+					d11 + 0.01D
+				)
+				.tex(1.0D, 1.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d7, d8, d11 + 0.01D)
-			.tex(0.0D, 1.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d6,
+					d8,
+					d10 - 0.01D
+				)
+				.tex(0.0D, 1.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d7, d9, d11 + 0.01D)
-			.tex(0.0D, 0.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d6,
+					d9,
+					d10 - 0.01D
+				)
+				.tex(0.0D, 0.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d6, d9, d11 + 0.01D)
-			.tex(1.0D, 0.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d7,
+					d9,
+					d10 - 0.01D
+				)
+				.tex(1.0D, 0.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
 
-		bufferbuilder.pos(
-				d6, d8, d11 + 0.01D)
-			.tex(1.0D, 1.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
+			bufferbuilder.pos(
+					d7,
+					d8,
+					d10 - 0.01D
+				)
+				.tex(1.0D, 1.0D)
+				.color(1F, 1F, 1F, alpha)
+				.endVertex();
+		}
 
-		bufferbuilder.pos(
-				d6, d8, d10 - 0.01D)
-			.tex(0.0D, 1.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
-
-		bufferbuilder.pos(
-				d6, d9, d10 - 0.01D)
-			.tex(0.0D, 0.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
-
-		bufferbuilder.pos(
-				d7, d9, d10 - 0.01D)
-			.tex(1.0D, 0.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
-
-		bufferbuilder.pos(
-				d7, d8, d10 - 0.01D)
-			.tex(1.0D, 1.0D)
-			.color(1F, 1F, 1F, alpha)
-			.endVertex();
-	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(EC entity) {
-		return this.texture;
-	}
-}
-	
-		
-		
+		@Override
+		protected ResourceLocation getEntityTexture(EC entity) {
+			return this.texture;
+		}
 	}
 }

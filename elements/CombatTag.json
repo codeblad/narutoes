@@ -1,0 +1,22 @@
+{
+  "_fv": 18,
+  "_type": "potion",
+  "definition": {
+    "name": "Combat Tag",
+    "effectName": "Combat Tag",
+    "icon": "combat_tag.png",
+    "color": {
+      "value": -16124788,
+      "falpha": 0.0
+    },
+    "isInstant": false,
+    "isBad": false,
+    "isBenefitical": true,
+    "registerPotionType": false,
+    "renderStatusInInventory": true,
+    "renderStatusInHUD": true,
+    "onActiveTick": {
+      "name": "CombatTagOnPotionActiveTick"
+    }
+  }
+}

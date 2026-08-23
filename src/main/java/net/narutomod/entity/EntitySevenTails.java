@@ -264,11 +264,11 @@ public class EntitySevenTails extends ElementsNarutomodMod.ModElement {
 						if (this.getSummoningPlayer() == null || !player.equals(this.getSummoningPlayer())) {
 							ProcedureRenderView.sendToPlayer(player, 100, 100, 1.0f, 1.0f, 1.0f, 1.0f);
 							player.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 5));
-							player.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 5));
+							player.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 0));
 						}
 					} else if (entity instanceof EntityLiving) {
 						entity.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 100, 5));
-						entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 5));
+						entity.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 100, 0));
 					}
 				}
 			}

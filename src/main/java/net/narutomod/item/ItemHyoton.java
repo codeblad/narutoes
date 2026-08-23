@@ -132,10 +132,9 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 				living.extinguish();
 				//if (!pos.equals(edh.prevBlockPos)) {
 				//	edh.prevBlockPos = pos;
-				EntityLivingBase entity2 = (EntityLivingBase) entity;
-				if (!pos.equals(this.getLastTickPos(entity))
-						&& (entity2.getHeldItemMainhand().equals(itemstack) || entity2.getHeldItemOffhand().equals(itemstack))
-				) {
+				
+				ItemStack stacksenbon = ProcedureUtils.getMatchingItemStack((EntityPlayer) entity, ItemIceSenbon.block);
+				if (stacksenbon != null && (living.getHeldItemMainhand().equals(itemstack) || living.getHeldItemOffhand().equals(itemstack)) &&  !pos.equals(this.getLastTickPos(living)) ) {
 					this.setlastTickPos(entity, pos);
 					EnchantmentFrostWalker.freezeNearby(living, world, pos, 1);
 				}

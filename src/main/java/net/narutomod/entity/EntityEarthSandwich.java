@@ -32,11 +32,13 @@ import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.init.Blocks;
 import net.minecraft.block.Block;
 
 import net.narutomod.item.ItemSuiton;
+import net.narutomod.potion.PotionCombatTag;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemDoton;
 import net.narutomod.item.ItemJutsu;
@@ -162,6 +164,10 @@ public class EntityEarthSandwich extends ElementsNarutomodMod.ModElement {
 									damage*=1.35f;
 								}
 								entity.attackEntityFrom(DamageSource.IN_WALL, damage);
+								// come back
+								if (entity instanceof EntityPlayer) {
+									((EntityLivingBase) entity).addPotionEffect(new PotionEffect(PotionCombatTag.potion, 1200, 0, true, false));
+								}
 							}
 						} else if (!entity.isEntityAlive() || !entity.getEntityBoundingBox().intersects(this.getEntityBoundingBox())) {
 							iter.remove();

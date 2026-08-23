@@ -133,6 +133,8 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 					entity.getEntityData().setBoolean("kgReceived",true);
 					ItemStack scroll = new ItemStack(ItemScrollKikaichuSphere.block,1);
 					ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entity,scroll);
+					ItemStack scroll2 = new ItemStack(ItemScrollKikaichuFlight.block,1);
+					ItemHandlerHelper.giveItemToPlayer((EntityPlayer) entity,scroll2);
 				} else if (entity.getEntityData().getInteger("KekkeiGenkai") == 19) {
 					entity.getEntityData().setBoolean("kgReceived",true);
 					ItemStack stack2 = new ItemStack(ItemSummoningContract.block,1);

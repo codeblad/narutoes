@@ -119,20 +119,38 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 	
 		@Override
 		public void setDead() {
-			super.setDead();
 			if (!this.world.isRemote) {
 				EntityLivingBase user = this.getSummoner();
+
 				if (user != null) {
 					user.getEntityData().removeTag(ENTITYID_KEY);
-				}
-				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:paperflip")), 0.6f, 0.8f);
-				ItemStack stack = ProcedureUtils.getMatchingItemStack(this.getSummoner(), ItemNinjutsu.block);
-				if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
-					ItemJutsu.Base item = (ItemJutsu.Base)stack.getItem();
-					//(30*20)+this.ticksExisted+this.ticksExisted/2
-					item.setJutsuCooldown(stack, SHIKIGAMI, 20 * 30);
+
+					if (user instanceof EntityPlayer) {
+						ItemStack stack = ProcedureUtils.getMatchingItemStack(
+							user,
+							ItemNinjutsu.block
+						);
+
+						if (stack != null && stack.getItem() instanceof ItemJutsu.Base) {
+							((ItemJutsu.Base) stack.getItem()).setJutsuCooldown(
+								stack,
+								SHIKIGAMI,
+								20 * 30
+							);
+						}
+					}
+
+					this.playSound(
+						SoundEvent.REGISTRY.getObject(
+							new ResourceLocation("narutomod:paperflip")
+						),
+						0.6f,
+						0.8f
+					);
 				}
 			}
+
+			super.setDead();
 		}
 
 		public static class PaperBarrage extends Entity  {

@@ -14,7 +14,7 @@ import net.minecraft.client.Minecraft;
 public class NarutomodModVariables {
 	public static double world_tick = 0;
 	public static double DeathAnimation_slowDust = 200;
-	public static int SAGEEXP = 7500;
+	public static int SAGEEXP = 5000;
 	public static String BATTLEXP = "battle_experience";
 	public static String RINNESHARINGAN_ACTIVATED = "RinneSharinganActivated";
 	public static String InvulnerableTime = "invulnerableTime";

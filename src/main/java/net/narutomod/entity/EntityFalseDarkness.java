@@ -18,9 +18,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Vec3d;
 import net.narutomod.item.ItemRaiton;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.item.ItemJutsu;
 import net.narutomod.ElementsNarutomodMod;
@@ -137,6 +139,8 @@ public class EntityFalseDarkness extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power));
+				int buildtime = (int) (20 * (1 + 1 * (power / 25f)));
+				entity.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, buildtime, 1, false, false));
 				ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 10);
 				return true;
 			}

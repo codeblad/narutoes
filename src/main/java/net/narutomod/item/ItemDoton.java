@@ -39,8 +39,10 @@ import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.block.Block;
 
 import net.narutomod.NarutomodModVariables;
+import net.narutomod.block.BlockMud;
 import net.narutomod.entity.EntityEarthSpears;
 import net.narutomod.entity.EntitySwampPit;
+import net.narutomod.potion.PotionCombatTag;
 import net.narutomod.entity.EntityEarthSandwich;
 import net.narutomod.entity.EntityEarthGolem;
 import net.narutomod.creativetab.TabModTab;
@@ -165,6 +167,16 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 			 || isEarthenMaterial(this.world.getBlockState(pos.up()).getMaterial());
 		}
 
+		private boolean isUserInMud() {
+			BlockPos pos = new BlockPos(this.user);
+			for (BlockPos checkPos : BlockPos.getAllInBox(pos.add(-1, -1, -1), pos.add(1, 1, 1))) {
+				if (this.world.getBlockState(checkPos).getBlock() == BlockMud.block) {
+					return true;
+				}
+			}
+			return false;
+		}
+
 		private boolean isUserIntangible() {
 			return this.user != null && ProcedureOnLivingUpdate.isNoClip(this.user);
 		}
@@ -189,8 +201,10 @@ public class ItemDoton extends ElementsNarutomodMod.ModElement {
 				this.setPosition(this.user.posX, this.user.posY, this.user.posZ);
 				boolean flag = this.ticksExisted % 10 != 0;
 				boolean flag1 = this.user instanceof EntityPlayer && (flag 
-				 || Chakra.pathway((EntityPlayer)this.user).getAmount() >= HIDINGINROCK.chakraUsage);
-				if (this.ticksExisted > this.waitTime && !this.isUserInEarth() || !flag1) {
+				|| Chakra.pathway((EntityPlayer)this.user).getAmount() >= HIDINGINROCK.chakraUsage);
+				boolean combatTagged = this.user.getActivePotionEffect(PotionCombatTag.potion) != null;
+				boolean inMud = this.isUserInMud();
+				if (this.ticksExisted > this.waitTime && !this.isUserInEarth() || !flag1 || combatTagged && !inMud) {
 					this.setDead();
 				} else {
 					this.setUserIntangible(true);
