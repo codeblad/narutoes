@@ -82,8 +82,7 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 		helmet = ((entity instanceof EntityPlayer) ? ((EntityPlayer) entity).inventory.armorInventory.get(3) : ItemStack.EMPTY);
 		
 
-		if ((((helmet).getItem() == new ItemStack(ItemRinnegan.helmet, (int) (1)).getItem())
-				|| ((helmet).getItem() == new ItemStack(ItemTenseigan.helmet, (int) (1)).getItem()))) {
+		if ((((helmet).getItem() == new ItemStack(ItemRinnegan.helmet, (int) (1)).getItem()))) {
 			{
 				NBTTagCompound nbt = new NBTTagCompound();
 				entity.writeToNBT(nbt);

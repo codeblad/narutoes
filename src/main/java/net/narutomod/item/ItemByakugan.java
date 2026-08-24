@@ -383,7 +383,9 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:bullet_impact")),
 							1f, 0.6f+this.rand.nextFloat()*1.2f);
-
+					if (!this.world.isRemote) {
+						this.target.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+					}
 					Chakra.Pathway cp = Chakra.pathway(this.target);
 					cp.consume(0.2f/64);
 					if (cp.getAmount() > cp.getMax()) {
@@ -394,7 +396,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					Vec3d look = this.user.getLookVec();
 					ProcedureUtils.setVelocity(this.target, look.x*3, look.y*3+1, look.z*3);
 					if (!this.world.isRemote) {
-						this.user.addPotionEffect(new PotionEffect(PotionChakraBlocked.potion, 8*20, 0, false, false));
+						this.target.addPotionEffect(new PotionEffect(PotionChakraBlocked.potion, 8*20, 0, false, false));
 						this.target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20*5, 3, false, false));
 						this.target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 20 * 5, 4, false, false));
 					}

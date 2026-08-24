@@ -965,7 +965,9 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 							1,0,0,0, 0, 0,
 							0, 0x10FFFFFF, 0, 0);
 				}
-				this.target.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 20, 1, false, false));
+				if (!this.world.isRemote) {
+					this.target.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 20, 1, false, false));
+				}
 			}
 
 

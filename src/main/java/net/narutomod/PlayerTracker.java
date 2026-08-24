@@ -316,7 +316,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				}
 				if (headstack.getItem() == ItemByakugan.helmet) {
 					if (PlayerTracker.getBattleXp((EntityPlayer) targetEntity) >= NarutomodModVariables.SAGEEXP) {
-						defMult += .35;
+						defMult += .35f;
 					} else {
 						defMult += .2f;
 					}
@@ -325,7 +325,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult += .35f;
 				}
 				if (headstack.getItem() == ItemRinnegan.helmet ||headstack.getItem() == ItemTenseigan.helmet  ) {
-					defMult += .35f;
+					defMult += .45f;
 				}
 				if (cheststack.getItem() == ItemAsuraPathArmor.body) {
 					defMult += 0.15f;
@@ -339,7 +339,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				if (cheststack.getItem() == ItemTenseigan.body) {
-					defMult += .5f;
+					defMult += .55f;
 				}
 				// ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
 				// if (stackwood != null) {
@@ -352,13 +352,24 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult+= 0.15f;
 				}
 
-				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
-					defMult+=.25f;
+				if (PlayerTracker.getBattleXp((EntityPlayer) targetEntity) >= NarutomodModVariables.SAGEEXP) {
+					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
+						defMult+=.25f;
+					}
+
+					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
+						defMult+=.45f;
+					}
+				} else {
+					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
+						defMult+=.1f;
+					}
+
+					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
+						defMult+=.2f;
+					}
 				}
 
-				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
-					defMult+=.45f;
-				}
 
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
