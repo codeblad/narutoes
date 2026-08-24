@@ -352,13 +352,24 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					defMult+= 0.15f;
 				}
 
-				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
-					defMult+=.25f;
+				if (PlayerTracker.getBattleXp((EntityPlayer) targetEntity) >= NarutomodModVariables.SAGEEXP) {
+					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
+						defMult+=.25f;
+					}
+
+					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
+						defMult+=.45f;
+					}
+				} else {
+					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 1) {
+						defMult+=.1f;
+					}
+
+					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
+						defMult+=.2f;
+					}
 				}
 
-				if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) == 2) {
-					defMult+=.45f;
-				}
 
 				if (ItemSenjutsu.isSageModeActivated((EntityPlayer) targetEntity)) {
 					if (EntityBijuManager.cloakLevel((EntityPlayer) targetEntity) > 0) {
