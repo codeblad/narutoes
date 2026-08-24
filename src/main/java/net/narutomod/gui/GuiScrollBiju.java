@@ -62,18 +62,18 @@ public class GuiScrollBiju extends ElementsNarutomodMod.ModElement {
 			if (!bm.isSealed() && !bm.isAddedToWorld()) {
 				Entity beast = bm.spawnEntity(player.world,player.posX,player.posY+20,player.posZ,0);
 				beast.setPosition(player.posX,player.posY+20,player.posZ);
-				String pos = (int) player.posX+", "+(int) player.posY+", "+(int) player.posZ;
-				ProcedureUtils.sendChatAll(I18n.translateToLocalFormatted("chattext.tailedbeast.arrival", tail, pos));
+				//String pos = (int) player.posX+", "+(int) player.posY+", "+(int) player.posZ;
+				//ProcedureUtils.sendChatAll(I18n.translateToLocalFormatted("chattext.tailedbeast.arrival", tail, pos));
 				super.handleButtonAction(player, buttonID);
 			} else {
 				if (bm.isAddedToWorld()) {
 					Entity beast = bm.getEntity();
 					BlockPos pos = bm.getPosition();
 					String abc = pos.getX()+" "+pos.getY()+" "+pos.getZ();
-					player.sendStatusMessage(new TextComponentString("The biju is already at "+abc), true);
+					player.sendStatusMessage(new TextComponentString("The Bijuu is already present at "+abc), true);
 				}
 				if (bm.isSealed()) {
-					player.sendStatusMessage(new TextComponentString("The biju is already at sealed"), true);
+					player.sendStatusMessage(new TextComponentString("The Bijuu is already sealed."), true);
 				}
 			}
 

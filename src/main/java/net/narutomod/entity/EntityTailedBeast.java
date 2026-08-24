@@ -144,6 +144,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		//public static final int BIJUDAMA_CD = 100;
 		private final double targetRange = 112.0D;
 		private final double bijudamaMinRange = 64.0D;
+		private static final int FUUIN_IMMUNITY_TIME = 20 * 60 * 25; // 25 minutes
 		private int deathTicks;
 		private int deathTotalTicks;
 		private EntityPlayer summoningPlayer;
@@ -155,6 +156,12 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		protected final ProcedureUtils.CollisionHelper collisionData;
 		public Entity mouthShootingJutsu;
 		private int meleeTime;
+		private int fuuinImmunityTicks;
+		private double fuuinLockX;
+		private double fuuinLockY;
+		private double fuuinLockZ;
+		private float fuuinLockYaw;
+		private float fuuinLockPitch;
 
 		public Base(World world) {
 			super(world);
@@ -278,6 +285,78 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		@Override
 		public IAttributeInstance getEntityAttribute(IAttribute attribute) {
 			return super.getEntityAttribute(attribute == SharedMonsterAttributes.MAX_HEALTH ? ProcedureUtils.MAXHEALTH : attribute);
+		}
+
+		private void startFuuinLock() {
+			if (this.world.isRemote) {
+				return;
+			}
+
+			this.fuuinImmunityTicks = FUUIN_IMMUNITY_TIME;
+
+			this.fuuinLockX = this.posX;
+			this.fuuinLockY = this.posY;
+			this.fuuinLockZ = this.posZ;
+			this.fuuinLockYaw = this.rotationYaw;
+			this.fuuinLockPitch = this.rotationPitch;
+
+			this.motionX = 0.0D;
+			this.motionY = 0.0D;
+			this.motionZ = 0.0D;
+
+			this.getNavigator().clearPath();
+			this.getMoveHelper().setMoveTo(this.posX, this.posY, this.posZ, 0.0D);
+
+			ProcedureUtils.sendChatAll(
+				new TextComponentString(
+					this.getName()
+					+ " is being sealed at "
+					+ MathHelper.floor(this.posX) + ", "
+					+ MathHelper.floor(this.posY) + ", "
+					+ MathHelper.floor(this.posZ)
+				).getFormattedText()
+			);
+			// String pos = (int) player.posX+", "+(int) player.posY+", "+(int) player.posZ;
+			// ProcedureUtils.sendChatAll(I18n.translateToLocalFormatted("chattext.tailedbeast.arrival", tail, pos));
+			//chat msg
+		}
+
+
+		private boolean isFuuinLocked() {
+			return this.fuuinImmunityTicks > 0;
+		}
+
+		private void updateFuuinLock() {
+			if (!this.isFuuinLocked()) {
+				return;
+			}
+
+			--this.fuuinImmunityTicks;
+
+			this.setPositionAndUpdate(
+				this.fuuinLockX,
+				this.fuuinLockY,
+				this.fuuinLockZ
+			);
+
+			this.motionX = 0.0D;
+			this.motionY = 0.0D;
+			this.motionZ = 0.0D;
+
+			this.rotationYaw = this.fuuinLockYaw;
+			this.prevRotationYaw = this.fuuinLockYaw;
+			this.rotationPitch = this.fuuinLockPitch;
+			this.prevRotationPitch = this.fuuinLockPitch;
+			this.rotationYawHead = this.fuuinLockYaw;
+			this.renderYawOffset = this.fuuinLockYaw;
+
+			this.getNavigator().clearPath();
+			this.getMoveHelper().setMoveTo(
+				this.fuuinLockX,
+				this.fuuinLockY,
+				this.fuuinLockZ,
+				0.0D
+			);
 		}
 
 		public double getBijudamaMinRange() {
@@ -559,6 +638,10 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public boolean attackEntityFrom(DamageSource source, float amount) {
+			if (this.isFuuinLocked()) {
+				return false;
+			}
+
 			if (this.getHealth() <= 0.0f)
 				return false;
 			if (source.getTrueSource() instanceof EntityPlayer && source.getTrueSource().equals(this.getControllingPassenger()))
@@ -706,8 +789,12 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		public void fuuinIntoVessel(Entity vessel, int fuuinTime) {
 			if (this.canBeSealed() && this.getHealth() < this.getMaxHealth() * 0.1f
 			 && (!(vessel instanceof EntityPlayer) || !EntityBijuManager.isJinchuriki((EntityPlayer)vessel))) {
+				// if (!vessel.equals(this.getTargetVessel())) {
+				// 	this.deathTicks = 0;
+				// }
 				if (!vessel.equals(this.getTargetVessel())) {
 					this.deathTicks = 0;
+					this.startFuuinLock();
 				}
 				this.setTargetVessel(vessel);
 				this.setHealth(0.0F);
@@ -729,6 +816,10 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			this.setTargetVessel(null);
 			this.deathTicks = 0;
 			this.deathTotalTicks = 200;
+
+			this.motionX = 0.0D;
+			this.motionY = 0.0D;
+			this.motionZ = 0.0D;
 		}
 
 		@Override
@@ -805,6 +896,10 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				this.getControllingPassenger().setSneaking(false);
 			}
 			super.onEntityUpdate();
+			if (this.isFuuinLocked()) {
+				this.updateFuuinLock();
+			}
+
 			if (this.deathTicks > 0) {
 				return;
 			}
@@ -824,7 +919,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				if (this.isAIDisabled() && jinchuriki != null && jinchuriki.getHealth() <= 0.0F) {
 					this.setNoAI(false);
 				}
-				if (this.ticksExisted % 40 == 0 && hp > 0.0f && hp < maxhp) {
+				if (!this.isFuuinLocked() && (this.ticksExisted % 40 == 0 && hp > 0.0f && hp < maxhp)) {
 					this.setHealth(hp + 0.01f * Math.max(hp, maxhp * 0.1f));
 				}
 				if (this.angerLevel > 0 && this.ticksExisted - this.getRevengeTimer() > 6000) {
@@ -920,13 +1015,32 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		@Override
 		public void readEntityFromNBT(NBTTagCompound compound) {
 			super.readEntityFromNBT(compound);
+
 			this.setAge(compound.getInteger("age"));
+
+			this.fuuinImmunityTicks = compound.getInteger("fuuinImmunityTicks");
+
+			if (compound.hasKey("fuuinLockX")) {
+				this.fuuinLockX = compound.getDouble("fuuinLockX");
+				this.fuuinLockY = compound.getDouble("fuuinLockY");
+				this.fuuinLockZ = compound.getDouble("fuuinLockZ");
+				this.fuuinLockYaw = compound.getFloat("fuuinLockYaw");
+				this.fuuinLockPitch = compound.getFloat("fuuinLockPitch");
+			}
 		}
 
 		@Override
 		public void writeEntityToNBT(NBTTagCompound compound) {
 			super.writeEntityToNBT(compound);
+
 			compound.setInteger("age", this.getAge());
+
+			compound.setInteger("fuuinImmunityTicks", this.fuuinImmunityTicks);
+			compound.setDouble("fuuinLockX", this.fuuinLockX);
+			compound.setDouble("fuuinLockY", this.fuuinLockY);
+			compound.setDouble("fuuinLockZ", this.fuuinLockZ);
+			compound.setFloat("fuuinLockYaw", this.fuuinLockYaw);
+			compound.setFloat("fuuinLockPitch", this.fuuinLockPitch);
 		}
 
 		@Override

@@ -247,7 +247,7 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 				this.stitchLockY = target.posY;
 				this.stitchLockZ = target.posZ;
 
-				possession.lifetimeReduction -= 40;
+				possession.lifetimeReduction -= 60;
 
 				if (!Chakra.pathway(user).consume(1000d)) {
 					this.setDead();
@@ -332,13 +332,17 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 					blockBox
 				);
 
-			for (EntityLivingBase target : entities) {
+		    for (EntityLivingBase target : entities) {
 
 				if (target == user) {
 					continue;
 				}
 
 				if (!target.isEntityAlive()) {
+					continue;
+				}
+
+				if (Jutsu.isOnReleaseCooldown(target)) {
 					continue;
 				}
 
@@ -490,7 +494,11 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 					this.userInput = new PlayerInput.Hook();
 				}
 
-				if (user != null) {
+			   if (user != null) {
+					if (!this.isAOE() && !this.isStitch() && target != null) {
+						Jutsu.startReleaseCooldown(target);
+					}
+
 					Jutsu.removeEntity(user, this.getEntityId());
 				}
 			}
@@ -563,6 +571,9 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 
 							if (this.shadowStrangle()) {
 								this.strangleCooldown = 20;
+								if (this.stitchCooldown <= 0) {
+									this.stitchCooldown = 20;
+								}
 							}
 						}
 
@@ -571,7 +582,9 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 								&& this.stitchCooldown <= 0) {
 
 							if (this.shadowStitch()) {
+								this.strangleCooldown = 80;
 								this.stitchCooldown = 300;
+									
 							}
 						}
 
@@ -598,9 +611,9 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 				return false;
 			}
 
-			if (isStitched(target)) {
-				return false;
-			}
+			// if (isStitched(target)) {
+			// 	return false;
+			// }
 
 			this.world.playSound(
 				null,
@@ -688,6 +701,20 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			private static final String ECENTITYID = "ShadowImitationEntityIdKey";
+			private static final String RELEASE_COOLDOWN = "ShadowImitationReleaseCooldown";
+			private static final int RELEASE_COOLDOWN_TICKS = 100;
+
+			private static void startReleaseCooldown(EntityLivingBase target) {
+				target.getEntityData().setLong(
+					RELEASE_COOLDOWN,
+					target.world.getTotalWorldTime() + RELEASE_COOLDOWN_TICKS
+				);
+			}
+
+			private static boolean isOnReleaseCooldown(EntityLivingBase target) {
+				return target.getEntityData().getLong(RELEASE_COOLDOWN)
+					> target.world.getTotalWorldTime();
+			}
 
 			private static void addEntity(EntityLivingBase user, EC entity) {
 				int[] oldintarray = user.getEntityData().getIntArray(ECENTITYID);
@@ -746,7 +773,12 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 
 				if (res != null && res.entityHit instanceof EntityLivingBase) {
 
-					if (res.entityHit.onGround && entity.onGround) {
+				EntityLivingBase target = (EntityLivingBase) res.entityHit;
+
+				if (target != entity
+						&& !isOnReleaseCooldown(target)
+						&& target.onGround
+						&& entity.onGround) {
 
 						if (!intarrayContains(
 								entity.world,
@@ -1016,7 +1048,7 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 
 			GlStateManager.pushMatrix();
 			GlStateManager.disableTexture2D();
-			GlStateManager.glLineWidth(2.0f);
+			GlStateManager.glLineWidth(2.5f);
 
 			GlStateManager.translate(
 				from.x - this.renderManager.viewerPosX,
