@@ -82,7 +82,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 	@Override
 	public void initElements() {
 		ItemArmor.ArmorMaterial enuma = EnumHelper.addArmorMaterial("BIJU_CLOAK", "narutomod:sasuke_",
-		 1024, new int[]{4, 8, 6, 3}, 0, null, 2.0f);
+		 1024, new int[]{6, 8, 8, 6}, 0, null, 2.0f);
 
 		elements.items.add(() -> new ItemArmor(enuma, 0, EntityEquipmentSlot.HEAD) {
 			@Override
@@ -345,7 +345,7 @@ public class ItemBijuCloak extends ElementsNarutomodMod.ModElement {
 			}
 			if (!entity.isPotionActive(MobEffects.STRENGTH)) {
 				entity.addPotionEffect(new PotionEffect(PotionChakraEnhancedStrength.potion, 22, d, false, false));
-				entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, level * 4, false, false));
+				entity.addPotionEffect(new PotionEffect(MobEffects.SPEED, 22, level * 5, false, false));
 				entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 22, 4, false, false));
 				entity.addPotionEffect(new PotionEffect(PotionReach.potion, 22, level - 1, false, false));
 			}
