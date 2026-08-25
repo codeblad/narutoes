@@ -207,7 +207,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 		private Vec3d start;
 		List<String> targets = new ArrayList<String>();
 		private final int startup = 15;
-		private final int duration = 15;
+		private final int duration = 30;
 
 		public ScorchWave(World worldIn) {
 			super(worldIn);
@@ -305,7 +305,7 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 									continue;
 								}
 								this.targets.add(entity1.getUniqueID().toString());
-								float damage = 2+0.5f*ItemJutsu.getDmgMult(this.user)*(1+3*this.power/10);
+								float damage = 2+0.2f*ItemJutsu.getDmgMult(this.user)*(1+3*this.power/10);
 
 								entity1.hurtResistantTime = 10;
 								entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor().setDamageIsAbsolute(),damage);
@@ -594,24 +594,39 @@ public class ItemShakuton extends ElementsNarutomodMod.ModElement {
 			//private static final String ID_KEY = "JitonSandShieldEntityIdKey";
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				entity.world.spawnEntity(new ScorchWave(entity, power));
-				ItemJutsu.setCurrentJutsuCooldown(stack, 20*9);
-				return true;
+				if (power < 10f) {
+					return false;
+				}
+				float j = ((RangedItem)block).getTotalBalls(stack);
+				for (int i = 0; i < j; i++) {
+					EntityScorchBall entity1 = ((RangedItem)block).get1stBallAndPutLast(entity.world, stack);
+					if (entity1 != null) {
+						entity1.setDead();
+					}
+				}
+				j = j/12*10;
+				((RangedItem)block).clearBalls(stack);
+				if (j > 0) {
+					entity.world.spawnEntity(new ScorchWave(entity, j));
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*9);
+					return true;
+				}
+				return false;
 			}
 
 			@Override
 			public float getMinPower() {
-				return 1.0f;
+				return 1f;
 			}
 
 			@Override
 			public float getPowerupDelay() {
-				return 30.0f;
+				return 5.0f;
 			}
 
 			@Override
 			public float getMaxPower() {
-				return 10.0f;
+				return 10f;
 			}
 		}
 	}

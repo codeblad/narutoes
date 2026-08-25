@@ -88,6 +88,28 @@ public class ProcedureOnPlayerPostTick extends ElementsNarutomodMod.ModElement {
 		if (!(world.isRemote) && entity instanceof EntityPlayerMP) {
 			((EntityPlayerMP) entity).removePotionEffect(MobEffects.RESISTANCE);
 		}
+
+		if (!world.isRemote && entity instanceof EntityPlayer) {
+			EntityPlayer entity2 = (EntityPlayer) entity;
+			//11 12 23
+			// exceptions for eternal and tensei
+			if (entity2.getEntityData().getInteger("KekkeiGenkai") == 11) {
+				if (ProcedureUtils.getMatchingItemStack(entity2, ItemByakugan.helmet) == null && ProcedureUtils.getMatchingItemStack(entity2, ItemTenseigan.helmet) == null) {
+					entity2.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 40, 10, false, false));
+				}
+			}
+
+			if (entity2.getEntityData().getInteger("KekkeiGenkai") == 12 || entity2.getEntityData().getInteger("KekkeiGenkai") == 23) {
+				if ((ProcedureUtils.getMatchingItemStack(entity2, ItemSharingan.helmet) == null
+						&& ProcedureUtils.getMatchingItemStack(entity2, ItemMangekyoSharingan.helmet) == null
+						&& ProcedureUtils.getMatchingItemStack(entity2, ItemMangekyoSharinganObito.helmet) == null
+				)
+						&& ProcedureUtils.getMatchingItemStack(entity2, ItemMangekyoSharinganEternal.helmet) == null && ProcedureUtils.getMatchingItemStack(entity2, ItemRinnegan.helmet) == null  ) {
+					entity2.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 40, 10, false, false));
+				}
+			}
+		}
+
 		if (!(world.isRemote) && entity instanceof EntityPlayerMP) {
 			Advancement _adv = ((MinecraftServer) ((EntityPlayerMP) entity).mcServer).getAdvancementManager()
 					.getAdvancement(new ResourceLocation("narutomod:ninjaachievement"));

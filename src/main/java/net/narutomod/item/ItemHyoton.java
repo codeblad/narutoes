@@ -57,7 +57,7 @@ public class ItemHyoton extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 219;
 	public static final ItemJutsu.JutsuEnum KILLSPIKES = new ItemJutsu.JutsuEnum(0, "ice_spike", 'S', 150, 30d, new EntityIceSpike.Jutsu());
 	public static final ItemJutsu.JutsuEnum ICESPEARS = new ItemJutsu.JutsuEnum(1, "ice_spear", 'S', 150, 30d, new EntityIceSpear.EC.Jutsu());
-	public static final ItemJutsu.JutsuEnum ICEDOME = new ItemJutsu.JutsuEnum(2, "ice_dome", 'S', 200, 400d, new EntityIceDome.EC.Jutsu());
+	public static final ItemJutsu.JutsuEnum ICEDOME = new ItemJutsu.JutsuEnum(2, "ice_dome", 'S', 200, 600d, new EntityIceDome.EC.Jutsu());
 	public static final ItemJutsu.JutsuEnum ICEPRISON = new ItemJutsu.JutsuEnum(3, "ice_prison", 'S', 150, 150d, new EntityIcePrison.EC.Jutsu());
 
 	public ItemHyoton(ElementsNarutomodMod instance) {

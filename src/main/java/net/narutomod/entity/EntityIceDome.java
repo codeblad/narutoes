@@ -36,6 +36,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.init.MobEffects;
 import net.minecraft.potion.PotionEffect;
 
+import net.narutomod.NarutomodModVariables;
+import net.narutomod.item.ItemRaiton;
+import net.narutomod.potion.PotionUsingJutsu;
 import net.narutomod.procedure.ProcedureUtils;
 import net.narutomod.procedure.ProcedureSync;
 import net.narutomod.item.ItemJutsu;
@@ -54,7 +57,7 @@ import static net.narutomod.item.ItemHyoton.ICEDOME;
 public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 224;
 	public static final int ENTITYID_RANGED = 225;
-	private static final float ENTITY_SCALE = 8.0f;
+	private static final float ENTITY_SCALE = 18.0f;
 
 	public EntityIceDome(ElementsNarutomodMod instance) {
 		super(instance, 535);
@@ -74,6 +77,7 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 	public static class EC extends EntityShieldBase implements ItemJutsu.IJutsu {
 		private final int talkTime = 26;
 		private int shootSpearsTime;
+		private boolean jutsuKey1Pressed = false;
 		private List<EntityLivingBase> entitiesInside = Lists.newArrayList();
 		private EntityLivingBase excludedEntity;
 
@@ -164,6 +168,14 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 					}
 				}
 			}
+			if (!this.world.isRemote) {
+				summoner.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+				boolean newPressed = summoner.getEntityData().getBoolean(NarutomodModVariables.EYETOGGLE);
+				if (this.jutsuKey1Pressed && !newPressed && this.shootSpearsTime <= 0 && Chakra.pathway(summoner).consume(200d)) {
+					this.shootSpearsTime = 40;
+				}
+				this.jutsuKey1Pressed = newPressed;
+			}
 			if (!this.world.isRemote && this.shootSpearsTime > 0 && summoner != null) {
 				for (EntityLivingBase entity : this.entitiesInside) {
 					if (entity.isEntityAlive() && !summoner.isOnSameTeam(entity)) {
@@ -171,8 +183,8 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 						double d1 = (this.rand.nextDouble()-0.5d) * this.width;
 						EntityIceSpear.EC a = new EntityIceSpear.EC.Jutsu().createJutsu(this.world, summoner, this.posX + d0 * 0.8d,
 						 this.posY + this.height - 1.6d, this.posZ + d1 * 0.8d, entity.posX, entity.posY + entity.height/2,
-						 entity.posZ, 1.2f, 0.25f);
-						a.baseImpactDamage = (4+(3f*ItemJutsu.getDmgMult(this.getSummoner())));
+						 entity.posZ, 1.35f, 0.45f);
+						a.baseImpactDamage = (6+(4f*ItemJutsu.getDmgMult(this.getSummoner())));
 					}
 				}
 				--this.shootSpearsTime;
@@ -353,7 +365,7 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 						SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:makyohyosho")),
 						net.minecraft.util.SoundCategory.NEUTRAL, 1f, 0.9f);
 				EC entity1 = new EC(entity, x, y, z);
-				entity1.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(150D+(12*ItemJutsu.getDmgMult(entity)));
+				entity1.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(350D+(17*ItemJutsu.getDmgMult(entity)));
 				entity1.setHealth(entity1.getMaxHealth());
 				entity.world.spawnEntity(entity1);
 				return entity1;

@@ -101,7 +101,8 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	}
 
     public static float getDefense(Entity entity) {
-		return 1.5f+17*ItemJutsu.getDmgMult(entity)/63;
+		//original = return 1.5f+17f*ItemJutsu.getDmgMult(entity)/63;
+		return 3f+16f*ItemJutsu.getDmgMult(entity)/63;
 	}
 
 	private static void logBattleExp(EntityPlayer entity, double xp) {
@@ -346,7 +347,11 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 				// 	defMult+= 0.1f;
 				// } Unethical
 				if (ItemRaiton.CHAKRAMODE.jutsu.isActivated((EntityLivingBase) targetEntity)) {
-					defMult+= 0.7f;
+					if (PlayerTracker.getBattleXp((EntityPlayer) targetEntity) >= NarutomodModVariables.SAGEEXP) {
+						defMult += .7f;
+					} else {
+						defMult += .35f;
+					}
 				}
 				if (ItemRanton.CLOUD.jutsu.isActivated((EntityLivingBase) targetEntity)) {
 					defMult+= 0.15f;
