@@ -131,10 +131,10 @@ public class EntitySlug extends ElementsNarutomodMod.ModElement {
 		protected void postScaleFixup() {
 			float f = this.getScale();
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(0.5D * f);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(7D * f * f);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(15D * f);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.2D + f * 0.04);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(1D * f);
-			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(13D + 3D * f);
+			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
 			super.postScaleFixup();
 			//this.setSize(this.ogWidth * f, this.ogHeight * f);
 			//this.setHealth(this.getMaxHealth());

@@ -89,10 +89,10 @@ public class EntityWindBlade extends ElementsNarutomodMod.ModElement {
 				}
 				if (this.targetTrace.entityHit != null) {
 					Vec3d vec = this.targetTrace.entityHit.getPositionVector().addVector(0d, this.targetTrace.entityHit.height * 0.5f, 0d).subtract(this.getPositionVector());
-					this.shootPrecise(vec.x, vec.y, vec.z, 0.85f);
+					this.shootPrecise(vec.x, vec.y, vec.z, 0.9f);
 				} else {
 					Vec3d vec = this.targetTrace.hitVec.subtract(this.getPositionVector());
-					this.shoot(vec.x, vec.y, vec.z, 0.75f, 0f);
+					this.shoot(vec.x, vec.y, vec.z, 0.8f, 0f);
 				}
 				if (this.ticksAlive % 8 == 1) {
 					this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:windecho")), 0.1f, this.rand.nextFloat() * 0.4f + 1.8f);

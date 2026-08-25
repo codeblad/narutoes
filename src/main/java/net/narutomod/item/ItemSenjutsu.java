@@ -494,7 +494,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 	
 		@Override
 		public float getPowerupDelay() {
-			return 3.0f;
+			return 6.0f;
 		}
 	
 		@Override

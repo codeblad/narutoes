@@ -97,9 +97,9 @@ public class EntityToad extends ElementsNarutomodMod.ModElement {
 		protected void postScaleFixup() {
 			float f = this.getScale();
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(5D * f);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(10D * f * f);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(12D * f);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6D * f);
-			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(13D + 3D * f);
+			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64D);
 			super.postScaleFixup();
 			this.experienceValue = (int)(f * 10);
 		}
