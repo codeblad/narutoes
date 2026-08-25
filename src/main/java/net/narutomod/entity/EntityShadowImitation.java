@@ -525,7 +525,7 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 
 				if (user != null && user.isEntityAlive()
 						&& ItemJutsu.canTarget(target)
-						&& this.canTargetBeSeen()) {
+						) {
 
 					this.setPosition(user.posX, user.posY, user.posZ);
 
@@ -538,6 +538,9 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 					} else {
 
 						if (this.ticksExisted == 1) {
+							if (!this.canTargetBeSeen()) {
+								this.setDead();
+							}
 							this.playSound(
 								SoundEvent.REGISTRY.getObject(
 									new ResourceLocation("narutomod:shadow_sfx")
@@ -656,9 +659,9 @@ public class EntityShadowImitation extends ElementsNarutomodMod.ModElement {
 				return false;
 			}
 
-			if (!this.canTargetBeSeen()) {
-				return false;
-			}
+			// if (!this.canTargetBeSeen()) {
+			// 	return false;
+			// }
 
 			EC stitch = new EC(
 				user,

@@ -144,7 +144,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 		//public static final int BIJUDAMA_CD = 100;
 		private final double targetRange = 112.0D;
 		private final double bijudamaMinRange = 64.0D;
-		private static final int FUUIN_IMMUNITY_TIME = 20 * 60 * 25; // 25 minutes
+		private static final int FUUIN_IMMUNITY_TIME = 20 * 60 * 10; // 10 minutes
 		private int deathTicks;
 		private int deathTotalTicks;
 		private EntityPlayer summoningPlayer;
