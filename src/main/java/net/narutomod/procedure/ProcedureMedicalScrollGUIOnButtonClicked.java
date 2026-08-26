@@ -50,7 +50,7 @@ public class ProcedureMedicalScrollGUIOnButtonClicked extends ElementsNarutomodM
 		double TenseiganEvolvedTime = 0;
 		boolean hasKey = false;
 		if ((((entity instanceof EntityPlayerMP) && ((entity).world instanceof WorldServer))
-				&& ProcedureUtils.getMatchingItemStack((EntityPlayer) entity, ItemIryoJutsu.block) != null && PlayerTracker.getBattleXp((EntityPlayer) entity) > 7500.0d ) ) {
+				&& ProcedureUtils.getMatchingItemStack((EntityPlayer) entity, ItemIryoJutsu.block) != null && PlayerTracker.getBattleXp((EntityPlayer) entity) >= 7500.0d ) ) {
 			stack0 = (new Object() {
 				public ItemStack getItemStack(int sltid) {
 					if (entity instanceof EntityPlayerMP) {
