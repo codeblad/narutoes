@@ -1,5 +1,7 @@
 package net.narutomod.procedure;
 
+import net.narutomod.Chakra;
+import net.narutomod.item.ItemDojutsu;
 import net.narutomod.item.ItemTenseiganChakraMode;
 import net.narutomod.item.ItemBijuCloak;
 import net.narutomod.Particles;
@@ -10,6 +12,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.Entity;
 
 import java.util.Map;
+
+import static net.narutomod.item.ItemTenseigan.helmet;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureTenseiganBodyTickEvent extends ElementsNarutomodMod.ModElement {
@@ -33,6 +37,12 @@ public class ProcedureTenseiganBodyTickEvent extends ElementsNarutomodMod.ModEle
 			((itemstack)).shrink((int) 1);
 		} else {
 			(entity).extinguish();
+			if (entity instanceof EntityLivingBase) {
+				boolean flag = ((ItemDojutsu.Base)helmet).isOwner(itemstack, (EntityLivingBase) entity);
+				if (!flag) {
+					Chakra.pathway((EntityLivingBase) entity).consume(2d);
+				}
+			}
 			Particles.spawnParticle(entity.world, Particles.Types.SMOKE, entity.posX, entity.posY + 0.8d, entity.posZ, 20, 0.15d, 0.4d, 0.15d, 0d,
 					0.1d, 0d, 0x20b5fff5, 20, 5, 0xF0, entity.getEntityId());
 			ItemBijuCloak.applyEffects((EntityLivingBase) entity, 2, 0);

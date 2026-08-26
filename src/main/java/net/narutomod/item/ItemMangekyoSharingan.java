@@ -236,15 +236,21 @@ public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 
 	public static void registerJutsu3(EntityLivingBase entity,World world, ItemStack itemstack, NBTTagCompound values, boolean usingJutsu) {
 		boolean newPressed = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
+		ItemStack stack = entity.getItemStackFromSlot(EntityEquipmentSlot.HEAD);
+		boolean flag = ((ItemDojutsu.Base)helmet).isOwner(stack, entity);
+		int mult = 1;
+		if (!flag) {
+			mult = 2;
+		}
 		if (values.getBoolean("jutsuKey3") && !usingJutsu && !newPressed) {
 			if (entity.isSneaking()) {
-				if (values.getInteger("honoikazuchiCD") <= 0 && Chakra.pathway(entity).consume(400d)) {
+				if (values.getInteger("honoikazuchiCD") <= 0 && Chakra.pathway(entity).consume(400*mult)) {
 					values.setInteger("honoikazuchiCD", 20 * 12);
 					ItemMangekyoSharingan.doDamage(itemstack,entity,3);
 					entity.world.spawnEntity(new HonoIkazuchi(entity));
 				}
 			} else {
-				if (values.getInteger("hienCD") <= 0 && Chakra.pathway(entity).consume(300d)) {
+				if (values.getInteger("hienCD") <= 0 && Chakra.pathway(entity).consume(300d*mult)) {
 					values.setInteger("hienCD", 20 * 10);
 					ItemMangekyoSharingan.doDamage(itemstack,entity,3);
 					entity.world.spawnEntity(new HiEn(entity));

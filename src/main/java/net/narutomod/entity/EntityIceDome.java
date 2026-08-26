@@ -156,6 +156,10 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 				this.playSound(SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:ice_formation")), 1f, 1f);
 			}
 			EntityLivingBase summoner = this.getSummoner();
+			if (summoner == null) {
+				this.setDead();
+				return;
+			}
 			if (!this.world.isRemote && summoner != null && this.ticksExisted % 20 == 1) {
 				summoner.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, 23, 0, false, false));
 			}
@@ -169,7 +173,9 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 				}
 			}
 			if (!this.world.isRemote) {
-				summoner.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+				if (summoner != null) {
+					summoner.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
+				}
 				boolean newPressed = summoner.getEntityData().getBoolean(NarutomodModVariables.EYETOGGLE);
 				if (this.jutsuKey1Pressed && !newPressed && this.shootSpearsTime <= 0 && Chakra.pathway(summoner).consume(200d)) {
 					this.shootSpearsTime = 40;

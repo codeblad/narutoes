@@ -593,17 +593,21 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 					}
 					boolean usingJutsu = ((EntityLivingBase) entity).isPotionActive(PotionUsingJutsu.potion);
 					if (!ItemByakugan.hasSlot(nbt, 2)) {
-
+						boolean flag = ((ItemDojutsu.Base)helmet).isOwner(itemstack, (EntityLivingBase) entity);
+						int mult = 1;
+						if (!flag) {
+							mult = 2;
+						}
 						if (eye.getItem() == new ItemStack(ItemTenseigan.helmet, (int) (1)).getItem()) {
 							boolean newPressed = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey1Pressed);
 							if (!usingJutsu && values.getBoolean("jutsuKey1") && !newPressed) {
 								if (entity.isSneaking()) {
-									if (values.getInteger("gravWellCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(750d)) {
+									if (values.getInteger("gravWellCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(750d*mult)) {
 										values.setInteger("gravWellCD", 20 * 13);
 										entity.world.spawnEntity(new GravityWell((EntityLivingBase) entity));
 									}
 								} else {
-									if (values.getInteger("airPushCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(350d)) {
+									if (values.getInteger("airPushCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(350d*mult)) {
 										values.setInteger("airPushCD", 20 * 4);
 										entity.world.spawnEntity(new AirPush((EntityLivingBase) entity));
 									}
@@ -615,7 +619,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 
 							boolean newPressed2 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
 							if (!usingJutsu && values.getBoolean("jutsuKey2") && !newPressed) {
-								if (values.getInteger("denialCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(800d)) {
+								if (values.getInteger("denialCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(800d*mult)) {
 									values.setInteger("denialCD", 20 * 15);
 									entity.world.spawnEntity(new Denial((EntityLivingBase) entity));
 								}
@@ -628,7 +632,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 
 							if (!usingJutsu && values.getBoolean("jutsuKey3") && !newPressed3 && values.getInteger("drainCD") <= 0) {
 								RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity,30,5);
-								if (result.entityHit instanceof EntityLivingBase && Chakra.pathway((EntityLivingBase) entity).consume(800d)) {
+								if (result.entityHit instanceof EntityLivingBase && Chakra.pathway((EntityLivingBase) entity).consume(800d*mult)) {
 									values.setInteger("drainCD", 20 * 15);
 									entity.world.spawnEntity(new Drain((EntityLivingBase) entity, (EntityLivingBase) result.entityHit));
 								}

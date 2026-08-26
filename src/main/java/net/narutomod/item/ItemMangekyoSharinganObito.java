@@ -202,8 +202,13 @@ public class ItemMangekyoSharinganObito extends ElementsNarutomodMod.ModElement 
 
 	public static void registerJutsu3(EntityLivingBase entity,World world, ItemStack itemstack, NBTTagCompound values, boolean usingJutsu) {
 		boolean newPressed = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);
+		boolean flag = ((ItemDojutsu.Base)helmet).isOwner(itemstack, entity);
+		int mult = 1;
+		if (!flag) {
+			mult = 2;
+		}
 		if (values.getBoolean("jutsuKey3") && !usingJutsu && !newPressed) {
-			if (values.getInteger("godsmajestyCD") <= 0 && Chakra.pathway(entity).consume(300d)) {
+			if (values.getInteger("godsmajestyCD") <= 0 && Chakra.pathway(entity).consume(300d*mult)) {
 				values.setInteger("godsmajestyCD", 20 * 11);
 				ItemMangekyoSharingan.doDamage(itemstack,entity,5);
 				entity.world.spawnEntity(new GodsMajesty(entity));
