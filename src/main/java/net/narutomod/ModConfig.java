@@ -17,6 +17,9 @@ public class ModConfig extends ElementsNarutomodMod.ModElement {
 	@Config.Comment("If enabled, rinnegan/tenseigan/ems gained without the prerequisite achievements will be removed.")
 	public static boolean REMOVE_CHEAT_DOJUTSUS = false;
 
+	@Config.Comment("If enabled, all eyes will be scoopable")
+	public static boolean SCOOP_ALL_EYES = false;
+
 	@Config.Comment("Itachi's spawn weight (0~20). 0 to stop spawning.")
 	public static int SPAWN_WEIGHT_ITACHI = 1;
 

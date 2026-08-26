@@ -39,6 +39,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.narutomod.Chakra;
 import net.narutomod.ElementsNarutomodMod;
+import net.narutomod.ModConfig;
 import net.narutomod.creativetab.TabModTab;
 import net.narutomod.entity.EntityRendererRegister;
 import net.narutomod.procedure.ProcedureUtils;
@@ -125,6 +126,33 @@ public class ItemEyeScooper extends ElementsNarutomodMod.ModElement {
 						stack = ProcedureUtils.getMatchingItemStack(entity, ItemMangekyoSharinganObito.helmet);
 						if (stack != null) {
 							(entity).dropItem(stack.copy(), true, true);
+						}
+						if (ModConfig.SCOOP_ALL_EYES) {
+							stack = ProcedureUtils.getMatchingItemStack(entity, ItemMangekyoSharinganEternal.helmet);
+							if (stack != null) {
+								(entity).dropItem(stack.copy(), true, true);
+							}
+
+							stack = ProcedureUtils.getMatchingItemStack(entity, ItemTenseigan.helmet);
+							if (stack != null) {
+								(entity).dropItem(stack.copy(), true, true);
+							}
+
+							stack = ProcedureUtils.getMatchingItemStack(entity, ItemRinnegan.helmet);
+							if (stack != null) {
+								(entity).dropItem(stack.copy(), true, true);
+							}
+
+
+							entity.inventory.clearMatchingItems(new ItemStack(ItemTenseigan.helmet, (int) (1)).getItem(), -1, (int) (-1),
+									null);
+
+							entity.inventory.clearMatchingItems(new ItemStack(ItemMangekyoSharinganEternal.helmet, (int) (1)).getItem(), -1, (int) (-1),
+									null);
+
+
+							entity.inventory.clearMatchingItems(new ItemStack(ItemRinnegan.helmet, (int) (1)).getItem(), -1, (int) (-1),
+									null);
 						}
 
 						entity.inventory.clearMatchingItems(new ItemStack(ItemByakugan.helmet, (int) (1)).getItem(), -1, (int) (-1),
