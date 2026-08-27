@@ -153,10 +153,10 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					if (this.gate <= 3) {
 						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*0.75);
 					}else if (this.gate <= 6) {
-						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*1.35);
+						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*1.25);
 					}
 					if (this.gate == 7) {
-						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*1.4f);
+						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*1.35f);
 					}
 					if (this.gate == 8) {
 						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*2f);
@@ -389,7 +389,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 				NBTTagCompound values = itemstack.getTagCompound();
 				if (gateOpened >= 3) {
 						if (attacker.equals(target)) {
-							target = ProcedureUtils.objectEntityLookingAt(attacker, 18d, 5d).entityHit;
+							target = ProcedureUtils.objectEntityLookingAt(attacker, 20d, 7d).entityHit;
 							if (target instanceof EntityLivingBase && values.getInteger("tpCool") <= 0) {
 								values.setInteger("tpCool",50);
 								values.setUniqueId("attackTarget", target.getUniqueID());
@@ -691,11 +691,11 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 							this.hit = true;
 							ProcedureUtils.setVelocity(this.user, look.x/2, look.y/2, look.z/2);
 							this.targets.add(entity1.getUniqueID().toString());
-							float damage = 10f+3*ItemJutsu.getDmgMult(this.user);
+							float damage = 10f+3.25f*ItemJutsu.getDmgMult(this.user);
 
 							int gate = ItemEightGates.getGatesOpened(this.user);
 							if (gate > 0) {
-								damage*=1+1f*gate/8;
+								damage*=1+1.25f*gate/8;
 							}
 
 							Vec3d knockback = this.user.getLookVec().scale(.5).addVector(0,1,0);
@@ -792,7 +792,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 
 							int gate = ItemEightGates.getGatesOpened(this.user);
 							if (gate > 0) {
-								damage*=1+1f*gate/8;
+								damage*=1+1.25f*gate/8;
 							}
 
 							Vec3d knockback = this.user.getLookVec().scale(10);
@@ -874,7 +874,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 							Vec3d pos = this.target.getPositionVector();
 							boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
 							this.world.newExplosion(this.user, pos.x, pos.y, pos.z, 1, false, flag);
-							float damage = 5+0.5f*ItemJutsu.getDmgMult(this.user);
+							float damage = 5+1.0f*ItemJutsu.getDmgMult(this.user);
 							this.target.hurtResistantTime = 10;
 							this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 						}
@@ -913,7 +913,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						float damage = 30f+7*ItemJutsu.getDmgMult(this.user);
 						int gate = ItemEightGates.getGatesOpened(this.user);
 						if (gate > 0) {
-							damage*=1+0.7f*gate/8;
+							damage*=1+1.0f*gate/8;
 						}
 						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 					}
@@ -1005,7 +1005,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 						float damage = 30f+9*ItemJutsu.getDmgMult(this.user);
 						int gate = ItemEightGates.getGatesOpened(this.user);
 						if (gate > 0) {
-							damage*=1+0.7f*gate/8;
+							damage*=1+1.0f*gate/8;
 						}
 						this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
 						boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
@@ -1120,7 +1120,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 									}
 									this.hit = true;
 									this.targets.add(entity1.getUniqueID().toString());
-									float damage = 10+1.25f*ItemJutsu.getDmgMult(this.user);
+									float damage = 10+1.45f*ItemJutsu.getDmgMult(this.user);
 
 									entity1.hurtResistantTime = 10;
 									entity1.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user),damage);
@@ -1349,7 +1349,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 								}
 								if (gate == 6) {
 									if (values.getInteger("asaCool") <= 0) {
-										values.setInteger("asaCool",20*9);
+										values.setInteger("asaCool",20*11);
 										entity2.world.spawnEntity(new ItemEightGates.RangedItem.AsaKujaku(player));
 										entity2.sendStatusMessage(new TextComponentString(
 												I18n.translateToLocal("entity.entityasakujaku.name")), true);
@@ -1623,7 +1623,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && this.shootingEntity != null) {
 				ProcedureAoeCommand.set(this, 0.0D, 0.5d * this.getEntityScale()).exclude(this.shootingEntity)
 						.damageEntities(DamageSource.causeIndirectDamage(this, this.shootingEntity).setDamageBypassesArmor(),
-								200+ItemJutsu.getNinjaMult(this.shootingEntity)*15);
+								100+ItemJutsu.getNinjaMult(this.shootingEntity)*13);
 				this.shootingEntity.getEntityData().setDouble(NarutomodModVariables.InvulnerableTime, 40d);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, 70.0F, false,
 						ForgeEventFactory.getMobGriefingEvent(this.world, (EntityLivingBase) this.shootingEntity));

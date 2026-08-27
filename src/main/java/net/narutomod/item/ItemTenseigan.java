@@ -267,7 +267,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 					boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.user);
 					this.world.newExplosion(this.user, this.start.x, this.start.y, this.start.z, 10, false, flag);
 					for (EntityLivingBase entity : this.trapped) {
-						float damage = (10 + (9f * ItemJutsu.getDmgMult(this.user)));
+						float damage = (10 + (15f * ItemJutsu.getDmgMult(this.user)));
 						entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user), damage);
 					}
 					this.setDead();
@@ -292,7 +292,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 		private EntityLivingBase user;
 		private Vec3d look;
 		private Vec3d start;
-		private final int startup = 40;
+		private final int startup = 60;
 		List<String> targets = new ArrayList<String>();
 
 		public Denial(World worldIn) {
@@ -360,7 +360,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 							(net.minecraft.util.SoundEvent) net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:BanshoTenin")),
 							SoundCategory.PLAYERS, 1.0F, 1.0F);
 
-					for (int j = 0; j < (int) 150; j++) {
+					for (int j = 0; j < (int) 200; j++) {
 						Vec3d a = this.user.getPositionVector().addVector(0,1,0);
 						Vec3d b = a.addVector(-size/2+this.rand.nextFloat()*size,-size/2+this.rand.nextFloat()*size,-size/2+this.rand.nextFloat()*size);
 						Vec3d c = b.subtract(a).normalize().scale(3+2*this.rand.nextFloat());
@@ -484,13 +484,20 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 
 				if (this.ticksExisted >= startup+5) {
 					this.target.hurtResistantTime = 10;
-					float damage = 2 + (0.75f * ItemJutsu.getDmgMult(this.user));
+					float damage = 2 + (1.25f * ItemJutsu.getDmgMult(this.user));
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor().setDamageIsAbsolute(), damage);
 					Chakra.Pathway cp = Chakra.pathway(this.target);
+					Chakra.Pathway cp2 = Chakra.pathway(this.user);
+					float amount = 0.35f;
+
 					cp.consume(0.25f / 20);
+
 					if (cp.getAmount() > cp.getMax()) {
 						cp.consume(0.02f);
+						amount = 0.45f;
 					}
+
+					cp2.consume(amount / -20);
 				}
 			}
 			if (this.ticksExisted == this.startup+20) {
@@ -608,7 +615,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 									}
 								} else {
 									if (values.getInteger("airPushCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(350d*mult)) {
-										values.setInteger("airPushCD", 20 * 4);
+										values.setInteger("airPushCD", 20 * 5);
 										entity.world.spawnEntity(new AirPush((EntityLivingBase) entity));
 									}
 								}
@@ -619,8 +626,8 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 
 							boolean newPressed2 = entity.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
 							if (!usingJutsu && values.getBoolean("jutsuKey2") && !newPressed) {
-								if (values.getInteger("denialCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(800d*mult)) {
-									values.setInteger("denialCD", 20 * 15);
+								if (values.getInteger("denialCD") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(500d*mult)) {
+									values.setInteger("denialCD", 20 * 10);
 									entity.world.spawnEntity(new Denial((EntityLivingBase) entity));
 								}
 
@@ -632,8 +639,8 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 
 							if (!usingJutsu && values.getBoolean("jutsuKey3") && !newPressed3 && values.getInteger("drainCD") <= 0) {
 								RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity,30,5);
-								if (result.entityHit instanceof EntityLivingBase && Chakra.pathway((EntityLivingBase) entity).consume(800d*mult)) {
-									values.setInteger("drainCD", 20 * 15);
+								if (result.entityHit instanceof EntityLivingBase && Chakra.pathway((EntityLivingBase) entity).consume(900d*mult)) {
+									values.setInteger("drainCD", 20 * 20);
 									entity.world.spawnEntity(new Drain((EntityLivingBase) entity, (EntityLivingBase) result.entityHit));
 								}
 							}

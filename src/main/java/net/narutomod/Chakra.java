@@ -262,11 +262,16 @@ public class Chakra extends ElementsNarutomodMod.ModElement {
 			}
 			//chakra regen here
 			boolean chakraBlocked = this.user.isPotionActive(PotionChakraBlocked.potion);
-			if (this.motionlessTime > 10 && this.user.isSneaking() && (!this.user.isAirBorne || flight != null) && !chakraBlocked) {
+			if (this.motionlessTime > 5 && this.user.isSneaking() && (!this.user.isAirBorne || flight != null) && !chakraBlocked) {
 				this.consume(-150d);
 				this.consume((-ModConfig.CHAKRA_REGEN_RATE - 0.001f )*6);
 				//* this.user.getFoodStats().getSaturationLevel()
+			} else {
+			if (this.user.ticksExisted % 10 == 0 && !chakraBlocked && this.user.onGround) {
+			this.consume(-5d);
 			}
+			}
+
 			//double d = 500d + PlayerTracker.getBattleXp(this.user) * 0.1d;
 			double d = 500d + 20000*(ItemJutsu.getNinjaMult(this.user)/63);
 			if (d != this.getMax() || this.forceSync) {

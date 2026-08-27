@@ -340,7 +340,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 					}
 				}
 				if (cheststack.getItem() == ItemTenseigan.body) {
-					defMult += .55f;
+					defMult += .3f;
 				}
 				// ItemStack stackwood = ProcedureUtils.getMatchingItemStack((EntityPlayer) targetEntity, ItemMokuton.block);
 				// if (stackwood != null) {
