@@ -84,7 +84,7 @@ import io.netty.buffer.ByteBuf;
 public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 	public static final int ENTITYID = 419;
 	public static final int ENTITYID_RANGED = 420;
-	private static final Map<UUID, Map<UUID, MarkerData>> serverMarkerMap = Maps.newHashMap();
+	public static final Map<UUID, Map<UUID, MarkerData>> serverMarkerMap = Maps.newHashMap();
 	private static final Map<UUID, MarkerData> clientMarkerList = Maps.newHashMap();
 
 	public EntityHiraishin(ElementsNarutomodMod instance) {
@@ -134,16 +134,21 @@ public class EntityHiraishin extends ElementsNarutomodMod.ModElement {
 		 .canActivateJutsu(stack, ItemNinjutsu.HIRAISHIN, player) == EnumActionResult.SUCCESS;
 	}
 
+
+	public static Map<UUID, MarkerData> getServerMarkers(UUID ownerUuid) {
+		return serverMarkerMap.get(ownerUuid);
+	}
+
 	private static final String TELEPORT_DEBOUNCE = "HiraishinTeleportDebounce";
 
-	private static boolean isTeleportDebounced(Entity entity) {
+	public static boolean isTeleportDebounced(Entity entity) {
 		if (entity == null) {
 			return true;
 		}
 		return entity.getEntityData().getLong(TELEPORT_DEBOUNCE) > entity.world.getTotalWorldTime();
 	}
 
-	private static void setTeleportDebounce(Entity entity, int ticks) {
+	public static void setTeleportDebounce(Entity entity, int ticks) {
 		if (entity == null) {
 			return;
 		}
