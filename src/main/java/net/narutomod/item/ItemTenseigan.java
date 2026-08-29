@@ -508,7 +508,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 				ProcedureUtils.setVelocity(this.target, look.x*4, look.y*4+1, look.z*4);
 				if (!this.world.isRemote) {
 					this.target.addPotionEffect(new PotionEffect(PotionChakraBlocked.potion, 8*20, 0, false, false));
-					this.target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20*5, 3, false, false));
+					this.target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20*3, 3, false, false));
 					this.target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 20 * 5, 4, false, false));
 				}
 			}

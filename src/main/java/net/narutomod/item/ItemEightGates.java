@@ -153,13 +153,13 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					if (this.gate <= 3) {
 						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*0.75);
 					}else if (this.gate <= 6) {
-						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*1.25);
+						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*1.2);
 					}
 					if (this.gate == 7) {
-						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*1.35f);
+						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*1.3f);
 					}
 					if (this.gate == 8) {
-						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*2f);
+						realStrength += (int) (ItemJutsu.getNinjaMult(entity)*1.75f);
 					}
 					//entity.addPotionEffect(new PotionEffect(MobEffects.HUNGER, 42, 3, false, false));
 					entity.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 12, 8, false, false));
