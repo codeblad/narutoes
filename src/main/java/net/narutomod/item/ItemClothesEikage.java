@@ -30,7 +30,7 @@ public class ItemClothesEikage extends ElementsNarutomodMod.ModElement {
 	public static final Item body = null;
 
 	public ItemClothesEikage(ElementsNarutomodMod instance) {
-		super(instance, 816);
+		super(instance, 8166);
 	}
 
 	@Override

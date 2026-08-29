@@ -152,7 +152,7 @@ public class EntityC0 extends ElementsNarutomodMod.ModElement {
 			//}
 			
 			if (this.ticksExisted > this.fuseTime ) {
-				new EventSphericalExplosion(this.world, null, (int)this.posX, (int)this.posY + 5, (int)this.posZ, this.explosionRange, 0, 0.0f);
+				new EventSphericalExplosion(this.world, null, (int)this.posX, (int)this.posY + 5, (int)this.posZ, this.explosionRange, 0, 0.0f, true);
 				ProcedureAoeCommand.set(this, 0d, this.explosionRange).damageEntities(ItemJutsu.causeJutsuDamage(this, null), this.explosionDamage+300f*ItemJutsu.getDmgMult(this.user));
 				this.setDead();
 				this.effectEntity.setDead();

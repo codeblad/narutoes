@@ -242,7 +242,7 @@ public static final ItemJutsu.JutsuEnum ARTEXPLOSION = new ItemJutsu.JutsuEnum(3
 
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float powerIn) {
-				if (powerIn >= this.getMaxPower() && PlayerTracker.getBattleXp((EntityPlayer) entity) >= 10000) {
+				if (powerIn >= this.getMaxPower() && PlayerTracker.getBattleXp((EntityPlayer) entity) >= 5000) {
 				Entity ec  = new EntityC0.EC(entity);
 				Vec3d vec = entity.getLookVec();
 				vec = entity.getPositionVector().addVector(vec.x, 1d, vec.z);

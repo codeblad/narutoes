@@ -217,7 +217,7 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 						cd = 100;
 						if (cp.consume(500d)) {
 							biju.mouthShootingJutsu = EntityWaterCanonball.EC.Jutsu.createJutsu(biju, 10.0f);
-							((EntityWaterCanonball.EC) biju.mouthShootingJutsu).setDamage(400f);
+							((EntityWaterCanonball.EC) biju.mouthShootingJutsu).setDamage(500f);
 							biju.getEntityData().setFloat("bijuACD", world.getTotalWorldTime() + cd);
 						}
 					} else if (tails == 2) {

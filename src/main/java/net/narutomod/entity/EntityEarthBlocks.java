@@ -248,7 +248,7 @@ public class EntityEarthBlocks extends ElementsNarutomodMod.ModElement {
 	    }
 
 	    public boolean griefingAllowed() {
-	    	return net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, null);
+	    	return (world.getGameRules().getBoolean("weakDestruction")) || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, null);
 	    }
 
 	    public int getTicksAlive() {

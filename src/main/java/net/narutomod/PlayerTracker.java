@@ -52,6 +52,7 @@ import com.google.common.collect.Maps;
 public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 	private static final String BATTLEXP = NarutomodModVariables.BATTLEXP;
 	private static final String KEEPXP_RULE = "keepNinjaXp";
+	public static final String WEAK_DESTRUCTION = "weakDestruction";
 	public static final String FORCE_DOJUTSU_DROP_RULE = "forceDojutsuDropOnDeath";
 	private static final String FORCE_SEND = "forceSendBattleXP2self";
 	private static final String UPDATE_HEALTH = "forceUpdateHealth";
@@ -558,6 +559,9 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 			}
 			if (!world.isRemote && !world.getGameRules().hasRule(FORCE_DOJUTSU_DROP_RULE)) {
 				world.getGameRules().addGameRule(FORCE_DOJUTSU_DROP_RULE, "false", net.minecraft.world.GameRules.ValueType.BOOLEAN_VALUE);
+			}
+			if (!world.isRemote && !world.getGameRules().hasRule(WEAK_DESTRUCTION)) {
+				world.getGameRules().addGameRule(WEAK_DESTRUCTION, "false", net.minecraft.world.GameRules.ValueType.BOOLEAN_VALUE);
 			}
 		}
 	}

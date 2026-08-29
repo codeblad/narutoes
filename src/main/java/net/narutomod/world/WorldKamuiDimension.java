@@ -252,31 +252,7 @@ public class WorldKamuiDimension extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		public void populate(int x, int z) {
-			BlockFalling.fallInstantly = true;
-			//net.minecraftforge.event.ForgeEventFactory.onChunkPopulate(true, this, this.world, this.random, x, z, false);
-			int i = x * 16;
-			int j = z * 16;
-			BlockPos blockpos = new BlockPos(i, 0, j);
-			float f = this.getIslandHeightValue(x, z, 1, 1);
-			if (f < -10.0F && this.random.nextInt(4) == 0) {
-				// modified 6-6-2020
-				this.islandGen.generate(this.world, this.random,
-						blockpos.add(this.random.nextInt(16) + 8, 55 + this.random.nextInt(16), this.random.nextInt(16) + 8));
-				if (this.random.nextInt(4) == 0)
-					this.islandGen.generate(this.world, this.random,
-							blockpos.add(this.random.nextInt(16) + 8, 55 + this.random.nextInt(16), this.random.nextInt(16) + 8));
-			}
-			//Biome biome = this.world.getBiome(blockpos.add(16, 0, 16));
-			//net.minecraftforge.common.MinecraftForge.EVENT_BUS
-			//		.post(new net.minecraftforge.event.terraingen.DecorateBiomeEvent.Pre(this.world, this.random, blockpos));
-			//biome.decorate(this.world, this.random, new BlockPos(i, 0, j));
-			//net.minecraftforge.common.MinecraftForge.EVENT_BUS
-			//		.post(new net.minecraftforge.event.terraingen.DecorateBiomeEvent.Post(this.world, this.random, blockpos));
-			//if (net.minecraftforge.event.terraingen.TerrainGen.populate(this, this.world, this.random, x, z, false,
-			//		net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.ANIMALS))
-			//	WorldEntitySpawner.performWorldGenSpawning(this.world, biome, i + 8, j + 8, 16, 16, this.random);
-			//net.minecraftforge.event.ForgeEventFactory.onChunkPopulate(false, this, this.world, this.random, x, z, false);
-			BlockFalling.fallInstantly = false;
+
 		}
 
 		@Override
@@ -400,28 +376,13 @@ public class WorldKamuiDimension extends ElementsNarutomodMod.ModElement {
 		 * but featureless.
 		 */
 		public void setBlocksInChunk(int x, int z, ChunkPrimer primer) {
-			// modified 5-22-2020
-			/*
-			 * int i = 2; int j = 3; int k = 33; int l = 3; this.buffer =
-			 * this.getHeights(this.buffer, x * 2, 0, z * 2, 3, 33, 3); for (int i1 = 0; i1
-			 * < 2; ++i1) { for (int j1 = 0; j1 < 2; ++j1) { for (int k1 = 0; k1 < 32; ++k1)
-			 * { double d0 = 0.25D; double d1 = this.buffer[((i1 + 0) * 3 + j1 + 0) * 33 +
-			 * k1 + 0]; double d2 = this.buffer[((i1 + 0) * 3 + j1 + 1) * 33 + k1 + 0];
-			 * double d3 = this.buffer[((i1 + 1) * 3 + j1 + 0) * 33 + k1 + 0]; double d4 =
-			 * this.buffer[((i1 + 1) * 3 + j1 + 1) * 33 + k1 + 0]; double d5 =
-			 * (this.buffer[((i1 + 0) * 3 + j1 + 0) * 33 + k1 + 1] - d1) * 0.25D; double d6
-			 * = (this.buffer[((i1 + 0) * 3 + j1 + 1) * 33 + k1 + 1] - d2) * 0.25D; double
-			 * d7 = (this.buffer[((i1 + 1) * 3 + j1 + 0) * 33 + k1 + 1] - d3) * 0.25D;
-			 * double d8 = (this.buffer[((i1 + 1) * 3 + j1 + 1) * 33 + k1 + 1] - d4) *
-			 * 0.25D; for (int l1 = 0; l1 < 4; ++l1) { double d9 = 0.125D; double d10 = d1;
-			 * double d11 = d2; double d12 = (d3 - d1) * 0.125D; double d13 = (d4 - d2) *
-			 * 0.125D; for (int i2 = 0; i2 < 8; ++i2) { double d14 = 0.125D; double d15 =
-			 * d10; double d16 = (d11 - d10) * 0.125D; for (int j2 = 0; j2 < 8; ++j2) {
-			 * IBlockState iblockstate = AIR; if (d15 > 0.0D) { iblockstate = STONE; } int
-			 * k2 = i2 + i1 * 8; int l2 = l1 + k1 * 4; int i3 = j2 + j1 * 8;
-			 * primer.setBlockState(k2, l2, i3, iblockstate); d15 += d16; } d10 += d12; d11
-			 * += d13; } d1 += d5; d2 += d6; d3 += d7; d4 += d8; } } } }
-			 */
+			for (int localX = 0; localX < 16; localX++) {
+				for (int localZ = 0; localZ < 16; localZ++) {
+					for (int y = SEALEVEL - 4; y <= SEALEVEL; y++) {
+						primer.setBlockState(localX, y, localZ, STONE);
+					}
+				}
+			}
 		}
 
 		private void replaceBiomeBlocks(int x, int z, ChunkPrimer primer, Biome[] biomesIn) {

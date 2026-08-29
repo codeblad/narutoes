@@ -170,14 +170,28 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 					if (entity.getHealth() > 0.0f && (!(entity instanceof EntityPlayer) || !((EntityPlayer) entity).isCreative())) {
 						if (this.damage >= 0.0f) {
 							if (entity.ticksExisted % 80 == 0) {
-								//entity.getMaxHealth() * this.damage()
-								//this.damage * 4
-								float amount = entity.getMaxHealth()*this.damage;
-								entity.setHealth(entity.getHealth() - amount);
-								//entity.attackEntityFrom(ProcedureUtils.SPECIAL_DAMAGE, entity.getMaxHealth() * this.damage);
+								float amount = entity.getMaxHealth() * this.damage;
+								if (this.gate == 8) {
+									entity.setHealth(entity.getHealth() - amount);
+								} else if (entity.getHealth() - amount <= 1.0f) {
+									entity.setHealth(1.0f);
+									ItemStack stack = entity.getHeldItemMainhand();
+									if (stack.getItem() != block) {
+										stack = entity.getHeldItemOffhand();
+									}
+									if (stack.getItem() == block) {
+										((RangedItem) block).closeGates(stack, entity);
+									}
+								} else {
+									entity.setHealth(entity.getHealth() - amount);
+								}
 							}
 						} else {
-							entity.setHealth(entity.getHealth() - this.damage);
+							if (this.gate == 8) {
+								entity.setHealth(entity.getHealth() - this.damage);
+							} else {
+								entity.setHealth(Math.max(1.0f, entity.getHealth() - this.damage));
+							}
 						}
 					}
 				}
@@ -511,8 +525,18 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 
 			@SubscribeEvent
 			public void onDeath(LivingDeathEvent event) {
-				ItemEightGates.closeGates(event.getEntityLiving());
-				//ProcedureUtils.clearDeathAnimations(entity);
+				EntityLivingBase entity = event.getEntityLiving();
+				ItemStack stack = entity.getHeldItemMainhand();
+				if (stack.getItem() != block) {
+					stack = entity.getHeldItemOffhand();
+				}
+
+				if (stack.getItem() == block && stack.hasTagCompound()) {
+					if (stack.getTagCompound().getFloat(GATE_KEY) >= 8f) {
+						((ItemJutsu.Base)stack.getItem()).setCurrentJutsuXp(stack, 0);
+					}
+				}
+				ItemEightGates.closeGates(entity);
 			}
 		}
 
@@ -1727,7 +1751,7 @@ public class ItemEightGates extends ElementsNarutomodMod.ModElement {
 							.damageEntities(ds, 2000+ItemJutsu.getNinjaMult(this.shootingEntity)*250);
 				}
 				this.world.newExplosion(this, this.posX, this.posY, this.posZ, 10.0F, false,
-				 ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
+				 (world.getGameRules().getBoolean("weakDestruction")) || ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 				if (EntityScalableProjectile.forwardsRaycastBlocks(this) != null) {
 					this.setDead();
 				}

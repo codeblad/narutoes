@@ -161,7 +161,7 @@ public class EntityRasengan extends ElementsNarutomodMod.ModElement {
 		private void breakBlocks(List<AxisAlignedBB> list) {
 			if (!list.isEmpty()) {
 				for (AxisAlignedBB aabb : list) {
-					ProcedureUtils.breakBlockAndDropWithChance(this.world, new BlockPos(ProcedureUtils.BB.getCenter(aabb)), 5.0F, 1.0F, 0.3F);
+					ProcedureUtils.breakBlockAndDropWithChance(this.world, new BlockPos(ProcedureUtils.BB.getCenter(aabb)), 5.0F, 1.0F, 0.3F, true, true);
 				}
 			}
 			//if (!list.isEmpty() && this.shootingEntity != null && this.shootingEntity.isSwingInProgress)

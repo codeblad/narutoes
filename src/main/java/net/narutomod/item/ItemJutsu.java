@@ -343,6 +343,18 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
+		public void setJutsuXp(ItemStack stack, JutsuEnum jutsuIn, int xp) {
+			if (this.jutsuList.contains(jutsuIn)) {
+				int[] xpmap = this.getJutsuXpMap(stack);
+				xpmap[jutsuIn.index] = Math.max(0, xp);
+				stack.getTagCompound().setIntArray(XPMAP_KEY, xpmap);
+			}
+		}
+
+		public void setCurrentJutsuXp(ItemStack stack, int xp) {
+			this.setJutsuXp(stack, this.getCurrentJutsu(stack), xp);
+		}
+
 		public void addCurrentJutsuXp(ItemStack stack, int xp) {
 			this.addJutsuXp(stack, this.getCurrentJutsuIndex(stack),
 			 Math.min(this.getCurrentJutsuRequiredXp(stack) * 3 - this.getCurrentJutsuXp(stack), xp));

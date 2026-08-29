@@ -13,6 +13,9 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.culling.ICamera;
@@ -43,7 +46,11 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 
 	public static class EC extends Entity implements ItemJutsu.IJutsu {
 		private static final int WAIT_PER_FULL_CHARGE = 200;
-		private static final int HEAL_DURATION = 10;
+		private static final int HEAL_DURATION = 60;
+
+		private static final DataParameter<Integer> USER_ID =
+			EntityDataManager.createKey(EC.class, DataSerializers.VARINT);
+
 		private final double chakraBurn = ItemIryoJutsu.MEDMODE.chakraUsage;
 		private EntityLivingBase user;
 		private float markedHealth;
@@ -63,6 +70,7 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 		public EC(EntityLivingBase userIn, float power) {
 			this(userIn.world);
 			this.user = userIn;
+			this.dataManager.set(USER_ID, userIn.getEntityId());
 			this.markedHealth = userIn.getHealth();
 			this.startingHealth = userIn.getHealth();
 			this.wait = Math.max(1, Math.round(WAIT_PER_FULL_CHARGE * (power / 10.0f)));
@@ -77,13 +85,26 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 
 		@Override
 		protected void entityInit() {
+			this.dataManager.register(USER_ID, -1);
 		}
 
 		@Nullable
 		protected EntityLivingBase getUser() {
-			if (this.user != null) {
+			if (this.user != null && !this.user.isDead) {
 				return this.user;
 			}
+
+			int id = this.dataManager.get(USER_ID);
+
+			if (id >= 0) {
+				Entity entity = this.world.getEntityByID(id);
+
+				if (entity instanceof EntityLivingBase) {
+					this.user = (EntityLivingBase)entity;
+					return this.user;
+				}
+			}
+
 			return null;
 		}
 
@@ -100,23 +121,19 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 				return;
 			}
 
+			if (this.world.isRemote) {
+				return;
+			}
+
 			this.setPosition(user.posX, user.posY, user.posZ);
 
-			if (!this.world.isRemote && !this.activated) {
+			if (!this.activated) {
 				int healStart = Math.max(0, this.wait - HEAL_DURATION);
 
 				if (!this.healing && this.ticksExisted >= healStart) {
 					this.healing = true;
 					this.startingHealth = user.getHealth();
 					this.totalHealing = Math.max(0.0f, this.markedHealth - this.startingHealth);
-
-					Chakra.Pathway cp = Chakra.pathway(user);
-					if (!cp.consume(this.power * this.chakraBurn)) {
-						this.activated = true;
-						this.setDead();
-						return;
-					}
-
 					this.chakraConsumed = true;
 				}
 
@@ -170,6 +187,10 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 			this.activated = compound.getBoolean("Activated");
 			this.healing = compound.getBoolean("Healing");
 			this.chakraConsumed = compound.getBoolean("ChakraConsumed");
+
+			if (compound.hasKey("UserId")) {
+				this.dataManager.set(USER_ID, compound.getInteger("UserId"));
+			}
 		}
 
 		@Override
@@ -182,6 +203,7 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 			compound.setBoolean("Activated", this.activated);
 			compound.setBoolean("Healing", this.healing);
 			compound.setBoolean("ChakraConsumed", this.chakraConsumed);
+			compound.setInteger("UserId", this.dataManager.get(USER_ID));
 		}
 
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
@@ -192,10 +214,12 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 				Entity entity1 = entity.world.getEntityByID(entity.getEntityData().getInteger(ID_KEY));
 
 				if (entity1 instanceof EC && entity1.isEntityAlive()) {
-					entity1.setDead();
+					if (!entity.world.isRemote) {
+						entity1.setDead();
 
-					if (entity instanceof EntityPlayer && !entity.world.isRemote) {
-						((EntityPlayer)entity).sendStatusMessage(new TextComponentString("Off"), true);
+						if (entity instanceof EntityPlayer) {
+							((EntityPlayer)entity).sendStatusMessage(new TextComponentString("Off"), true);
+						}
 					}
 
 					return false;
@@ -205,11 +229,16 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 					return false;
 				}
 
+				if (entity.world.isRemote) {
+					return true;
+				}
+
 				entity1 = new EC(entity, power);
 				entity.world.spawnEntity(entity1);
 				entity.getEntityData().setInteger(ID_KEY, entity1.getEntityId());
 				ItemJutsu.setCurrentJutsuCooldown(stack, (long)(20f * (12f + power)));
-				if (entity instanceof EntityPlayer && !entity.world.isRemote) {
+
+				if (entity instanceof EntityPlayer) {
 					((EntityPlayer)entity).sendStatusMessage(new TextComponentString("On"), true);
 				}
 
@@ -230,7 +259,7 @@ public class EntityCellularActivation extends ElementsNarutomodMod.ModElement {
 			public float getMaxPower() {
 				return 10.0f;
 			}
-						
+
 			@Override
 			public float getMinPower() {
 				return 2.0f;

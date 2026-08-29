@@ -36,31 +36,74 @@ public class EventSphericalExplosion extends SpecialEvent {
 	};
 
 	public EventSphericalExplosion() {
-		super();
-	}
+	super();
+}
 
-	public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z, int radiusIn, long startTime) {
-		this(worldIn, excludeEntity, x, y, z, radiusIn, startTime, 0f);
-	}
+public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z,
+		int radiusIn, long startTime) {
+	this(worldIn, excludeEntity, x, y, z, radiusIn, startTime, 0f, true, true, false);
+}
 
-	public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z, int radiusIn, long startTime, float fireChanceIn) {
-		this(worldIn, excludeEntity, x, y, z, radiusIn, startTime, fireChanceIn, true, true);
-	}
+public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z,
+		int radiusIn, long startTime, float fireChanceIn) {
+	this(worldIn, excludeEntity, x, y, z, radiusIn, startTime,
+		fireChanceIn, true, true, false);
+}
 
-	public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z, int radiusIn, long startTime, float fireChanceIn, boolean particlesIn, boolean soundIn) {
-		this(worldIn, excludeEntity, x, y, z, radiusIn, startTime, true, fireChanceIn, particlesIn, soundIn);
-	}
+public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z,
+		int radiusIn, long startTime, float fireChanceIn, boolean particlesIn, boolean soundIn) {
+	this(worldIn, excludeEntity, x, y, z, radiusIn, startTime,
+		true, fireChanceIn, particlesIn, soundIn, false);
+}
 
-	public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z, int radiusIn, long startTime, boolean useResistance, float fireChanceIn, boolean particlesIn, boolean soundIn) {
-		super(EnumEventType.SPHERICAL_EXPLOSION, worldIn, excludeEntity, x, y, z, startTime, particlesIn, soundIn);
-		if (!worldIn.isRemote) {
-			this.mobGriefing = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(worldIn, excludeEntity);
-			this.radius = radiusIn;
-			this.ty = this.radius;
-			this.useBlockExplosionResistance = useResistance;
-			this.fireChance = fireChanceIn;
-		}
+
+public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z,
+		int radiusIn, long startTime, boolean weakDestructionIn) {
+	this(worldIn, excludeEntity, x, y, z, radiusIn, startTime,
+		0f, true, true, weakDestructionIn);
+}
+
+
+public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z,
+		int radiusIn, long startTime, float fireChanceIn, boolean weakDestructionIn) {
+	this(worldIn, excludeEntity, x, y, z, radiusIn, startTime,
+		fireChanceIn, true, true, weakDestructionIn);
+}
+
+
+public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z,
+		int radiusIn, long startTime, float fireChanceIn, boolean particlesIn,
+		boolean soundIn, boolean weakDestructionIn) {
+	this(worldIn, excludeEntity, x, y, z, radiusIn, startTime,
+		true, fireChanceIn, particlesIn, soundIn, weakDestructionIn);
+}
+
+/* ORIGINAL overload -- KEEP THIS */
+public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z,
+		int radiusIn, long startTime, boolean useResistance, float fireChanceIn,
+		boolean particlesIn, boolean soundIn) {
+	this(worldIn, excludeEntity, x, y, z, radiusIn, startTime,
+		useResistance, fireChanceIn, particlesIn, soundIn, true);
+}
+
+/* FULL overload */
+public EventSphericalExplosion(World worldIn, Entity excludeEntity, int x, int y, int z,
+		int radiusIn, long startTime, boolean useResistance, float fireChanceIn,
+		boolean particlesIn, boolean soundIn, boolean weakDestruction) {
+
+	super(EnumEventType.SPHERICAL_EXPLOSION, worldIn, excludeEntity, x, y, z,
+		startTime, particlesIn, soundIn);
+
+	if (!worldIn.isRemote) {
+		this.mobGriefing = (weakDestruction && worldIn.getGameRules().getBoolean("weakDestruction"))
+			|| net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(worldIn, excludeEntity);
+
+		this.radius = radiusIn;
+		this.ty = this.radius;
+		this.useBlockExplosionResistance = useResistance;
+		this.fireChance = fireChanceIn;
 	}
+}
 
 	public int getRadius() {
 		return this.radius;

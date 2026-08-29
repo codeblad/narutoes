@@ -191,7 +191,7 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 				}
 				ProcedureAoeCommand.set(this, 0d, this.fullScale * 0.25f).exclude(this.shootingEntity)
 				 .damageEntities(ItemJutsu.causeJutsuDamage(this, this.shootingEntity).setFireDamage(), this.damage).setFire(15);
-				boolean flag = ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
+				boolean flag =  ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity);
 				this.world.newExplosion(this.shootingEntity, this.posX, this.posY, this.posZ, this.explosionSize, flag, false);
 				this.setDead();
 			}

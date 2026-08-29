@@ -790,15 +790,19 @@ public class ProcedureUtils extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static EntityItem breakBlockAndDropWithChance(World world, BlockPos pos, float hardnessLimit, float breakChance, float dropChance) {
-		return breakBlockAndDropWithChance(world, pos, hardnessLimit, breakChance, dropChance, true);
+		return breakBlockAndDropWithChance(world, pos, hardnessLimit, breakChance, dropChance, true, false);
+	}
+
+	public static EntityItem breakBlockAndDropWithChance(World world, BlockPos pos, float hardnessLimit, float breakChance, float dropChance, boolean sound) {
+       return breakBlockAndDropWithChance(world, pos, hardnessLimit, breakChance, dropChance, sound, false);
 	}
 
 	@Nullable
-	public static EntityItem breakBlockAndDropWithChance(World world, BlockPos pos, float hardnessLimit, float breakChance, float dropChance, boolean sound) {
+	public static EntityItem breakBlockAndDropWithChance(World world, BlockPos pos, float hardnessLimit, float breakChance, float dropChance, boolean sound, boolean weakDestruction) {
 		EntityItem entityToSpawn = null;
 		IBlockState blockstate = world.getBlockState(pos);
 		float blockHardness = blockstate.getBlockHardness(world, pos);
-		boolean griefing = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, null);
+		boolean griefing = (weakDestruction && world.getGameRules().getBoolean("weakDestruction")) || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(world, null);
 		if (!world.isAirBlock(pos) && blockHardness >= 0.0f && blockHardness <= hardnessLimit && RNG.nextFloat() <= breakChance) {
 			if (sound) {
 				SoundType type = blockstate.getBlock().getSoundType();
