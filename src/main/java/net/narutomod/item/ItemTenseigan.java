@@ -484,7 +484,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 
 				if (this.ticksExisted >= startup+5) {
 					this.target.hurtResistantTime = 10;
-					float damage = 2 + (1.25f * ItemJutsu.getDmgMult(this.user));
+					float damage = 2 + (1.15f * ItemJutsu.getDmgMult(this.user));
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor().setDamageIsAbsolute(), damage);
 					Chakra.Pathway cp = Chakra.pathway(this.target);
 					Chakra.Pathway cp2 = Chakra.pathway(this.user);
@@ -508,8 +508,8 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 				ProcedureUtils.setVelocity(this.target, look.x*4, look.y*4+1, look.z*4);
 				if (!this.world.isRemote) {
 					this.target.addPotionEffect(new PotionEffect(PotionChakraBlocked.potion, 8*20, 0, false, false));
-					this.target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20*3, 3, false, false));
-					this.target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 20 * 5, 4, false, false));
+					this.target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20*2, 3, false, false));
+					this.target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 20 * 3, 4, false, false));
 				}
 			}
 			if (this.ticksExisted > startup+20) {
@@ -640,7 +640,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 							if (!usingJutsu && values.getBoolean("jutsuKey3") && !newPressed3 && values.getInteger("drainCD") <= 0) {
 								RayTraceResult result = ProcedureUtils.objectEntityLookingAt(entity,30,5);
 								if (result.entityHit instanceof EntityLivingBase && Chakra.pathway((EntityLivingBase) entity).consume(900d*mult)) {
-									values.setInteger("drainCD", 20 * 20);
+									values.setInteger("drainCD", 20 * 25);
 									entity.world.spawnEntity(new Drain((EntityLivingBase) entity, (EntityLivingBase) result.entityHit));
 								}
 							}
