@@ -484,7 +484,7 @@ public class ItemTenseigan extends ElementsNarutomodMod.ModElement {
 
 				if (this.ticksExisted >= startup+5) {
 					this.target.hurtResistantTime = 10;
-					float damage = 2 + (1.15f * ItemJutsu.getDmgMult(this.user));
+					float damage = 2 + (1.0f * ItemJutsu.getDmgMult(this.user));
 					this.target.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.user).setDamageBypassesArmor().setDamageIsAbsolute(), damage);
 					Chakra.Pathway cp = Chakra.pathway(this.target);
 					Chakra.Pathway cp2 = Chakra.pathway(this.user);
