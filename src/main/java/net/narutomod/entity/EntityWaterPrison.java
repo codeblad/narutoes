@@ -202,7 +202,7 @@ public class EntityWaterPrison extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				ItemJutsu.setCurrentJutsuCooldown(stack, 20*10);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 10*1);
 				return this.createJutsu(entity) != null;
 			}
 
