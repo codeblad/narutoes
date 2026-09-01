@@ -72,7 +72,7 @@ public class ItemJutsu extends ElementsNarutomodMod.ModElement {
 		if (entity instanceof EntityPlayer) {
 			float boost = 1;
 			if (ItemSenjutsu.isSageModeActivated((EntityPlayer) entity)) {
-				boost = 1.3f;
+				boost = 1.25f;
 			}
 			if (EntityBijuManager.cloakLevel((EntityPlayer) entity) == 1) {
 				boost = 1.075f;
