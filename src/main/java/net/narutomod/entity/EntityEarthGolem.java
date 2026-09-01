@@ -86,7 +86,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			float newPower = (1+4*(this.power/5)) * ItemJutsu.getDmgMult(this.getSummoner());
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR).setBaseValue(20.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.ARMOR_TOUGHNESS).setBaseValue(16.0D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(100.0D + 6*newPower);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(200.0D + 9*newPower);
 			this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(15.0D + 0.5*newPower);
 			this.getEntityAttribute(SharedMonsterAttributes.FOLLOW_RANGE).setBaseValue(64.0D);
 			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D + (f - 1F) * 0.05D);
@@ -220,7 +220,7 @@ public class EntityEarthGolem extends ElementsNarutomodMod.ModElement {
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (power >= 1.0f) {
 					entity.world.spawnEntity(new EC(entity, power));
-					ItemJutsu.setCurrentJutsuCooldown(stack, 20*20);
+					ItemJutsu.setCurrentJutsuCooldown(stack, 20*25);
 					return true;
 				}
 				return false;
