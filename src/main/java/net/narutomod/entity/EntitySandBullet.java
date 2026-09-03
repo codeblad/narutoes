@@ -134,7 +134,7 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 				Vec3d vec = this.shootingEntity instanceof EntityLiving && ((EntityLiving)this.shootingEntity).getAttackTarget() != null
 				 ? ((EntityLiving)this.shootingEntity).getAttackTarget().getPositionEyes(1f).subtract(this.getPositionVector())
 				 : this.shootingEntity.getLookVec();
-				this.shoot(vec.x, vec.y, vec.z, 1.2f, 0.05f);
+				this.shoot(vec.x, vec.y, vec.z, 1.2f, 0.02f);
 			}
 			super.onUpdate();
 			if (this.ticksAlive > this.delay + 80) {
@@ -147,12 +147,12 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && (result.entityHit == null || !this.ignoreEntities.contains(result.entityHit))) {
 				this.playSound(net.minecraft.util.SoundEvent.REGISTRY
 				 .getObject(new ResourceLocation("narutomod:bullet_impact")), 1f, 0.4f + this.rand.nextFloat() * 0.6f);
-				ProcedureAoeCommand bruh = ProcedureAoeCommand.set(this,0,4);
+				ProcedureAoeCommand bruh = ProcedureAoeCommand.set(this,0,8);
 				for (Entity entity : bruh.getList()) {
 					entity.hurtResistantTime = 10;
 					entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 12+2.0f*ItemJutsu.getDmgMult(this.shootingEntity));
 				}
-				this.world.createExplosion(this.shootingEntity, result.hitVec.x, result.hitVec.y, result.hitVec.z, 1f,
+				this.world.createExplosion(this.shootingEntity, result.hitVec.x, result.hitVec.y, result.hitVec.z, 2f,
 						net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
 				/*if (result.entityHit instanceof EntityLivingBase) {
 					result.entityHit.hurtResistantTime = 10;
