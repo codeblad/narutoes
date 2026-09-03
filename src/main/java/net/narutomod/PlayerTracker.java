@@ -439,7 +439,7 @@ public class PlayerTracker extends ElementsNarutomodMod.ModElement {
 								if (targetEntity.getRidingEntity() instanceof ItemYoton.EntityBiggerMe) {
 									defMult += 0.3f;
 								} else {
-									defMult += 0.6f;
+									defMult += 0.55f;
 								}
 							}
 						}

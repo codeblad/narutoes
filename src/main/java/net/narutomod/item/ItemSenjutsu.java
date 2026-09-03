@@ -464,7 +464,7 @@ public class ItemSenjutsu extends ElementsNarutomodMod.ModElement {
 		public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 			if (power >= 100.0f) {
 				Chakra.Pathway cp = Chakra.pathway(entity);
-				stack.getTagCompound().setDouble(SAGECHAKRADEPLETIONAMOUNT, cp.getAmount());
+				stack.getTagCompound().setDouble(SAGECHAKRADEPLETIONAMOUNT, cp.getMax() * 0.1);
 				float f = stack.getItem() == block && ((RangedItem)stack.getItem()).getCurrentJutsu(stack) == SAGEMODE
 				 ? ((RangedItem)stack.getItem()).getCurrentJutsuXpModifier(stack, entity) : 1.0f;
 				cp.consume(-0.8f / f, true);
