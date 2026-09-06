@@ -206,7 +206,7 @@ public class EntityOneTail extends ElementsNarutomodMod.ModElement {
 				this.setSwingingArms(true);
 				this.mouthShootingJutsu = new EntityFutonVacuum.EC.Jutsu().createJutsu(this, (float)this.getBijudamaMinRange(), 40);
 				((EntityFutonVacuum.EC)this.mouthShootingJutsu).setDamage(40.0f);
-				((EntityFutonVacuum.EC)this.mouthShootingJutsu).setBulletSize(30.0f);
+				((EntityFutonVacuum.EC)this.mouthShootingJutsu).setBulletSize(10.0f);
 			} else {
 				super.attackEntityWithRangedAttack(target, distanceFactor);
 			}
