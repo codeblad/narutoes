@@ -13,6 +13,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.narutomod.ElementsNarutomodMod;
 import net.narutomod.entity.EntitySusanooBase;
 import net.narutomod.item.ItemEightGates;
+import net.narutomod.item.*;
 
 @ElementsNarutomodMod.ModElement.Tag
 public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
@@ -22,27 +23,29 @@ public class ProcedureOnLivingJump extends ElementsNarutomodMod.ModElement {
 
 	public static void lunge(EntityPlayer entity) {
 		double speed = ProcedureUtils.getModifiedSpeed(entity);
-		if (entity.getEntityData().getLong("jumpCool") > entity.world.getTotalWorldTime()) {
-			return;
-		}
+
 		boolean leapt = false;
 		if (entity.isPotionActive(MobEffects.JUMP_BOOST) && speed >= 0.14d
-		 && (entity.isSneaking()) && (entity.getFoodStats().getFoodLevel() > 4.0f || ItemEightGates.getGatesOpened(entity) > 0)) {
+		 && (entity.isSneaking()) && (entity.getFoodStats().getFoodLevel() > 4.0f)) {
 			double motionY = 0.42d + (double) (entity.getActivePotionEffect(MobEffects.JUMP_BOOST).getAmplifier() + 1) * 0.1d;
-			if (speed > 0.4d && motionY > 0.8d) {
-				RayTraceResult t = ProcedureUtils.objectEntityLookingAt(entity, 50d, 1.0d);
+			if (motionY > 0.8d && entity.getEntityData().getLong("jumpCool") <= entity.world.getTotalWorldTime()) {
+
+			if (ItemEightGates.getGatesOpened(entity) >= 6 || ItemRaiton.CHAKRAMODE.jutsu.isActivated(entity)) {
+				RayTraceResult t = ProcedureUtils.objectEntityLookingAt(entity, 40d, 1.0d);
 				if (t != null && (t.entityHit != null || !entity.world.isAirBlock(t.getBlockPos()))) {
 					entity.motionX = entity.motionY = entity.motionZ = 0d;
 					Vec3d vec = t.entityHit != null ? t.entityHit.getPositionVector() : t.hitVec;
 					Vec3d vec3d = entity.getPositionVector().subtract(vec).normalize();
-					entity.setPosition(vec.x + vec3d.x, vec.y + vec3d.y + 0.1d, vec.z + vec3d.z);
+					entity.setPosition(vec.x + vec3d.x, vec.y + vec3d.y + 0.3d, vec.z + vec3d.z);
 					leapt = true;
 					if (entity.world.isRemote) {
 						ProcedureSync.ResetBoundingBox.sendToServer(entity);
 					}
+					entity.getEntityData().setLong("jumpCool",entity.world.getTotalWorldTime()+5);
 				}
 			}
-			entity.getEntityData().setLong("jumpCool",entity.world.getTotalWorldTime()+1);
+			}
+	
 			if (!leapt) {
 				speed += 0.8d;
 				float yaw = entity.rotationYaw * 0.017453292F;

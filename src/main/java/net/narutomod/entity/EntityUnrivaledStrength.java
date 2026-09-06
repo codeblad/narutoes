@@ -81,9 +81,9 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 					strMult = (int) ((0.5+0.5*(power/20))*(ItemJutsu.getNinjaMult(userIn)*1.1));
 					power*=2.65f;
 				} else {
-					this.duration = (int)(power * 120f);
-					strMult = (int) ((0.5+0.5*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.7));
-					power*=1.4f;
+					this.duration = (int)(power * 130f);
+					strMult = (int) ((0.5+0.5*(power/20))*(ItemJutsu.getNinjaMult(userIn)*0.8));
+					power*=1.65f;
 				}
 			} else {
 				this.duration = (int)(power * 60f);
@@ -101,7 +101,7 @@ public class EntityUnrivaledStrength extends ElementsNarutomodMod.ModElement {
 
 			effect = userIn.getActivePotionEffect(MobEffects.SPEED);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.SPEED, this.duration, 
-			 (int)(power * 0.5f), false, false));
+			 (int)(power * 0.4f), false, false));
 			effect = userIn.getActivePotionEffect(MobEffects.JUMP_BOOST);
 			userIn.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, this.duration, 
 			 (int)(power * 0.25f), false, false));

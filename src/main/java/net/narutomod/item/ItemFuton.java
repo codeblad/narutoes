@@ -125,7 +125,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 					} else if (user instanceof EntityNinjaMob.Base) {
 						f *= ((EntityNinjaMob.Base)user).getNinjaLevel() * 0.04;
 					}
-					this.damageModifier = f * 3;
+					this.damageModifier = f * 2;
 				}
 			}
 		}
@@ -140,7 +140,7 @@ public class ItemFuton extends ElementsNarutomodMod.ModElement {
 			super.addEffects();
 			EntityLivingBase user = this.getUser();
 			if (user != null && this.ticksExisted % 10 == 0) {
-				user.addPotionEffect(new PotionEffect(PotionReach.potion, 12, 3, false, false));
+				user.addPotionEffect(new PotionEffect(PotionReach.potion, 12, 2, false, false));
 			}
 		}
 

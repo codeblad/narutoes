@@ -168,7 +168,7 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 				//|| ((EntityPlayer) entity).isCreative()
 				if (world.getTotalWorldTime() > biju.getEntityData().getFloat("bijuACD") ) {
 					if (tails == 9) {
-						cd = 100;
+						cd = 200;
 						if (cp.consume(1000d)) {
 							biju.mouthShootingJutsu = EntityNineTails.EntityBeam.shoot((EntityLivingBase) entity, 0.6f, 0.8f);
 							biju.getEntityData().setFloat("bijuACD", world.getTotalWorldTime() + cd);
@@ -221,17 +221,17 @@ public class ProcedureSpecialJutsu1OnKeyPressed extends ElementsNarutomodMod.Mod
 							biju.getEntityData().setFloat("bijuACD", world.getTotalWorldTime() + cd);
 						}
 					} else if (tails == 2) {
-						cd = 40;
+						cd = 100;
 						if (cp.consume(350d)) {
 							biju.mouthShootingJutsu = new ItemKaton.EntityBigFireball(biju, 10.0f, false, false);
 							Vec3d vec = biju.getLookVec();
 							((ItemKaton.EntityBigFireball) biju.mouthShootingJutsu).shoot(vec.x, vec.y, vec.z, 1.2f, 0);
-							((ItemKaton.EntityBigFireball) biju.mouthShootingJutsu).setDamage(250.0f);
+							((ItemKaton.EntityBigFireball) biju.mouthShootingJutsu).setDamage(400.0f);
 							biju.world.spawnEntity(biju.mouthShootingJutsu);
 							biju.getEntityData().setFloat("bijuACD", world.getTotalWorldTime() + cd);
 						}
 					} else if (tails == 1) {
-						cd = 120;
+						cd = 140;
 						if (cp.consume(800d)) {
 							biju.mouthShootingJutsu = new EntityFutonVacuum.EC.Jutsu().createJutsu(biju, (float) biju.getBijudamaMinRange(), 40);
 							((EntityFutonVacuum.EC) biju.mouthShootingJutsu).setDamage(60.0f);

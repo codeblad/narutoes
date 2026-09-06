@@ -125,13 +125,23 @@ public class EntityHidingInAsh extends ElementsNarutomodMod.ModElement {
 				  net.minecraft.util.SoundEvent.REGISTRY.getObject(new ResourceLocation(("narutomod:hiding_in_ash"))),
 				  net.minecraft.util.SoundCategory.NEUTRAL, 5, 1f);
 				entity.world.spawnEntity(new EC(entity, power));
-				ItemJutsu.setCurrentJutsuCooldown(stack, 200);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 10);
 				return true;
 			}
 	
 			@Override
 			public float getPowerupDelay() {
-				return 15.0f;
+				return 20.0f;
+			}
+
+			@Override
+			public float getMaxPower() {
+				return 10.0f;
+			}
+
+			@Override
+			public float getBasePower() {
+				return 1.0f;
 			}
 		}
 	}
