@@ -215,7 +215,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 
 	public static class EntityBrackenDance extends EntitySpike.Base implements ItemJutsu.IJutsu {
 		private final int growTime = 2;
-		private final float maxScale = 4.0f;
+		private final float maxScale = 3.0f;
 		private float power = 1.0f;
 
 		public EntityBrackenDance(World worldIn) {
@@ -243,7 +243,7 @@ public class ItemShikotsumyaku extends ElementsNarutomodMod.ModElement {
 				 this.world.getEntitiesWithinAABB(EntityLivingBase.class, this.getEntityBoundingBox().grow(1d, 0d, 1d))) {
 					if (!entity.equals(this.shootingEntity) && entity != this.shootingEntity) {
 						if (ticksAlive < 8) {
-							float damage = 6.0f + (10.0f * (this.power / 20)) * ItemJutsu.getDmgMult(this.shootingEntity);
+							float damage = 6.0f + (8.0f * (this.power / 20)) * ItemJutsu.getDmgMult(this.shootingEntity);
 							entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), damage);
 							entity.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20, 2, false, false));
 						}

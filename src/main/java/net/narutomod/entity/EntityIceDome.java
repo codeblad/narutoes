@@ -189,7 +189,7 @@ public class EntityIceDome extends ElementsNarutomodMod.ModElement {
 						double d1 = (this.rand.nextDouble()-0.5d) * this.width;
 						EntityIceSpear.EC a = new EntityIceSpear.EC.Jutsu().createJutsu(this.world, summoner, this.posX + d0 * 0.8d,
 						 this.posY + this.height - 1.6d, this.posZ + d1 * 0.8d, entity.posX, entity.posY + entity.height/2,
-						 entity.posZ, 1.35f, 0.45f);
+						 entity.posZ, 1.35f, 0.7f);
 						a.baseImpactDamage = (6+(4f*ItemJutsu.getDmgMult(this.getSummoner())));
 					}
 				}

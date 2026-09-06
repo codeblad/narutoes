@@ -162,7 +162,7 @@ public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 
 	public static void handleAmaterasu(EntityLivingBase user) {
 		EntityLivingBase target;
-		RayTraceResult t = ProcedureUtils.objectEntityLookingAt(user, 30d);
+		RayTraceResult t = ProcedureUtils.objectEntityLookingAt(user, 50d, 2d);
 		double strength = (double) 2+ItemJutsu.getDmgMult(user)*1.5;
 		user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 		if (t.typeOfHit == RayTraceResult.Type.ENTITY) {

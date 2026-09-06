@@ -396,9 +396,9 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 					Vec3d look = this.user.getLookVec();
 					ProcedureUtils.setVelocity(this.target, look.x*3, look.y*3+1, look.z*3);
 					if (!this.world.isRemote) {
-						this.target.addPotionEffect(new PotionEffect(PotionChakraBlocked.potion, 8*20, 0, false, false));
-						this.target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20*5, 3, false, false));
-						this.target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 20 * 5, 4, false, false));
+						this.target.addPotionEffect(new PotionEffect(PotionChakraBlocked.potion, 20 * 5, 0, false, false));
+						this.target.addPotionEffect(new PotionEffect(PotionHeaviness.potion, 20*2, 3, false, false));
+						this.target.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 20 * 5, 10, false, false));
 					}
 				}
 				this.user.setPositionAndUpdate(this.userStart.x, this.userStart.y, this.userStart.z);

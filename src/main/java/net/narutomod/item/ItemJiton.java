@@ -235,7 +235,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 	}
 
 	public static class EntitySandShield extends EntityShieldBase {
-		private final double chakraUsage = 2.5d; // per 1 ticks
+		private final double chakraUsage = 1.0d; // per 1 ticks
 		private List<SwarmTarget> sandTargets = Lists.newArrayList();
 		private int color;
 
@@ -247,7 +247,7 @@ public class ItemJiton extends ElementsNarutomodMod.ModElement {
 		public EntitySandShield(EntityLivingBase user, Type sandType) {
 			super(user);
 			this.setSize(3.0F, 3.0F);
-			double d = user instanceof EntityPlayer ? (50+2.75d * PlayerTracker.getNinjaLevel((EntityPlayer)user)) : 100d;
+			double d = user instanceof EntityPlayer ? (100+6d * PlayerTracker.getNinjaLevel((EntityPlayer)user)) : 100d;
 			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(d);
 			this.setHealth(this.getMaxHealth());
 			this.color = sandType.getColor();

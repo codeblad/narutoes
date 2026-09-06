@@ -1214,7 +1214,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			}
 			if ((user instanceof Base && ((Base)user).consumeHealthAsChakra((float)chakraUsage * 0.1f))
 			 || (user != null && net.narutomod.Chakra.pathway(user).consume(chakraUsage))) {
-				EntityTailBeastBall entity = new EntityTailBeastBall(summonerIn, maxscale, maxdamage);
+				EntityTailBeastBall entity = new EntityTailBeastBall(summonerIn, maxscale, maxdamage * 1.5f);
 				summonerIn.world.spawnEntity(entity);
 				return entity;
 			}

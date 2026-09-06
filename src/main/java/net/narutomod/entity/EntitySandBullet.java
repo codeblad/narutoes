@@ -149,8 +149,10 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 				 .getObject(new ResourceLocation("narutomod:bullet_impact")), 1f, 0.4f + this.rand.nextFloat() * 0.6f);
 				ProcedureAoeCommand bruh = ProcedureAoeCommand.set(this,0,8);
 				for (Entity entity : bruh.getList()) {
+					if (entity != this.shootingEntity) {
 					entity.hurtResistantTime = 10;
 					entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 12+2.0f*ItemJutsu.getDmgMult(this.shootingEntity));
+					}
 				}
 				this.world.createExplosion(this.shootingEntity, result.hitVec.x, result.hitVec.y, result.hitVec.z, 2f,
 						net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(this.world, this.shootingEntity));
@@ -212,7 +214,7 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 					if (entity instanceof EntityPuppet3rdKazekage.EntityCustom) {
 						((EntityPuppet3rdKazekage.EntityCustom)entity).setMouthOpen(false);
 					}
-					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 4);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 6);
 					return true;
 				}
 				return false;
