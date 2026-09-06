@@ -162,7 +162,7 @@ public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 
 	public static void handleAmaterasu(EntityLivingBase user) {
 		EntityLivingBase target;
-		RayTraceResult t = ProcedureUtils.objectEntityLookingAt(user, 50d, 2d);
+		RayTraceResult t = ProcedureUtils.objectEntityLookingAt(user, 40d, 2d);
 		double strength = (double) 2+ItemJutsu.getDmgMult(user)*1.5;
 		user.addPotionEffect(new PotionEffect(PotionUsingJutsu.potion, 5, 1, false, false));
 		if (t.typeOfHit == RayTraceResult.Type.ENTITY) {
@@ -171,7 +171,7 @@ public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 				target = (EntityLivingBase) t.entityHit;
 				int duration = 10;
 				if (target.isPotionActive(PotionAmaterasuFlame.potion)) {
-					duration = target.getActivePotionEffect(PotionAmaterasuFlame.potion).getDuration()+10;
+					duration = target.getActivePotionEffect(PotionAmaterasuFlame.potion).getDuration()+5;
 				}
 				target.addPotionEffect(new PotionEffect(PotionAmaterasuFlame.potion, duration, (int) (strength), (false), (false)));
 			}
@@ -196,7 +196,7 @@ public class ItemMangekyoSharingan extends ElementsNarutomodMod.ModElement {
 						.getBlockPos().getY()), (entity.world.rayTraceBlocks(entity.getPositionEyes(1f), entity.getPositionEyes(1f).addVector(
 								entity.getLook(1f).x * 50, entity.getLook(1f).y * 50, entity.getLook(1f).z * 50), false, false, true)
 						.getBlockPos().getZ()));
-			} else if (values.getInteger("amaTime") < 20*5) {
+			} else if (values.getInteger("amaTime") < 20*3) {
 				if ((!usingJutsu || values.getBoolean("amaterasu"))) {
 					if (values.getInteger("amaCool") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(chakraUsage * 0.25d)) {
 						values.setInteger("amaTime", values.getInteger("amaTime") + 1);
