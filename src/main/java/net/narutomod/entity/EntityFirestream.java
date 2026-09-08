@@ -15,6 +15,8 @@ import net.narutomod.ElementsNarutomodMod;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 
 import net.minecraft.world.World;
 import net.minecraft.util.ResourceLocation;
@@ -25,6 +27,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.entity.projectile.ProjectileHelper;
+import net.narutomod.procedure.ProcedureSync;
+import net.narutomod.procedure.ProcedureUtils;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -72,7 +76,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			this(shooterIn.world);
 			this.shooter = shooterIn;
 			this.setIdlePosition();
-			this.width = MathHelper.clamp(widthIn,5,35);
+			this.width = MathHelper.clamp(widthIn,4,35);
 			this.range = MathHelper.clamp(rangeIn,20,300);
 			float mult = 0.75f+1.5f*(((float) powa)/25);
 			this.damage = 4F+ItemJutsu.getDmgMult(shooterIn)*1.6f*mult;
@@ -167,13 +171,13 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 		}
 
 
-		public static class Jutsu1 implements ItemJutsu.IJutsuCallback {
+		public static class Jutsu1 implements ItemJutsu.IJutsuCallback { //great annihilation
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				if (this.createJutsu(entity, power) == null) {
 					return false;
 				}
-				ItemJutsu.setCurrentJutsuCooldown(stack, 400);
+				ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 25);
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
 				return true;
 			}
@@ -198,7 +202,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 				SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:katon_gokamekeku")),
 				SoundCategory.NEUTRAL, 5, 1f);
-				EC ec =new EC(entity, power * 0.8, power * 2.65, power);
+				EC ec =new EC(entity, power * 0.85, power * 2.65, power);
 				ec.setFlameColor(color);
 				entity.world.spawnEntity(ec);
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
@@ -226,11 +230,11 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 			}
 		}
 
-		public static class Jutsu2 implements ItemJutsu.IJutsuCallback {
+		public static class Jutsu2 implements ItemJutsu.IJutsuCallback { //firestream
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				this.createJutsu(entity, power, (int)(power * 3f));
-				ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 5);
+				this.createJutsu(entity, (int)(power * 2f), (int)(power * 2f));
+				ItemJutsu.setCurrentJutsuCooldown(stack, 20 * 7);
 
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
 				return true;
@@ -247,7 +251,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 
 
 			public EC createJutsu(EntityLivingBase entity, float power, int duration, int color) {
-				EC entity1 = new EC(entity, 1.5f, power*1.5, power);
+				EC entity1 = new EC(entity, 1.5f, power * 1.5, power);
 				entity1.setDamage(0.75f);
 				entity1.wait = 0;
 				entity1.maxLife = duration;
@@ -263,14 +267,14 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 
 			@Override
 			public float getPowerupDelay() {
-				return 10.0f;
+				return 5.0f;
 			}
 	
 
 
 			@Override
 			public float getMaxPower() {
-				return 25.0f;
+				return 20.0f;
 			}
 		}
 	}
@@ -326,6 +330,9 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				if (result.entityHit != this.shooter) {
 					result.entityHit.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shooter).setFireDamage(), this.damage);
 					result.entityHit.setFire(10);
+						if (this.shooter instanceof EntityPlayerMP) {
+						ProcedureSync.SetGlowing.send((EntityPlayerMP)this.shooter, result.entityHit, 15);
+					}
 				}
 			} else if (i == 0) {
 				BlockPos pos = result.getBlockPos().offset(result.sideHit);

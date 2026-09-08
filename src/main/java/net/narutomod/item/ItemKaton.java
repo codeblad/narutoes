@@ -216,8 +216,9 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 			if (!this.world.isRemote && (this.ticksInAir > (this.guided ? 60 : 40) || this.isInWater())) {
 				this.setDead();
 			} else {
+				float f = this.fullScale * (this.ticksAlive * 0.5f) / this.timeToFullscale;
 				if (!this.world.isRemote && this.ticksAlive <= this.timeToFullscale) {
-					this.setEntityScale(Math.max(3.5F, 1.0f + (this.fullScale - 3f) * (this.ticksAlive * 0.5f) / this.timeToFullscale));
+    				this.setEntityScale(Math.max(3.5f, f));
 				}
 				if (this.guided && this.shootingEntity != null) {
 					Vec3d vec;
@@ -229,10 +230,31 @@ public class ItemKaton extends ElementsNarutomodMod.ModElement {
 					} else {
 						vec = this.target.getPositionEyes(1f).subtract(this.getPositionVector());
 					}
+
+					Vec3d vec3d = this.shootingEntity.getLookVec();
+    				double groundOffset = 0.0d;
+
+    				if (this.shootingEntity.onGround) {
+        				float sizeProgress = MathHelper.clamp(
+           				 (f - 0.5f) / (20.0f - 0.5f),
+           				 0.0f,
+            			1.0f
+        				);
+
+        			float upwardAmount = MathHelper.clamp(
+            		(float) vec3d.y,
+           			 0.0f,
+            		1.0f
+        			);
+        			groundOffset = 4.0d * sizeProgress * (1.0d - upwardAmount);
+    				}
+
+					vec = vec.add(new Vec3d(0d, groundOffset, 0d));
+
 					this.motionX *= 0.9D;
 					this.motionY *= 0.9D;
 					this.motionZ *= 0.9D;
-					this.shoot(vec.x, vec.y, vec.z, 1.01f, 0f);
+					this.shoot(vec.x, vec.y, vec.z, 1.05f, 0f);
 				}
 				if (this.rand.nextFloat() <= 0.2f) {
 					//this.playSound(SoundEvents.BLOCK_FIRE_EXTINGUISH, 1, this.rand.nextFloat() + 0.5f);
