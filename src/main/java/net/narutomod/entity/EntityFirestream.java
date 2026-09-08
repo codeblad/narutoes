@@ -202,7 +202,7 @@ public class EntityFirestream extends ElementsNarutomodMod.ModElement {
 				entity.world.playSound(null, entity.posX, entity.posY, entity.posZ,
 				SoundEvent.REGISTRY.getObject(new ResourceLocation("narutomod:katon_gokamekeku")),
 				SoundCategory.NEUTRAL, 5, 1f);
-				EC ec =new EC(entity, power * 0.85, power * 2.65, power);
+				EC ec =new EC(entity, power * 0.825, power * 2.65, power);
 				ec.setFlameColor(color);
 				entity.world.spawnEntity(ec);
 				//ItemJutsu.setCurrentJutsuCooldown(stack, (EntityPlayer)entity, (long)(power * 200));
