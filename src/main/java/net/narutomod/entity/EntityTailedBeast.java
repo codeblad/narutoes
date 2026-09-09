@@ -1177,7 +1177,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 				new EventSphericalExplosion(this.world, this.shootingEntity, (int) this.posX, (int) this.posY,
 				 (int) this.posZ, (int)radius, 0, 0.33f);
 				ProcedureAoeCommand.set(this, 0d, radius * 1.5).exclude(excludePlayer)
-				 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.maxDamage * 1.2f);
+				 .damageEntitiesCentered(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), this.maxDamage * 1.4f);
 				this.setDead();
 			}
 		}
@@ -1214,7 +1214,7 @@ public class EntityTailedBeast extends ElementsNarutomodMod.ModElement {
 			}
 			if ((user instanceof Base && ((Base)user).consumeHealthAsChakra((float)chakraUsage * 0.1f))
 			 || (user != null && net.narutomod.Chakra.pathway(user).consume(chakraUsage))) {
-				EntityTailBeastBall entity = new EntityTailBeastBall(summonerIn, maxscale, maxdamage * 1.1f);
+				EntityTailBeastBall entity = new EntityTailBeastBall(summonerIn, maxscale, maxdamage);
 				summonerIn.world.spawnEntity(entity);
 				return entity;
 			}

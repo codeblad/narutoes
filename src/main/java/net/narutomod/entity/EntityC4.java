@@ -56,9 +56,9 @@ public class EntityC4 extends ElementsNarutomodMod.ModElement {
 		private static final DataParameter<Boolean> IGNITED = EntityDataManager.<Boolean>createKey(EC.class, DataSerializers.BOOLEAN);
 		private final float finalSize = 6.0f;
 		private final int growTicks = 60;
-		private final int fuse = 50;
-		private final float blastRadius = 45.0f;
-		private int damageTicks = 80;
+		private final int fuse = 40;
+		private final float blastRadius = 25.0f;
+		private int damageTicks = 70;
 		private int damagePerTick = 2;
 		private int ignitionTime;
 		private float nextStepDistance = this.finalSize;

@@ -81,7 +81,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 		private final int waitTime = 50;
 		private double chakraUsage;
 		private boolean jutsuKey1Pressed;
-		private boolean jutsuKey2Pressed;
+		private boolean jutsuKey4Pressed;
 		private boolean jutsuKey3Pressed;
 		float jutsu1Cool = 0;
 		float jutsu2Cool = 0;
@@ -160,7 +160,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 			private int dist = 35;
 			private int delay = 15;
 			List<String> targets = new ArrayList<String>();
-			private final int lifeTime = 20*3;
+			private final int lifeTime = 20*1;
 
 			public PaperBarrage(World worldIn) {
 				super(worldIn);
@@ -221,7 +221,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 			private int dist = 35;
 			private int delay = 15;
 			List<String> targets = new ArrayList<String>();
-			private final int lifeTime = 10*3;
+			private final int lifeTime = 20*1;
 
 			public ExplosivePlanes(World worldIn) {
 				super(worldIn);
@@ -324,9 +324,9 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 							}
 							this.jutsuKey1Pressed = newPressed;
 
-							boolean newPressed2 = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey2Pressed);
+							boolean newPressed4 = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey4Pressed);
 							Chakra.Pathway chakra = Chakra.pathway(user);
-							if (this.jutsuKey2Pressed && !newPressed2 && this.jutsu2Cool <= 0 && (chakra.getAmount() >= 500)) {
+							if (this.jutsuKey4Pressed && !newPressed4 && this.jutsu2Cool <= 0 && (chakra.getAmount() >= 500)) {
 								RayTraceResult targetRT = user instanceof EntityLiving && ((EntityLiving)user).getAttackTarget() != null
 										? new RayTraceResult(((EntityLiving)user).getAttackTarget())
 										: ProcedureUtils.objectEntityLookingAt(user, 30d, 3d, true, true, EntityShikigami.EC.class);
