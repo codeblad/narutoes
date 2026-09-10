@@ -151,7 +151,7 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 				for (Entity entity : bruh.getList()) {
 					if (entity != this.shootingEntity) {
 					entity.hurtResistantTime = 10;
-					entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 12+2.0f*ItemJutsu.getDmgMult(this.shootingEntity));
+					entity.attackEntityFrom(ItemJutsu.causeJutsuDamage(this, this.shootingEntity), 12+1.5f*ItemJutsu.getDmgMult(this.shootingEntity));
 					}
 				}
 				this.world.createExplosion(this.shootingEntity, result.hitVec.x, result.hitVec.y, result.hitVec.z, 2f,
@@ -214,7 +214,7 @@ public class EntitySandBullet extends ElementsNarutomodMod.ModElement {
 					if (entity instanceof EntityPuppet3rdKazekage.EntityCustom) {
 						((EntityPuppet3rdKazekage.EntityCustom)entity).setMouthOpen(false);
 					}
-					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 6);
+					ItemJutsu.setCurrentJutsuCooldown(stack,20 * 10);
 					return true;
 				}
 				return false;
