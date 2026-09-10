@@ -343,7 +343,7 @@ public class EntityShikigami extends ElementsNarutomodMod.ModElement {
 									}
 								}
 							}
-							this.jutsuKey2Pressed = newPressed2;
+							this.jutsuKey4Pressed = newPressed4;
 
 
 							boolean newPressed3 = user.getEntityData().getBoolean(NarutomodModVariables.JutsuKey3Pressed);

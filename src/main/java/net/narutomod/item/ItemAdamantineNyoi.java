@@ -273,7 +273,7 @@ public class ItemAdamantineNyoi extends ElementsNarutomodMod.ModElement {
 						this.segment[i].checked = false;
 					}
 					for (int i = 1; i < this.segment.length; i++) {
-						Vec3d vec = frontLook.scale(scale * this.lengthMultiplier * 3.75f * i / this.segment.length).add(frontVec);
+						Vec3d vec = frontLook.scale(scale * this.lengthMultiplier * 0.5f * i / this.segment.length).add(frontVec);
 						this.segment[i].setEntityScale(scale);
 						if (this.segment[i].isAddedToWorld() && this.ticksAlive < this.lifeSpan - 30 && !this.segment[i].checked) {
 							this.segment[i].checked = true;
@@ -288,7 +288,7 @@ public class ItemAdamantineNyoi extends ElementsNarutomodMod.ModElement {
 							Vec3d vec2 = this.segment[i].collisionhelper.getUpdatedMotion();
 							float f = MathHelper.sqrt((float)vec2.lengthVector() * scale);
 							for (Map.Entry<Entity, EnumFacing> entry : this.segment[i].collisionhelper.getEntitiesHitMap().entrySet()) {
-								entry.getKey().attackEntityFrom(DamageSource.causeIndirectDamage(this, shooter), 10+ItemJutsu.getDmgMult(this.shootingEntity)*3.5f);
+								entry.getKey().attackEntityFrom(DamageSource.causeIndirectDamage(this, shooter), 10 + (4.0f * (ItemJutsu.getDmgMult(this.shootingEntity))));
 								ProcedureUtils.CollisionHelper.reposHitEntity(this.segment[i].getEntityBoundingBox().offset(vec2), entry.getKey(), entry.getValue());
 								/*entry.getKey().addVelocity(vec2.x, vec2.y, vec2.z);
 								entry.getKey().velocityChanged = true;*/
@@ -373,13 +373,13 @@ public class ItemAdamantineNyoi extends ElementsNarutomodMod.ModElement {
 		public static class Jutsu implements ItemJutsu.IJutsuCallback {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
-				((RangedItem)stack.getItem()).setCurrentJutsuCooldown(stack, 300);
+				((RangedItem)stack.getItem()).setCurrentJutsuCooldown(stack, 20 * 8);
 				return true;
 			}
 	
 			@Override
 			public float getPowerupDelay() {
-				return 30.0f;
+				return 15.0f;
 			}
 	
 			@Override

@@ -24,6 +24,7 @@ public class NarutomodModVariables {
 	public static String JinchurikiTailsTag = "JinchurikiTails";
 	public static String MostRecentWornDojutsuTime = "mostRecentlyHadAnyDojutsu";
 	public static String JutsuKey2Pressed = "JutsuKey2Pressed";
+	public static String JutsuKey4Pressed = "JutsuKey4Pressed";
 	public static String forceBowPose = "ForceBipedBowPose";
 	public static String tenseiganEvolvedTime = "TenseiganEvolvedTime";
 	public static String tempDisableAI = "temporaryDisableAI";

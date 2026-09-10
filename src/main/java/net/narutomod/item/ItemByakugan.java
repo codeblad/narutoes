@@ -536,7 +536,7 @@ public class ItemByakugan extends ElementsNarutomodMod.ModElement {
 										}
 									} else {
 										if (values.getInteger("airCool") <= 0 && Chakra.pathway((EntityLivingBase) entity).consume(200d)) {
-											values.setInteger("airCool",20*3);
+											values.setInteger("airCool",20*5);
 											entity.world.spawnEntity(new ItemByakugan.AirPalm((EntityLivingBase) entity));
 										}
 									}
