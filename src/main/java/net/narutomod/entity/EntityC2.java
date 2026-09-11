@@ -62,13 +62,13 @@ public class EntityC2 extends ElementsNarutomodMod.ModElement {
 			super(ownerIn);
 			this.setSize(WIDTH, HEIGHT);
 			this.setExplosionSize(12.0f);
+			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(150.0D + (ownerIn.getMaxHealth() * 2.0f));
 		}
 
 		@Override
 		protected void applyEntityAttributes() {
 			super.applyEntityAttributes();
 			this.getEntityAttribute(SharedMonsterAttributes.FLYING_SPEED).setBaseValue(0.6D);
-			this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(100.0D);
 		}
 
 		@Override

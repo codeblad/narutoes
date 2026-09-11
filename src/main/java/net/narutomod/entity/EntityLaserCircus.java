@@ -144,7 +144,7 @@ public class EntityLaserCircus extends ElementsNarutomodMod.ModElement {
 			@Override
 			public boolean createJutsu(ItemStack stack, EntityLivingBase entity, float power) {
 				entity.world.spawnEntity(new EC(entity, power, stack));
-				ItemJutsu.setCurrentJutsuCooldown(stack,20*8);
+				ItemJutsu.setCurrentJutsuCooldown(stack,20*12);
 				return true;
 			}
 

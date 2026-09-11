@@ -57,7 +57,7 @@ public class EntityC4 extends ElementsNarutomodMod.ModElement {
 		private final float finalSize = 6.0f;
 		private final int growTicks = 60;
 		private final int fuse = 40;
-		private final float blastRadius = 25.0f;
+		private final float blastRadius = 35.0f;
 		private int damageTicks = 70;
 		private int damagePerTick = 2;
 		private int ignitionTime;
